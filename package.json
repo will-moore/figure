@@ -1,0 +1,28 @@
+{
+  "name": "figure",
+  "version": "1.0.0-beta1",
+  "description": "OMERO figure creation app",
+  "main": "index.js",
+  "scripts": {
+    "test": "grunt test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/will-moore/figure.git"
+  },
+  "keywords": [
+    "backbone",
+    "jQuery",
+    "figure"
+  ],
+  "author": "William Moore",
+  "license": "GPL",
+  "bugs": {
+    "url": "https://github.com/will-moore/figure/issues"
+  },
+  "homepage": "https://github.com/will-moore/figure",
+  "devDependencies": {
+    "grunt": "^0.4.4",
+    "grunt-contrib-jshint": "^0.10.0"
+  }
+}
