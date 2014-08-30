@@ -23,8 +23,9 @@
   "homepage": "https://github.com/will-moore/figure",
   "devDependencies": {
     "grunt": "~0.4.4",
-    "grunt-contrib-jshint": "~0.10.0",
+    "grunt-contrib-concat": "^0.5.0",
     "grunt-contrib-jasmine": "~0.6.4",
+    "grunt-contrib-jshint": "~0.10.0",
     "grunt-contrib-jst": "^0.6.0",
     "grunt-contrib-watch": "^0.6.1"
   }
