@@ -1,6 +1,6 @@
 {
   "name": "figure",
-  "version": "1.0.0-beta1",
+  "version": "1.1.1",
   "description": "OMERO figure creation app",
   "main": "index.js",
   "scripts": {
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/will-moore/figure.git"
+    "url": "git://github.com/ome/figure.git"
   },
   "keywords": [
     "backbone",
@@ -18,9 +18,9 @@
   "author": "William Moore",
   "license": "GPL",
   "bugs": {
-    "url": "https://github.com/will-moore/figure/issues"
+    "url": "https://github.com/ome/figure/issues"
   },
-  "homepage": "https://github.com/will-moore/figure",
+  "homepage": "http://figure.openmicroscopy.org/",
   "devDependencies": {
     "grunt": "~0.4.4",
     "grunt-contrib-concat": "^0.5.0",
