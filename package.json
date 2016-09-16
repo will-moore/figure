@@ -1,6 +1,6 @@
 {
   "name": "omero-figure",
-  "version": "1.2.1-dev",
+  "version": "2.0.0-dev",
   "description": "OMERO figure creation app",
   "main": "index.js",
   "scripts": {
@@ -16,7 +16,7 @@
     "figure"
   ],
   "author": "William Moore",
-  "license": "GPL",
+  "license": "AGPL",
   "bugs": {
     "url": "https://github.com/ome/figure/issues"
   },
