@@ -1,5 +1,5 @@
 {
-  "name": "figure",
+  "name": "omero-figure",
   "version": "1.2.1-dev",
   "description": "OMERO figure creation app",
   "main": "index.js",
