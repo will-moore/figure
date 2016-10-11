@@ -1,6 +1,6 @@
 {
   "name": "omero-figure",
-  "version": "2.0.0-dev",
+  "version": "2.0.0",
   "description": "OMERO figure creation app",
   "main": "index.js",
   "scripts": {
@@ -8,19 +8,19 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/ome/figure.git"
+    "url": "git://github.com/ome/omero-figure.git"
   },
   "keywords": [
     "backbone",
     "jQuery",
     "figure"
   ],
-  "author": "William Moore",
-  "license": "AGPL",
+  "author": "The Open Microscopy Team",
+  "license": "AGPLv3",
   "bugs": {
-    "url": "https://github.com/ome/figure/issues"
+    "url": "https://github.com/ome/omero-figure/issues"
   },
-  "homepage": "http://figure.openmicroscopy.org/",
+  "homepage": "https://github.com/ome/omero-figure",
   "devDependencies": {
     "grunt": "~0.4.4",
     "grunt-contrib-concat": "^0.5.0",
