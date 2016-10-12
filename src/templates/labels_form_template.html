@@ -1,0 +1,13 @@
+
+        <div class="">
+
+            <% _.each(labels, function(l, i) { %>
+
+                <form class="edit-label-form form-inline" role="form" data-key="<%= l.key %>">
+
+                    <%= inner_template({l:l, position:position, edit:true}) %>
+
+                </form>
+
+            <% }); %>
+        </div>

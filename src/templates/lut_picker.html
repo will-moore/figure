@@ -1,0 +1,17 @@
+
+
+<div class="btn-group-vertical col-xs-6" role="group">
+
+	<% _.each(luts, function(lut, i) { %>
+
+		<button type="button" class="btn btn-default lutOption" data-lut="<%= lut.name %>">
+			<span class="lutBg" style="background-position: <%= lut.bgPos %>">&nbsp</span>
+			<%= lut.displayName %> </button>
+
+		<% if (i === parseInt(luts.length/2)) { %>
+			</div>
+			<div class="btn-group-vertical col-xs-6" role="group">
+		<% } %>
+
+	<% }) %>
+</div>

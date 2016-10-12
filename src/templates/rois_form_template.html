@@ -1,0 +1,93 @@
+
+
+<h5>ROIs
+    <% if (panelCount > 0) { %>
+        <span style="font-weight:normal; padding-left:64px"><%= roiCount %> ROIs selected</span>
+    <% } %>
+</h5>
+
+<% if (panelCount > 0) { %>
+
+<form class="form-inline" role="form">
+
+    <div class="btn-group">
+        <button type="button" class="shape-color btn btn-default btn-sm dropdown-toggle" title="ROI Color"
+            <% if (roiCount === 0) print('disabled') %>
+            data-toggle="dropdown">
+            <span data-color="<%= color %>" style="background-color:#<%= color %>">&nbsp &nbsp &nbsp</span>
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu dropdownSelect colorpicker" role="menu">
+            <li><a href="#">
+                <span data-color="000000" style="background-color:#000">&nbsp &nbsp &nbsp</span>&nbsp Black
+            </a></li>
+            <li><a href="#">
+                <span data-color="0000FF" style="background-color:#00f">&nbsp &nbsp &nbsp</span>&nbsp Blue
+            </a></li>
+            <li><a href="#">
+                <span data-color="00FF00" style="background-color:#0f0">&nbsp &nbsp &nbsp</span>&nbsp Green
+            </a></li>
+            <li><a href="#">
+                <span data-color="FF0000" style="background-color:#f00">&nbsp &nbsp &nbsp</span>&nbsp Red
+            </a></li>
+            <li><a href="#">
+                <span data-color="FFFF00" style="background-color:#ff0">&nbsp &nbsp &nbsp</span>&nbsp Yellow
+            </a></li>
+            <li><a href="#">
+                <span data-color="FFFFFF" style="background-color:#fff">&nbsp &nbsp &nbsp</span>&nbsp White
+            </a></li>
+            <li><a href="#">
+                <span data-color="FF00FF" style="background-color:#f0f">&nbsp &nbsp &nbsp</span>&nbsp Magenta
+            </a></li>
+            <li class="divider"></li>
+            <li><a data-color="colorpicker" data-oldcolor="<%= color %>" href="#">
+                <span class="colorpickerOption">&nbsp &nbsp &nbsp</span>&nbsp More Colors...
+            </a></li>
+        </ul>
+    </div>
+
+    <div class="btn-group">
+        <button type="button" class="line-width btn btn-default btn-sm dropdown-toggle" title="Line Width: <%= lineWidth %>"
+            <% if (roiCount === 0) print('disabled') %>
+            data-toggle="dropdown">
+            <span data-line-width="<%= lineWidth %>" class='linewidthOption' style='height:<%= lineWidth %>px; width:20px'></span>
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu dropdownSelect lineWidth" role="menu">
+
+            <% _.each([1,2,3,4,5,7,10,15,20,30],function(p){
+                print ("<li><a href='#'>"+p+"<span title='Line Width: "+p+"' data-line-width='"+p+"' class='linewidthOption' style='height:"+p+"px; width:20px'></span></a></li>")
+            }); %>
+
+        </ul>
+    </div>
+
+    <div class="btn-group">
+        <button type="button" class="btn btn-sm btn-default copyROIs" title="Copy All ROIs"
+                <% if (roiCount === 0) print('disabled') %> >
+            Copy
+        </button>
+        <button type="button" class="btn btn-sm btn-default pasteROIs" title="Paste ROIs"
+                <% if (!canPaste) print('disabled') %> >
+            Paste
+        </button>
+        <button type="button" class="btn btn-sm btn-default deleteROIs" title="Delete All ROIs"
+                <% if (roiCount === 0) print('disabled') %> >
+            Delete
+        </button>
+    </div>
+
+    <div class="pull-right"
+        <% if (panelCount > 1) { %>
+            title="Cannot draw ROIs on multiple panels. Select a single panel"
+        <% } else if (panelCount === 0) { %>
+            title="Select a panel to draw ROIs"
+        <% } %> >
+        <button class="edit_rois btn btn-sm btn-success"
+            <% if (panelCount !== 1) { %> disabled="disabled"<% } %> >
+            Draw
+        </button>
+    </div>
+
+</form>
+<% } %>
