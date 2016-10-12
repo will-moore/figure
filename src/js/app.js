@@ -18,7 +18,6 @@
 //
 
 $(function(){
-    console.log("OK?");
 
     var figureModel = new FigureModel();
 
