@@ -786,6 +786,44 @@
             this.$el.append(this.xywh_template(json));
         },
 
+        getImageLinks(remoteUrl, imageIds, imageNames) {
+            // Link if we have a single remote image, E.g. http://jcb-dataviewer.rupress.org/jcb/img_detail/625679/
+            var imageLinks = [];
+            if (remoteUrl) {
+                if (imageIds.length == 1) {
+                    imageLinks.push({'text': 'Image viewer', 'url': remoteUrl});
+                }
+            // OR all the images are local...
+            } else {
+                imageLinks.push({'text': 'Webclient', 'url': WEBINDEX_URL + "?show=image-" + imageIds.join('|image-')});
+
+                // Handle other 'Open With' options
+                OPEN_WITH.forEach(function(v){
+                    var selectedObjs = imageIds.map(function(id, i){
+                        return {'id': id, 'name': imageNames[i], 'type': 'image'};
+                    });
+                    var enabled = false;
+                    if (typeof v.isEnabled === "function") {
+                        enabled = v.isEnabled(selectedObjs);
+                    } else if (typeof v.supported_objects === "object" && v.supported_objects.length > 0) {
+                        enabled = v.supported_objects.reduce(function(prev, supported){
+                            // enabled if plugin supports 'images' or 'image' (if we've selected a single image)
+                            return prev || supported === 'images' || (supported === 'image' && imageIds.length === 1);
+                        }, false);
+                    }
+                    if (!enabled) return;
+
+                    // Get the link via url provider...
+                    var url = v.url + '?image=' + imageIds.join('&image=');
+                    if (v.getUrl) {
+                        url = v.getUrl(selectedObjs, v.url);
+                    }
+                    imageLinks.push({'text': v.label, 'url': url});
+                });
+            }
+            return imageLinks;
+        },
+
         // render BOTH templates
         render: function() {
             // If event comes from handle_xywh() then we dont need to render()
@@ -797,9 +835,11 @@
             var json,
                 title = this.models.length + " Panels Selected...",
                 remoteUrl,
+                imageNames = [],
                 imageIds = [];
             this.models.forEach(function(m) {
                 imageIds.push(m.get('imageId'));
+                imageNames.push(m.get('name'));
                 if (m.get('baseUrl')) {
                     remoteUrl = m.get('baseUrl') + "/img_detail/" + m.get('imageId') + "/";
                 }
@@ -847,16 +887,7 @@
 
             json.export_dpi = json.export_dpi || 0;
 
-            // Link IF we have a single remote image, E.g. http://jcb-dataviewer.rupress.org/jcb/img_detail/625679/
-            json.imageLink = false;
-            if (remoteUrl) {
-                if (imageIds.length == 1) {
-                    json.imageLink = remoteUrl;
-                }
-            // OR all the images are local
-            } else {
-                json.imageLink = WEBINDEX_URL + "?show=image-" + imageIds.join('|image-');
-            }
+            json.imageLinks = this.getImageLinks(remoteUrl, imageIds, imageNames);
 
             // all setId if we have a single Id
             json.setImageId = _.uniq(imageIds).length == 1;

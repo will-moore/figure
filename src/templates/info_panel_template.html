@@ -4,13 +4,15 @@
 
     <table class="table">
         <tbody>
-            <tr><td>Image
-                <% if (imageLink) { %>
-                <a class="pull-right" target="new"
-                    href="<%= imageLink %>">
-                    <span class="glyphicon glyphicon-share"></span> Show in Webclient
-                </a>
-                <% } %>
+            <tr><td>Image</td></tr>
+            <tr><td>
+                <span class="glyphicon glyphicon-share"></span> Open with:
+                <% _.each(imageLinks, function(link, i) { %>
+                    <% if (i > 0) {print("|")} %>
+                    <a target="_blank" href="<%= link.url %>">
+                        <%= link.text %>
+                    </a>
+                <% }) %>
             </td></tr>
             <tr><td>
                 <div class="col-sm-6"><small><strong>Image ID</strong>:</small></div>
