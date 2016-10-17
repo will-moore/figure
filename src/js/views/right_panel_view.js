@@ -786,7 +786,7 @@
             this.$el.append(this.xywh_template(json));
         },
 
-        getImageLinks(remoteUrl, imageIds, imageNames) {
+        getImageLinks: function(remoteUrl, imageIds, imageNames) {
             // Link if we have a single remote image, E.g. http://jcb-dataviewer.rupress.org/jcb/img_detail/625679/
             var imageLinks = [];
             if (remoteUrl) {
