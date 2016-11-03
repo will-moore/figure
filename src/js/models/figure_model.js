@@ -1,7 +1,7 @@
     
     // Version of the json file we're saving.
     // This only needs to increment when we make breaking changes (not linked to release versions.)
-    var VERSION = 1;
+    var VERSION = 2;
 
 
     // ------------------------- Figure Model -----------------------------------
@@ -105,6 +105,27 @@
                     p.pixel_size_x = ps;
                     p.pixel_size_y = ps;
                     delete p.pixel_size;
+                });
+            }
+            if (v < 2) {
+                console.log("Transforming to VERSION 2");
+                _.each(json.panels, function(p){
+                    if (p.shapes) {
+                        p.shapes = p.shapes.map(function(shape){
+                            // Update to OMERO 5.3.0 model of Ellipse
+                            if (shape.type === "Ellipse") {
+                                shape.x = shape.cx;
+                                shape.y = shape.cy;
+                                shape.radiusX = shape.rx;
+                                shape.radiusY = shape.ry;
+                                delete shape.cx;
+                                delete shape.cy;
+                                delete shape.rx;
+                                delete shape.ry;
+                            }
+                            return shape;
+                        });
+                    }
                 });
             }
 

@@ -1,0 +1,29 @@
+
+
+<% if (shapes.length > 1) { %>
+    <% _.each(shapes, function(shape) { %>
+    <tr class="roiModalRoiItem shape" data-shapeId="<%= shape.id %>"
+        <% if (!shape.icon) { %>title="<%= shape.type %> not supported in OMERO.figure"<% } %>
+        >
+        <td></td>
+        <td><span class="glyphicon <% if (shape.icon) { %><%= shape.icon %><% } %>"></span> </td>
+        <td>Z: <%= shape.theZ + 1 %> </td>
+        <td>T: <%= shape.theT + 1 %> </td>
+        <td class="roiViewport">
+            <% if (!shape.icon) { %>
+                <span>
+                    <%= shape.type %>
+                </span>
+            <% } %>
+        </td>
+        <td>
+            <% if (shape.icon) { %>
+            <button type="button" class="addOmeroShape btn btn-success btn-sm"
+                    title="Add Shape to image">
+                Add
+            </button>
+            <% } %>
+        </td>
+    </tr>
+    <% }) %>
+<% } %>
