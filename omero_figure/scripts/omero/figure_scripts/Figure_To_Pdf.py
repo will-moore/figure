@@ -35,11 +35,17 @@ except ImportError:
     import Image
     import ImageDraw
 
+import logging
+
+logger = logging.getLogger('figure_to_pdf')
+
 try:
     import markdown
     markdown_imported = True
 except ImportError:
     markdown_imported = False
+    logger.error("Markdown not imported. See"
+                 " https://pythonhosted.org/Markdown/install.html")
 
 try:
     from reportlab.pdfgen import canvas
@@ -53,6 +59,7 @@ except ImportError:
 
 from omero.gateway import BlitzGateway
 from omero.rtypes import rstring, robject
+
 
 ORIGINAL_DIR = "1_originals"
 RESAMPLED_DIR = "2_pre_resampled"
@@ -617,7 +624,6 @@ class FigureExport(object):
         # Handy to know what the last created file is:
         self.figure_file_name = full_name
 
-        print "get_figure_file_name()", full_name
         return full_name
 
     def build_figure(self):
@@ -676,16 +682,11 @@ class FigureExport(object):
         col = 0
         row = 0
         for p in range(self.page_count):
-            print ("\n------------------------- PAGE ", p + 1,
-                   "--------------------------")
+
             px = col * (self.page_width + paper_spacing)
             py = row * (self.page_height + paper_spacing)
             page = {'x': px, 'y': py}
 
-            # if export_option == "TIFF":
-            #     add_panels_to_tiff(conn, tiffFigure, panels_json, imageIds,
-            #     page)
-            # elif export_option == "PDF":
             self.add_panels_to_page(panels_json, image_ids, page)
 
             # complete page and save
@@ -727,7 +728,6 @@ class FigureExport(object):
 
         links = []
         for iid in list(image_ids):
-            print "linking to", iid
             link = ImageAnnotationLinkI()
             link.parent = ImageI(iid, False)
             link.child = file_ann._obj
@@ -738,8 +738,8 @@ class FigureExport(object):
                 links = self.conn.getUpdateService().saveAndReturnArray(
                     links, self.conn.SERVICE_OPTS)
             except:
-                print ("Failed to attach figure: %s to images %s"
-                       % (file_ann, image_ids))
+                logger.error("Failed to attach figure: %s to images %s"
+                             % (file_ann, image_ids))
 
         return file_ann
 
@@ -758,7 +758,6 @@ class FigureExport(object):
                 windows.append([c['window']['start'], c['window']['end']])
                 colors.append(c['color'])
 
-        print "setActiveChannels", c_idxs, windows, colors
         image.setActiveChannels(c_idxs, windows, colors)
 
     def get_crop_region(self, panel):
@@ -780,27 +779,19 @@ class FigureExport(object):
         tile_w = orig_w / (zoom/100)
         tile_h = orig_h / (zoom/100)
 
-        print 'zoom', zoom
-        print 'frame_w', frame_w, 'frame_h', frame_h, 'orig', orig_w, orig_h
-        print "Initial tile w, h", tile_w, tile_h
-
         orig_ratio = float(orig_w) / orig_h
         wh = float(frame_w) / frame_h
 
         if abs(orig_ratio - wh) > 0.01:
             # if viewport is wider than orig...
             if (orig_ratio < wh):
-                print "viewport wider"
                 tile_h = tile_w / wh
             else:
-                print "viewport longer"
                 tile_w = tile_h * wh
 
-        print 'dx', dx, '(orig_w - tile_w)/2', (orig_w - tile_w)/2
         cropx = ((orig_w - tile_w)/2) - dx
         cropy = ((orig_h - tile_h)/2) - dy
 
-        print 'tile_w', tile_w, 'tile_h', tile_h
         return {'x': cropx, 'y': cropy, 'width': tile_w, 'height': tile_h}
 
     def get_time_label_text(self, delta_t, format):
@@ -855,24 +846,16 @@ class FigureExport(object):
                      'topleft': [], 'topright': [],
                      'bottomleft': [], 'bottomright': []}
 
-        print "sorting labels..."
         for l in labels:
             if 'text' not in l:
-                print "NO text", 'time' in l, 'deltaT', 'deltaT' in panel
-                print panel['theT'], len(panel['deltaT']),
-                print panel['theT'] < len(panel['deltaT'])
                 if 'deltaT' in panel and panel['theT'] < len(panel['deltaT']):
                     the_t = panel['theT']
-                    print 'theT', the_t
                     d_t = panel['deltaT'][the_t]
-                    print 'dT', d_t
                     text = self.get_time_label_text(d_t, l['time'])
-                    print 'text', text
                     l['text'] = text
                 else:
                     continue
 
-            print l
             pos = l['position']
             l['size'] = int(l['size'])   # make sure 'size' is number
             if pos in positions:
@@ -977,7 +960,8 @@ class FigureExport(object):
             return
 
         if not ('pixel_size_x' in panel and panel['pixel_size_x'] > 0):
-            print "Can't show scalebar - pixel_size_x is not defined for panel"
+            v = "Can't show scalebar - pixel_size_x is not defined for panel"
+            logger.error(v)
             return
 
         sb = panel['scalebar']
@@ -990,7 +974,6 @@ class FigureExport(object):
         blue = int(color[4:6], 16)
 
         position = 'position' in sb and sb['position'] or 'bottomright'
-        print 'scalebar.position', position
         align = 'left'
 
         if position == 'topleft':
@@ -1008,14 +991,9 @@ class FigureExport(object):
             ly = y + height - spacer
             align = "right"
 
-        print "Adding Scalebar of %s microns." % sb['length'],
-        print "Pixel size is %s microns" % panel['pixel_size_x']
         pixels_length = sb['length'] / panel['pixel_size_x']
         scale_to_canvas = panel['width'] / float(region_width)
         canvas_length = pixels_length * scale_to_canvas
-        print 'Scalebar length (panel pixels):', pixels_length
-        print 'Scale by %s to page ' \
-              'coordinate length: %s' % (scale_to_canvas, canvas_length)
 
         if align == 'left':
             lx_end = lx + canvas_length
@@ -1056,7 +1034,6 @@ class FigureExport(object):
 
         if 'z_projection' in panel and panel['z_projection']:
             if 'z_start' in panel and 'z_end' in panel:
-                print "Z_projection:", panel['z_start'], panel['z_end']
                 image.setProjection('intmax')
                 image.setProjectionRange(panel['z_start'], panel['z_end'])
 
@@ -1154,7 +1131,6 @@ class FigureExport(object):
         if self.export_images:
             orig_name = os.path.join(
                 self.zip_folder_name, ORIGINAL_DIR, img_name)
-            print "Saving original to: ", orig_name
         pil_img = self.get_panel_image(image, panel, orig_name)
 
         # for PDF export, we might have a target dpi
@@ -1190,8 +1166,7 @@ class FigureExport(object):
         try:
             para = Paragraph(text, style)
         except ValueError:
-            print "Couldn't add paragraph to PDF:"
-            print text
+            logger.error("Couldn't add paragraph to PDF: %s" % text)
             text = "[Failed to format paragraph - not shown]"
             para = Paragraph(text, style)
         w, h = para.wrap(aw, page_y)   # find required space
@@ -1201,7 +1176,6 @@ class FigureExport(object):
             parah = h
         # If there's not enough space, start a new page
         if parah > (page_y - inch):
-            print "new page"
             c.save()
             page_y = maxh    # reset to top of new page
         indent = inch
@@ -1228,8 +1202,6 @@ class FigureExport(object):
         if 'Webclient_URI' in script_params:
             base_url = script_params['Webclient_URI']
         page_height = self.page_height
-        avail_height = page_height-2*inch
-        print 'availHeight', avail_height
 
         # Need to sort panels from top (left) -> bottom of Figure
         panels_json.sort(key=lambda x: int(x['y']) + x['y'] * 0.01)
@@ -1249,7 +1221,6 @@ class FigureExport(object):
 
         if "Figure_URI" in script_params:
             file_url = script_params["Figure_URI"]
-            print "Figure URL", file_url
             figure_link = ("Link to Figure: <a href='%s' color='blue'>%s</a>"
                            % (file_url, file_url))
             page_y = self.add_para_with_thumb(figure_link, page_y,
@@ -1260,7 +1231,6 @@ class FigureExport(object):
                 len(self.figure_json['legend']) > 0):
             page_y = self.add_para_with_thumb("Legend:", page_y,
                                               style=style_h3)
-            print "\n--- Adding Figure Legend ---"
             legend = self.figure_json['legend']
             if markdown_imported:
                 # convert markdown to html
@@ -1273,8 +1243,6 @@ class FigureExport(object):
                     p = "<p>" + p
                     page_y = self.add_para_with_thumb(p, page_y, style=style_n)
             else:
-                print ("Markdown not imported. See"
-                       " https://pythonhosted.org/Markdown/install.html")
                 page_y = self.add_para_with_thumb(legend, page_y,
                                                   style=style_n)
 
@@ -1333,12 +1301,9 @@ class FigureExport(object):
         for i, panel in enumerate(panels_json):
 
             if not self.panel_is_on_page(panel, page):
-                print 'Panel', panel['imageId'], 'not on page...'
                 continue
 
-            print "\n-------------------------------- "
             image_id = panel['imageId']
-            print "Adding PANEL - Image ID:", image_id
             # draw_panel() creates PIL image then applies it to the page.
             # For TIFF export, draw_panel() also adds shapes to the
             # PIL image before pasting onto the page...
@@ -1351,7 +1316,6 @@ class FigureExport(object):
             # Finally, add scale bar and labels to the page
             self.draw_scalebar(panel, pil_img.size[0], page)
             self.draw_labels(panel, page)
-            print ""
 
     def get_figure_file_ext(self):
         return "pdf"
@@ -1424,7 +1388,6 @@ class FigureExport(object):
         y = y - page['y']
 
         if dpi is not None:
-            print "Resample panel to %s dpi..." % dpi
             # E.g. target is 300 dpi and width & height is '72 dpi'
             # so we need image to be width * dpi/72 pixels
             target_w = (width * dpi) / 72
@@ -1433,18 +1396,13 @@ class FigureExport(object):
             target_h = dpi_scale * curr_h
             target_w = int(round(target_w))
             target_h = int(round(target_h))
-            print "    curr_w, curr_h", curr_w, curr_h
             if target_w > curr_w:
                 if self.export_images:
                     # Save image BEFORE resampling
                     rs_name = os.path.join(
                         self.zip_folder_name, RESAMPLED_DIR, img_name)
-                    print "Saving pre_resampled to: ", rs_name
                     pil_img.save(rs_name)
-                print "    Resample to target_w, target_h", target_w, target_h
                 pil_img = pil_img.resize((target_w, target_h), Image.BICUBIC)
-            else:
-                print "    Already over %s dpi" % dpi
 
         # in the folder to zip
         if self.zip_folder_name is not None:
@@ -1505,7 +1463,6 @@ class TiffExport(FigureExport):
         """
         tiff_width = self.scale_coords(self.page_width)
         tiff_height = self.scale_coords(self.page_height)
-        print "TIFF: width, height", tiff_width, tiff_height
         self.tiff_figure = Image.new(
             "RGBA", (tiff_width, tiff_height), (255, 255, 255))
 
@@ -1521,12 +1478,10 @@ class TiffExport(FigureExport):
         x = x - page['x']
         y = y - page['y']
 
-        print "paste_image: x, y, width, height", x, y, width, height
         x = self.scale_coords(x)
         y = self.scale_coords(y)
         width = self.scale_coords(width)
         height = self.scale_coords(height)
-        print "scale_coords: x, y, width, height", x, y, width, height
 
         x = int(round(x))
         y = int(round(y))
@@ -1537,11 +1492,9 @@ class TiffExport(FigureExport):
         if self.exportImages:
             rs_name = os.path.join(self.zip_folder_name, RESAMPLED_DIR,
                                    img_name)
-            print "Saving pre_resampled to: ", rs_name
             pil_img.save(rs_name)
 
         # Resize to our target size to match DPI of figure
-        print "resize to: x, y, width, height", x, y, width, height
         pil_img = pil_img.resize((width, height), Image.BICUBIC)
 
         if self.exportImages:
@@ -1565,8 +1518,6 @@ class TiffExport(FigureExport):
         x2 = self.scale_coords(x2)
         y2 = self.scale_coords(y2)
         width = self.scale_coords(width)
-
-        print "draw_line - TIFF...", x, y, x2, y2
 
         for l in range(width):
             draw.line([(x, y), (x2, y2)], fill=rgb)
@@ -1648,7 +1599,6 @@ def export_figure(conn, script_params):
     conn.SERVICE_OPTS.setOmeroGroup(-1)
 
     export_option = script_params['Export_Option']
-    print 'exportOption', export_option
 
     if export_option == 'PDF':
         fig_export = FigureExport(conn, script_params)
@@ -1699,7 +1649,6 @@ def run_script():
         for key in client.getInputKeys():
             if client.getInput(key):
                 script_params[key] = client.getInput(key, unwrap=True)
-        print script_params
 
         # call the main script - returns a file annotation wrapper
         file_annotation = export_figure(conn, script_params)
