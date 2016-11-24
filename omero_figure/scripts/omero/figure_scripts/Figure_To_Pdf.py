@@ -44,8 +44,8 @@ try:
     markdown_imported = True
 except ImportError:
     markdown_imported = False
-    logger.error("Markdown not imported. See"
-                 " https://pythonhosted.org/Markdown/install.html")
+    logger.error("Markdown not installed. See"
+                 " https://pypi.python.org/pypi/Markdown")
 
 try:
     from reportlab.pdfgen import canvas
@@ -55,6 +55,8 @@ try:
     reportlab_installed = True
 except ImportError:
     reportlab_installed = False
+    logger.error("Reportlab not installed. See"
+                 " https://pypi.python.org/pypi/reportlab/")
 
 
 from omero.gateway import BlitzGateway
