@@ -114,22 +114,22 @@ class ShapeToPdfExport(object):
         if "shapes" in panel:
             for shape in panel["shapes"]:
                 if shape['type'] == "Arrow":
-                    self.drawArrow(shape)
+                    self.draw_arrow(shape)
                 elif shape['type'] == "Line":
-                    self.drawLine(shape)
+                    self.draw_line(shape)
                 elif shape['type'] == "Rectangle":
-                    self.drawRectangle(shape)
+                    self.draw_rectangle(shape)
                 elif shape['type'] == "Ellipse":
-                    self.drawEllipse(shape)
+                    self.draw_ellipse(shape)
 
-    def getRGB(self, color):
+    def get_rgb(self, color):
         # Convert from E.g. '#ff0000' to (255, 0, 0)
         red = int(color[1:3], 16)
         green = int(color[3:5], 16)
         blue = int(color[5:7], 16)
         return (red, green, blue)
 
-    def panelToPageCoords(self, shape_x, shape_y):
+    def panel_to_page_coords(self, shape_x, shape_y):
         """
         Convert coordinate from the image onto the PDF page.
         Handles zoom, offset & rotation of panel, rotating the
@@ -180,16 +180,16 @@ class ShapeToPdfExport(object):
         shape_y = (shape_y * self.scale) + y
         return {'x': shape_x, 'y': shape_y, 'inPanel': in_panel}
 
-    def drawRectangle(self, shape):
-        top_left = self.panelToPageCoords(shape['x'], shape['y'])
+    def draw_rectangle(self, shape):
+        top_left = self.panel_to_page_coords(shape['x'], shape['y'])
 
         # Don't draw if all corners are outside the panel
-        top_right = self.panelToPageCoords(shape['x'] + shape['width'],
-                                           shape['y'])
-        bottom_left = self.panelToPageCoords(shape['x'],
-                                             shape['y'] + shape['height'])
-        bottom_right = self.panelToPageCoords(shape['x'] + shape['width'],
-                                              shape['y'] + shape['height'])
+        top_right = self.panel_to_page_coords(shape['x'] + shape['width'],
+                                              shape['y'])
+        bottom_left = self.panel_to_page_coords(shape['x'],
+                                                shape['y'] + shape['height'])
+        bottom_right = self.panel_to_page_coords(shape['x'] + shape['width'],
+                                                 shape['y'] + shape['height'])
         if (top_left['inPanel'] is False) and (
                 top_right['inPanel'] is False) and (
                 bottom_left['inPanel'] is False) and (
@@ -201,7 +201,7 @@ class ShapeToPdfExport(object):
         x = top_left['x']
         y = self.page_height - top_left['y']    # - height
 
-        rgb = self.getRGB(shape['strokeColor'])
+        rgb = self.get_rgb(shape['strokeColor'])
         r = float(rgb[0])/255
         g = float(rgb[1])/255
         b = float(rgb[2])/255
@@ -224,9 +224,9 @@ class ShapeToPdfExport(object):
             # Restore coordinates, rotation etc.
             self.canvas.restoreState()
 
-    def drawLine(self, shape):
-        start = self.panelToPageCoords(shape['x1'], shape['y1'])
-        end = self.panelToPageCoords(shape['x2'], shape['y2'])
+    def draw_line(self, shape):
+        start = self.panel_to_page_coords(shape['x1'], shape['y1'])
+        end = self.panel_to_page_coords(shape['x2'], shape['y2'])
         x1 = start['x']
         y1 = self.page_height - start['y']
         x2 = end['x']
@@ -235,7 +235,7 @@ class ShapeToPdfExport(object):
         if (start['inPanel'] is False) and (end['inPanel'] is False):
             return
 
-        rgb = self.getRGB(shape['strokeColor'])
+        rgb = self.get_rgb(shape['strokeColor'])
         r = float(rgb[0])/255
         g = float(rgb[1])/255
         b = float(rgb[2])/255
@@ -248,9 +248,9 @@ class ShapeToPdfExport(object):
         p.lineTo(x2, y2)
         self.canvas.drawPath(p, fill=1, stroke=1)
 
-    def drawArrow(self, shape):
-        start = self.panelToPageCoords(shape['x1'], shape['y1'])
-        end = self.panelToPageCoords(shape['x2'], shape['y2'])
+    def draw_arrow(self, shape):
+        start = self.panel_to_page_coords(shape['x1'], shape['y1'])
+        end = self.panel_to_page_coords(shape['x2'], shape['y2'])
         x1 = start['x']
         y1 = self.page_height - start['y']
         x2 = end['x']
@@ -260,7 +260,7 @@ class ShapeToPdfExport(object):
         if (start['inPanel'] is False) and (end['inPanel'] is False):
             return
 
-        rgb = self.getRGB(shape['strokeColor'])
+        rgb = self.get_rgb(shape['strokeColor'])
         r = float(rgb[0])/255
         g = float(rgb[1])/255
         b = float(rgb[2])/255
@@ -307,15 +307,15 @@ class ShapeToPdfExport(object):
         p.lineTo(arrow_point1_x, arrow_point1_y)
         self.canvas.drawPath(p, fill=1, stroke=1)
 
-    def drawEllipse(self, shape):
+    def draw_ellipse(self, shape):
         stroke_width = shape['strokeWidth'] * self.scale
-        c = self.panelToPageCoords(shape['cx'], shape['cy'])
+        c = self.panel_to_page_coords(shape['cx'], shape['cy'])
         cx = c['x']
         cy = self.page_height - c['y']
         rx = shape['rx'] * self.scale
         ry = shape['ry'] * self.scale
         rotation = (shape['rotation'] + self.panel['rotation']) * -1
-        rgb = self.getRGB(shape['strokeColor'])
+        rgb = self.get_rgb(shape['strokeColor'])
         r = float(rgb[0])/255
         g = float(rgb[1])/255
         b = float(rgb[2])/255
@@ -365,15 +365,15 @@ class ShapeToPilExport(object):
         if "shapes" in panel:
             for shape in panel["shapes"]:
                 if shape['type'] == "Arrow":
-                    self.drawArrow(shape)
+                    self.draw_arrow(shape)
                 elif shape['type'] == "Line":
-                    self.drawLine(shape)
+                    self.draw_line(shape)
                 elif shape['type'] == "Rectangle":
-                    self.drawRectangle(shape)
+                    self.draw_rectangle(shape)
                 elif shape['type'] == "Ellipse":
-                    self.drawEllipse(shape)
+                    self.draw_ellipse(shape)
 
-    def getPanelCoords(self, shape_x, shape_y):
+    def get_panel_coords(self, shape_x, shape_y):
         """
         Convert coordinate from the image onto the panel.
         Handles zoom, offset & rotation of panel, rotating the
@@ -411,24 +411,24 @@ class ShapeToPilExport(object):
 
         return {'x': shape_x, 'y': shape_y}
 
-    def getRGB(self, color):
+    def get_rgb(self, color):
         # Convert from E.g. '#ff0000' to (255, 0, 0)
         red = int(color[1:3], 16)
         green = int(color[3:5], 16)
         blue = int(color[5:7], 16)
         return (red, green, blue)
 
-    def drawArrow(self, shape):
+    def draw_arrow(self, shape):
 
-        start = self.getPanelCoords(shape['x1'], shape['y1'])
-        end = self.getPanelCoords(shape['x2'], shape['y2'])
+        start = self.get_panel_coords(shape['x1'], shape['y1'])
+        end = self.get_panel_coords(shape['x2'], shape['y2'])
         x1 = start['x']
         y1 = start['y']
         x2 = end['x']
         y2 = end['y']
         head_size = ((shape['strokeWidth'] * 5) + 9) * self.scale
         stroke_width = shape['strokeWidth'] * self.scale
-        rgb = self.getRGB(shape['strokeColor'])
+        rgb = self.get_rgb(shape['strokeColor'])
 
         # Do some trigonometry to get the line angle can calculate arrow points
         dx = x2 - x1
@@ -460,19 +460,19 @@ class ShapeToPilExport(object):
         # Draw Arrow head, up to tip at x2, y2
         self.draw.polygon(points, fill=rgb, outline=rgb)
 
-    def drawLine(self, shape):
-        start = self.getPanelCoords(shape['x1'], shape['y1'])
-        end = self.getPanelCoords(shape['x2'], shape['y2'])
+    def draw_line(self, shape):
+        start = self.get_panel_coords(shape['x1'], shape['y1'])
+        end = self.get_panel_coords(shape['x2'], shape['y2'])
         x1 = start['x']
         y1 = start['y']
         x2 = end['x']
         y2 = end['y']
         stroke_width = shape['strokeWidth'] * self.scale
-        rgb = self.getRGB(shape['strokeColor'])
+        rgb = self.get_rgb(shape['strokeColor'])
 
         self.draw.line([(x1, y1), (x2, y2)], fill=rgb, width=int(stroke_width))
 
-    def drawRectangle(self, shape):
+    def draw_rectangle(self, shape):
         # clockwise list of corner points on the OUTSIDE of thick line
         w = shape['strokeWidth']
         cx = shape['x'] + (shape['width']/2)
@@ -480,11 +480,11 @@ class ShapeToPilExport(object):
         rotation = self.panel['rotation'] * -1
 
         # Centre of rect rotation in PIL image
-        centre = self.getPanelCoords(cx, cy)
+        centre = self.get_panel_coords(cx, cy)
         cx = centre['x']
         cy = centre['y']
         scale_w = w * self.scale
-        rgb = self.getRGB(shape['strokeColor'])
+        rgb = self.get_rgb(shape['strokeColor'])
 
         # To support rotation, draw rect on temp canvas, rotate and paste
         width = int((shape['width'] + w) * self.scale)
@@ -505,16 +505,16 @@ class ShapeToPilExport(object):
         self.pil_img.paste(temp_rect, (int(paste_x), int(paste_y)),
                            mask=temp_rect)
 
-    def drawEllipse(self, shape):
+    def draw_ellipse(self, shape):
 
         w = int(shape['strokeWidth'] * self.scale)
-        ctr = self.getPanelCoords(shape['cx'], shape['cy'])
+        ctr = self.get_panel_coords(shape['cx'], shape['cy'])
         cx = ctr['x']
         cy = ctr['y']
         rx = self.scale * shape['rx']
         ry = self.scale * shape['ry']
         rotation = (shape['rotation'] + self.panel['rotation']) * -1
-        rgb = self.getRGB(shape['strokeColor'])
+        rgb = self.get_rgb(shape['strokeColor'])
 
         width = int((rx * 2) + w)
         height = int((ry * 2) + w)
@@ -564,18 +564,18 @@ class FigureExport(object):
         self.page_width = self.figure_json['paper_width']
         self.page_height = self.figure_json['paper_height']
 
-    def getZipName(self):
+    def get_zip_name(self):
 
         # file names can't include unicode characters
         name = unicodedata.normalize(
-            'NFKD', self.figureName).encode('ascii', 'ignore')
+            'NFKD', self.figure_name).encode('ascii', 'ignore')
         # in case we have path/to/name.pdf, just use name.pdf
         name = path.basename(name)
         # Remove commas: causes problems 'duplicate headers' in file download
         name = name.replace(",", ".")
         return "%s.zip" % name
 
-    def getFigureFileName(self):
+    def get_figure_file_name(self):
         """
         For PDF export we will only create a single figure file, but
         for TIFF export we may have several pages, so we need unique names
@@ -585,11 +585,11 @@ class FigureExport(object):
         """
 
         # Extension is pdf or tiff
-        fext = self.getFigureFileExt()
+        fext = self.get_figure_file_ext()
 
         # file names can't include unicode characters
         name = unicodedata.normalize(
-            'NFKD', self.figureName).encode('ascii', 'ignore')
+            'NFKD', self.figure_name).encode('ascii', 'ignore')
         # in case we have path/to/name, just use name
         name = path.basename(name)
 
@@ -617,13 +617,13 @@ class FigureExport(object):
         # Handy to know what the last created file is:
         self.figure_file_name = full_name
 
-        print "getFigureFileName()", full_name
+        print "get_figure_file_name()", full_name
         return full_name
 
-    def buildFigure(self):
+    def build_figure(self):
         """
         The main building of the figure happens here, independently of format.
-        We set up directories as needed, call createFigure() to create
+        We set up directories as needed, call create_figure() to create
         the PDF or TIFF then iterate through figure pages, adding panels
         for each page.
         Then we add an info page and create a zip of everything if needed.
@@ -659,10 +659,10 @@ class FigureExport(object):
                 for d in (ORIGINAL_DIR, RESAMPLED_DIR, FINAL_DIR):
                     img_dir = os.path.join(zip_dir, d)
                     os.mkdir(img_dir)
-                self.addReadMeFile()
+                self.add_read_me_file()
 
         # Create the figure file(s)
-        self.createFigure()
+        self.create_figure()
 
         panels_json = self.figure_json['panels']
         image_ids = set()
@@ -689,7 +689,7 @@ class FigureExport(object):
             self.add_panels_to_page(panels_json, image_ids, page)
 
             # complete page and save
-            self.savePage()
+            self.save_page()
 
             col = col + 1
             if col >= page_col_count:
@@ -697,10 +697,10 @@ class FigureExport(object):
                 row = row + 1
 
         # Add thumbnails and links page
-        self.addInfoPage(panels_json)
+        self.add_info_page(panels_json)
 
         # Saves the completed  figure file
-        self.saveFigure()
+        self.save_figure()
 
         # PDF will get created in this group
         if group_id is None:
@@ -712,7 +712,7 @@ class FigureExport(object):
         mimetype = self.mimetype
 
         if self.zip_folder_name is not None:
-            zip_name = self.getZipName()
+            zip_name = self.get_zip_name()
             # Recursively zip everything up
             compress(zip_name, self.zip_folder_name)
 
@@ -743,7 +743,7 @@ class FigureExport(object):
 
         return file_ann
 
-    def applyRdefs(self, image, channels):
+    def apply_rdefs(self, image, channels):
         """ Apply the channel levels and colors to the image """
         c_idxs = []
         windows = []
@@ -761,7 +761,7 @@ class FigureExport(object):
         print "setActiveChannels", c_idxs, windows, colors
         image.setActiveChannels(c_idxs, windows, colors)
 
-    def getCropRegion(self, panel):
+    def get_crop_region(self, panel):
         """
         Gets the width and height in points/pixels for a panel in the
         figure. This is at the 'original' figure / PDF coordinates
@@ -820,21 +820,22 @@ class FigureExport(object):
             text = "%s:%02d:%02d" % (h, m, s)
         return text
 
-    def addROIs(self, panel, page):
+    def add_rois(self, panel, page):
         """
         Add any Shapes
         """
         if "shapes" not in panel:
             return
 
-        crop = self.getCropRegion(panel)
-        ShapeToPdfExport(self.figureCanvas, panel, page, crop, self.page_height)
+        crop = self.get_crop_region(panel)
+        ShapeToPdfExport(self.figure_canvas, panel, page, crop,
+                         self.page_height)
 
-    def drawLabels(self, panel, page):
+    def draw_labels(self, panel, page):
         """
         Add the panel labels to the page.
         Here we calculate the position of labels but delegate
-        to self.drawText() to actually place the labels on PDF/TIFF
+        to self.draw_text() to actually place the labels on PDF/TIFF
         """
         labels = panel['labels']
         x = panel['x']
@@ -877,7 +878,7 @@ class FigureExport(object):
             if pos in positions:
                 positions[pos].append(l)
 
-        def drawLab(label, lx, ly, align='left'):
+        def draw_lab(label, lx, ly, align='left'):
             label_h = label['size']
             color = label['color']
             red = int(color[0:2], 16)
@@ -887,7 +888,7 @@ class FigureExport(object):
             rgb = (red, green, blue)
             text = label['text']
 
-            self.drawText(text, lx, ly, fontsize, rgb, align=align)
+            self.draw_text(text, lx, ly, fontsize, rgb, align=align)
             return label_h
 
         # Render each position:
@@ -896,13 +897,13 @@ class FigureExport(object):
                 lx = x + spacer
                 ly = y + spacer
                 for l in labels:
-                    label_h = drawLab(l, lx, ly)
+                    label_h = draw_lab(l, lx, ly)
                     ly += label_h + spacer
             elif key == 'topright':
                 lx = x + width - spacer
                 ly = y + spacer
                 for l in labels:
-                    label_h = drawLab(l, lx, ly, align='right')
+                    label_h = draw_lab(l, lx, ly, align='right')
                     ly += label_h + spacer
             elif key == 'bottomleft':
                 lx = x + spacer
@@ -910,26 +911,26 @@ class FigureExport(object):
                 labels.reverse()  # last item goes bottom
                 for l in labels:
                     ly = ly - l['size'] - spacer
-                    drawLab(l, lx, ly)
+                    draw_lab(l, lx, ly)
             elif key == 'bottomright':
                 lx = x + width - spacer
                 ly = y + height
                 labels.reverse()  # last item goes bottom
                 for l in labels:
                     ly = ly - l['size'] - spacer
-                    drawLab(l, lx, ly, align='right')
+                    draw_lab(l, lx, ly, align='right')
             elif key == 'top':
                 lx = x + (width/2)
                 ly = y
                 labels.reverse()
                 for l in labels:
                     ly = ly - l['size'] - spacer
-                    drawLab(l, lx, ly, align='center')
+                    draw_lab(l, lx, ly, align='center')
             elif key == 'bottom':
                 lx = x + (width/2)
                 ly = y + height + spacer
                 for l in labels:
-                    label_h = drawLab(l, lx, ly, align='center')
+                    label_h = draw_lab(l, lx, ly, align='center')
                     ly += label_h + spacer
             elif key == 'left':
                 lx = x - spacer
@@ -937,7 +938,7 @@ class FigureExport(object):
                 total_h = sum(sizes) + spacer * (len(labels)-1)
                 ly = y + (height-total_h)/2
                 for l in labels:
-                    label_h = drawLab(l, lx, ly, align='right')
+                    label_h = draw_lab(l, lx, ly, align='right')
                     ly += label_h + spacer
             elif key == 'right':
                 lx = x + width + spacer
@@ -945,7 +946,7 @@ class FigureExport(object):
                 total_h = sum(sizes) + spacer * (len(labels)-1)
                 ly = y + (height-total_h)/2
                 for l in labels:
-                    label_h = drawLab(l, lx, ly)
+                    label_h = draw_lab(l, lx, ly)
                     ly += label_h + spacer
             elif key == 'leftvert':
                 lx = x - spacer
@@ -953,13 +954,13 @@ class FigureExport(object):
                 labels.reverse()
                 for l in labels:
                     lx = lx - l['size'] - spacer
-                    drawLab(l, lx, ly, align='vertical')
+                    draw_lab(l, lx, ly, align='vertical')
 
-    def drawScalebar(self, panel, region_width, page):
+    def draw_scalebar(self, panel, region_width, page):
         """
         Add the scalebar to the page.
         Here we calculate the position of scalebar but delegate
-        to self.drawLine() and self.drawText() to actually place
+        to self.draw_line() and self.draw_text() to actually place
         the scalebar and label on PDF/TIFF
         """
         x = panel['x']
@@ -1021,10 +1022,9 @@ class FigureExport(object):
         else:
             lx_end = lx - canvas_length
 
-        self.drawLine(lx, ly, lx_end, ly, 3, (red, green, blue))
+        self.draw_line(lx, ly, lx_end, ly, 3, (red, green, blue))
 
         if 'show_label' in sb and sb['show_label']:
-            # c = self.figureCanvas
             symbol = u"\u00B5m"
             if 'pixel_size_x_symbol' in panel:
                 symbol = panel['pixel_size_x_symbol']
@@ -1041,11 +1041,11 @@ class FigureExport(object):
             else:
                 ly = ly + 5
 
-            self.drawText(
+            self.draw_text(
                 label, (lx + lx_end)/2, ly, font_size, (red, green, blue),
                 align="center")
 
-    def getPanelImage(self, image, panel, orig_name=None):
+    def get_panel_image(self, image, panel, orig_name=None):
         """
         Gets the rendered image from OMERO, then crops & rotates as needed.
         Optionally saving original and cropped images as TIFFs.
@@ -1107,7 +1107,7 @@ class FigureExport(object):
             pil_img = pil_img.rotate(rotation, Image.BICUBIC)
 
         # Final crop to size
-        panel_size = self.getCropRegion(panel)
+        panel_size = self.get_crop_region(panel)
 
         w, h = pil_img.size
         tile_w = panel_size['width']
@@ -1127,10 +1127,10 @@ class FigureExport(object):
 
         return out
 
-    def drawPanel(self, panel, page, idx):
+    def draw_panel(self, panel, page, idx):
         """
         Gets the image from OMERO, processes (and saves) it then
-        calls self.pasteImage() to add it to PDF or TIFF figure.
+        calls self.paste_image() to add it to PDF or TIFF figure.
         """
         image_id = panel['imageId']
         channels = panel['channels']
@@ -1142,7 +1142,7 @@ class FigureExport(object):
         y = y - page['y']
 
         image = self.conn.getObject("Image", image_id)
-        self.applyRdefs(image, channels)
+        self.apply_rdefs(image, channels)
 
         # create name to save image
         original_name = image.getName()
@@ -1155,17 +1155,17 @@ class FigureExport(object):
             orig_name = os.path.join(
                 self.zip_folder_name, ORIGINAL_DIR, img_name)
             print "Saving original to: ", orig_name
-        pil_img = self.getPanelImage(image, panel, orig_name)
+        pil_img = self.get_panel_image(image, panel, orig_name)
 
         # for PDF export, we might have a target dpi
         dpi = 'export_dpi' in panel and panel['export_dpi'] or None
 
         # Paste the panel to PDF or TIFF image
-        self.pasteImage(pil_img, img_name, panel, page, dpi)
+        self.paste_image(pil_img, img_name, panel, page, dpi)
 
         return image, pil_img
 
-    def getThumbnail(self, image_id):
+    def get_thumbnail(self, image_id):
         """ Saves thumb as local jpg and returns name """
 
         conn = self.conn
@@ -1177,10 +1177,10 @@ class FigureExport(object):
         pil_img.save(temp_name)
         return temp_name
 
-    def addParaWithThumb(self, text, page_y, style, thumb_src=None):
+    def add_para_with_thumb(self, text, page_y, style, thumb_src=None):
         """ Adds paragraph text to point on PDF info page """
 
-        c = self.figureCanvas
+        c = self.figure_canvas
         aw = self.page_width - (inch * 2)
         maxh = self.page_height - inch
         spacer = 10
@@ -1211,7 +1211,7 @@ class FigureExport(object):
         para.drawOn(c, indent, page_y - h)
         return page_y - parah - spacer  # reduce the available height
 
-    def addReadMeFile(self):
+    def add_read_me_file(self):
         """ Add a simple text file into the zip to explain what's there """
         read_me_path = os.path.join(self.zip_folder_name, "README.txt")
         f = open(read_me_path, 'w')
@@ -1220,7 +1220,7 @@ class FigureExport(object):
         finally:
             f.close()
 
-    def addInfoPage(self, panels_json):
+    def add_info_page(self, panels_json):
         """Generates a PDF info page with figure title, links to images etc"""
         script_params = self.script_params
         figure_name = self.figure_name
@@ -1245,19 +1245,21 @@ class FigureExport(object):
 
         # Start adding at the top, update page_y as we add paragraphs
         page_y = maxh
-        page_y = self.addParaWithThumb(figure_name, page_y, style=style_h)
+        page_y = self.add_para_with_thumb(figure_name, page_y, style=style_h)
 
         if "Figure_URI" in script_params:
             file_url = script_params["Figure_URI"]
             print "Figure URL", file_url
             figure_link = ("Link to Figure: <a href='%s' color='blue'>%s</a>"
                            % (file_url, file_url))
-            page_y = self.addParaWithThumb(figure_link, page_y, style=style_n)
+            page_y = self.add_para_with_thumb(figure_link, page_y,
+                                              style=style_n)
 
         # Add Figure Legend
         if ('legend' in self.figure_json and
                 len(self.figure_json['legend']) > 0):
-            page_y = self.addParaWithThumb("Legend:", page_y, style=style_h3)
+            page_y = self.add_para_with_thumb("Legend:", page_y,
+                                              style=style_h3)
             print "\n--- Adding Figure Legend ---"
             legend = self.figure_json['legend']
             if markdown_imported:
@@ -1269,13 +1271,14 @@ class FigureExport(object):
                 para_lines = legend.split("<p>")
                 for p in para_lines:
                     p = "<p>" + p
-                    page_y = self.addParaWithThumb(p, page_y, style=style_n)
+                    page_y = self.add_para_with_thumb(p, page_y, style=style_n)
             else:
                 print ("Markdown not imported. See"
                        " https://pythonhosted.org/Markdown/install.html")
-                page_y = self.addParaWithThumb(legend, page_y, style=style_n)
+                page_y = self.add_para_with_thumb(legend, page_y,
+                                                  style=style_n)
 
-        page_y = self.addParaWithThumb(
+        page_y = self.add_para_with_thumb(
             "Figure contains the following images:", page_y, style=style_h3)
 
         # Go through sorted panels, adding paragraph for each unique image
@@ -1291,7 +1294,7 @@ class FigureExport(object):
             if iid in img_ids:
                 continue    # ignore images we've already handled
             img_ids.add(iid)
-            thumb_src = self.getThumbnail(iid)
+            thumb_src = self.get_thumbnail(iid)
             # thumb = "<img src='%s' width='%s' height='%s' " \
             #         "valign='middle' />" % (thumbSrc, thumbSize, thumbSize)
             lines = []
@@ -1301,14 +1304,14 @@ class FigureExport(object):
                 "<a href='%s' color='blue'>%s</a>" % (img_url, img_url))
             # addPara([" ".join(line)])
             line = " ".join(lines)
-            page_y = self.addParaWithThumb(
+            page_y = self.add_para_with_thumb(
                 line, page_y, style=style_n, thumbSrc=thumb_src)
 
         if len(scalebars) > 0:
             scalebars = list(set(scalebars))
-            page_y = self.addParaWithThumb("Scalebars:", page_y,
-                                           style=style_h3)
-            page_y = self.addParaWithThumb(
+            page_y = self.add_para_with_thumb("Scalebars:", page_y,
+                                              style=style_h3)
+            page_y = self.add_para_with_thumb(
                 "Scalebar Lengths: %s" % ", ".join(scalebars),
                 page_y, style=style_n)
 
@@ -1336,43 +1339,43 @@ class FigureExport(object):
             print "\n-------------------------------- "
             image_id = panel['imageId']
             print "Adding PANEL - Image ID:", image_id
-            # drawPanel() creates PIL image then applies it to the page.
-            # For TIFF export, drawPanel() also adds shapes to the
+            # draw_panel() creates PIL image then applies it to the page.
+            # For TIFF export, draw_panel() also adds shapes to the
             # PIL image before pasting onto the page...
-            image, pil_img = self.drawPanel(panel, page, i)
+            image, pil_img = self.draw_panel(panel, page, i)
             if image.canAnnotate():
                 image_ids.add(image_id)
             # ... but for PDF we have to add shapes to the whole PDF page
-            self.addROIs(panel, page)       # This does nothing for TIFF export
+            self.add_rois(panel, page)  # This does nothing for TIFF export
 
             # Finally, add scale bar and labels to the page
-            self.drawScalebar(panel, pil_img.size[0], page)
-            self.drawLabels(panel, page)
+            self.draw_scalebar(panel, pil_img.size[0], page)
+            self.draw_labels(panel, page)
             print ""
 
-    def getFigureFileExt(self):
+    def get_figure_file_ext(self):
         return "pdf"
 
-    def createFigure(self):
+    def create_figure(self):
         """
         Creates a PDF figure. This is overwritten by ExportTiff subclass.
         """
         if not reportlab_installed:
             raise ImportError(
                 "Need to install https://bitbucket.org/rptlab/reportlab")
-        name = self.getFigureFileName()
+        name = self.get_figure_file_name()
         self.figure_canvas = canvas.Canvas(
             name, pagesize=(self.page_width, self.page_height))
 
-    def savePage(self):
+    def save_page(self):
         """ Called on completion of each page. Saves page of PDF """
         self.figure_canvas.showPage()
 
-    def saveFigure(self):
+    def save_figure(self):
         """ Completes PDF figure (or info-page PDF for TIFF export) """
         self.figure_canvas.save()
 
-    def drawText(self, text, x, y, fontsize, rgb, align="center"):
+    def draw_text(self, text, x, y, fontsize, rgb, align="center"):
         """ Adds text to PDF. Overwritten for TIFF below """
         ly = y + fontsize
         ly = self.page_height - ly + 5
@@ -1395,7 +1398,7 @@ class FigureExport(object):
             c.drawCentredString(self.page_height - y, -(x + fontsize), text)
             c.rotate(-90)
 
-    def drawLine(self, x, y, x2, y2, width, rgb):
+    def draw_line(self, x, y, x2, y2, width, rgb):
         """ Adds line to PDF. Overwritten for TIFF below """
         red, green, blue = rgb
         red = float(red)/255
@@ -1409,7 +1412,7 @@ class FigureExport(object):
         c.setStrokeColorRGB(red, green, blue)
         c.line(x, y, x2, y2,)
 
-    def pasteImage(self, pil_img, img_name, panel, page, dpi):
+    def paste_image(self, pil_img, img_name, panel, page, dpi):
         """ Adds the PIL image to the PDF figure. Overwritten for TIFFs """
 
         x = panel['x']
@@ -1472,11 +1475,11 @@ class TiffExport(FigureExport):
         self.ns = "omero.web.figure.tiff"
         self.mimetype = "image/tiff"
 
-    def addROIs(self, panel, page):
+    def add_rois(self, panel, page):
         """ TIFF export doesn't add ROIs to page (does it to panel)"""
         pass
 
-    def getFont(self, fontsize):
+    def get_font(self, fontsize):
         """ Try to load font from known location in OMERO """
         try:
             font = ImageFont.truetype(self.font_path, fontsize)
@@ -1485,28 +1488,28 @@ class TiffExport(FigureExport):
                 '%s/pilfonts/B%0.2d.pil' % (self.GATEWAYPATH, 24))
         return font
 
-    def scaleCoords(self, coord):
+    def scale_coords(self, coord):
         """
         Origianl figure coordinates assume 72 dpi figure, but we want to
         export at 300 dpi, so everything needs scaling accordingly
         """
         return (coord * 300)/72
 
-    def getFigureFileExt(self):
+    def get_figure_file_ext(self):
         return "tiff"
 
-    def createFigure(self):
+    def create_figure(self):
         """
         Creates a new PIL image ready to receive panels, labels etc.
         This is created for each page in the figure.
         """
-        tiff_width = self.scaleCoords(self.page_width)
-        tiff_height = self.scaleCoords(self.page_height)
+        tiff_width = self.scale_coords(self.page_width)
+        tiff_height = self.scale_coords(self.page_height)
         print "TIFF: width, height", tiff_width, tiff_height
-        self.tiffFigure = Image.new(
+        self.tiff_figure = Image.new(
             "RGBA", (tiff_width, tiff_height), (255, 255, 255))
 
-    def pasteImage(self, pil_img, img_name, panel, page, dpi=None):
+    def paste_image(self, pil_img, img_name, panel, page, dpi=None):
         """ Add the PIL image to the current figure page """
 
         x = panel['x']
@@ -1518,12 +1521,12 @@ class TiffExport(FigureExport):
         x = x - page['x']
         y = y - page['y']
 
-        print "pasteImage: x, y, width, height", x, y, width, height
-        x = self.scaleCoords(x)
-        y = self.scaleCoords(y)
-        width = self.scaleCoords(width)
-        height = self.scaleCoords(height)
-        print "scaleCoords: x, y, width, height", x, y, width, height
+        print "paste_image: x, y, width, height", x, y, width, height
+        x = self.scale_coords(x)
+        y = self.scale_coords(y)
+        width = self.scale_coords(width)
+        height = self.scale_coords(height)
+        print "scale_coords: x, y, width, height", x, y, width, height
 
         x = int(round(x))
         y = int(round(y))
@@ -1546,41 +1549,41 @@ class TiffExport(FigureExport):
             pil_img.save(img_name)
 
         # Now at full figure resolution - Good time to add shapes...
-        crop = self.getCropRegion(panel)
+        crop = self.get_crop_region(panel)
         ShapeToPilExport(pil_img, panel, crop)
 
         width, height = pil_img.size
         box = (x, y, x + width, y + height)
         self.tiffFigure.paste(pil_img, box)
 
-    def drawLine(self, x, y, x2, y2, width, rgb):
+    def draw_line(self, x, y, x2, y2, width, rgb):
         """ Draw line on the current figure page """
         draw = ImageDraw.Draw(self.tiffFigure)
 
-        x = self.scaleCoords(x)
-        y = self.scaleCoords(y)
-        x2 = self.scaleCoords(x2)
-        y2 = self.scaleCoords(y2)
-        width = self.scaleCoords(width)
+        x = self.scale_coords(x)
+        y = self.scale_coords(y)
+        x2 = self.scale_coords(x2)
+        y2 = self.scale_coords(y2)
+        width = self.scale_coords(width)
 
-        print "drawLine - TIFF...", x, y, x2, y2
+        print "draw_line - TIFF...", x, y, x2, y2
 
         for l in range(width):
             draw.line([(x, y), (x2, y2)], fill=rgb)
             y += 1
             y2 += 1
 
-    def drawText(self, text, x, y, fontsize, rgb, align="center"):
+    def draw_text(self, text, x, y, fontsize, rgb, align="center"):
         """ Add text to the current figure page """
-        x = self.scaleCoords(x)
-        fontsize = self.scaleCoords(fontsize)
+        x = self.scale_coords(x)
+        fontsize = self.scale_coords(fontsize)
 
-        font = self.getFont(fontsize)
+        font = self.get_font(fontsize)
         txt_w, txt_h = font.getsize(text)
 
         if align == "vertical":
             # write text on temp image (transparent)
-            y = self.scaleCoords(y)
+            y = self.scale_coords(y)
             x = int(round(x))
             y = int(round(y))
             temp_label = Image.new('RGBA', (txt_w, txt_h), (255, 255, 255, 0))
@@ -1592,7 +1595,7 @@ class TiffExport(FigureExport):
             self.tiffFigure.paste(w, (x, y), mask=w)
         else:
             y = y - 5       # seems to help, but would be nice to fix this!
-            y = self.scaleCoords(y)
+            y = self.scale_coords(y)
             textdraw = ImageDraw.Draw(self.tiffFigure)
             if align == "center":
                 x = x - (txt_w / 2)
@@ -1600,22 +1603,22 @@ class TiffExport(FigureExport):
                 x = x - txt_w
             textdraw.text((x, y), text, font=font, fill=rgb)
 
-    def savePage(self):
+    def save_page(self):
         """
         Save the current PIL image page as a TIFF and start a new
         PIL image for the next page
         """
-        self.figureFileName = self.getFigureFileName()
+        self.figure_file_name = self.get_figure_file_name()
 
-        self.tiffFigure.save(self.figureFileName)
+        self.tiff_figure.save(self.figure_file_name)
 
         # Create a new blank tiffFigure for subsequent pages
-        self.createFigure()
+        self.create_figure()
 
-    def addInfoPage(self, panels_json):
+    def add_info_page(self, panels_json):
         """
         Since we need a PDF for the info page, we create one first,
-        then call superclass addInfoPage
+        then call superclass add_info_page
         """
         # We allow TIFF figure export without reportlab (no Info page)
         if not reportlab_installed:
@@ -1627,11 +1630,11 @@ class TiffExport(FigureExport):
         self.figure_canvas = canvas.Canvas(
             full_name, pagesize=(self.page_width, self.page_height))
 
-        # Superclass method will call addParaWithThumb(),
+        # Superclass method will call add_para_with_thumb(),
         # to add lines to self.infoLines
-        super(TiffExport, self).addInfoPage(panels_json)
+        super(TiffExport, self).add_info_page(panels_json)
 
-    def saveFigure(self):
+    def save_figure(self):
         """ Completes PDF figure (or info-page PDF for TIFF export) """
         # We allow TIFF figure export without reportlab (no Info page)
         if not reportlab_installed:
@@ -1656,10 +1659,10 @@ def export_figure(conn, script_params):
     elif export_option == 'TIFF_IMAGES':
         fig_export = TiffExport(conn, script_params, export_images=True)
 
-    return fig_export.buildFigure()
+    return fig_export.build_figure()
 
 
-def runScript():
+def run_script():
     """
     The main entry point of the script, as called by the client
     via the scripting service, passing the required parameters.
@@ -1712,4 +1715,4 @@ def runScript():
         client.closeSession()
 
 if __name__ == "__main__":
-    runScript()
+    run_script()
