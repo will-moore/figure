@@ -1188,11 +1188,8 @@ class FigureExport(object):
     def add_read_me_file(self):
         """ Add a simple text file into the zip to explain what's there """
         read_me_path = os.path.join(self.zip_folder_name, "README.txt")
-        f = open(read_me_path, 'w')
-        try:
+        with open(read_me_path, 'w') as f:
             f.write(README_TXT)
-        finally:
-            f.close()
 
     def add_info_page(self, panels_json):
         """Generates a PDF info page with figure title, links to images etc"""
