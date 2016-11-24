@@ -16,6 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+import logging
 import json
 import unicodedata
 
@@ -27,6 +28,9 @@ from math import atan, sin, cos, sqrt, radians
 
 from omero.model import ImageAnnotationLinkI, ImageI
 import omero.scripts as scripts
+from omero.gateway import BlitzGateway
+from omero.rtypes import rstring, robject
+
 
 from cStringIO import StringIO
 try:
@@ -34,8 +38,6 @@ try:
 except ImportError:
     import Image
     import ImageDraw
-
-import logging
 
 logger = logging.getLogger('figure_to_pdf')
 
@@ -57,10 +59,6 @@ except ImportError:
     reportlab_installed = False
     logger.error("Reportlab not installed. See"
                  " https://pypi.python.org/pypi/reportlab/")
-
-
-from omero.gateway import BlitzGateway
-from omero.rtypes import rstring, robject
 
 
 ORIGINAL_DIR = "1_originals"
@@ -1664,6 +1662,7 @@ def run_script():
 
     finally:
         client.closeSession()
+
 
 if __name__ == "__main__":
     run_script()
