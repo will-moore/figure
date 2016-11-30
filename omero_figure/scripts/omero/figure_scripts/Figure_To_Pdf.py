@@ -1270,7 +1270,7 @@ class FigureExport(object):
             # addPara([" ".join(line)])
             line = " ".join(lines)
             page_y = self.add_para_with_thumb(
-                line, page_y, style=style_n, thumbSrc=thumb_src)
+                line, page_y, style=style_n, thumb_src=thumb_src)
 
         if len(scalebars) > 0:
             scalebars = list(set(scalebars))
