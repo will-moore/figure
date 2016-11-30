@@ -649,7 +649,7 @@ class FigureExport(object):
         # Create a zip if we have multiple TIFF pages or we're exporting Images
         export_option = self.script_params['Export_Option']
         create_zip = False
-        if self.exportImages:
+        if self.export_images:
             create_zip = True
         if (self.page_count > 1) and (export_option.startswith("TIFF")):
             create_zip = True
@@ -1486,7 +1486,7 @@ class TiffExport(FigureExport):
         height = int(round(height))
 
         # Save image BEFORE resampling
-        if self.exportImages:
+        if self.export_images:
             rs_name = os.path.join(self.zip_folder_name, RESAMPLED_DIR,
                                    img_name)
             pil_img.save(rs_name)
@@ -1494,7 +1494,7 @@ class TiffExport(FigureExport):
         # Resize to our target size to match DPI of figure
         pil_img = pil_img.resize((width, height), Image.BICUBIC)
 
-        if self.exportImages:
+        if self.export_images:
             img_name = os.path.join(self.zip_folder_name, FINAL_DIR, img_name)
             pil_img.save(img_name)
 
