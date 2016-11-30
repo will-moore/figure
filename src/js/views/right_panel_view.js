@@ -694,6 +694,7 @@
             "click .clear_dpi": "clear_dpi",
             "blur .xywh_form input": "handle_xywh",
             "keyup .xywh_form input": "handle_xywh",
+            "click .set_aspect_ratio": "lockAspectRatio"
         },
 
         handle_xywh: function(event) {
@@ -714,6 +715,7 @@
             // Avoid re-rendering and losing focus everytime there is a Blur event
             // set(attr, value) will not cause render()
             this.ignoreChange = true;
+            var aspectRatioStatus = false;
             this.models.forEach(function(m) {
                 if (attr === 'x' || attr ==='y') {
                     var old = m.get(attr);
@@ -741,14 +743,43 @@
                         this.render();
                         return;
                     }
-                    m.set(attr, value);
+
+                    //Check aspect ratio button state
+                    //If selected, check attribute and value and then recalculate other attribute value
+                    //Set both values parallely
+                    var newWidthHeight = {};
+                    newWidthHeight[attr] = value;
+
+                    if ($(".set_aspect_ratio", this.$el).hasClass("active")) {
+                        aspectRatioStatus = true;
+                        var widthCur = m.get('width');
+                        var heightCur = m.get('height');
+                        var aspRatio = widthCur/heightCur;
+
+                        if (attr === 'width'){
+                            var heightNew = value/aspRatio;
+                            newWidthHeight['height'] = heightNew;
+                        }
+                        else {
+                            var widthNew = value * aspRatio;
+                            newWidthHeight['width'] = widthNew;
+                        }
+                        this.ignoreChange = false;
+                    }
+                    m.set(newWidthHeight);
                 }
             }.bind(this));
             // Timout for ignoreChange
             // Only reset this AFTER render() is called
             setTimeout(function(){
                 this.ignoreChange = false;
-            }, 50);
+                // keep locked status of the aspect ratio button the same,
+                // when the focus shifts because of a blur event
+                if (aspectRatioStatus === true) {
+                    $(".set_aspect_ratio", this.$el).addClass("active");
+                }
+            }.bind(this), 50);
+
         },
 
         set_dpi: function(event) {
@@ -769,6 +800,11 @@
             // Simply show dialog - Everything else handled by SetIdModalView
             $("#setIdModal").modal('show');
             $("#setIdModal .imgId").val("").focus();
+        },
+
+        lockAspectRatio: function(event) {
+            event.preventDefault();
+            $(".set_aspect_ratio", this.$el).toggleClass("active");
         },
 
         // just update x,y,w,h by rendering ONE template
