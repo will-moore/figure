@@ -538,7 +538,7 @@ class ShapeToPilExport(object):
         paste_x = cx - (temp_ellipse.size[0]/2)
         paste_y = cy - (temp_ellipse.size[1]/2)
         self.pil_img.paste(temp_ellipse, (int(paste_x), int(paste_y)),
-                          mask=temp_ellipse)
+                           mask=temp_ellipse)
 
 
 class FigureExport(object):
