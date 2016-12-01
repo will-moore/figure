@@ -537,7 +537,7 @@ class ShapeToPilExport(object):
         # Use ellipse as mask, so transparent part is not pasted
         paste_x = cx - (temp_ellipse.size[0]/2)
         paste_y = cy - (temp_ellipse.size[1]/2)
-        self.pilImg.paste(temp_ellipse, (int(paste_x), int(paste_y)),
+        self.pil_img.paste(temp_ellipse, (int(paste_x), int(paste_y)),
                           mask=temp_ellipse)
 
 
@@ -1504,11 +1504,11 @@ class TiffExport(FigureExport):
 
         width, height = pil_img.size
         box = (x, y, x + width, y + height)
-        self.tiffFigure.paste(pil_img, box)
+        self.tiff_figure.paste(pil_img, box)
 
     def draw_line(self, x, y, x2, y2, width, rgb):
         """ Draw line on the current figure page """
-        draw = ImageDraw.Draw(self.tiffFigure)
+        draw = ImageDraw.Draw(self.tiff_figure)
 
         x = self.scale_coords(x)
         y = self.scale_coords(y)
@@ -1540,11 +1540,11 @@ class TiffExport(FigureExport):
             w = temp_label.rotate(90, expand=True)
             # Use label as mask, so transparent part is not pasted
             y = y - (w.size[1]/2)
-            self.tiffFigure.paste(w, (x, y), mask=w)
+            self.tiff_figure.paste(w, (x, y), mask=w)
         else:
             y = y - 5       # seems to help, but would be nice to fix this!
             y = self.scale_coords(y)
-            textdraw = ImageDraw.Draw(self.tiffFigure)
+            textdraw = ImageDraw.Draw(self.tiff_figure)
             if align == "center":
                 x = x - (txt_w / 2)
             elif align == "right":
