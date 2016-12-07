@@ -1,0 +1,65 @@
+
+
+    <% _.each(channels, function(c, i) { %>
+        <div class="btn-group" style="padding:2px">
+            <button type="button"
+            title="Turn channel on/off"
+class="btn btn-default channel-btn lutBg"
+                    data-index="<%= i %>"
+                    style="background-color:#<%= c.color %>; background-position: <%= c.lutBgPos %>">
+                <div class="<% if(c.active) { %>ch-btn-down<% } else if (typeof c.active == 'boolean') { %>ch-btn-up<% } else { %>ch-btn-flat<% }%>">&nbsp</div>&nbsp
+            </button>
+            <button type="button" class="btn btn-default dropdown-toggle"
+                    data-toggle="dropdown" title="Pick channel color">
+                <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu colorpicker" data-index="<%= i %>">
+                <li class="dropdown-header">Channel Color</li>
+                <li class="divider"></li>
+                <li><a data-color="0000FF" href="#">
+                    <span style="background-color:#00f">&nbsp &nbsp &nbsp</span>&nbsp Blue
+                </a></li>
+                <li><a data-color="00FF00" href="#">
+                    <span style="background-color:#0f0">&nbsp &nbsp &nbsp</span>&nbsp Green
+                </a></li>
+                <li><a data-color="FF0000" href="#">
+                    <span style="background-color:#f00">&nbsp &nbsp &nbsp</span>&nbsp Red
+                </a></li>
+                <li><a data-color="FFFF00" href="#">
+                    <span style="background-color:#ff0">&nbsp &nbsp &nbsp</span>&nbsp Yellow
+                </a></li>
+                <li><a data-color="FFFFFF" href="#">
+                    <span style="background-color:#fff">&nbsp &nbsp &nbsp</span>&nbsp White
+                </a></li>
+                <li><a data-color="FF00FF" href="#">
+                    <span style="background-color:#f0f">&nbsp &nbsp &nbsp</span>&nbsp Magenta
+                </a></li>
+                <li class="divider"></li>
+                <li><a data-color="lutpicker" href="#">
+                    <span class="lutBg">&nbsp &nbsp &nbsp</span>&nbsp Lookup Tables
+                </a></li>
+                <li><a data-color="colorpicker" data-oldcolor="<%= c.color %>" href="#">
+                    <span class="colorpickerOption">&nbsp &nbsp &nbsp</span>&nbsp More Colors...
+                </a></li>
+            </ul>
+        </div><br>
+    <% }); %>
+
+    <div class="btn-group rotation-controls" style="padding:2px">
+        <button type="button" class="btn btn-default btn-sm show-rotation" title="Rotate image">
+            <span class="glyphicon glyphicon-repeat"></span>
+            <span class="rotation_value"><%= rotation %></span> &deg;
+        </button>
+
+        <div class="rotation-slider"></div>
+    </div>
+
+
+    <div class="btn-group" style="padding:2px" title="Maximum intensity Z-projection (choose range with 2 handles on Z-slider)">
+        <button type="button" class="btn btn-default btn-sm z-projection
+                <% if(z_projection) { %>zp-btn-down<% } else if (typeof z_projection == 'boolean') { %><% } else { %>ch-btn-flat<% }%>"
+                <% if (z_projection_disabled) { %>disabled="disabled"<% } %>
+                >
+            <span class="glyphicon"></span>
+        </button>
+    </div>

@@ -1,0 +1,28 @@
+
+<h5 style="margin-top:6px">
+    View
+    <span style="font-weight:normal; float:right">
+        x: <span style="color: #aaa"><%= x %></span>
+        y: <span style="color: #aaa"><%= y %></span>
+        width: <span style="color: #aaa"><%= width %></span>
+        height: <span style="color: #aaa"><%= height %></span>
+    </span>
+</h5>
+
+<div class="btn-group">
+    <button type="button" class="btn btn-sm btn-default copyCropRegion" title="Copy crop region"
+        <% if (!canCopyRect) print('disabled') %> >
+        Copy
+    </button>
+    <button type="button" class="btn btn-sm btn-default pasteCropRegion" title="Paste crop region"
+        <% if (!canPasteRect) print('disabled') %> >
+        Paste
+    </button>
+    <button type="button" class="btn btn-sm btn-default reset-zoom-shape" title="Reset crop">
+        Reset
+    </button>
+</div>
+
+<button class="pull-right crop-btn btn btn-sm btn-success">
+    Crop
+</button>

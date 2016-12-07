@@ -1,0 +1,8 @@
+
+
+    <!-- One of these added to each position 'top', 'topleft' etc within Panel $el -->
+    <div class="label_layout label_<%= position %>">
+        <% _.each(labels, function(l, i) { %>
+            <div style='color:#<%= l.color %>; font-size:<%= l.size %>px'><%= l.text %></div>
+        <% }); %>
+    </div>

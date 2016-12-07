@@ -1,0 +1,29 @@
+
+    <% if (disabled) { %>
+        <td>
+            <% if(imageId > 0) { print("<img class='small-thumb' src='" + thumbSrc + "' />") }
+               else { print ("<div class='missingThumb small-thumb'></div>")} %>
+        </td>
+        <td title="This figure is currently open">
+            <div style="width:400px; word-wrap:break-word;">
+                <%= name %>
+            </div>
+        </td>
+    <% } else { %>
+        <td>
+            <a href="<%= url %>">
+                <img class='small-thumb' src='<%= thumbSrc %>' />
+            </a>
+        </td>
+        <td>
+            <div style="width:400px; word-wrap:break-word;">
+                <a href="<%= url %>"><%= name %></a>
+            </div>
+        </td>
+    <% } %>
+    <td>
+        <%= formatDate(creationDate) %>
+    </td>
+    <td>
+        <%= ownerFullName %>
+    </td>

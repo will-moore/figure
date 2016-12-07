@@ -1,0 +1,107 @@
+
+
+<div class="btn-group" role="group" aria-label="...">
+    <button type="button" data-state="SELECT"
+    	class="btn btn-default select-btn <% if (state==='SELECT')print('pressed') %>">
+        <span class="glyphicon"></span></button>
+</div>
+
+
+<div class="btn-group shape-option" role="group" aria-label="...">
+    <button type="button" class="btn btn-default rect-btn <% if (state==='RECT')print('pressed') %>"
+            title="Rectangle" data-state="RECT">
+        <span class="glyphicon"></span></button>
+    <button type="button" class="btn btn-default line-btn <% if (state==='LINE')print('pressed') %>"
+            title="Line" data-state="LINE">
+        <span class="glyphicon"></span></button>
+    <button type="button" class="btn btn-default arrow-btn <% if (state==='ARROW')print('pressed') %>"
+            title="Arrow" data-state="ARROW">
+        <span class="glyphicon"></span></button>
+    <button type="button" class="btn btn-default ellipse-btn <% if (state==='ELLIPSE')print('pressed') %>"
+            title="Ellipse" data-state="ELLIPSE">
+        <span class="glyphicon"></span></button>
+</div>
+
+
+<div class="btn-group">
+    <button type="button" class="shape-color btn btn-default dropdown-toggle" title="Label Color"
+        data-toggle="dropdown">
+        <span data-color="<%= color %>" style="background-color:#<%= color %>">&nbsp &nbsp &nbsp</span>
+        <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu dropdownSelect colorpicker" role="menu">
+        <li><a href="#">
+            <span data-color="000000" style="background-color:#000">&nbsp &nbsp &nbsp</span>&nbsp Black
+        </a></li>
+        <li><a href="#">
+            <span data-color="0000FF" style="background-color:#00f">&nbsp &nbsp &nbsp</span>&nbsp Blue
+        </a></li>
+        <li><a href="#">
+            <span data-color="00FF00" style="background-color:#0f0">&nbsp &nbsp &nbsp</span>&nbsp Green
+        </a></li>
+        <li><a href="#">
+            <span data-color="FF0000" style="background-color:#f00">&nbsp &nbsp &nbsp</span>&nbsp Red
+        </a></li>
+        <li><a href="#">
+            <span data-color="FFFF00" style="background-color:#ff0">&nbsp &nbsp &nbsp</span>&nbsp Yellow
+        </a></li>
+        <li><a href="#">
+            <span data-color="FFFFFF" style="background-color:#fff">&nbsp &nbsp &nbsp</span>&nbsp White
+        </a></li>
+        <li><a href="#">
+            <span data-color="FF00FF" style="background-color:#f0f">&nbsp &nbsp &nbsp</span>&nbsp Magenta
+        </a></li>
+        <li class="divider"></li>
+        <li><a data-color="colorpicker" data-oldcolor="<%= color %>" href="#">
+            <span class="colorpickerOption">&nbsp &nbsp &nbsp</span>&nbsp More Colors...
+        </a></li>
+    </ul>
+</div>
+
+
+<div class="btn-group">
+    <button type="button" class="line-width btn btn-default dropdown-toggle" title="Line Width: <%= lineWidth %>"
+        data-toggle="dropdown">
+        <span data-line-width="<%= lineWidth %>" class='linewidthOption' style='height:<%= lineWidth %>px'></span>
+        <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu dropdownSelect lineWidth" role="menu">
+
+        <% _.each([1,2,3,4,5,7,10,15,20,30],function(p){
+            print ("<li><a href='#'>"+p+"<span title='Line Width: "+p+"' data-line-width='"+p+"' class='linewidthOption' style='height:"+p+"px'></span></a></li>")
+        }); %>
+
+    </ul>
+</div>
+
+
+<div class="btn-group">
+    <button type="button" class="btn btn-default" title="Delete, Copy, Paste etc"
+        data-toggle="dropdown">
+        <span>Edit</span>
+        <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu" role="menu">
+        <li <% if (!sel) print('class="disabled"') %> >
+            <a href="#" class="copyShape">
+                Copy Shape   &nbsp&nbsp&nbsp <%= cmdKey %>C
+            </a>
+        </li>
+        <li <% if (!toPaste) print('class="disabled"') %> >
+            <a href="#" class="pasteShape">
+                Paste Shape   &nbsp&nbsp&nbsp <%= cmdKey %>V
+            </a>
+        </li>
+        <li <% if (!sel) print('class="disabled"') %> >
+            <a href="#" class="deleteShape">
+                Delete Shape    &nbsp&nbsp&nbsp Del
+            </a>
+        </li>
+        <li>
+            <a href="#" class="selectAll">
+                Select All Shapes    &nbsp&nbsp <%= cmdKey %>A
+            </a>
+        </li>
+    </ul>
+</div>
+

@@ -1,0 +1,11 @@
+
+    <!-- Alternative label_template - uses table to valign middle for 'left' & 'right' labels -->
+    <div class="label_layout label_middle label_<%= position %>">
+        <table>
+            <tr><td>
+                <% _.each(labels, function(l, i) { %>
+                    <div style='color:#<%= l.color %>; font-size:<%= l.size %>px'><%= l.text %></div>
+                <% }); %>
+            </td></tr>
+        </table>
+    </div>
