@@ -88,10 +88,10 @@ if (OME === undefined) {
 
 OPEN_WITH = [];
 
-OME.setOpenWithEnabledHandler = function(label, fn) {
-    // look for label in OPEN_WITH
+OME.setOpenWithEnabledHandler = function(id, fn) {
+    // look for id in OPEN_WITH
     OPEN_WITH.forEach(function(ow){
-        if (ow.label === label) {
+        if (ow.id === id) {
             ow.isEnabled = function() {
                 // wrap fn with try/catch, since error here will break jsTree menu
                 var args = Array.from(arguments);
@@ -110,10 +110,10 @@ OME.setOpenWithEnabledHandler = function(label, fn) {
 
 // Helper can be used by 'open with' plugins to provide
 // a url for the selected objects
-OME.setOpenWithUrlProvider = function(label, fn) {
-    // look for label in OPEN_WITH
+OME.setOpenWithUrlProvider = function(id, fn) {
+    // look for id in OPEN_WITH
     OPEN_WITH.forEach(function(ow){
-        if (ow.label === label) {
+        if (ow.id === id) {
             ow.getUrl = fn;
         }
     });
@@ -158,7 +158,6 @@ $(function(){
 
     // When we load, setup Open With options
     $.getJSON(WEBGATEWAYINDEX + "open_with/", function(data){
-        console.log(data);
         if (data && data.open_with_options) {
             OPEN_WITH = data.open_with_options;
             // Try to load scripts if specified:
