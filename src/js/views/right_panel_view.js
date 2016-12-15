@@ -822,7 +822,8 @@
                     if (url.indexOf(BASE_WEBFIGURE_URL) === 0) {
                         return;
                     }
-                    imageLinks.push({'text': v.label, 'url': url});
+                    var label = v.label || v.id;
+                    imageLinks.push({'text': label, 'url': url});
                 });
             }
             return imageLinks;
