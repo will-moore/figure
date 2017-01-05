@@ -3,6 +3,11 @@ var RoiLoaderView = Backbone.View.extend({
 
     tagName: 'tbody',
 
+    // We limit the number of planes you can load at once.
+    // Otherwise, with shapes on every plane of image, could request many planes at once.
+    NEW_PLANE_LIMIT: 10,
+    newPlaneCount: 0,
+
     template: JST["src/templates/modal_dialogs/roi_modal_roi.html"],
     shapeTemplate: JST["src/templates/modal_dialogs/roi_modal_shape.html"],
 
@@ -54,11 +59,14 @@ var RoiLoaderView = Backbone.View.extend({
         }.bind(this));
         var html = this.shapeTemplate({'shapes': shapesJson});
         $(".roiModalRoiItem[data-roiId='" + roiId + "']", this.$el).after(html);
+
+        this.newPlaneCount = 0;
         shapesJson.forEach(function(s){
             var $td = $(".roiModalRoiItem[data-shapeId='" + s.id + "'] td.roiViewport", this.$el);
-            if (s.icon) {
+            if (s.icon && this.newPlaneCount < this.NEW_PLANE_LIMIT) {
                 this.appendShape($td, s);
             }
+            this.newPlaneCount++;
         }.bind(this));
     },
 
@@ -75,6 +83,12 @@ var RoiLoaderView = Backbone.View.extend({
             var shape = this.collection.getShape(shapeId);
             var shapeJson = shape.toJSON();
             this.collection.trigger('shape_click', [shapeJson]);
+            // If we haven't already rendered an image panel for this shape...
+            var $element = $(".roiViewport", $tr);
+            var supportedShape = this.roiIcons[shapeJson.type];
+            if (supportedShape && $('.imagePanel', $element).length === 0) {
+                this.appendShape($element, shapeJson);
+            }
         } else {
             // Otherwise toggle ROI (show/hide shapes)
             var roiId = parseInt($tr.attr('data-roiId'), 10);
@@ -135,6 +149,7 @@ var RoiLoaderView = Backbone.View.extend({
     render: function() {
 
         var roiData = this.collection;  //.toJSON();
+        this.newPlaneCount = 0;
 
         roiData.forEach(function(roi){
             var roiJson = {id: roi.get('id'),
@@ -178,10 +193,11 @@ var RoiLoaderView = Backbone.View.extend({
             this.$el.append(html);
 
             var $element = $("#roiModalRoiList .roiViewport").last();
-            if (roiJson.shapes[0].icon) {
+            if (roiJson.shapes[0].icon && this.newPlaneCount < this.NEW_PLANE_LIMIT) {
                 // Only show shape if supported type
                 this.appendShape($element, roiJson.shapes[0]);
             }
+            this.newPlaneCount++;
 
         }.bind(this));
 
