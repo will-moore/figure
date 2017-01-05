@@ -1,5 +1,4 @@
 
-
 var ChannelSliderView = Backbone.View.extend({
 
     template: JST["src/templates/channel_slider_template.html"],
@@ -11,15 +10,11 @@ var ChannelSliderView = Backbone.View.extend({
         this.models.forEach(function(m){
             self.listenTo(m, 'change:channels', self.render);
         });
-
-        // this.$el = $("#channel_sliders");
     },
 
     events: {
         "keyup .ch_start": "handle_channel_input",
-        // "blur .ch_start": "handle_channel_input",
         "keyup .ch_end": "handle_channel_input",
-        // "blur .ch_end": "handle_channel_input",
     },
 
     handle_channel_input: function(event) {
