@@ -82,6 +82,43 @@ var figureConfirmDialog = function(title, message, buttons, callback) {
     });
 };
 
+if (OME === undefined) {
+    var OME = {};
+}
+
+OPEN_WITH = [];
+
+OME.setOpenWithEnabledHandler = function(id, fn) {
+    // look for id in OPEN_WITH
+    OPEN_WITH.forEach(function(ow){
+        if (ow.id === id) {
+            ow.isEnabled = function() {
+                // wrap fn with try/catch, since error here will break jsTree menu
+                var args = Array.from(arguments);
+                var enabled = false;
+                try {
+                    enabled = fn.apply(this, args);
+                } catch (e) {
+                    // Give user a clue as to what went wrong
+                    console.log("Open with " + label + ": " + e);
+                }
+                return enabled;
+            }
+        }
+    });
+};
+
+// Helper can be used by 'open with' plugins to provide
+// a url for the selected objects
+OME.setOpenWithUrlProvider = function(id, fn) {
+    // look for id in OPEN_WITH
+    OPEN_WITH.forEach(function(ow){
+        if (ow.id === id) {
+            ow.getUrl = fn;
+        }
+    });
+};
+
 
 $(function(){
 
@@ -118,5 +155,18 @@ $(function(){
                 $this.text($this.text().replace("⌘", "Ctrl+"));
         });
     }
+
+    // When we load, setup Open With options
+    $.getJSON(WEBGATEWAYINDEX + "open_with/", function(data){
+        if (data && data.open_with_options) {
+            OPEN_WITH = data.open_with_options;
+            // Try to load scripts if specified:
+            OPEN_WITH.forEach(function(ow){
+                if (ow.script_url) {
+                    $.getScript(ow.script_url);
+                }
+            })
+        }
+    });
 
 });
