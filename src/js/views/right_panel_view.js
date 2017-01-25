@@ -781,7 +781,7 @@
                 this.ignoreChange = false;
                 // keep locked status of the aspect ratio button the same,
                 // when the focus shifts because of a blur event
-                if (aspectRatioStatus === true) {
+                if (aspectRatioStatus) {
                     $(".set_aspect_ratio", this.$el).addClass("active");
                 }
             }.bind(this), 50);
