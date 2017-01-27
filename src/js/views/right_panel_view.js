@@ -772,7 +772,7 @@
                         }
                         this.ignoreChange = false;
                     }
-                    m.set(newWidthHeight);
+                    m.save(newWidthHeight);
                 }
             }.bind(this));
             // Timout for ignoreChange
@@ -811,12 +811,6 @@
         lockAspectRatio: function(event) {
             event.preventDefault();
             $(".set_aspect_ratio", this.$el).toggleClass("active");
-            if ($(".set_aspect_ratio", this.$el).hasClass("active")) {
-                $(".aspect_ratio_selected", this.$el).addClass("glyphicon-ok-sign");
-            }
-            if (!$(".set_aspect_ratio", this.$el).hasClass("active")) {
-                $(".aspect_ratio_selected", this.$el).removeClass("glyphicon-ok-sign");
-            }
         },
 
         // just update x,y,w,h by rendering ONE template
