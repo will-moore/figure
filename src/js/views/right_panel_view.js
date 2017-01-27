@@ -700,7 +700,7 @@
             "click .clear_dpi": "clear_dpi",
             "blur .xywh_form input": "handle_xywh",
             "keyup .xywh_form input": "handle_xywh",
-            "click .set_aspect_ratio": "lockAspectRatio"
+            "click .setAspectRatio": "lockAspectRatio"
         },
 
         handle_xywh: function(event) {
@@ -756,7 +756,7 @@
                     var newWidthHeight = {};
                     newWidthHeight[attr] = value;
 
-                    if ($(".set_aspect_ratio", this.$el).hasClass("active")) {
+                    if ($(".setAspectRatio", this.$el).hasClass("aspectRatioSelected")) {
                         aspectRatioStatus = true;
                         var widthCur = m.get('width');
                         var heightCur = m.get('height');
@@ -782,7 +782,7 @@
                 // keep locked status of the aspect ratio button the same,
                 // when the focus shifts because of a blur event
                 if (aspectRatioStatus) {
-                    $(".set_aspect_ratio", this.$el).addClass("active");
+                    $(".setAspectRatio", this.$el).addClass("aspectRatioSelected");
                 }
             }.bind(this), 50);
 
@@ -810,7 +810,7 @@
 
         lockAspectRatio: function(event) {
             event.preventDefault();
-            $(".set_aspect_ratio", this.$el).toggleClass("active");
+            $(".setAspectRatio", this.$el).toggleClass("aspectRatioSelected");
         },
 
         // just update x,y,w,h by rendering ONE template
