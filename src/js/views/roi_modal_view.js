@@ -96,8 +96,7 @@ var RoiModalView = Backbone.View.extend({
             var url = BASE_WEBFIGURE_URL + 'roiCount/' + this.m.get('imageId') + '/';
 
             var $btn = $(".loadRois", this.$el)
-                .attr({'disabled': 'disabled'})
-                .show();
+                .attr({'disabled': 'disabled'});
             $btn.parent().attr('title', 'Checking for ROIs...');  // title on parent div - still works if btn disabled
             $.getJSON(url, function(data){
                 if (data.roi && data.roi > 0) {
@@ -113,7 +112,7 @@ var RoiModalView = Backbone.View.extend({
         loadRois: function(event) {
             event.preventDefault();
             // hide button and tip
-            $(".loadRois", this.$el).hide();
+            $(".loadRois", this.$el).prop('disabled', true);
             $("#roiModalTip").hide();
 
             var iid = this.m.get('imageId');
