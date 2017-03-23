@@ -1,0 +1,21 @@
+
+ <div class="clearfix" style="position: relative">
+    <span class="ch_start">
+        <input type="number" data-window="start"
+        <% if (startsNotEqual) { %>
+            title="Average: <%= startAvg %> (selected images have different start values)"
+            style="color: #ccc;"
+        <% } %>
+        data-idx="<%=idx%>" style="width: 40px" value="<%= startAvg %>" max="<%= endAvg %>">
+    </span>
+    <div class="ch_slider" style="background-color:#<%=color%>" aria-disabled="false">
+    </div>
+    <span class="ch_end">
+        <input type="number" data-window="end"
+        <% if (endsNotEqual) { %>
+            title="Average: <%= endAvg %> (selected images have different end values)"
+            style="color: #ccc;"
+        <% } %>
+        data-idx="<%=idx%>" value="<%= endAvg %>" min="<%= startAvg %>">
+    </span>
+</div>
