@@ -11,6 +11,9 @@ var RoiModalView = Backbone.View.extend({
         // ID for temp shape that we add & remove from shapeManager
         TEMP_SHAPE_ID: -1234,
 
+        // This gets populated when dialog loads
+        omeroRoiCount: 0,
+        roisLoaded: false,
 
         initialize: function() {
 
@@ -62,7 +65,8 @@ var RoiModalView = Backbone.View.extend({
                 }
 
                 // remove any previous OMERO ROIs
-                $("#roiModalRoiList table").empty()
+                $("#roiModalRoiList table").empty();
+                self.roisLoaded = false;
 
                 self.render();
                 self.checkForRois();
@@ -99,13 +103,9 @@ var RoiModalView = Backbone.View.extend({
                 .attr({'disabled': 'disabled'});
             $btn.parent().attr('title', 'Checking for ROIs...');  // title on parent div - still works if btn disabled
             $.getJSON(url, function(data){
-                if (data.roi && data.roi > 0) {
-                    $btn.removeAttr('disabled')
-                    .parent().attr('title', 'Load ' + data.roi + ' ROIs from OMERO');
-                } else {
-                    $btn.parent().attr('title', 'This image has no ROIs on the OMERO server');
-                }
-            });
+                this.omeroRoiCount = data.roi;
+                this.renderToolbar();
+            }.bind(this));
         },
 
         // Load Rectangles from OMERO and render them
@@ -124,17 +124,16 @@ var RoiModalView = Backbone.View.extend({
             this.listenTo(Rois, "shape_click", this.showShapePlane);
             Rois.url = ROIS_JSON_URL + iid + "/",
             Rois.fetch({success: function(model, response, options){
+                $(".loadRois", this.$el).prop('disabled', false);
+                $("#roiModalRoiList table").empty();
+                this.roisLoaded = true;
+                this.renderToolbar();
                 var roiLoaderView = new RoiLoaderView({collection: model, panel: this.m});
-                // We append el first, then render so that ROI panels & shapes render correctly
                 $("#roiModalRoiList table").append(roiLoaderView.el);
                 roiLoaderView.render();
             }.bind(this),
             error: function(m, rsp){
                 var info = rsp.status + " " + rsp.statusText
-                if (rsp.status === 404) {
-                    // OMERO 5.0 url is /get_rois_json/iid (no final slash)
-                    info = "You need to use OMERO 5.1 or later";
-                }
                 alert("Failed to load ROIS: " + info);
             } });
         },
@@ -341,7 +340,9 @@ var RoiModalView = Backbone.View.extend({
                         'sel': sel,
                         'cmdKey': windows ? "Ctrl+" : "⌘",
                         'toPaste': toPaste,
-                        'zoom': parseInt(scale * 100, 10)};
+                        'zoom': parseInt(scale * 100, 10),
+                        'omeroRoiCount': this.omeroRoiCount,
+                        'roisLoaded': this.roisLoaded};
             $(".roi_toolbar", this.$el).html(this.template(json));
         },
 

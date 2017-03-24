@@ -106,8 +106,21 @@
 </div>
 
 
-<div class="btn-group">
-    <button class="loadRois btn btn-success" disabled='disabled' title="Load ROIs from OMERO">
-        Load ROIs
+<div class="btn-group"
+    <% if (omeroRoiCount > 0) { %>
+        title="Load <%=omeroRoiCount%> ROIs from OMERO"
+    <% } else { %>
+        title="This image has no ROIs on the OMERO server"
+    <% } %>>
+    <button class="loadRois btn btn-success"
+        <% if (omeroRoiCount == 0) { %>
+            disabled='disabled'
+        <% } %>
+    >
+        <% if (roisLoaded) {%>
+            Refresh ROIs
+        <% } else { %>
+            Load ROIs
+        <% } %>
     </button>
 </div>
