@@ -51,9 +51,10 @@ except ImportError:
 
 try:
     from reportlab.pdfgen import canvas
-    from reportlab.lib.styles import getSampleStyleSheet
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
     from reportlab.lib.units import inch
     from reportlab.platypus import Paragraph
+    from reportlab.lib.enums import TA_LEFT, TA_CENTER, TA_RIGHT
     reportlab_installed = True
 except ImportError:
     reportlab_installed = False
@@ -1338,25 +1339,53 @@ class FigureExport(object):
 
     def draw_text(self, text, x, y, fontsize, rgb, align="center"):
         """ Adds text to PDF. Overwritten for TIFF below """
-        ly = y + fontsize
-        ly = self.page_height - ly + 5
+        if markdown_imported:
+            # convert markdown to html
+            text = markdown.markdown(text)
+
+        y = self.page_height - y
         c = self.figure_canvas
+        # Needs to be wide enough to avoid wrapping
+        para_width = self.page_width
 
         red, green, blue = rgb
         red = float(red)/255
         green = float(green)/255
         blue = float(blue)/255
-        c.setFont("Helvetica", fontsize)
-        c.setFillColorRGB(red, green, blue)
+
+        alignment = TA_LEFT
         if (align == "center"):
-            c.drawCentredString(x, ly, text)
+            alignment = TA_CENTER
+            x = x - (para_width/2)
         elif (align == "right"):
-            c.drawRightString(x, ly, text)
+            alignment = TA_RIGHT
+            x = x - para_width
         elif (align == "left"):
-            c.drawString(x, ly, text)
+            pass
         elif align == 'vertical':
+            # Switch axes
             c.rotate(90)
-            c.drawCentredString(self.page_height - y, -(x + fontsize), text)
+            px = x
+            x = y
+            y = -px
+            # Align center
+            alignment = TA_CENTER
+            x = x - (para_width/2)
+
+        style_n = getSampleStyleSheet()['Normal']
+        style = ParagraphStyle(
+            'label',
+            parent=style_n,
+            alignment=alignment,
+            textColor=(red, green, blue),
+            fontSize=fontsize)
+
+        para = Paragraph(text, style)
+        w, h = para.wrap(para_width, y)   # find required space
+        para.drawOn(c, x, y - h + int(fontsize * 0.25))
+
+        # Rotate back again
+        if align == 'vertical':
             c.rotate(-90)
 
     def draw_line(self, x, y, x2, y2, width, rgb):
