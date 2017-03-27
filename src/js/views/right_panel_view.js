@@ -430,6 +430,8 @@
                 key = $form.attr('data-key'),
                 deleteMap = {};
 
+            // escape the key to handle 'single' and "double" quotes
+            key = _.escape(key);
             deleteMap[key] = false;
 
             this.models.forEach(function(m){
