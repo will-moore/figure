@@ -4,6 +4,8 @@ var RoiModalView = Backbone.View.extend({
 
         template: JST["src/templates/shapes/shape_toolbar_template.html"],
 
+        roi_zt_buttons_template: JST["src/templates/modal_dialogs/roi_zt_buttons.html"],
+
         el: $("#roiModal"),
 
         model:FigureModel,
@@ -94,6 +96,20 @@ var RoiModalView = Backbone.View.extend({
             "click .deleteShape": "deleteShapes",
             "click .selectAll": "selectAllShapes",
             "click .loadRois": "loadRois",
+            "click .revert_theZ": "revertTheZ",
+            "click .revert_theT": "revertTheT",
+        },
+
+        revertTheZ: function() {
+            var orig_model = this.model.getSelected().head();
+            this.m.set('theZ', orig_model.get('theZ'));
+            this.renderImagePlane();
+        },
+
+        revertTheT: function() {
+            var orig_model = this.model.getSelected().head();
+            this.m.set('theT', orig_model.get('theT'));
+            this.renderImagePlane();
         },
 
         checkForRois: function() {
@@ -230,10 +246,13 @@ var RoiModalView = Backbone.View.extend({
                 // Remove any temporary shapes (from hovering over OMERO shapes)
                 return (s.id !== this.TEMP_SHAPE_ID);
             }.bind(this));
+
+            var theZ = this.m.get('theZ'),
+                theT = this.m.get('theT');
             this.model.getSelected().forEach(function(panel){
 
                 // We use save() to notify undo/redo queue. TODO - fix!
-                panel.save('shapes', shapesJson);
+                panel.save({'shapes': shapesJson, 'theZ': theZ, 'theT': theT});
             });
 
             $("#roiModal").modal("hide");
@@ -411,6 +430,14 @@ var RoiModalView = Backbone.View.extend({
         renderImagePlane: function() {
             var src = this.m.get_img_src();
             this.$roiImg.attr('src', src);
+
+            var orig_model = this.model.getSelected().head();
+            var json = {'theZ': this.m.get('theZ'),
+                        'theT': this.m.get('theT'),
+                        'origZ': orig_model.get('theZ'),
+                        'origT': orig_model.get('theT')}
+            var html = this.roi_zt_buttons_template(json);
+            $("#roi_zt_buttons").html(html);
         },
 
         render: function() {
