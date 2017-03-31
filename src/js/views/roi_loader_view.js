@@ -100,7 +100,7 @@ var RoiLoaderView = Backbone.View.extend({
         var roiData = this.collection;  //.toJSON();
         this.newPlaneCount = 0;
 
-        roiData.forEach(function(roi){
+        var json = roiData.map(function(roi){
             var roiJson = {id: roi.get('id'),
                            shapes: []},
                 minT, maxT = 0,
@@ -136,12 +136,11 @@ var RoiLoaderView = Backbone.View.extend({
             roiJson.minT = minT;
             roiJson.maxT = maxT;
 
-            // return r;
-            var html = this.template({'roi': roiJson});
-
-            this.$el.append(html);
-
+            return roiJson;
         }.bind(this));
+
+        var html = this.template({'rois': json});
+        this.$el.html(html);
 
         return this;
     }

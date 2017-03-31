@@ -6,22 +6,23 @@
         <% if (!shape.icon) { %>title="<%= shape.type %> not supported in OMERO.figure"<% } %>
         >
         <td></td>
-        <td><span class="glyphicon <% if (shape.icon) { %><%= shape.icon %><% } %>"></span> </td>
-        <td>Z: <%= shape.theZ + 1 %> </td>
-        <td>T: <%= shape.theT + 1 %> </td>
-        <td class="roiViewport">
-            <% if (!shape.icon) { %>
-                <span>
-                    <%= shape.type %>
-                </span>
-            <% } %>
+        <td></td>
+        <td>
+            <span class="glyphicon <% if (shape.icon) { %><%= shape.icon %><% } %>"></span>
+            <%= shape.id %>
         </td>
+        <td><%= shape.theZ + 1 %> </td>
+        <td><%= shape.theT + 1 %> </td>
         <td>
             <% if (shape.icon) { %>
             <button type="button" class="addOmeroShape btn btn-success btn-sm"
                     title="Add Shape to image">
                 Add
             </button>
+            <% } else { %>
+                <span>
+                    <%= shape.type %>
+                </span>
             <% } %>
         </td>
     </tr>

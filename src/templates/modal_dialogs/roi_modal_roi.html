@@ -1,4 +1,13 @@
 
+<tr>
+    <th></th>
+    <th>ROI</th>
+    <th>Shape</th>
+    <th>Z</th>
+    <th>T</th>
+    <th></th>
+</tr>
+<% _.each(rois, function(roi) { %>
 
 <tr class="roiModalRoiItem"
         data-roiId="<%= roi.id %>"
@@ -14,27 +23,22 @@
             <span class="toggleRoi glyphicon glyphicon-play"></span>
         <% } %>
     </td>
+    <td><%= roi.id %></td>
     <td>
         <span class="glyphicon <% if (roi.shapes[0].icon) { %><%= roi.icon %><% } %>"></span>
+        <% if (roi.shapes.length === 1) { %>
+            <%= roi.shapes[0].id %>
+        <% } %>
     </td>
 
     <td style="padding-left: 0; padding-right: 0">
-        Z:
         <% if (roi.minZ !== undefined) { %>
             <%= roi.minZ + 1 %><% if (roi.maxZ !== roi.minZ) print("-" + (roi.maxZ + 1)); %>
         <% } %>
     </td>
     <td style="padding-left: 0; padding-right: 0">
-        T:
         <% if (roi.minT !== undefined) { %>
             <%= roi.minT + 1 %><% if (roi.maxT !== roi.minT) print("-" + (roi.maxT + 1)); %>
-        <% } %>
-    </td>
-    <td class="roiViewport">
-        <% if (!roi.shapes[0].icon) { %>
-            <span>
-                <%= roi.shapes[0].type %>
-            </span>
         <% } %>
     </td>
     <td>
@@ -46,3 +50,5 @@
         <% } %>
     </td>
 </tr>
+
+<% }) %>
