@@ -3,6 +3,7 @@
 <% if (shapes.length > 1) { %>
     <% _.each(shapes, function(shape) { %>
     <tr class="roiModalRoiItem shape" data-shapeId="<%= shape.id %>"
+        title="<%= shape.tooltip %>"
         <% if (!shape.icon) { %>title="<%= shape.type %> not supported in OMERO.figure"<% } %>
         >
         <td></td>

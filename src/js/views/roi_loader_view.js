@@ -49,6 +49,7 @@ var RoiLoaderView = Backbone.View.extend({
         var roi = this.collection.get(roiId);
         var shapesJson = roi.shapes.map(function(shapeModel){
             var s = shapeModel.toJSON();
+            s.tooltip = this.getTooltip(s);
             s.icon = this.roiIcons[s.type];
             return s;
         }.bind(this));
@@ -95,6 +96,20 @@ var RoiLoaderView = Backbone.View.extend({
         this.collection.selectShape();
     },
 
+    getTooltip: function(shape) {
+        var coords = [];
+        if (shape.type === 'Rectangle') {
+            coords = ['x', 'y', 'width', 'height'];
+        } else if (shape.type === 'Ellipse') {
+            coords = ['x', 'y', 'radiusX', 'radiusY'];
+        } else if (shape.type === 'Line' || shape.type == 'Arrow') {
+            coords = ['x1', 'y1', 'x2', 'y2'];
+        }
+        return coords.map(function(c){
+            return c + ": " + shape[c];
+        }).join(" ");
+    },
+
     render: function() {
 
         var roiData = this.collection;  //.toJSON();
@@ -125,6 +140,7 @@ var RoiLoaderView = Backbone.View.extend({
                         }
                         maxT = Math.max(maxT, s.theT);
                     }
+                    s.tooltip = this.getTooltip(s);
                     return s;
                 }.bind(this));
             }
