@@ -7,10 +7,8 @@
         <% if (!shape.icon) { %>title="<%= shape.type %> not supported in OMERO.figure"<% } %>
         >
         <td></td>
-        <td></td>
         <td>
             <span class="glyphicon <% if (shape.icon) { %><%= shape.icon %><% } %>"></span>
-            <%= shape.id %>
         </td>
         <td><%= shape.theZ + 1 %> </td>
         <td><%= shape.theT + 1 %> </td>

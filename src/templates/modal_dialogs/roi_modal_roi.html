@@ -1,8 +1,7 @@
 
 <tr>
     <th></th>
-    <th>ROI</th>
-    <th>Shape</th>
+    <th></th>
     <th>Z</th>
     <th>T</th>
     <th></th>
@@ -24,12 +23,8 @@
             <span class="toggleRoi glyphicon glyphicon-play"></span>
         <% } %>
     </td>
-    <td><%= roi.id %></td>
     <td>
         <span class="glyphicon <% if (roi.shapes[0].icon) { %><%= roi.icon %><% } %>"></span>
-        <% if (roi.shapes.length === 1) { %>
-            <%= roi.shapes[0].id %>
-        <% } %>
     </td>
 
     <td style="padding-left: 0; padding-right: 0">
