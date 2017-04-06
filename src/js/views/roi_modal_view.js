@@ -180,7 +180,7 @@ var RoiModalView = Backbone.View.extend({
             var viewport = this.m.getViewportAsRect();
             shape = this.shapeManager.pasteShapesJson([shapeJson], viewport);
             if (!shape) {
-                alert("Couldn't add shape outside of current viewport");
+                alert("Couldn't add shape outside of current view. Try zooming out.");
             }
         },
 

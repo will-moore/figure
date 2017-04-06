@@ -105,9 +105,10 @@ var RoiLoaderView = Backbone.View.extend({
         } else if (shape.type === 'Line' || shape.type == 'Arrow') {
             coords = ['x1', 'y1', 'x2', 'y2'];
         }
-        return coords.map(function(c){
+        coords = coords.map(function(c){
             return c + ": " + shape[c];
-        }).join(" ");
+        });
+        return 'ID: ' + shape.id + ' ' + coords.join(" ")
     },
 
     render: function() {
