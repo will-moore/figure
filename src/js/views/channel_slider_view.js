@@ -107,6 +107,7 @@ var ChannelSliderView = Backbone.View.extend({
                 var min = mins.reduce(reduceFn(Math.min), 9999);
                 var max = maxs.reduce(reduceFn(Math.max), -9999);
                 var color = colors.reduce(allEqualFn, colors[0]) ? colors[0] : 'ccc';
+                var lutBgPos = FigureLutPicker.getLutBackgroundPosition(color);
                 if (color == "FFFFFF") color = "ccc";  // white slider would be invisible
 
                 // Make sure slider range is increased if needed to include current values
@@ -135,7 +136,9 @@ var ChannelSliderView = Backbone.View.extend({
                             m.save_channel_window(chIdx, {'start': ui.values[0], 'end': ui.values[1]});
                         });
                     }
-                });
+                })
+                // Need to add background style to newly created div.ui-slider-range
+                .children('.ui-slider-range').css('background-position', lutBgPos)
             }.bind(this));
         return this;
     }
