@@ -1,3 +1,4 @@
+
 var ChannelSliderView = Backbone.View.extend({
 
     template: JST["src/templates/channel_slider_template.html"],

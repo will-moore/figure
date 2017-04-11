@@ -1,0 +1,9 @@
+
+<span class="label label-default" style="font-size: 12px">Z: <%= theZ + 1 %></span>
+<% if (theZ != origZ) { %>
+    <button type="button" class="revert_theZ btn btn-success btn-xs">Revert to Z: <%= origZ + 1 %></button>
+<% } %>
+<span class="label label-default" style="font-size: 12px">T: <%= theT +1 %></span>
+<% if (theT != origT) { %>
+    <button type="button" class="revert_theT btn btn-success btn-xs">Revert to T: <%= origT + 1 %></button>
+<% } %>

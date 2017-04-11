@@ -316,11 +316,11 @@ class ShapeToPdfExport(object):
 
     def draw_ellipse(self, shape):
         stroke_width = shape['strokeWidth'] * self.scale
-        c = self.panel_to_page_coords(shape['cx'], shape['cy'])
+        c = self.panel_to_page_coords(shape['x'], shape['y'])
         cx = c['x']
         cy = self.page_height - c['y']
-        rx = shape['rx'] * self.scale
-        ry = shape['ry'] * self.scale
+        rx = shape['radiusX'] * self.scale
+        ry = shape['radiusY'] * self.scale
         rotation = (shape['rotation'] + self.panel['rotation']) * -1
         rgb = self.get_rgb(shape['strokeColor'])
         r = float(rgb[0])/255
@@ -515,11 +515,11 @@ class ShapeToPilExport(object):
     def draw_ellipse(self, shape):
 
         w = int(shape['strokeWidth'] * self.scale)
-        ctr = self.get_panel_coords(shape['cx'], shape['cy'])
+        ctr = self.get_panel_coords(shape['x'], shape['y'])
         cx = ctr['x']
         cy = ctr['y']
-        rx = self.scale * shape['rx']
-        ry = self.scale * shape['ry']
+        rx = self.scale * shape['radiusX']
+        ry = self.scale * shape['radiusY']
         rotation = (shape['rotation'] + self.panel['rotation']) * -1
         rgb = self.get_rgb(shape['strokeColor'])
 

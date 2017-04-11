@@ -109,7 +109,7 @@
             } else {
                 // delete shapes
                 if (this.shapeManager) {
-                    this.shapeManager.deleteAll();
+                    this.shapeManager.deleteAllShapes();
                 }
             }
         },
