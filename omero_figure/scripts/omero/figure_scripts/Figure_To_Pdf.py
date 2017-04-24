@@ -1568,7 +1568,7 @@ class TiffExport(FigureExport):
             txt_w, txt_h = font.getsize(t['text'])
             widths.append(txt_w)
             heights.append(txt_h)
-        
+
         label_w = sum(widths)
         label_h = max(heights)
 
@@ -1600,8 +1600,6 @@ class TiffExport(FigureExport):
         token = ""
         i = 0
         while i < len(html):
-            new_bold = False
-            new_italics = False
             # look for start / end of b or i elements
             start_bold = html[i:].startswith("<strong>")
             end_bold = html[i:].startswith("</strong>")
@@ -1620,7 +1618,8 @@ class TiffExport(FigureExport):
             # if style has changed:
             if start_bold or end_bold or start_ital or end_ital:
                 # save token with previous style
-                tokens.append({'text': token, 'bold': in_bold, 'italics': in_italics})
+                tokens.append({'text': token, 'bold': in_bold,
+                               'italics': in_italics})
                 token = ""
                 if start_bold or end_bold:
                     in_bold = start_bold
@@ -1644,7 +1643,6 @@ class TiffExport(FigureExport):
             text = markdown.markdown(text)
 
         temp_label = self.draw_temp_label(text, fontsize, rgb)
-
 
         if align == "vertical":
             temp_label = temp_label.rotate(90, expand=True)
