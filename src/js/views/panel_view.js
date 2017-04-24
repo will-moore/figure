@@ -64,9 +64,6 @@
                         'width': w +'px',
                         'height': h +'px'});
 
-            // container needs to be square for rotation to vertical
-            $('.left_vlabels', this.$el).css('width', h + 'px');
-
             // update the img within the panel
             var zoom = this.model.get('zoom'),
                 vp_css = this.model.get_vp_img_css(zoom, w, h),
@@ -166,9 +163,6 @@
                 }
             });
             self.$el.append(html);
-
-            // need to force update of vertical labels layout
-            $('.left_vlabels', self.$el).css('width', self.$el.height() + 'px');
 
             return this;
         },
