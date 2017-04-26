@@ -678,6 +678,11 @@ class FigureExport(object):
         id1 = panels_json[0]['imageId']
         group_id = self.conn.getObject("Image", id1).getDetails().group.id.val
 
+        # PDF will get created in this group
+        if group_id is None:
+            group_id = self.conn.getEventContext().groupId
+        self.conn.SERVICE_OPTS.setOmeroGroup(group_id)
+
         # For each page, add panels...
         col = 0
         row = 0
@@ -703,11 +708,11 @@ class FigureExport(object):
         # Saves the completed  figure file
         self.save_figure()
 
-        # PDF will get created in this group
-        if group_id is None:
-            group_id = self.conn.getEventContext().groupId
-        self.conn.SERVICE_OPTS.setOmeroGroup(group_id)
+        file_ann = self.create_file_annotation(image_ids)
+        return file_ann
 
+
+    def create_file_annotation(self, image_ids):
         output_file = self.figure_file_name
         ns = self.ns
         mimetype = self.mimetype
@@ -1590,6 +1595,39 @@ class TiffExport(FigureExport):
         self.figure_canvas.save()
 
 
+class OmeroExport(TiffExport):
+
+    def __init__(self, conn, script_params):
+
+        super(OmeroExport, self).__init__(conn, script_params, export_images)
+
+    def save_page(self):
+        """
+        Save the current PIL image page as a TIFF and start a new
+        PIL image for the next page
+        """
+        self.figure_file_name = self.get_figure_file_name()
+
+        # self.tiff_figure.save(self.figure_file_name)
+
+        import numpy
+        if (self.export_omero):
+            np_array = numpy.asarray(self.tiff_figure)
+            red = np_array[::,::,0]
+            green = np_array[::,::,1]
+            blue = np_array[::,::,2]
+            plane_gen = iter([red, green, blue])
+            image_id = self.conn.createImageFromNumpySeq(plane_gen,
+                                          self.figure_file_name,
+                                          sizeC=3,
+                                          description=None, dataset=None)
+        # Create a new blank tiffFigure for subsequent pages
+        self.create_figure()
+
+    def create_file_annotation(self, image_ids):
+        pass
+
+
 def export_figure(conn, script_params):
 
     # make sure we can find all images
@@ -1605,7 +1643,8 @@ def export_figure(conn, script_params):
         fig_export = TiffExport(conn, script_params)
     elif export_option == 'TIFF_IMAGES':
         fig_export = TiffExport(conn, script_params, export_images=True)
-
+    elif export_option == 'OMERO_IMAGES':
+        fig_export = OmeroExport(conn, script_params, export_omero=True)
     return fig_export.build_figure()
 
 
@@ -1616,7 +1655,8 @@ def run_script():
     """
 
     export_options = [rstring('PDF'), rstring('PDF_IMAGES'),
-                      rstring('TIFF'), rstring('TIFF_IMAGES')]
+                      rstring('TIFF'), rstring('TIFF_IMAGES'),
+                      rstring('OMERO_IMAGES')]
 
     client = scripts.client(
         'Figure_To_Pdf.py',
