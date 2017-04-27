@@ -715,7 +715,6 @@ class FigureExport(object):
         file_ann = self.create_file_annotation(image_ids)
         return file_ann
 
-
     def create_file_annotation(self, image_ids):
         output_file = self.figure_file_name
         ns = self.ns
@@ -1633,15 +1632,15 @@ class OmeroExport(TiffExport):
         description = self.figure_json.get('legend')
 
         np_array = numpy.asarray(self.tiff_figure)
-        red = np_array[::,::,0]
-        green = np_array[::,::,1]
-        blue = np_array[::,::,2]
+        red = np_array[::, ::, 0]
+        green = np_array[::, ::, 1]
+        blue = np_array[::, ::, 2]
         plane_gen = iter([red, green, blue])
         self.new_image = self.conn.createImageFromNumpySeq(
-                plane_gen,
-                self.figure_file_name,
-                sizeC=3,
-                description=description, dataset=dataset)
+            plane_gen,
+            self.figure_file_name,
+            sizeC=3,
+            description=description, dataset=dataset)
         # Reset group context
         self.conn.SERVICE_OPTS.setOmeroGroup(-1)
         # Create a new blank tiffFigure for subsequent pages
