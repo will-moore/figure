@@ -168,7 +168,8 @@
             opts = {"PDF": "PDF",
                 "PDF & images": "PDF_IMAGES",
                 "TIFF": "TIFF",
-                "TIFF & images": "TIFF_IMAGES"};
+                "TIFF & images": "TIFF_IMAGES",
+                "to OMERO": "OMERO"};
             exportOption = opts[export_opt];
 
             // Get figure as json
@@ -214,10 +215,22 @@
                                 $pdf_inprogress.hide();
 
                                 // Show result
-                                if (pdf_job.results.File_Annotation) {
-                                    var fa_id = pdf_job.results.File_Annotation.id,
-                                        fa_download = WEBINDEX_URL + "annotation/" + fa_id + "/";
-                                    $pdf_download.attr('href', fa_download).show();
+                                if (pdf_job.results.New_Figure) {
+                                    var fa_id = pdf_job.results.New_Figure.id;
+                                    if (pdf_job.results.New_Figure.type === "FileAnnotation") {
+                                        var fa_download = WEBINDEX_URL + "annotation/" + fa_id + "/";
+                                        $pdf_download
+                                            .attr({'href': fa_download, 'data-original-title': 'Download Figure'})
+                                            .show()
+                                            .children('span').prop('class', 'glyphicon glyphicon-download-alt');
+                                    } else if (pdf_job.results.New_Figure.type === "Image") {
+                                        var fa_download = pdf_job.results.New_Figure.browse_url;
+                                        $pdf_download
+                                            .attr({'href': fa_download, 'data-original-title': 'Go to Figure Image'})
+                                            .show()
+                                            .tooltip()
+                                            .children('span').prop('class', 'glyphicon glyphicon-share');
+                                    }
                                 } else if (pdf_job.stderr) {
                                     // Only show any errors if NO result
                                     var stderr_url = WEBINDEX_URL + "get_original_file/" + pdf_job.stderr + "/";
