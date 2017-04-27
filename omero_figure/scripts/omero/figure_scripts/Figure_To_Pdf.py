@@ -19,6 +19,7 @@
 import logging
 import json
 import unicodedata
+import numpy
 
 from datetime import datetime
 import os
@@ -213,7 +214,8 @@ class ShapeToPdfExport(object):
         g = float(rgb[1])/255
         b = float(rgb[2])/255
         self.canvas.setStrokeColorRGB(r, g, b)
-        stroke_width = shape['strokeWidth'] * self.scale
+        stroke_width = shape['strokeWidth'] if 'strokeWidth' in shape else 2
+        stroke_width = stroke_width * self.scale
         self.canvas.setLineWidth(stroke_width)
 
         rotation = self.panel['rotation'] * -1
@@ -481,7 +483,7 @@ class ShapeToPilExport(object):
 
     def draw_rectangle(self, shape):
         # clockwise list of corner points on the OUTSIDE of thick line
-        w = shape['strokeWidth']
+        w = shape['strokeWidth'] if 'strokeWidth' in shape else 2
         cx = shape['x'] + (shape['width']/2)
         cy = shape['y'] + (shape['height']/2)
         rotation = self.panel['rotation'] * -1
@@ -705,7 +707,7 @@ class FigureExport(object):
         # Add thumbnails and links page
         self.add_info_page(panels_json)
 
-        # Saves the completed  figure file
+        # Saves the completed figure file
         self.save_figure()
 
         file_ann = self.create_file_annotation(image_ids)
@@ -1599,33 +1601,43 @@ class OmeroExport(TiffExport):
 
     def __init__(self, conn, script_params):
 
-        super(OmeroExport, self).__init__(conn, script_params, export_images)
+        super(OmeroExport, self).__init__(conn, script_params)
+
+        self.new_image = None
 
     def save_page(self):
         """
-        Save the current PIL image page as a TIFF and start a new
+        Save the current PIL image page as a new OMERO images and start a new
         PIL image for the next page
         """
         self.figure_file_name = self.get_figure_file_name()
 
-        # self.tiff_figure.save(self.figure_file_name)
+        # Try to get a Dataset
+        dataset = None
+        for p in self.figure_json['panels']:
+            dataset = conn.getObject('Image', p['imageId']
 
-        import numpy
-        if (self.export_omero):
-            np_array = numpy.asarray(self.tiff_figure)
-            red = np_array[::,::,0]
-            green = np_array[::,::,1]
-            blue = np_array[::,::,2]
-            plane_gen = iter([red, green, blue])
-            image_id = self.conn.createImageFromNumpySeq(plane_gen,
-                                          self.figure_file_name,
-                                          sizeC=3,
-                                          description=None, dataset=None)
+        description = self.figure_json.get('legend')
+
+        np_array = numpy.asarray(self.tiff_figure)
+        red = np_array[::,::,0]
+        green = np_array[::,::,1]
+        blue = np_array[::,::,2]
+        plane_gen = iter([red, green, blue])
+        self.new_image = self.conn.createImageFromNumpySeq(
+                plane_gen,
+                self.figure_file_name,
+                sizeC=3,
+                description=description, dataset=None)
         # Create a new blank tiffFigure for subsequent pages
         self.create_figure()
 
     def create_file_annotation(self, image_ids):
-        pass
+        """Return result of script."""
+
+        # We don't need to create file annotation, but we can return
+        # the new image, which will be returned from the script
+        return self.new_image
 
 
 def export_figure(conn, script_params):
@@ -1643,8 +1655,8 @@ def export_figure(conn, script_params):
         fig_export = TiffExport(conn, script_params)
     elif export_option == 'TIFF_IMAGES':
         fig_export = TiffExport(conn, script_params, export_images=True)
-    elif export_option == 'OMERO_IMAGES':
-        fig_export = OmeroExport(conn, script_params, export_omero=True)
+    elif export_option == 'OMERO':
+        fig_export = OmeroExport(conn, script_params)
     return fig_export.build_figure()
 
 
@@ -1656,7 +1668,7 @@ def run_script():
 
     export_options = [rstring('PDF'), rstring('PDF_IMAGES'),
                       rstring('TIFF'), rstring('TIFF_IMAGES'),
-                      rstring('OMERO_IMAGES')]
+                      rstring('OMERO')]
 
     client = scripts.client(
         'Figure_To_Pdf.py',
@@ -1691,10 +1703,10 @@ def run_script():
         file_annotation = export_figure(conn, script_params)
 
         # return this file_annotation to the client.
-        client.setOutput("Message", rstring("Pdf Figure created"))
+        client.setOutput("Message", rstring("Figure created"))
         if file_annotation is not None:
             client.setOutput(
-                "File_Annotation",
+                "New_Figure",
                 robject(file_annotation._obj))
 
     finally:
