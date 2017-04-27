@@ -584,13 +584,15 @@ class FigureExport(object):
         name = name.replace(",", ".")
         return "%s.zip" % name
 
-    def get_figure_file_name(self):
+    def get_figure_file_name(self, page=None):
         """
         For PDF export we will only create a single figure file, but
         for TIFF export we may have several pages, so we need unique names
         for each to avoid overwriting.
         This method supports both, simply using different extension
         (pdf/tiff) for each.
+
+        @param page:        If we know a page number we want to use.
         """
 
         # Extension is pdf or tiff
@@ -611,7 +613,7 @@ class FigureExport(object):
         # Remove commas: causes problems 'duplicate headers' in file download
         full_name = full_name.replace(",", ".")
 
-        index = 1
+        index = page if page is not None else 1
         if fext == "tiff" and self.page_count > 1:
             full_name = "%s_page_%02d.%s" % (name, index, fext)
         if self.zip_folder_name is not None:
@@ -680,11 +682,6 @@ class FigureExport(object):
         id1 = panels_json[0]['imageId']
         group_id = self.conn.getObject("Image", id1).getDetails().group.id.val
 
-        # PDF will get created in this group
-        if group_id is None:
-            group_id = self.conn.getEventContext().groupId
-        self.conn.SERVICE_OPTS.setOmeroGroup(group_id)
-
         # For each page, add panels...
         col = 0
         row = 0
@@ -697,7 +694,7 @@ class FigureExport(object):
             self.add_panels_to_page(panels_json, image_ids, page)
 
             # complete page and save
-            self.save_page()
+            self.save_page(p)
 
             col = col + 1
             if col >= page_col_count:
@@ -709,6 +706,11 @@ class FigureExport(object):
 
         # Saves the completed figure file
         self.save_figure()
+
+        # PDF will get created in this group
+        if group_id is None:
+            group_id = self.conn.getEventContext().groupId
+        self.conn.SERVICE_OPTS.setOmeroGroup(group_id)
 
         file_ann = self.create_file_annotation(image_ids)
         return file_ann
@@ -1335,7 +1337,7 @@ class FigureExport(object):
         self.figure_canvas = canvas.Canvas(
             name, pagesize=(self.page_width, self.page_height))
 
-    def save_page(self):
+    def save_page(self, page=None):
         """ Called on completion of each page. Saves page of PDF """
         self.figure_canvas.showPage()
 
@@ -1558,7 +1560,7 @@ class TiffExport(FigureExport):
                 x = x - txt_w
             textdraw.text((x, y), text, font=font, fill=rgb)
 
-    def save_page(self):
+    def save_page(self, page=None):
         """
         Save the current PIL image page as a TIFF and start a new
         PIL image for the next page
@@ -1605,17 +1607,28 @@ class OmeroExport(TiffExport):
 
         self.new_image = None
 
-    def save_page(self):
+    def save_page(self, page=None):
         """
         Save the current PIL image page as a new OMERO images and start a new
         PIL image for the next page
         """
-        self.figure_file_name = self.get_figure_file_name()
+        self.figure_file_name = self.get_figure_file_name(page + 1)
 
         # Try to get a Dataset
         dataset = None
-        for p in self.figure_json['panels']:
-            dataset = conn.getObject('Image', p['imageId']
+        for panel in self.figure_json['panels']:
+            parent = self.conn.getObject('Image', panel['imageId']).getParent()
+            if parent is not None and parent.OMERO_CLASS == 'Dataset':
+                if parent.canLink():
+                    dataset = parent
+                    break
+
+        # Need to specify group for new image
+        group_id = self.conn.getEventContext().groupId
+        if dataset is not None:
+            group_id = dataset.getDetails().group.id.val
+            dataset = dataset._obj      # get the omero.model.DatasetI
+        self.conn.SERVICE_OPTS.setOmeroGroup(group_id)
 
         description = self.figure_json.get('legend')
 
@@ -1628,7 +1641,9 @@ class OmeroExport(TiffExport):
                 plane_gen,
                 self.figure_file_name,
                 sizeC=3,
-                description=description, dataset=None)
+                description=description, dataset=dataset)
+        # Reset group context
+        self.conn.SERVICE_OPTS.setOmeroGroup(-1)
         # Create a new blank tiffFigure for subsequent pages
         self.create_figure()
 
