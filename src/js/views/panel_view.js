@@ -147,7 +147,9 @@
             _.each(labels, function(l) {
                 // check if label is dynamic delta-T
                 var ljson = $.extend(true, {}, l);
-                if (l.color.toLowerCase() == self.page_color.toLowerCase()) {
+                // If label is same color as page (and is outside of panel)
+                if (ljson.color.toLowerCase() == self.page_color.toLowerCase() &&
+                        ["top", "bottom", "left", "right", "leftvert"].indexOf(l.position) > -1 ) {
                     // If black -> white, otherwise -> black
                     if (ljson.color === '000000') {
                         ljson.color = 'ffffff';
