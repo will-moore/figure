@@ -67,6 +67,7 @@
 
             // Full render if page_color changes (might need to update labels etc)
             this.listenTo(this.model, 'change:page_color', this.render);
+            this.listenTo(this.model, 'change:page_color', this.renderPanels);
 
             // refresh current UI
             this.renderZoom();
@@ -713,6 +714,15 @@
                 $delete_panel.attr("disabled", "disabled");
                 this.$copyBtn.addClass("disabled");
             }
+        },
+
+        renderPanels: function() {
+            // Re-render all the panels...
+            // Remove and re-add
+            $('.imagePanel', this.$figure).remove();
+            this.model.panels.forEach(function(panel){
+                this.addOne(panel);
+            }.bind(this));
         },
 
         // Render is called on init()

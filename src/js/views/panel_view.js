@@ -147,9 +147,13 @@
             _.each(labels, function(l) {
                 // check if label is dynamic delta-T
                 var ljson = $.extend(true, {}, l);
-                if (l.color == self.page_color) {
-                    // TODO: pick a color with good contrast with background.
-                    l.color = 'ff0000';
+                if (l.color.toLowerCase() == self.page_color.toLowerCase()) {
+                    // If black -> white, otherwise -> black
+                    if (ljson.color === '000000') {
+                        ljson.color = 'ffffff';
+                    } else {
+                        ljson.color = '000000';
+                    }
                 }
                 if (typeof ljson.text == 'undefined' && ljson.time) {
                     ljson.text = self.model.get_time_label_text(ljson.time);
