@@ -17,6 +17,7 @@
             // w & h from reportlab.
             'paper_width': 595,
             'paper_height': 842,
+            'page_color': 'FFFFFF',
             'page_count': 1,
             'page_col_count': 1,    // pages laid out in grid
             'paper_spacing': 50,    // between each page
@@ -73,6 +74,7 @@
                     'orientation': data.orientation,
                     'legend': data.legend,
                     'legend_collapsed': data.legend_collapsed,
+                    'page_color': data.page_color,
                 };
 
             // For missing attributes, we fill in with defaults
@@ -154,6 +156,7 @@
                 orientation: this.get('orientation'),
                 legend: this.get('legend'),
                 legend_collapsed: this.get('legend_collapsed'),
+                page_color: this.get('page_color'),
             };
             if (this.get('figureName')){
                 figureJSON.figureName = this.get('figureName')

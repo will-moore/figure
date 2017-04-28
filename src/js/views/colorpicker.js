@@ -180,6 +180,10 @@ var ColorPickerView = Backbone.View.extend({
             this.$submit_btn.prop('disabled', 'disabled');
         }
 
+        if (options.pickedColors) {
+            this.pickedColors = _.uniq(this.pickedColors.concat(options.pickedColors));
+        }
+
         // save callback to use on submit
         if (options.success) {
             this.success = options.success;

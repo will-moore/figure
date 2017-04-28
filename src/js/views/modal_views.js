@@ -44,6 +44,23 @@
             "change .paperSizeSelect": "rerender",
             // "keyup #dpi": "rerenderDb",
             "change input": "rerender",
+            "click .pageColor": "handlePaperColor",
+        },
+
+        handlePaperColor: function(event) {
+            event.preventDefault();
+
+            var page_color = $(event.target).val();
+            FigureColorPicker.show({
+                'color': page_color,
+                'pickedColors': ['#000000', '#ffffff', '#eeeeee'],
+                'success': function(newColor){
+                    // simply update <input>
+                    $('.pageColor', this.$el).val(newColor);
+                }.bind(this)
+            });
+
+            return false;
         },
 
         initialize: function(options) {
@@ -66,8 +83,8 @@
                 orientation = $form.find('input[name="pageOrientation"]:checked').val(),
                 custom_w = parseInt($("#paperWidth").val(), 10),
                 custom_h = parseInt($("#paperHeight").val(), 10),
-                units = $('.wh_units:first', $form).text();
-
+                units = $('.wh_units:first', $form).text(),
+                pageColor = $('.pageColor', $form).val().replace('#', '');
 
             var w_mm, h_m, w_pixels, h_pixels;
             if (size == 'A4') {
@@ -124,6 +141,7 @@
                 'paper_height': h_pixels,
                 'page_count': pageCount,
                 'page_col_count': cols,
+                'page_color': pageColor,
             };
             return rv;
         },
