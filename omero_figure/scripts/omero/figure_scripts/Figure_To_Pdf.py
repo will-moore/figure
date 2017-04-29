@@ -129,7 +129,8 @@ class ShapeToPdfExport(object):
                 elif shape['type'] == "Ellipse":
                     self.draw_ellipse(shape)
 
-    def get_rgb(self, color):
+    @staticmethod
+    def get_rgb(color):
         # Convert from E.g. '#ff0000' to (255, 0, 0)
         red = int(color[1:3], 16)
         green = int(color[3:5], 16)
@@ -1328,6 +1329,19 @@ class FigureExport(object):
         self.figure_canvas = canvas.Canvas(
             name, pagesize=(self.page_width, self.page_height))
 
+        # Page color - simply draw colored rectangle over whole page
+        page_color = self.figure_json.get('page_color')
+        if page_color and page_color.lower() != 'ffffff':
+            rgb = ShapeToPdfExport.get_rgb('#' + page_color)
+            r = float(rgb[0])/255
+            g = float(rgb[1])/255
+            b = float(rgb[2])/255
+            print rgb, r, g, b
+            self.figure_canvas.setStrokeColorRGB(r, g, b)
+            self.figure_canvas.setFillColorRGB(r, g, b)
+            self.figure_canvas.setLineWidth(4)
+            self.figure_canvas.rect(0, 0, self.page_width, self.page_height, fill=1)
+
     def save_page(self):
         """ Called on completion of each page. Saves page of PDF """
         self.figure_canvas.showPage()
@@ -1460,8 +1474,12 @@ class TiffExport(FigureExport):
         """
         tiff_width = self.scale_coords(self.page_width)
         tiff_height = self.scale_coords(self.page_height)
-        self.tiff_figure = Image.new(
-            "RGBA", (tiff_width, tiff_height), (255, 255, 255))
+        page_color = self.figure_json.get('page_color')
+        rgb = (255, 255, 255)
+        page_color = self.figure_json.get('page_color')
+        if page_color is not None:
+            rgb = ShapeToPdfExport.get_rgb('#' + page_color)
+        self.tiff_figure = Image.new("RGBA", (tiff_width, tiff_height), rgb)
 
     def paste_image(self, pil_img, img_name, panel, page, dpi=None):
         """ Add the PIL image to the current figure page """
