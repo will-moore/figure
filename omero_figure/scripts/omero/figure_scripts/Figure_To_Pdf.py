@@ -1340,7 +1340,8 @@ class FigureExport(object):
             self.figure_canvas.setStrokeColorRGB(r, g, b)
             self.figure_canvas.setFillColorRGB(r, g, b)
             self.figure_canvas.setLineWidth(4)
-            self.figure_canvas.rect(0, 0, self.page_width, self.page_height, fill=1)
+            self.figure_canvas.rect(0, 0, self.page_width,
+                                    self.page_height, fill=1)
 
     def save_page(self):
         """ Called on completion of each page. Saves page of PDF """
