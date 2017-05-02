@@ -1131,6 +1131,8 @@ class FigureExport(object):
         y = y - page['y']
 
         image = self.conn.getObject("Image", image_id)
+        if image is None:
+            return None, None
         self.apply_rdefs(image, channels)
 
         # create name to save image
@@ -1158,6 +1160,8 @@ class FigureExport(object):
 
         conn = self.conn
         image = conn.getObject("Image", image_id)
+        if image is None:
+            return
         thumb_data = image.getThumbnail(size=(96, 96))
         i = StringIO(thumb_data)
         pil_img = Image.open(i)
@@ -1317,6 +1321,8 @@ class FigureExport(object):
             # For TIFF export, draw_panel() also adds shapes to the
             # PIL image before pasting onto the page...
             image, pil_img = self.draw_panel(panel, page, i)
+            if image is None:
+                continue
             if image.canAnnotate():
                 image_ids.add(image_id)
             # ... but for PDF we have to add shapes to the whole PDF page
