@@ -1639,7 +1639,13 @@ class OmeroExport(TiffExport):
             dataset = dataset._obj      # get the omero.model.DatasetI
         self.conn.SERVICE_OPTS.setOmeroGroup(group_id)
 
-        description = self.figure_json.get('legend')
+        description = "Created from OMERO.figure: "
+        url = self.script_params.get("Figure_URI")
+        legend = self.figure_json.get('legend')
+        if url is not None:
+            description += url
+        if legend is not None:
+            description = "%s\n\n%s" % (description ,legend)
 
         np_array = numpy.asarray(self.tiff_figure)
         red = np_array[::, ::, 0]
