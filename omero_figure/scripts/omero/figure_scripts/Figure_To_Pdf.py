@@ -19,7 +19,6 @@
 import logging
 import json
 import unicodedata
-import numpy
 
 from datetime import datetime
 import os
@@ -60,6 +59,11 @@ except ImportError:
     reportlab_installed = False
     logger.error("Reportlab not installed. See"
                  " https://pypi.python.org/pypi/reportlab/")
+
+try:
+    import numpy
+except ImportError:
+    pass
 
 
 ORIGINAL_DIR = "1_originals"
