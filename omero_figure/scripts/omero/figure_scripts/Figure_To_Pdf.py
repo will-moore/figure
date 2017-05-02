@@ -1336,7 +1336,6 @@ class FigureExport(object):
             r = float(rgb[0])/255
             g = float(rgb[1])/255
             b = float(rgb[2])/255
-            print rgb, r, g, b
             self.figure_canvas.setStrokeColorRGB(r, g, b)
             self.figure_canvas.setFillColorRGB(r, g, b)
             self.figure_canvas.setLineWidth(4)
