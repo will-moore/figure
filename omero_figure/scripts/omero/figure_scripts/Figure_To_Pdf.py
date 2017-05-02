@@ -1645,7 +1645,7 @@ class OmeroExport(TiffExport):
         if url is not None:
             description += url
         if legend is not None:
-            description = "%s\n\n%s" % (description ,legend)
+            description = "%s\n\n%s" % (description, legend)
 
         np_array = numpy.asarray(self.tiff_figure)
         red = np_array[::, ::, 0]
