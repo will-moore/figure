@@ -58,8 +58,7 @@ try:
     reportlab_installed = True
 except ImportError:
     reportlab_installed = False
-    logger.error("Reportlab not installed. See"
-                 " https://pypi.python.org/pypi/reportlab/")
+    logger.error("Reportlab not installed.")
 
 
 ORIGINAL_DIR = "1_originals"
@@ -712,8 +711,7 @@ class FigureExport(object):
             group_id = self.conn.getEventContext().groupId
         self.conn.SERVICE_OPTS.setOmeroGroup(group_id)
 
-        file_ann = self.create_file_annotation(image_ids)
-        return file_ann
+        return self.create_file_annotation(image_ids)
 
     def create_file_annotation(self, image_ids):
         output_file = self.figure_file_name
@@ -1614,7 +1612,7 @@ class OmeroExport(TiffExport):
 
     def save_page(self, page=None):
         """
-        Save the current PIL image page as a new OMERO images and start a new
+        Save the current PIL image page as a new OMERO image and start a new
         PIL image for the next page
         """
         self.figure_file_name = self.get_figure_file_name(page + 1)
