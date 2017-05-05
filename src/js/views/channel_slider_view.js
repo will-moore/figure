@@ -104,8 +104,9 @@ var ChannelSliderView = Backbone.View.extend({
                 var endAvg = parseInt(ends.reduce(addFn, 0) / ends.length, 10);
                 var startsNotEqual = starts.reduce(allEqualFn, starts[0]) === false;
                 var endsNotEqual = ends.reduce(allEqualFn, ends[0]) === false;
-                var min = mins.reduce(reduceFn(Math.min), 9999);
-                var max = maxs.reduce(reduceFn(Math.max), -9999);
+                var min = mins.reduce(reduceFn(Math.min));
+                var max = maxs.reduce(reduceFn(Math.max));
+                console.log(min, max);
                 var color = colors.reduce(allEqualFn, colors[0]) ? colors[0] : 'ccc';
                 var lutBgPos = FigureLutPicker.getLutBackgroundPosition(color);
                 if (color == "FFFFFF") color = "ccc";  // white slider would be invisible
