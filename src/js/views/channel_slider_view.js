@@ -109,7 +109,7 @@ var ChannelSliderView = Backbone.View.extend({
                 console.log(min, max);
                 var color = colors.reduce(allEqualFn, colors[0]) ? colors[0] : 'ccc';
                 var lutBgPos = FigureLutPicker.getLutBackgroundPosition(color);
-                if (color == "FFFFFF") color = "ccc";  // white slider would be invisible
+                if (color.toUpperCase() === "FFFFFF") color = "ccc";  // white slider would be invisible
 
                 // Make sure slider range is increased if needed to include current values
                 min = Math.min(min, startAvg);
