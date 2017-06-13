@@ -136,7 +136,7 @@ var ChannelSliderView = Backbone.View.extend({
                 }
             };
             var allEqualFn = function(prev, value) {
-                return value === prev ? prev : false;
+                return value === prev ? prev : undefined;
             };
             var reduceFn = function(fn) {
                 return function(prev, curr) {
@@ -173,12 +173,13 @@ var ChannelSliderView = Backbone.View.extend({
                 // Reduce lists into summary for this channel
                 var startAvg = parseInt(starts.reduce(addFn, 0) / starts.length, 10);
                 var endAvg = parseInt(ends.reduce(addFn, 0) / ends.length, 10);
-                var startsNotEqual = starts.reduce(allEqualFn, starts[0]) === false;
-                var endsNotEqual = ends.reduce(allEqualFn, ends[0]) === false;
+                var startsNotEqual = starts.reduce(allEqualFn, starts[0]) === undefined;
+                var endsNotEqual = ends.reduce(allEqualFn, ends[0]) === undefined;
                 var min = mins.reduce(reduceFn(Math.min), 9999);
                 var max = maxs.reduce(reduceFn(Math.max), -9999);
                 var color = colors.reduce(allEqualFn, colors[0]) ? colors[0] : 'ccc';
-                var reverse = reverses.reduce(allEqualFn, reverses[0]);
+                // allEqualFn for booleans will return undefined if not or equal
+                var reverse = reverses.reduce(allEqualFn, reverses[0]) ? true : false;
                 var active = actives.reduce(allEqualFn, actives[0]);
                 var style = {'background-position': '0 0'}
                 var sliderClass = '';
