@@ -1,6 +1,6 @@
 {
   "name": "omero-figure",
-  "version": "3.0.0",
+  "version": "0.0.0",
   "description": "OMERO figure creation app",
   "main": "index.js",
   "scripts": {
