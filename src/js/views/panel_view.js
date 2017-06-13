@@ -69,7 +69,7 @@
                         'height': h +'px'});
 
             // container needs to be square for rotation to vertical
-            $('.left_vlabels', this.$el).css('width', h + 'px');
+            $('.left_vlabels', this.$el).css('width', 3 * h + 'px');
 
             // update the img within the panel
             var zoom = this.model.get('zoom'),
@@ -160,8 +160,8 @@
                 if (typeof ljson.text == 'undefined' && ljson.time) {
                     ljson.text = self.model.get_time_label_text(ljson.time);
                 } else {
-                    // Escape all labels so they are safe
-                    ljson.text = _.escape(ljson.text);
+                    // Markdown also escapes all labels so they are safe
+                    ljson.text = markdown.toHTML(ljson.text);
                 }
                 positions[l.position].push(ljson);
             });
@@ -182,7 +182,7 @@
             self.$el.append(html);
 
             // need to force update of vertical labels layout
-            $('.left_vlabels', self.$el).css('width', self.$el.height() + 'px');
+            $('.left_vlabels', self.$el).css('width', 3 * self.$el.height() + 'px');
 
             return this;
         },
