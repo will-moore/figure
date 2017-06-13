@@ -61,6 +61,12 @@ var ChannelSliderView = Backbone.View.extend({
                     return ch[idx].color;
                 }
             }
+            var getReverse = function(idx) {
+                return function(ch) {
+                    // For older figures (created pre 5.3.0) might be undefined
+                    return ch[idx].reverseIntensity === true;
+                }
+            }
             var windowFn = function (idx, attr) {
                 return function (ch) {
                     return ch[idx].window[attr];
@@ -99,6 +105,7 @@ var ChannelSliderView = Backbone.View.extend({
                 var mins = chData.map(windowFn(chIdx, 'min'));
                 var maxs = chData.map(windowFn(chIdx, 'max'));
                 var colors = chData.map(getColor(chIdx));
+                var reverses = chData.map(getReverse(chIdx));
                 // Reduce lists into summary for this channel
                 var startAvg = parseInt(starts.reduce(addFn, 0) / starts.length, 10);
                 var endAvg = parseInt(ends.reduce(addFn, 0) / ends.length, 10);
@@ -107,7 +114,16 @@ var ChannelSliderView = Backbone.View.extend({
                 var min = mins.reduce(reduceFn(Math.min), 9999);
                 var max = maxs.reduce(reduceFn(Math.max), -9999);
                 var color = colors.reduce(allEqualFn, colors[0]) ? colors[0] : 'ccc';
-                var lutBgPos = FigureLutPicker.getLutBackgroundPosition(color);
+                var reverse = reverses.reduce(allEqualFn, reverses[0]);
+                var style = {'background-position': '0 0'}
+                var sliderClass = '';
+                if (color.endsWith('.lut')) {
+                    style['background-position'] = FigureLutPicker.getLutBackgroundPosition(color);
+                    sliderClass = 'lutBg';
+                }
+                if (reverse) {
+                    style.transform = 'scaleX(-1)';
+                }
                 if (color == "FFFFFF") color = "ccc";  // white slider would be invisible
 
                 // Make sure slider range is increased if needed to include current values
@@ -138,7 +154,9 @@ var ChannelSliderView = Backbone.View.extend({
                     }
                 })
                 // Need to add background style to newly created div.ui-slider-range
-                .children('.ui-slider-range').css('background-position', lutBgPos)
+                .children('.ui-slider-range').css(style)
+                .addClass(sliderClass);
+
             }.bind(this));
         return this;
     }
