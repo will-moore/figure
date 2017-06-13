@@ -529,17 +529,20 @@
         },
 
         get_img_src: function() {
-            var cStrings = [];
-            _.each(this.get('channels'), function(c, i){
-                if (c.active) {
-                    cStrings.push(1+i + "|" + c.window.start + ":" + c.window.end + "$" + c.color);
-                }
+            var chs = this.get('channels');
+            var cStrings = chs.map(function(c, i){
+                return (c.active ? '' : '-') + (1+i) + "|" + c.window.start + ":" + c.window.end + "$" + c.color;
+            });
+            var maps_json = chs.map(function(c){
+                return {'reverse': {'enabled': !!c.reverseIntensity}};
             });
             var renderString = cStrings.join(","),
                 imageId = this.get('imageId'),
                 theZ = this.get('theZ'),
                 theT = this.get('theT'),
                 baseUrl = this.get('baseUrl'),
+                // stringify json and remove spaces
+                maps = '&maps=' + JSON.stringify(maps_json).replace(/ /g, ""),
                 proj = "";
             if (this.get('z_projection')) {
                 proj = "&p=intmax|" + this.get('z_start') + ":" + this.get('z_end');
@@ -547,7 +550,7 @@
             baseUrl = baseUrl || WEBGATEWAYINDEX.slice(0, -1);  // remove last /
 
             return baseUrl + '/render_image/' + imageId + "/" + theZ + "/" + theT
-                    + '/?c=' + renderString + proj + "&m=c";
+                    + '/?c=' + renderString + proj + maps +"&m=c";
         },
 
         // used by the PanelView and ImageViewerView to get the size and
