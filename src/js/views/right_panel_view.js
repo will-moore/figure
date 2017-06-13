@@ -1619,7 +1619,7 @@
         },
 
         render: function() {
-            var json, html,
+            var html,
                 max_rotation = 0,
                 sum_rotation = 0,
                 sum_sizeZ = 0,
@@ -1628,60 +1628,18 @@
                 zp,
                 self = this;
             if (this.models) {
-
-                // Comare channels from each Panel Model to see if they are
-                // compatible, and compile a summary json.
-                json = [];
-                var compatible = true;
-
-                this.models.forEach(function(m){
-                    var chs = m.get('channels');
+                this.models.forEach(function(m, i){
                     rotation = m.get('rotation');
                     max_rotation = Math.max(max_rotation, rotation);
                     sum_rotation += rotation;
                     sum_sizeZ += m.get('sizeZ');
                     // start with a copy of the first image channels
-                    if (json.length === 0) {
-                        _.each(chs, function(c) {
-                            json.push($.extend(true, {}, c));
-                        });
+                    if (i === 0) {
                         z_projection = !!m.get('z_projection');
                     } else{
                         zp = !!m.get('z_projection');
                         if (zp !== z_projection) {
                             z_projection = undefined;
-                        }
-                        // compare json summary so far with this channels
-                        if (json.length != chs.length) {
-                            compatible = false;
-                        } else {
-                            // if attributes don't match - show 'null' state
-                            _.each(chs, function(c, cIndex) {
-                                if (json[cIndex].color != c.color) {
-                                    json[cIndex].color = 'ccc';
-                                }
-                                if (json[cIndex].active != c.active) {
-                                    json[cIndex].active = undefined;
-                                }
-                                // process the 'window' {min, max, start, end}
-                                var wdw = json[cIndex].window,    // the window we're updating
-                                    w = c.window;
-                                // if we haven't got a label yet, compare 'start' from 1st 2 panels
-                                if (typeof wdw.start_label === 'undefined') {
-                                    wdw.start_label = (w.start === wdw.start) ? parseInt(w.start,10) : '-';
-                                } else if (wdw.start_label != w.start) {
-                                    wdw.start_label = "-";      // otherwise revert to '-' unless all same
-                                }
-                                if (typeof wdw.end_label === 'undefined') {
-                                    wdw.end_label = (w.end === wdw.end) ? parseInt(w.end,10) : '-';
-                                } else if (wdw.end_label != w.end) {
-                                    wdw.end_label = "-";      // revert to '-' unless all same
-                                }
-                                wdw.min = Math.min(wdw.min, w.min);
-                                wdw.max = Math.max(wdw.max, w.max);
-                                wdw.start = wdw.start + w.start;    // average when done
-                                wdw.end = wdw.end + w.end;
-                            });
                         }
                     }
                 });
@@ -1697,15 +1655,7 @@
                 // if all panels have sizeZ == 1, don't allow z_projection
                 z_projection_disabled = (sum_sizeZ === this.models.length);
 
-                if (!compatible) {
-                    json = [];
-                }
-                // Add LUT offsets
-                json = json.map(function(ch){
-                    ch.lutBgPos = FigureLutPicker.getLutBackgroundPosition(ch.color);
-                    return ch;
-                });
-                html = this.template({'channels':json,
+                html = this.template({
                     'z_projection_disabled': z_projection_disabled,
                     'rotation': rotation,
                     'z_projection': z_projection});
