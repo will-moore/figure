@@ -63,7 +63,7 @@ var ChannelSliderView = Backbone.View.extend({
             this.model.toggle_channel(idx);
         } else if (this.models) {
             // 'flat' means that some panels have this channel on, some off
-            var flat = $(e.currentTarget).hasClass('ch-btn-flat');
+            var flat = $('div', e.currentTarget).hasClass('ch-btn-flat');
             this.models.forEach(function(m){
                 if(flat) {
                     m.toggle_channel(idx, true);
