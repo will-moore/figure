@@ -1507,8 +1507,6 @@
         },
 
         events: {
-            "click .channel-btn": "toggle_channel",
-            "click .dropdown-menu a": "pick_color",
             "click .show-rotation": "show_rotation",
             "click .z-projection": "z_projection",
         },
@@ -1553,62 +1551,6 @@
             } else {
                 $rc.find('.rotation-slider').slider("destroy");
             }
-        },
-
-        pick_color: function(e) {
-            var color = e.currentTarget.getAttribute('data-color'),
-                $colorbtn = $(e.currentTarget).parent().parent(),
-                oldcolor = $(e.currentTarget).attr('data-oldcolor'),
-                idx = $colorbtn.attr('data-index'),
-                self = this;
-
-            if (color == 'colorpicker') {
-                FigureColorPicker.show({
-                    'color': oldcolor,
-                    'success': function(newColor){
-                        // remove # from E.g. #ff00ff
-                        newColor = newColor.replace("#", "");
-                        self.set_color(idx, newColor);
-                    }
-                });
-            } else if (color == 'lutpicker') {
-                FigureLutPicker.show({
-                    success: function(lutName){
-                        // LUT names are handled same as color strings
-                        self.set_color(idx, lutName);
-                    }
-                });
-            } else {
-                this.set_color(idx, color);
-            }
-            return false;
-        },
-
-        set_color: function(idx, color) {
-            if (this.models) {
-                this.models.forEach(function(m){
-                    m.save_channel(idx, 'color', color);
-                });
-            }
-        },
-
-        toggle_channel: function(e) {
-            var idx = e.currentTarget.getAttribute('data-index');
-
-            if (this.model) {
-                this.model.toggle_channel(idx);
-            } else if (this.models) {
-                // 'flat' means that some panels have this channel on, some off
-                var flat = $(e.currentTarget).hasClass('ch-btn-flat');
-                this.models.forEach(function(m){
-                    if(flat) {
-                        m.toggle_channel(idx, true);
-                    } else {
-                        m.toggle_channel(idx);
-                    }
-                });
-            }
-            return false;
         },
 
         clear: function() {
