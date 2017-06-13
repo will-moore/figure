@@ -42,6 +42,11 @@ var ChannelSliderView = Backbone.View.extend({
                     self.set_color(idx, lutName);
                 }
             });
+        } else if (color == 'reverse') {
+            var reverse = $('span', e.currentTarget).hasClass('glyphicon-ok');
+            self.models.forEach(function(m){
+                m.save_channel(idx, 'reverseIntensity', !reverse);
+            });
         } else {
             this.set_color(idx, color);
         }
@@ -204,6 +209,7 @@ var ChannelSliderView = Backbone.View.extend({
                                                 'endsNotEqual': endsNotEqual,
                                                 'active': active,
                                                 'lutBgPos': lutBgPos,
+                                                'reverse': reverse,
                                                 'color': color});
                 var $div = $(sliderHtml).appendTo(this.$el);
 

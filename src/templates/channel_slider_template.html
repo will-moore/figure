@@ -15,7 +15,11 @@ class="btn btn-default channel-btn lutBg"
                 <span class="caret"></span>
             </button>
             <ul class="dropdown-menu colorpicker" data-index="<%= idx %>">
-                <li class="dropdown-header">Channel Color</li>
+                <li>
+                    <a data-color="reverse" class="reverseIntensity" href="#">
+                        <span class="glyphicon <% if(reverse) { %>glyphicon-ok<% }%>"></span> Reverse Intensity
+                    </a>
+                </li>
                 <li class="divider"></li>
                 <li><a data-color="0000FF" href="#">
                     <span style="background-color:#00f">&nbsp &nbsp &nbsp</span>&nbsp Blue
