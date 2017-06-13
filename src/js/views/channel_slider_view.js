@@ -67,6 +67,11 @@ var ChannelSliderView = Backbone.View.extend({
                     return ch[idx].reverseIntensity === true;
                 }
             }
+            var getActive = function(idx) {
+                return function(ch) {
+                    return ch[idx].active === true;
+                }
+            }
             var windowFn = function (idx, attr) {
                 return function (ch) {
                     return ch[idx].window[attr];
@@ -106,6 +111,7 @@ var ChannelSliderView = Backbone.View.extend({
                 var maxs = chData.map(windowFn(chIdx, 'max'));
                 var colors = chData.map(getColor(chIdx));
                 var reverses = chData.map(getReverse(chIdx));
+                var actives = chData.map(getActive(chIdx));
                 // Reduce lists into summary for this channel
                 var startAvg = parseInt(starts.reduce(addFn, 0) / starts.length, 10);
                 var endAvg = parseInt(ends.reduce(addFn, 0) / ends.length, 10);
@@ -115,10 +121,12 @@ var ChannelSliderView = Backbone.View.extend({
                 var max = maxs.reduce(reduceFn(Math.max), -9999);
                 var color = colors.reduce(allEqualFn, colors[0]) ? colors[0] : 'ccc';
                 var reverse = reverses.reduce(allEqualFn, reverses[0]);
+                var active = actives.reduce(allEqualFn, actives[0]);
                 var style = {'background-position': '0 0'}
                 var sliderClass = '';
+                var lutBgPos = FigureLutPicker.getLutBackgroundPosition(color);
                 if (color.endsWith('.lut')) {
-                    style['background-position'] = FigureLutPicker.getLutBackgroundPosition(color);
+                    style['background-position'] = lutBgPos;
                     sliderClass = 'lutBg';
                 }
                 if (reverse) {
@@ -135,6 +143,8 @@ var ChannelSliderView = Backbone.View.extend({
                                                 'startsNotEqual': startsNotEqual,
                                                 'endAvg': endAvg,
                                                 'endsNotEqual': endsNotEqual,
+                                                'active': active,
+                                                'lutBgPos': lutBgPos,
                                                 'color': color});
                 var $div = $(sliderHtml).appendTo(this.$el);
 
