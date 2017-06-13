@@ -40,7 +40,7 @@
                 this.ctv.clear().remove();
             }
             if (selected.length > 0) {
-                this.ctv = new ChannelToggleView({models: selected});
+                this.ctv = new ImageDisplayOptionsView({models: selected});
                 $("#channelToggle").empty().append(this.ctv.render().el);
             }
             if (this.csv) {
@@ -1492,10 +1492,10 @@
         }
     });
 
-    // Coloured Buttons to Toggle Channels on/off.
-    var ChannelToggleView = Backbone.View.extend({
+    // Options such as Rotation, Z-Projection etc.
+    var ImageDisplayOptionsView = Backbone.View.extend({
         tagName: "div",
-        template: JST["src/templates/channel_toggle_template.html"],
+        template: JST["src/templates/image_display_options_template.html"],
 
         initialize: function(opts) {
             // This View may apply to a single PanelModel or a list
