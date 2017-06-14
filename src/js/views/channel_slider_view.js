@@ -180,8 +180,8 @@ var ChannelSliderView = Backbone.View.extend({
                 var endAvg = parseInt(ends.reduce(addFn, 0) / ends.length, 10);
                 var startsNotEqual = starts.reduce(allEqualFn, starts[0]) === undefined;
                 var endsNotEqual = ends.reduce(allEqualFn, ends[0]) === undefined;
-                var min = mins.reduce(reduceFn(Math.min), 9999);
-                var max = maxs.reduce(reduceFn(Math.max), -9999);
+                var min = mins.reduce(reduceFn(Math.min));
+                var max = maxs.reduce(reduceFn(Math.max));
                 var color = colors.reduce(allEqualFn, colors[0]) ? colors[0] : 'ccc';
                 // allEqualFn for booleans will return undefined if not or equal
                 var reverse = reverses.reduce(allEqualFn, reverses[0]) ? true : false;
@@ -192,6 +192,8 @@ var ChannelSliderView = Backbone.View.extend({
                 if (color.endsWith('.lut')) {
                     style['background-position'] = lutBgPos;
                     sliderClass = 'lutBg';
+                } else if (color.toUpperCase() === "FFFFFF") {
+                    color = "ccc";  // white slider would be invisible
                 }
                 if (reverse) {
                     style.transform = 'scaleX(-1)';
