@@ -866,6 +866,16 @@ class FigureExport(object):
 
             pos = l['position']
             l['size'] = int(l['size'])   # make sure 'size' is number
+            # If page is black and label is black, make label white
+            page_color = self.figure_json.get('page_color').lower()
+            label_color = l['color'].lower()
+            label_on_page = pos in ('left', 'right', 'top',
+                                    'bottom', 'leftvert')
+            if label_on_page:
+                if label_color == '000000' and page_color == '000000':
+                    l['color'] = 'ffffff'
+                if label_color == 'ffffff' and page_color == 'ffffff':
+                    l['color'] = '000000'
             if pos in positions:
                 positions[pos].append(l)
 
