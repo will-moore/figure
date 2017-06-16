@@ -1121,13 +1121,12 @@
                 return {'dx': dx, 'dy': dy};
             }
             var length = Math.sqrt(dx * dx + dy * dy),
-                ang1 = Math.atan(dy/dx),
-                deg1 = ang1/(Math.PI/180);  // rad -> deg
+                ang1 = Math.atan(dy/dx);
             if (dx < 0) {
-                deg1 = 180 + deg1;
+                ang1 = Math.PI + ang1;
             }
-            var deg2 = deg1 - this.r,
-                ang2 = deg2 * (Math.PI/180);  // deg -> rad
+            var angr = this.r * (Math.PI/180),  // deg -> rad
+                ang2 = ang1 - angr;
             dx = Math.cos(ang2) * length;
             dy = Math.sin(ang2) * length;
             return {'dx': dx, 'dy': dy};
