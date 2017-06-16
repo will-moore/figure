@@ -19,7 +19,7 @@
 
 $(function(){
 
-    var figureModel = new FigureModel();
+    window.figureModel = new FigureModel();
 
     window.FigureColorPicker = new ColorPickerView();
     window.FigureLutPicker = new LutPickerView();
