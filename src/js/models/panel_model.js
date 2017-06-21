@@ -233,11 +233,6 @@
             }
             // ... then add new labels ...
             for (var j=0; j<labels.length; j++) {
-                // check that we're not adding a white label outside panel (on a white background)
-                if (_.contains(["top", "bottom", "left", "right", "leftvert"], labels[j].position) &&
-                        labels[j].color == "FFFFFF") {
-                    labels[j].color = "000000";
-                }
                 labs.push( $.extend(true, {}, labels[j]) );
             }
             // ... so that we get the changed event triggering OK

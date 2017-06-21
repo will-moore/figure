@@ -65,9 +65,12 @@
             this.listenTo(this.model, 'change:unsaved', this.renderSaveBtn);
             this.listenTo(this.model, 'change:figureName', this.renderFigureName);
 
+            // Full render if page_color changes (might need to update labels etc)
+            this.listenTo(this.model, 'change:page_color', this.render);
+            this.listenTo(this.model, 'change:page_color', this.renderPanels);
+
             // refresh current UI
             this.renderZoom();
-            // this.zoom_paper_to_fit();
 
             // 'Auto-render' on init.
             this.render();
@@ -677,7 +680,8 @@
 
         // Add a panel to the view
         addOne: function(panel) {
-            var view = new PanelView({model:panel});    // uiState:this.uiState
+            var page_color = this.model.get('page_color');
+            var view = new PanelView({model:panel, page_color:page_color});
             this.$figure.append(view.render().el);
         },
 
@@ -725,6 +729,15 @@
             }
         },
 
+        renderPanels: function() {
+            // Re-render all the panels...
+            // Remove and re-add
+            $('.imagePanel', this.$figure).remove();
+            this.model.panels.forEach(function(panel){
+                this.addOne(panel);
+            }.bind(this));
+        },
+
         // Render is called on init()
         // Update any changes to sizes of paper or canvas
         render: function() {
@@ -733,6 +746,7 @@
 
             var page_w = m.get('paper_width'),
                 page_h = m.get('paper_height'),
+                page_color = m.get('page_color'),
                 size = this.model.getFigureSize(),
                 canvas_w = Math.max(m.get('canvas_width'), size.w),
                 canvas_h = Math.max(m.get('canvas_height'), size.h),
@@ -757,7 +771,7 @@
                 $pages = $(".paper");
             }
 
-            $pages.css({'width': page_w, 'height': page_h});
+            $pages.css({'width': page_w, 'height': page_h, 'background-color': '#' + page_color});
 
             this.$figure.css({'width': size.w, 'height': size.h,
                     'left': figure_left, 'top': figure_top});

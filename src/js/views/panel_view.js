@@ -28,6 +28,10 @@
             // During drag, model isn't updated, but we trigger 'drag'
             this.model.on('drag_resize', this.drag_resize, this);
 
+            // Used for rendering labels against page_color background
+            if (opts.page_color) {
+                this.page_color = opts.page_color;
+            }
             this.render();
         },
 
@@ -143,6 +147,16 @@
             _.each(labels, function(l) {
                 // check if label is dynamic delta-T
                 var ljson = $.extend(true, {}, l);
+                // If label is same color as page (and is outside of panel)
+                if (ljson.color.toLowerCase() == self.page_color.toLowerCase() &&
+                        ["top", "bottom", "left", "right", "leftvert"].indexOf(l.position) > -1 ) {
+                    // If black -> white, otherwise -> black
+                    if (ljson.color === '000000') {
+                        ljson.color = 'ffffff';
+                    } else {
+                        ljson.color = '000000';
+                    }
+                }
                 if (typeof ljson.text == 'undefined' && ljson.time) {
                     ljson.text = self.model.get_time_label_text(ljson.time);
                 } else {

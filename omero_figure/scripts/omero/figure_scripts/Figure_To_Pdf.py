@@ -130,7 +130,8 @@ class ShapeToPdfExport(object):
                 elif shape['type'] == "Ellipse":
                     self.draw_ellipse(shape)
 
-    def get_rgb(self, color):
+    @staticmethod
+    def get_rgb(color):
         # Convert from E.g. '#ff0000' to (255, 0, 0)
         red = int(color[1:3], 16)
         green = int(color[3:5], 16)
@@ -420,13 +421,6 @@ class ShapeToPilExport(object):
 
         return {'x': shape_x, 'y': shape_y}
 
-    def get_rgb(self, color):
-        # Convert from E.g. '#ff0000' to (255, 0, 0)
-        red = int(color[1:3], 16)
-        green = int(color[3:5], 16)
-        blue = int(color[5:7], 16)
-        return (red, green, blue)
-
     def draw_arrow(self, shape):
 
         start = self.get_panel_coords(shape['x1'], shape['y1'])
@@ -437,7 +431,7 @@ class ShapeToPilExport(object):
         y2 = end['y']
         head_size = ((shape['strokeWidth'] * 5) + 9) * self.scale
         stroke_width = shape['strokeWidth'] * self.scale
-        rgb = self.get_rgb(shape['strokeColor'])
+        rgb = ShapeToPdfExport.get_rgb(shape['strokeColor'])
 
         # Do some trigonometry to get the line angle can calculate arrow points
         dx = x2 - x1
@@ -477,7 +471,7 @@ class ShapeToPilExport(object):
         x2 = end['x']
         y2 = end['y']
         stroke_width = shape['strokeWidth'] * self.scale
-        rgb = self.get_rgb(shape['strokeColor'])
+        rgb = ShapeToPdfExport.get_rgb(shape['strokeColor'])
 
         self.draw.line([(x1, y1), (x2, y2)], fill=rgb, width=int(stroke_width))
 
@@ -493,7 +487,7 @@ class ShapeToPilExport(object):
         cx = centre['x']
         cy = centre['y']
         scale_w = w * self.scale
-        rgb = self.get_rgb(shape['strokeColor'])
+        rgb = ShapeToPdfExport.get_rgb(shape['strokeColor'])
 
         # To support rotation, draw rect on temp canvas, rotate and paste
         width = int((shape['width'] + w) * self.scale)
@@ -523,7 +517,7 @@ class ShapeToPilExport(object):
         rx = self.scale * shape['radiusX']
         ry = self.scale * shape['radiusY']
         rotation = (shape['rotation'] + self.panel['rotation']) * -1
-        rgb = self.get_rgb(shape['strokeColor'])
+        rgb = ShapeToPdfExport.get_rgb(shape['strokeColor'])
 
         width = int((rx * 2) + w)
         height = int((ry * 2) + w)
@@ -865,6 +859,16 @@ class FigureExport(object):
 
             pos = l['position']
             l['size'] = int(l['size'])   # make sure 'size' is number
+            # If page is black and label is black, make label white
+            page_color = self.figure_json.get('page_color', 'ffffff').lower()
+            label_color = l['color'].lower()
+            label_on_page = pos in ('left', 'right', 'top',
+                                    'bottom', 'leftvert')
+            if label_on_page:
+                if label_color == '000000' and page_color == '000000':
+                    l['color'] = 'ffffff'
+                if label_color == 'ffffff' and page_color == 'ffffff':
+                    l['color'] = '000000'
             if pos in positions:
                 positions[pos].append(l)
 
@@ -1341,6 +1345,19 @@ class FigureExport(object):
         self.figure_canvas = canvas.Canvas(
             name, pagesize=(self.page_width, self.page_height))
 
+        # Page color - simply draw colored rectangle over whole page
+        page_color = self.figure_json.get('page_color')
+        if page_color and page_color.lower() != 'ffffff':
+            rgb = ShapeToPdfExport.get_rgb('#' + page_color)
+            r = float(rgb[0])/255
+            g = float(rgb[1])/255
+            b = float(rgb[2])/255
+            self.figure_canvas.setStrokeColorRGB(r, g, b)
+            self.figure_canvas.setFillColorRGB(r, g, b)
+            self.figure_canvas.setLineWidth(4)
+            self.figure_canvas.rect(0, 0, self.page_width,
+                                    self.page_height, fill=1)
+
     def save_page(self, page=None):
         """ Called on completion of each page. Saves page of PDF """
         self.figure_canvas.showPage()
@@ -1508,8 +1525,11 @@ class TiffExport(FigureExport):
         """
         tiff_width = self.scale_coords(self.page_width)
         tiff_height = self.scale_coords(self.page_height)
-        self.tiff_figure = Image.new(
-            "RGBA", (tiff_width, tiff_height), (255, 255, 255))
+        rgb = (255, 255, 255)
+        page_color = self.figure_json.get('page_color')
+        if page_color is not None:
+            rgb = ShapeToPdfExport.get_rgb('#' + page_color)
+        self.tiff_figure = Image.new("RGBA", (tiff_width, tiff_height), rgb)
 
     def paste_image(self, pil_img, img_name, panel, page, dpi=None):
         """ Add the PIL image to the current figure page """
