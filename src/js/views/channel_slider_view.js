@@ -15,6 +15,69 @@ var ChannelSliderView = Backbone.View.extend({
     events: {
         "keyup .ch_start": "handle_channel_input",
         "keyup .ch_end": "handle_channel_input",
+        "click .channel-btn": "toggle_channel",
+        "click .dropdown-menu a": "pick_color",
+    },
+
+    pick_color: function(e) {
+        var color = e.currentTarget.getAttribute('data-color'),
+            $colorbtn = $(e.currentTarget).parent().parent(),
+            oldcolor = $(e.currentTarget).attr('data-oldcolor'),
+            idx = $colorbtn.attr('data-index'),
+            self = this;
+
+        if (color == 'colorpicker') {
+            FigureColorPicker.show({
+                'color': oldcolor,
+                'success': function(newColor){
+                    // remove # from E.g. #ff00ff
+                    newColor = newColor.replace("#", "");
+                    self.set_color(idx, newColor);
+                }
+            });
+        } else if (color == 'lutpicker') {
+            FigureLutPicker.show({
+                success: function(lutName){
+                    // LUT names are handled same as color strings
+                    self.set_color(idx, lutName);
+                }
+            });
+        } else if (color == 'reverse') {
+            var reverse = $('span', e.currentTarget).hasClass('glyphicon-check');
+            self.models.forEach(function(m){
+                m.save_channel(idx, 'reverseIntensity', !reverse);
+            });
+        } else {
+            this.set_color(idx, color);
+        }
+        return false;
+    },
+
+    set_color: function(idx, color) {
+        if (this.models) {
+            this.models.forEach(function(m){
+                m.save_channel(idx, 'color', color);
+            });
+        }
+    },
+
+    toggle_channel: function(e) {
+        var idx = e.currentTarget.getAttribute('data-index');
+
+        if (this.model) {
+            this.model.toggle_channel(idx);
+        } else if (this.models) {
+            // 'flat' means that some panels have this channel on, some off
+            var flat = $('div', e.currentTarget).hasClass('ch-btn-flat');
+            this.models.forEach(function(m){
+                if(flat) {
+                    m.toggle_channel(idx, true);
+                } else {
+                    m.toggle_channel(idx);
+                }
+            });
+        }
+        return false;
     },
 
     handle_channel_input: function(event) {
@@ -61,13 +124,24 @@ var ChannelSliderView = Backbone.View.extend({
                     return ch[idx].color;
                 }
             }
+            var getReverse = function(idx) {
+                return function(ch) {
+                    // For older figures (created pre 5.3.0) might be undefined
+                    return ch[idx].reverseIntensity === true;
+                }
+            }
+            var getActive = function(idx) {
+                return function(ch) {
+                    return ch[idx].active === true;
+                }
+            }
             var windowFn = function (idx, attr) {
                 return function (ch) {
                     return ch[idx].window[attr];
                 }
             };
             var allEqualFn = function(prev, value) {
-                return value === prev ? prev : false;
+                return value === prev ? prev : undefined;
             };
             var reduceFn = function(fn) {
                 return function(prev, curr) {
@@ -99,16 +173,32 @@ var ChannelSliderView = Backbone.View.extend({
                 var mins = chData.map(windowFn(chIdx, 'min'));
                 var maxs = chData.map(windowFn(chIdx, 'max'));
                 var colors = chData.map(getColor(chIdx));
+                var reverses = chData.map(getReverse(chIdx));
+                var actives = chData.map(getActive(chIdx));
                 // Reduce lists into summary for this channel
                 var startAvg = parseInt(starts.reduce(addFn, 0) / starts.length, 10);
                 var endAvg = parseInt(ends.reduce(addFn, 0) / ends.length, 10);
-                var startsNotEqual = starts.reduce(allEqualFn, starts[0]) === false;
-                var endsNotEqual = ends.reduce(allEqualFn, ends[0]) === false;
+                var startsNotEqual = starts.reduce(allEqualFn, starts[0]) === undefined;
+                var endsNotEqual = ends.reduce(allEqualFn, ends[0]) === undefined;
                 var min = mins.reduce(reduceFn(Math.min));
                 var max = maxs.reduce(reduceFn(Math.max));
                 var color = colors.reduce(allEqualFn, colors[0]) ? colors[0] : 'ccc';
+                // allEqualFn for booleans will return undefined if not or equal
+                var reverse = reverses.reduce(allEqualFn, reverses[0]) ? true : false;
+                var active = actives.reduce(allEqualFn, actives[0]);
+                var style = {'background-position': '0 0'}
+                var sliderClass = '';
                 var lutBgPos = FigureLutPicker.getLutBackgroundPosition(color);
-                if (color.toUpperCase() === "FFFFFF") color = "ccc";  // white slider would be invisible
+                if (color.endsWith('.lut')) {
+                    style['background-position'] = lutBgPos;
+                    sliderClass = 'lutBg';
+                } else if (color.toUpperCase() === "FFFFFF") {
+                    color = "ccc";  // white slider would be invisible
+                }
+                if (reverse) {
+                    style.transform = 'scaleX(-1)';
+                }
+                if (color == "FFFFFF") color = "ccc";  // white slider would be invisible
 
                 // Make sure slider range is increased if needed to include current values
                 min = Math.min(min, startAvg);
@@ -119,6 +209,9 @@ var ChannelSliderView = Backbone.View.extend({
                                                 'startsNotEqual': startsNotEqual,
                                                 'endAvg': endAvg,
                                                 'endsNotEqual': endsNotEqual,
+                                                'active': active,
+                                                'lutBgPos': lutBgPos,
+                                                'reverse': reverse,
                                                 'color': color});
                 var $div = $(sliderHtml).appendTo(this.$el);
 
@@ -138,7 +231,9 @@ var ChannelSliderView = Backbone.View.extend({
                     }
                 })
                 // Need to add background style to newly created div.ui-slider-range
-                .children('.ui-slider-range').css('background-position', lutBgPos)
+                .children('.ui-slider-range').css(style)
+                .addClass(sliderClass);
+
             }.bind(this));
         return this;
     }

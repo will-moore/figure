@@ -749,6 +749,7 @@ class FigureExport(object):
         c_idxs = []
         windows = []
         colors = []
+        reverses = []
 
         # OMERO.figure doesn't support greyscale rendering
         image.setColorRenderingModel()
@@ -758,8 +759,9 @@ class FigureExport(object):
                 c_idxs.append(i+1)
                 windows.append([c['window']['start'], c['window']['end']])
                 colors.append(c['color'])
+                reverses.append(c['reverseIntensity'])
 
-        image.setActiveChannels(c_idxs, windows, colors)
+        image.setActiveChannels(c_idxs, windows, colors, reverses)
 
     def get_crop_region(self, panel):
         """
