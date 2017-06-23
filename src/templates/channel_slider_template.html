@@ -17,7 +17,10 @@ class="btn btn-default channel-btn lutBg"
             <ul class="dropdown-menu colorpicker" data-index="<%= idx %>">
                 <li>
                     <a data-color="reverse" class="reverseIntensity" href="#">
-                        <span class="glyphicon <% if(reverse) { %>glyphicon-ok<% }%>"></span> Reverse Intensity
+                        <span style="font-size: 18px; position: relative; top: 4px;;"
+                            class="glyphicon
+                            <% if(reverse) { %>glyphicon-check<% } else { %>glyphicon-unchecked<% } %>">
+                        </span> Reverse Intensity
                     </a>
                 </li>
                 <li class="divider"></li>

@@ -43,7 +43,7 @@ var ChannelSliderView = Backbone.View.extend({
                 }
             });
         } else if (color == 'reverse') {
-            var reverse = $('span', e.currentTarget).hasClass('glyphicon-ok');
+            var reverse = $('span', e.currentTarget).hasClass('glyphicon-check');
             self.models.forEach(function(m){
                 m.save_channel(idx, 'reverseIntensity', !reverse);
             });
