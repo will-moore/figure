@@ -759,7 +759,7 @@ class FigureExport(object):
                 c_idxs.append(i+1)
                 windows.append([c['window']['start'], c['window']['end']])
                 colors.append(c['color'])
-                reverses.append(c['reverseIntensity'])
+                reverses.append(c.get('reverseIntensity', False))
 
         image.setActiveChannels(c_idxs, windows, colors, reverses)
 
