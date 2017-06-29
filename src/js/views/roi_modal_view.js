@@ -280,11 +280,7 @@ var RoiModalView = Backbone.View.extend({
             event.preventDefault();
             var $a = $(event.target),
                 $span = $a.children('span');
-            // For the Label Text, handle this differently...
-            if ($a.attr('data-label')) {
-                $('.new-label-form .label-text', this.$el).val( $a.attr('data-label') );
-            }
-            // All others, we take the <span> from the <a> and place it in the <button>
+            // Take the <span> from the <a> and place it in the <button>
             if ($span.length === 0) $span = $a;  // in case we clicked on <span>
             var $li = $span.parent().parent(),
                 $button = $li.parent().prev();
