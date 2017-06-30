@@ -681,6 +681,8 @@ class FigureExport(object):
         row = 0
         for p in range(self.page_count):
 
+            self.add_page_color()
+
             px = col * (self.page_width + paper_spacing)
             py = row * (self.page_height + paper_spacing)
             page = {'x': px, 'y': py}
@@ -1347,7 +1349,8 @@ class FigureExport(object):
         self.figure_canvas = canvas.Canvas(
             name, pagesize=(self.page_width, self.page_height))
 
-        # Page color - simply draw colored rectangle over whole page
+    def add_page_color(self):
+        """ Simply draw colored rectangle over whole current page."""
         page_color = self.figure_json.get('page_color')
         if page_color and page_color.lower() != 'ffffff':
             rgb = ShapeToPdfExport.get_rgb('#' + page_color)
@@ -1532,6 +1535,10 @@ class TiffExport(FigureExport):
         if page_color is not None:
             rgb = ShapeToPdfExport.get_rgb('#' + page_color)
         self.tiff_figure = Image.new("RGBA", (tiff_width, tiff_height), rgb)
+
+    def add_page_color(self):
+        """ Don't need to do anything for TIFF. Image is already colored."""
+        pass
 
     def paste_image(self, pil_img, img_name, panel, page, dpi=None):
         """ Add the PIL image to the current figure page """
