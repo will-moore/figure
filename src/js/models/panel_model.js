@@ -243,11 +243,13 @@
             var newLabels = [];
             _.each(this.get('channels'), function(c){
                 if (c.active) {
+                    // If channel has LUT, make grey (visible on black/white bg)
+                    var chColor = c.color.endsWith('lut') ? 'BBBBBB' : c.color;
                     newLabels.push({
                         'text': c.label,
                         'size': options.size,
                         'position': options.position,
-                        'color': options.color || c.color
+                        'color': options.color || chColor
                     });
                 }
             });
