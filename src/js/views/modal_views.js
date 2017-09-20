@@ -222,12 +222,6 @@
             // get image Data
             $.getJSON(BASE_WEBFIGURE_URL + 'imgData/' + parseInt(idInput, 10) + '/', function(data){
 
-                // Don't allow BIG images
-                if (data.size.width * data.size.height > 5000 * 5000) {
-                    alert("Image '" + data.meta.imageName + "' is too big for OMERO.figure");
-                    return;
-                }
-
                 // just pick what we need
                 var newImg = {
                     'imageId': data.id,

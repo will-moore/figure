@@ -525,6 +525,10 @@
                 'y':this.get('y') + (this.get('height')/2)};
         },
 
+        is_big_image: function() {
+            return this.get('orig_width') * this.get('orig_height') > 4000 * 4000;
+        },
+
         get_img_src: function() {
             var chs = this.get('channels');
             var cStrings = chs.map(function(c, i){
@@ -546,19 +550,35 @@
             }
             baseUrl = baseUrl || WEBGATEWAYINDEX.slice(0, -1);  // remove last /
 
-            return baseUrl + '/render_image/' + imageId + "/" + theZ + "/" + theT
-                    + '/?c=' + renderString + proj + maps +"&m=c";
+            // If BIG image, render scaled region
+            var region = "";
+            if (this.is_big_image()) {
+                baseUrl = BASE_WEBFIGURE_URL + 'render_scaled_region/';
+                var rect = this.getViewportAsRect();
+                region = '&region=' + [rect.x, rect.y, rect.width, rect.height].join(',');
+            } else {
+                baseUrl += '/render_image/';
+            }
+
+            return baseUrl + imageId + "/" + theZ + "/" + theT
+                    + '/?c=' + renderString + proj + maps + region + "&m=c";
         },
 
         // used by the PanelView and ImageViewerView to get the size and
         // offset of the img within it's frame
         get_vp_img_css: function(zoom, frame_w, frame_h, dx, dy, fit) {
 
+            console.log('get_vp_img_css', zoom, frame_w, dx, dy, fit)
+
             var orig_w = this.get('orig_width'),
                 orig_h = this.get('orig_height');
             if (typeof dx == 'undefined') dx = this.get('dx');
             if (typeof dy == 'undefined') dy = this.get('dy');
             zoom = zoom || 100;
+
+            if (this.is_big_image()) {
+                zoom = 100;
+            }
 
             var img_x = 0,
                 img_y = 0,

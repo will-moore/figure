@@ -281,11 +281,6 @@
                 // work with the response
                 success: function( data ) {
 
-                    if (data.size.width * data.size.height > 5000 * 5000) {
-                        alert("Image '" + data.meta.imageName + "' is too big for OMERO.figure");
-                        return;
-                    }
-
                     coords.spacer = coords.spacer || data.size.width/20;
                     var full_width = (coords.colCount * (data.size.width + coords.spacer)) - coords.spacer,
                         full_height = (coords.rowCount * (data.size.height + coords.spacer)) - coords.spacer;
