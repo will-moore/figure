@@ -1156,10 +1156,14 @@
         // TODO: Update each panel separately.
         update_img_css: function(zoom, dx, dy, save) {
 
-            orig_dx = dx;
-            orig_dy = dy;
+            var orig_dx = dx;
+            var orig_dy = dy;
             dx = dx / (zoom/100);
             dy = dy / (zoom/100);
+
+            var big_image = this.models.reduce(function(prev, m){
+                return prev || m.is_big_image();
+            }, false);
 
             var avg_dx = this.models.getAverage('dx'),
                 avg_dy = this.models.getAverage('dy');
@@ -1174,6 +1178,10 @@
                 dy = dy * scale;
                 dx += avg_dx;
                 dy += avg_dy;
+                if (!big_image) {
+                    orig_dx = dx;
+                    orig_dy = dy;
+                }
                 this.$vp_img.css( this.models.head().get_vp_img_css(zoom, frame_w, frame_h, orig_dx, orig_dy) );
                 this.$vp_zoom_value.text(zoom + "%");
 
