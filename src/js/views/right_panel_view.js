@@ -1156,6 +1156,8 @@
         // TODO: Update each panel separately.
         update_img_css: function(zoom, dx, dy, save) {
 
+            orig_dx = dx;
+            orig_dy = dy;
             dx = dx / (zoom/100);
             dy = dy / (zoom/100);
 
@@ -1172,7 +1174,7 @@
                 dy = dy * scale;
                 dx += avg_dx;
                 dy += avg_dy;
-                this.$vp_img.css( this.models.head().get_vp_img_css(zoom, frame_w, frame_h, dx, dy) );
+                this.$vp_img.css( this.models.head().get_vp_img_css(zoom, frame_w, frame_h, orig_dx, orig_dy) );
                 this.$vp_zoom_value.text(zoom + "%");
 
                 if (save) {
@@ -1244,7 +1246,7 @@
             // Now get img src & positioning css for each panel, 
             this.models.forEach(function(m){
                 var src = m.get_img_src(),
-                    img_css = m.get_vp_img_css(m.get('zoom'), frame_w, frame_h, m.get('dx'), m.get('dy'));
+                    img_css = m.get_vp_img_css(m.get('zoom'), frame_w, frame_h);
                 img_css.src = src;
                 // if a 'reasonable' dpi is set, we don't pixelate
                 dpiSet = m.get('export_dpi') > 100;

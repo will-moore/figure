@@ -570,63 +570,90 @@
 
             console.log('get_vp_img_css', zoom, frame_w, dx, dy, fit)
 
-            var orig_w = this.get('orig_width'),
-                orig_h = this.get('orig_height');
-            if (typeof dx == 'undefined') dx = this.get('dx');
-            if (typeof dy == 'undefined') dy = this.get('dy');
-            zoom = zoom || 100;
+            // if (this.is_big_image()) {
+            //     // For big images, the rendered image shows the viewport
+            //     // and we simply want it to fill the viewport...
 
-            // For big images, the rendered image shows the viewport
-            // and we simply want it to fill the viewport...
-            if (this.is_big_image()) {
-                zoom = 100;
-                dx = 0;
-                dy = 0;
-            }
+            //     // if we're not dragging
+            //     if (typeof dx == 'undefined') {
+            //         dx = 0;
+            //     } else {
+            //         // we're dragging - just calculate drag offset
+            //         dx = dx - this.get('dx');
+            //         dx = dx / this.get('zoom') / 100;
+            //     }
+            //     if (typeof dy == 'undefined') {
+            //         dy = 0;
+            //     }
 
+            // }
             var img_x = 0,
                 img_y = 0,
-                img_w = frame_w * (zoom/100),
-                img_h = frame_h * (zoom/100),
-                orig_ratio = orig_w / orig_h,
-                vp_ratio = frame_w / frame_h;
-            if (Math.abs(orig_ratio - vp_ratio) < 0.01) {
-                // ignore...
-            // if viewport is wider than orig, offset y
-            } else if (orig_ratio < vp_ratio) {
-                img_h = img_w / orig_ratio;
+                img_w,
+                img_h;
+
+            var orig_w = this.get('orig_width'),
+                orig_h = this.get('orig_height');
+            var big = this.is_big_image()
+            if (big) {
+                img_w = frame_w;
+                img_h = frame_h;
+                if (typeof dx != 'undefined') {
+                    img_x = dx;
+                }
+                if (typeof dy != 'undefined') {
+                    img_y = dy;
+                }
+
             } else {
-                img_w = img_h * orig_ratio;
+                if (typeof dx == 'undefined') dx = this.get('dx');
+                if (typeof dy == 'undefined') dy = this.get('dx');
+
+                zoom = zoom || 100;
+
+                var orig_ratio = orig_w / orig_h,
+                    vp_ratio = frame_w / frame_h;
+                img_w = frame_w * (zoom/100);
+                img_h = frame_h * (zoom/100);
+                if (Math.abs(orig_ratio - vp_ratio) < 0.01) {
+                    // ignore...
+                // if viewport is wider than orig, offset y
+                } else if (orig_ratio < vp_ratio) {
+                    img_h = img_w / orig_ratio;
+                } else {
+                    img_w = img_h * orig_ratio;
+                }
+                var vp_scale_x = frame_w / orig_w,
+                    vp_scale_y = frame_h / orig_h,
+                    vp_scale = Math.max(vp_scale_x, vp_scale_y);
+
+                // offsets if image is centered
+                img_y = (img_h - frame_h)/2;
+                img_x = (img_w - frame_w)/2;
+
+
+                dx = dx * (zoom/100);
+                dy = dy * (zoom/100);
+                img_x = (dx * vp_scale) - img_x;
+                img_y = (dy * vp_scale) - img_y;
             }
-            var vp_scale_x = frame_w / orig_w,
-                vp_scale_y = frame_h / orig_h,
-                vp_scale = Math.max(vp_scale_x, vp_scale_y);
-
-            // offsets if image is centered
-            img_y = (img_h - frame_h)/2;
-            img_x = (img_w - frame_w)/2;
-
-            // now shift by dx & dy
-            dx = dx * (zoom/100);
-            dy = dy * (zoom/100);
-            img_x = (dx * vp_scale) - img_x;
-            img_y = (dy * vp_scale) - img_y;
+            console.log('img_x', img_x, 'img_y', img_y, 'img_w', img_w, 'img_h', img_h);
 
             var transform_x = 100 * (frame_w/2 - img_x) / img_w,
                 transform_y = 100 * (frame_h/2 - img_y) / img_h,
                 rotation = this.get('rotation') || 0;
 
             // option to align image within viewport (not used now)
-            if (fit) {
-                img_x = Math.min(img_x, 0);
-                if (img_x + img_w < frame_w) {
-                    img_x = frame_w - img_w;
-                }
-                img_y = Math.min(img_y, 0);
-                if (img_y + img_h < frame_h) {
-                    img_y = frame_h - img_h;
-                }
-            }
+            // if (fit) {
+            //     img_x = Math.min(img_x, 0);
+            //     if (img_x + img_w < frame_w) {
+            //         img_x = frame_w - img_w;
+            //     }
+            //     img_y = Math.min(img_y, 0);
+            //     if (img_y + img_h < frame_h) {
+            //         img_y = frame_h - img_h;
+            //     }
+            // }
 
             var css = {'left':img_x,
                        'top':img_y,
