@@ -576,8 +576,12 @@
             if (typeof dy == 'undefined') dy = this.get('dy');
             zoom = zoom || 100;
 
+            // For big images, the rendered image shows the viewport
+            // and we simply want it to fill the viewport...
             if (this.is_big_image()) {
                 zoom = 100;
+                dx = 0;
+                dy = 0;
             }
 
             var img_x = 0,

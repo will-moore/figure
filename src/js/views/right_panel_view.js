@@ -1096,7 +1096,11 @@
                 dx = xy.dx;
                 dy = xy.dy;
             }
+            // Save then re-render
             this.update_img_css(this.zoom_avg, dx, dy, true);
+            // TODO: this also re-builds sliders etc.
+            // Split out render_viewport() from render()
+            this.render();
             this.dragging = false;
             return false;
         },
