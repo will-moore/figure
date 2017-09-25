@@ -74,12 +74,13 @@
             // update the img within the panel
             var zoom = this.model.get('zoom'),
                 vp_css = this.model.get_vp_img_css(zoom, w, h),
-                panel_scale = vp_css.width / this.model.get('orig_width');
+                svg_css = this.model.get_vp_full_plane_css(zoom, w, h),
+                panel_scale = svg_css.width / this.model.get('orig_width');
 
             // These two elements are siblings under imgContainer and must
             // maintain exactly on top of each other
             this.$img_panel.css(vp_css);
-            this.$panel_canvas.css(vp_css);
+            this.$panel_canvas.css(svg_css);
 
             // panel_canvas contains the shapeManager svg, which we zoom:
             if (this.shapeManager) {
@@ -105,7 +106,7 @@
                 if (!this.shapeManager) {
                     var canvasId = this.$panel_canvas.attr('id');
                     this.$panel_canvas.attr({'width': w + 'px', 'height': h + 'px'});
-                    var panel_scale = this.$img_panel.width() / w;
+                    var panel_scale = this.$panel_canvas.width() / w;
                     this.shapeManager = new ShapeManager(canvasId, w, h, {'readOnly': true});
                     this.shapeManager.setZoom(panel_scale * 100);
                 }

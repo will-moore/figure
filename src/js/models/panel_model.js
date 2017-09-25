@@ -564,14 +564,58 @@
                     + '/?c=' + renderString + proj + maps + region + "&m=c";
         },
 
+        // Turn coordinates into css object with rotation transform
+        _viewport_css(img_x, img_y, img_w, img_h, frame_w, frame_h) {
+            var transform_x = 100 * (frame_w/2 - img_x) / img_w,
+                transform_y = 100 * (frame_h/2 - img_y) / img_h,
+                rotation = this.get('rotation') || 0;
+
+            var css = {'left':img_x,
+                       'top':img_y,
+                       'width':img_w,
+                       'height':img_h,
+                       '-webkit-transform-origin': transform_x + '% ' + transform_y + '%',
+                       'transform-origin': transform_x + '% ' + transform_y + '%',
+                       '-webkit-transform': 'rotate(' + rotation + 'deg)',
+                       'transform': 'rotate(' + rotation + 'deg)'
+                   };
+            return css;
+        },
+
         // used by the PanelView and ImageViewerView to get the size and
         // offset of the img within it's frame
-        get_vp_img_css: function(zoom, frame_w, frame_h, x, y, fit) {
+        get_vp_img_css: function(zoom, frame_w, frame_h, x, y) {
+
+            // For non-big images, we have the full plane in hand
+            // css just shows the viewport region
+            if (!this.is_big_image()) {
+                return this.get_vp_full_plane_css(zoom, frame_w, frame_h, x, y);
+
+            // For 'big' images, we render just the viewport, so the rendered
+            // image fully fills the viewport.
+            } else {
+                img_w = frame_w;
+                img_h = frame_h;
+                if (typeof x != 'undefined') {
+                    img_x = x;
+                } else {
+                    img_x = 0;
+                }
+                if (typeof y != 'undefined') {
+                    img_y = y;
+                } else {
+                    img_y = 0;
+                }
+                return this._viewport_css(img_x, img_y, img_w, img_h, frame_w, frame_h);
+            }
+        },
+
+        // get CSS that positions and scales a full image plane so that
+        // only the 'viewport' shows in the parent container
+        get_vp_full_plane_css: function(zoom, frame_w, frame_h, x, y) {
 
             var dx = x;
             var dy = y;
-
-            console.log('get_vp_img_css', zoom, frame_w, dx, dy, fit)
 
             var orig_w = this.get('orig_width'),
                 orig_h = this.get('orig_height');
@@ -607,36 +651,7 @@
             img_x = (dx * vp_scale) - img_x;
             img_y = (dy * vp_scale) - img_y;
 
-            var big = this.is_big_image()
-            if (big) {
-                img_w = frame_w;
-                img_h = frame_h;
-                if (typeof x != 'undefined') {
-                    img_x = x;
-                } else {
-                    img_x = 0;
-                }
-                if (typeof y != 'undefined') {
-                    img_y = y;
-                } else {
-                    img_y = 0;
-                }
-            }
-
-            var transform_x = 100 * (frame_w/2 - img_x) / img_w,
-                transform_y = 100 * (frame_h/2 - img_y) / img_h,
-                rotation = this.get('rotation') || 0;
-
-            var css = {'left':img_x,
-                       'top':img_y,
-                       'width':img_w,
-                       'height':img_h,
-                       '-webkit-transform-origin': transform_x + '% ' + transform_y + '%',
-                       'transform-origin': transform_x + '% ' + transform_y + '%',
-                       '-webkit-transform': 'rotate(' + rotation + 'deg)',
-                       'transform': 'rotate(' + rotation + 'deg)'
-                   };
-            return css;
+            return this._viewport_css(img_x, img_y, img_w, img_h, frame_w, frame_h);
         },
 
         getPanelDpi: function(w, h, zoom) {

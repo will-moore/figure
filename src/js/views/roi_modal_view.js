@@ -450,29 +450,20 @@ var RoiModalView = Backbone.View.extend({
                 frame_h = maxSize / wh;
             }
 
-            var c = this.m.get_vp_img_css(this.m.get('zoom'), frame_w, frame_h, this.m.get('dx'), this.m.get('dy'));
+            // Get css for the image plane
+            var css = this.m.get_vp_img_css(this.m.get('zoom'), frame_w, frame_h);
+            this.$roiImg.css(css);
 
+            // Get css for the SVG (full plane)
+            var svg_css = this.m.get_vp_full_plane_css(this.m.get('zoom'), frame_w, frame_h);
             var w = this.m.get('orig_width'),
                 h = this.m.get('orig_height');
-            var scale = c.width / w;
+            var scale = svg_css.width / w;
             // TODO: add public methods to set w & h
             this.shapeManager._orig_width = w;
             this.shapeManager._orig_height = h;
             this.shapeManager.setZoom(scale * 100);
-
-            var css = {
-                "left": c.left + "px",
-                "top": c.top + "px",
-                "width": c.width + "px",
-                "height": c.height + "px",
-                "-webkit-transform-origin": c['transform-origin'],
-                "transform-origin": c['transform-origin'],
-                "-webkit-transform": c.transform,
-                "transform": c.transform
-            }
-            this.$roiImg.css(css);
-
-            $("#roi_paper").css(css);
+            $("#roi_paper").css(svg_css);
 
             $("#roiViewer").css({'width': frame_w + 'px', 'height': frame_h + 'px'});
 
