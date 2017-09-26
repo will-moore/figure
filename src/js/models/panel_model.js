@@ -609,6 +609,38 @@
                 } else {
                     img_y = 0;
                 }
+                // if we're resizing width / height....
+                var old_w = parseInt(this.get('width'), 10);
+                var old_h = parseInt(this.get('height'), 10);
+                frame_w = parseInt(frame_w);
+                frame_h = parseInt(frame_h);
+                if (old_w !== frame_w || old_h !== frame_h) {
+                    var orig_aspect = this.get('orig_width') / this.get('orig_height');
+                    var new_aspect = frame_w/frame_h;
+                    var old_aspect = old_w/old_h;
+                    var available_w, available_h;   // max size we render on resize
+                    // if current rendered viewport image is wider
+                    if (old_aspect > orig_aspect) {
+                        available_w = old_w;
+                        available_h = old_w / orig_aspect;
+                    } else {
+                        available_h = old_h;
+                        available_w = old_h * orig_aspect;
+                    }
+
+                    var new_aspect = frame_w/frame_h;
+                    var old_aspect = old_w/old_h;
+                    // if new viewport is wider than available...
+                    if (new_aspect > orig_aspect) {
+                        //...we adjust height and y-offset
+                        img_h = (old_h / old_w) * frame_w;
+                        img_y = (frame_h - img_h) / 2;
+                    } else {
+                        img_w = (old_w / old_h) * frame_h;
+                        img_x = (frame_w - img_w) / 2;
+                    }
+                }
+
                 return this._viewport_css(img_x, img_y, img_w, img_h, frame_w, frame_h);
             }
         },

@@ -23,9 +23,9 @@
                 this.render_image);
             this.listenTo(this.model, 'change:labels change:theT change:deltaT', this.render_labels);
             this.listenTo(this.model, 'change:shapes', this.render_shapes);
-            // This could be handled by backbone.relational, but do it manually for now...
-            // this.listenTo(this.model.channels, 'change', this.render);
-            // During drag, model isn't updated, but we trigger 'drag'
+
+            // During drag or resize, model isn't updated, but we trigger 'drag'
+            // TODO: Handle drag and resize independently
             this.model.on('drag_resize', this.drag_resize, this);
 
             // Used for rendering labels against page_color background
@@ -78,7 +78,7 @@
                 panel_scale = svg_css.width / this.model.get('orig_width');
 
             // These two elements are siblings under imgContainer and must
-            // maintain exactly on top of each other
+            // will be exactly on top of each other for non-big images.
             this.$img_panel.css(vp_css);
             this.$panel_canvas.css(svg_css);
 
