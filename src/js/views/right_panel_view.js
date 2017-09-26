@@ -1179,6 +1179,7 @@
                 dx += avg_dx;
                 dy += avg_dy;
                 if (!big_image) {
+                    // For big images, we simply offset the image that fills the viewport
                     orig_dx = dx;
                     orig_dy = dy;
                 }
