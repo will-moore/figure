@@ -471,7 +471,9 @@
                 scale = Math.max(xPercent, yPercent);
 
             // if not zoomed or panned and panel shape is approx same as image...
-            if (dx === 0 && dy === 0 && zoom == 100 && Math.abs(xPercent - yPercent) < 0.01) {
+            var orig_wh = orig_width / orig_height,
+                view_wh = width / height;
+            if (dx === 0 && dy === 0 && zoom == 100 && Math.abs(orig_wh - view_wh) < 0.01) {
                 // ...ROI is whole image
                 return {'x': 0, 'y': 0, 'width': orig_width, 'height': orig_height}
             }
