@@ -557,7 +557,8 @@
             if (this.is_big_image()) {
                 baseUrl = BASE_WEBFIGURE_URL + 'render_scaled_region/';
                 var rect = this.getViewportAsRect();
-                region = '&region=' + [rect.x, rect.y, rect.width, rect.height].join(',');
+                var coords = [rect.x, rect.y, rect.width, rect.height].map(function(c){return parseInt(c)})
+                region = '&region=' + coords.join(',');
             } else {
                 baseUrl += '/render_image/';
             }
