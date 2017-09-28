@@ -599,21 +599,14 @@
             } else {
                 img_w = frame_w;
                 img_h = frame_h;
-                if (typeof x != 'undefined') {
-                    img_x = x;
-                } else {
-                    img_x = 0;
-                }
-                if (typeof y != 'undefined') {
-                    img_y = y;
-                } else {
-                    img_y = 0;
-                }
+
                 // if we're zooming...
                 if (zoom !== this.get('zoom')) {
                     img_w = frame_w * zoom / this.get('zoom');
                     img_h = frame_h * zoom / this.get('zoom');
                 }
+                var img_x = 0;
+                var img_y = 0;
 
                 // if we're resizing width / height....
                 var old_w = parseInt(this.get('width'), 10);
@@ -645,9 +638,11 @@
                             img_w = (old_w / old_h) * frame_h;
                         }
                     }
-                    // For zooming or resize, we need to centre image
-                    img_y = (frame_h - img_h) / 2;
-                    img_x = (frame_w - img_w) / 2;
+                }
+                // For zooming or resize, we need to centre image
+                if (old_w !== img_w || old_h !== img_h || zoom !== this.get('zoom')) {
+                    img_y = y || ((frame_h - img_h) / 2);
+                    img_x = x || ((frame_w - img_w) / 2);
                 }
 
                 return this._viewport_css(img_x, img_y, img_w, img_h, frame_w, frame_h);
