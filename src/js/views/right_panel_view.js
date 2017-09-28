@@ -1031,17 +1031,15 @@
             this.full_size = 250;
 
             this.models = opts.models;
-            var self = this,
-                zoom_sum = 0;
+            var self = this;
 
             this.models.forEach(function(m){
                 self.listenTo(m,
-                    'change:width change:height change:channels change:zoom change:theZ change:theT change:rotation change:z_projection change:z_start change:z_end change:export_dpi',
+                    'change:width change:height change:channels change:theZ change:theT change:rotation change:z_projection change:z_start change:z_end change:export_dpi',
                     self.render);
-                zoom_sum += m.get('zoom');
-
             });
 
+            var zoom_sum = this.models.getSum('zoom');
             this.zoom_avg = parseInt(zoom_sum/ this.models.length, 10);
 
             $("#vp_zoom_slider").slider({
