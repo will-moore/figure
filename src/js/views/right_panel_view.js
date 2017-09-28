@@ -1154,10 +1154,8 @@
         // TODO: Update each panel separately.
         update_img_css: function(zoom, dx, dy, save) {
 
-            var orig_dx = dx;
-            var orig_dy = dy;
-            dx = dx / (zoom/100);
-            dy = dy / (zoom/100);
+            var scaled_dx = dx / (zoom/100);
+            var scaled_dy = dy / (zoom/100);
 
             var big_image = this.models.reduce(function(prev, m){
                 return prev || m.is_big_image();
@@ -1172,29 +1170,32 @@
                     zm_w = this.models.head().get('orig_width') / frame_w,
                     zm_h = this.models.head().get('orig_height') / frame_h,
                     scale = Math.min(zm_w, zm_h);
-                dx = dx * scale;
-                dy = dy * scale;
-                dx += avg_dx;
-                dy += avg_dy;
-                if (!big_image) {
+                scaled_dx = scaled_dx * scale;
+                scaled_dy = scaled_dy * scale;
+                scaled_dx += avg_dx;
+                scaled_dy += avg_dy;
+
+                var offset_x = scaled_dx;
+                var offset_y = scaled_dy;
+                if (big_image) {
                     // For big images, we simply offset the image that fills the viewport
-                    orig_dx = dx;
-                    orig_dy = dy;
+                    offset_x = dx;
+                    offset_y = dy;
                 }
-                this.$vp_img.css( this.models.head().get_vp_img_css(zoom, frame_w, frame_h, orig_dx, orig_dy) );
+                this.$vp_img.css( this.models.head().get_vp_img_css(zoom, frame_w, frame_h, offset_x, offset_y) );
                 this.$vp_zoom_value.text(zoom + "%");
 
                 if (save) {
                     if (typeof dx === "undefined") dx = 0;  // rare crazy-dragging case!
                     if (typeof dy === "undefined") dy = 0;
                     this.models.forEach(function(m){
-                        m.save({'dx': dx,
-                                'dy': dy});
+                        m.save({'dx': scaled_dx,
+                                'dy': scaled_dy});
                     });
                 }
             }
 
-            this.zmView.renderXYWH(zoom, dx, dy);
+            this.zmView.renderXYWH(zoom, scaled_dx, scaled_dy);
         },
 
         formatTime: function(seconds) {
