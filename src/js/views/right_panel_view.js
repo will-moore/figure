@@ -1019,6 +1019,7 @@
     var ImageViewerView = Backbone.View.extend({
 
         template: JST["src/templates/viewport_template.html"],
+        inner_template: JST["src/templates/viewport_inner_template.html"],
 
         className: "imageViewer",
 
@@ -1060,6 +1061,8 @@
                     self.models.forEach(function(m){
                         m.save(to_save);
                     });
+                    // we don't listenTo zoom change...
+                    self.rerender_image_change();
                 }
             });
             this.$vp_zoom_value = $("#vp_zoom_value");
@@ -1096,9 +1099,8 @@
             }
             // Save then re-render
             this.update_img_css(this.zoom_avg, dx, dy, true);
-            // TODO: this also re-builds sliders etc.
-            // Split out render_viewport() from render()
-            this.render();
+            // Need to re-render for BIG images
+            this.rerender_image_change();
             this.dragging = false;
             return false;
         },
@@ -1218,6 +1220,35 @@
             }
         },
 
+        get_imgs_css: function() {
+            // Get img src & positioning css for each panel,
+            var imgs_css = [];
+            this.models.forEach(function(m){
+                var src = m.get_img_src();
+                var img_css = m.get_vp_img_css(m.get('zoom'), frame_w, frame_h);
+                img_css.src = src;
+                // if a 'reasonable' dpi is set, we don't pixelate
+                dpiSet = m.get('export_dpi') > 100;
+                img_css.pixelated = !dpiSet;
+                imgs_css.push(img_css);
+            });
+            return imgs_css;
+        },
+
+        rerender_image_change: function() {
+            // Render a change to image without removing old image
+            // by adding new image over top!
+            var json = {};
+            json.imgs_css = this.get_imgs_css();
+            json.opacity = 1/json.imgs_css.length;
+            var html = this.inner_template(json);
+            // We add this over the top of existing images
+            // So they remain visible while new image is loading
+            this.$vp_frame.append(html);
+            // update this to include new images
+            this.$vp_img = $(".vp_img", this.$el);
+        },
+
         render: function() {
 
             // render child view
@@ -1226,7 +1257,7 @@
             // only show viewport if original w / h ratio is same for all models
             var model = this.models.head(),
                 self = this;
-            var imgs_css = [];
+            var imgs_css;
 
             // get average viewport frame w/h & zoom
             var wh = this.models.getAverageWH(),
@@ -1251,16 +1282,7 @@
                 frame_h = this.full_size / wh;
             }
 
-            // Now get img src & positioning css for each panel, 
-            this.models.forEach(function(m){
-                var src = m.get_img_src(),
-                    img_css = m.get_vp_img_css(m.get('zoom'), frame_w, frame_h);
-                img_css.src = src;
-                // if a 'reasonable' dpi is set, we don't pixelate
-                dpiSet = m.get('export_dpi') > 100;
-                img_css.pixelated = !dpiSet;
-                imgs_css.push(img_css);
-            });
+            imgs_css = this.get_imgs_css();
 
             // update sliders
             var Z_disabled = false,
@@ -1352,7 +1374,7 @@
             });
 
             var json = {};
-
+            json.inner_template = this.inner_template;
             json.opacity = 1 / imgs_css.length;
             json.imgs_css = imgs_css;
             json.frame_w = frame_w;
