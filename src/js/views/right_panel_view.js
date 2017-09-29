@@ -1043,12 +1043,10 @@
                     self.rerender_image_change);
             });
 
-            var zoom_sum = this.models.getSum('zoom');
-            this.zoom_avg = parseInt(zoom_sum/ this.models.length, 10);
 
             $("#vp_zoom_slider").slider({
-                // zoom may be > 1000 if set by 'crop'
-                max: Math.max(self.zoom_avg, 1000),
+                // NB: these values are updated on render()
+                max: 1000,
                 min: 100,
                 value: self.zoom_avg,
                 slide: function(event, ui) {
@@ -1413,8 +1411,16 @@
             this.zoom_avg = zoom >> 0;
             this.$vp_zoom_value.text(this.zoom_avg + "%");
             // zoom may be > 1000 if set by 'crop'
+
+            // We want to be able to zoom Big images to 'actual size' in viewport
+            // e.g. where 250 pixels of image is shown in viewport
+            var max_width = this.models.getMax('orig_width');
+            var max_zoom = parseInt(max_width / 250) * 100;
+            max_zoom = Math.max(this.zoom_avg, max_zoom, 10000);
+
+            // Current zoom may be larger due to small crop region
             $("#vp_zoom_slider").slider({'value': this.zoom_avg,
-                                         'max': Math.max(this.zoom_avg, 1000)});
+                                         'max': max_zoom});
 
             return this;
         }
