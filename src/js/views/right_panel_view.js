@@ -1036,8 +1036,11 @@
 
             this.models.forEach(function(m){
                 self.listenTo(m,
-                    'change:width change:height change:channels change:theZ change:theT change:rotation change:z_projection change:z_start change:z_end change:export_dpi',
+                    'change:width change:height change:rotation change:z_projection change:z_start change:z_end change:export_dpi',
                     self.render);
+                self.listenTo(m,
+                    'change:channels change:theZ change:theT',
+                    self.rerender_image_change);
             });
 
             var zoom_sum = this.models.getSum('zoom');
@@ -1244,6 +1247,11 @@
             var html = this.inner_template(json);
             // We add this over the top of existing images
             // So they remain visible while new image is loading
+            // If we're viewing multiple images (with opacity) we
+            // don't want to see through to old images
+            if (json.imgs_css.length > 1) {
+                this.$vp_img.remove();
+            }
             this.$vp_frame.append(html);
             // update this to include new images
             this.$vp_img = $(".vp_img", this.$el);
