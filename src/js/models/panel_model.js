@@ -606,11 +606,16 @@
         // if we're dragging or zooming
         get_vp_big_image_css: function(zoom, frame_w, frame_h, x, y) {
 
+            // Used for static rendering, as well as during zoom, panning, panel resizing
+            // and panel re-shaping (stretch/squash).
+
+            var zooming = zoom !== this.get('zoom');
+
             var img_w = frame_w;
             var img_h = frame_h;
 
             // if we're zooming...
-            if (zoom !== this.get('zoom')) {
+            if (zooming) {
                 img_w = frame_w * zoom / this.get('zoom');
                 img_h = frame_h * zoom / this.get('zoom');
             }
@@ -622,7 +627,9 @@
             var old_h = parseInt(this.get('height'), 10);
             frame_w = parseInt(frame_w);
             frame_h = parseInt(frame_h);
-            if (old_w !== img_w || old_h !== img_h) {
+
+            var resizing = old_w !== img_w || old_h !== img_h;
+            if (resizing) {
                 var orig_aspect = this.get('orig_width') / this.get('orig_height');
                 var new_aspect = frame_w/frame_h;
                 var old_aspect = old_w/old_h;
@@ -639,7 +646,9 @@
                 var new_aspect = frame_w/frame_h;
                 var old_aspect = old_w/old_h;
                 // if new viewport is wider than available...
-                if (Math.abs(new_aspect - old_aspect) > 0.01) {
+                // Don't use (new_aspect !== old_aspect) because rounding errors.
+                var reshaping = Math.abs(new_aspect - old_aspect) > 0.01;
+                if (reshaping) {
                     if (new_aspect > orig_aspect) {
                         //...we adjust height and y-offset
                         img_h = (old_h / old_w) * frame_w;
@@ -649,7 +658,7 @@
                 }
             }
             // For zooming or resize, we need to centre image
-            if (old_w !== img_w || old_h !== img_h || zoom !== this.get('zoom')) {
+            if (resizing || zooming) {
                 img_y = y || ((frame_h - img_h) / 2);
                 img_x = x || ((frame_w - img_w) / 2);
             }
