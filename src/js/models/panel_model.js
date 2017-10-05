@@ -557,6 +557,13 @@
             if (this.is_big_image()) {
                 baseUrl = BASE_WEBFIGURE_URL + 'render_scaled_region/';
                 var rect = this.getViewportAsRect();
+                // Render a region that is 1.5 x larger
+                var length = Math.max(rect.width, rect.height) * 1.5;
+                console.log('get_img_src', rect, length, (length - rect.height) / 2);
+                rect.x = rect.x - ((length - rect.width) / 2);
+                rect.y = rect.y - ((length - rect.height) / 2);
+                rect.width = length;
+                rect.height = length;
                 var coords = [rect.x, rect.y, rect.width, rect.height].map(function(c){return parseInt(c)})
                 region = '&region=' + coords.join(',');
             } else {
@@ -611,16 +618,32 @@
 
             var zooming = zoom !== this.get('zoom');
 
-            var img_w = frame_w;
-            var img_h = frame_h;
+            // Need to know what the original offsets are...
+            // We know that the image is 1.5 * bigger than viewport
+            var length = Math.max(frame_w, frame_h) * 1.5;
+
+            var img_x;
+            var img_y;
+            var img_w = length;
+            var img_h = length;
 
             // if we're zooming...
             if (zooming) {
-                img_w = frame_w * zoom / this.get('zoom');
-                img_h = frame_h * zoom / this.get('zoom');
+                img_w = length * zoom / this.get('zoom');
+                img_h = length * zoom / this.get('zoom');
+                img_y = y || ((frame_h - img_h) / 2);
+                img_x = x || ((frame_w - img_w) / 2);
+                return this._viewport_css(img_x, img_y, img_w, img_h, frame_w, frame_h);
+            } else {
+                img_x = (frame_w - length) / 2;
+                img_y = (frame_h - length) / 2;
             }
-            var img_x = 0;
-            var img_y = 0;
+
+            // Need to know what the original offsets are...
+            // We know that the image is 1.5 * bigger than viewport
+            // var length = Math.max(frame_w, frame_h) * 1.5;
+            // var img_x = 0;
+            // var img_y = 0;
 
             // if we're resizing width / height....
             var old_w = parseInt(this.get('width'), 10);
@@ -633,32 +656,51 @@
                 var orig_aspect = this.get('orig_width') / this.get('orig_height');
                 var new_aspect = frame_w/frame_h;
                 var old_aspect = old_w/old_h;
-                var available_w, available_h;   // max size we render on resize
-                // if current rendered viewport image is wider
-                if (old_aspect > orig_aspect) {
-                    available_w = old_w;
-                    available_h = old_w / orig_aspect;
-                } else {
-                    available_h = old_h;
-                    available_w = old_h * orig_aspect;
-                }
+                // var available_w, available_h;   // max size we render on resize
+                // // if current rendered viewport image is wider
+                // if (old_aspect > orig_aspect) {
+                //     available_w = old_w;
+                //     available_h = old_w / orig_aspect;
+                // } else {
+                //     available_h = old_h;
+                //     available_w = old_h * orig_aspect;
+                // }
 
                 var new_aspect = frame_w/frame_h;
                 var old_aspect = old_w/old_h;
-                // if new viewport is wider than available...
                 // Don't use (new_aspect !== old_aspect) because rounding errors.
                 var reshaping = Math.abs(new_aspect - old_aspect) > 0.01;
                 if (reshaping) {
+                    console.log(new_aspect, orig_aspect);
+                    // if new viewport is wider than original image:
                     if (new_aspect > orig_aspect) {
-                        //...we adjust height and y-offset
-                        img_h = (old_h / old_w) * frame_w;
+                        // if (old_aspect < 1) {
+
+                        // } else {
+                        //     img_h = length;
+                        img_h = (old_h / old_w) * frame_w * 1.5;
+                        img_w = img_h;
+                        //     img_w = img_h;
+                        // }
+                        // if (old_aspect < 1) {
+                        //     // size is limited by viewport width
+                        //     img_h = frame_w * 1.5 / old_aspect;
+                        //     img_w = frame_w * 1.5 / old_aspect;
+                        // }
                     } else {
-                        img_w = (old_w / old_h) * frame_h;
+                        if (old_aspect < orig_aspect) {
+                            console.log('OK?');
+                            img_w = (old_w / old_h) * frame_h * 1.5;
+                            img_h = img_w;
+                        }
+
+                        // if (old_aspect > 1) {
+                        //     // size is set by viewport height
+                        //     img_h = frame_h * 1.5 * old_aspect;
+                        //     img_w = frame_h * 1.5 * old_aspect;
+                        // }
                     }
                 }
-            }
-            // For zooming or resize, we need to centre image
-            if (resizing || zooming) {
                 img_y = y || ((frame_h - img_h) / 2);
                 img_x = x || ((frame_w - img_w) / 2);
             }
