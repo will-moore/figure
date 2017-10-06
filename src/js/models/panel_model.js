@@ -617,6 +617,7 @@
             // and panel re-shaping (stretch/squash).
 
             var zooming = zoom !== this.get('zoom');
+            var panning = (x !== undefined && y!== undefined);
 
             // Need to know what the original offsets are...
             // We know that the image is 1.5 * bigger than viewport
@@ -705,8 +706,15 @@
                         // }
                     // }
                 }
-                img_y = y || ((frame_h - img_h) / 2);
-                img_x = x || ((frame_w - img_w) / 2);
+                img_y = (frame_h - img_h) / 2;
+                img_x = (frame_w - img_w) / 2;
+
+                // If we're panning...
+                if (panning) {
+                    // ...we need to simply increment existing offset
+                    img_x += x;
+                    img_y += y;
+                }
             }
 
             return this._viewport_css(img_x, img_y, img_w, img_h, frame_w, frame_h);
