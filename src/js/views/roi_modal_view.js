@@ -66,6 +66,10 @@ var RoiModalView = Backbone.View.extend({
                     self.shapeManager.setShapesJson(shapesJson);
                 }
 
+                // Default line width depends on image size
+                var lw = self.m.is_big_image() ? 30 : 2;
+                self.shapeManager.setStrokeWidth(lw);
+
                 // remove any previous OMERO ROIs
                 $("#roiModalRoiList table").empty();
                 self.roisLoaded = false;
@@ -75,8 +79,6 @@ var RoiModalView = Backbone.View.extend({
             });
 
             this.shapeManager = new ShapeManager("roi_paper", 1, 1);
-            // Initially start with thin white lines.
-            self.shapeManager.setStrokeWidth(1);
             self.shapeManager.setStrokeColor('#FFFFFF');
 
             this.$roiImg = $('.roi_image', this.$el);
@@ -346,10 +348,17 @@ var RoiModalView = Backbone.View.extend({
                 scale = this.zoom,
                 sel = this.shapeManager.getSelectedShapes().length > 0,
                 toPaste = this.model.get('clipboard'),
-                windows = navigator.platform.toUpperCase().indexOf('WIN') > -1;
+                windows = navigator.platform.toUpperCase().indexOf('WIN') > -1,
+                lineWidths = [1,2,3,4,5,7,10,15,20,30];
             color = color ? color.replace("#", "") : 'FFFFFF';
             toPaste = (toPaste && (toPaste.SHAPES || toPaste.CROP));
+            if (this.m.is_big_image()) {
+                // Add thicker line options: 50, 100,
+                lineWidths.splice(lineWidths.length, 0, 50, 100);
+            }
+
             var json = {'state': state,
+                        'lineWidths': lineWidths,
                         'lineWidth': lineW,
                         'color': color,
                         'sel': sel,
