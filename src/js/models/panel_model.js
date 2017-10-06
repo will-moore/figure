@@ -640,12 +640,6 @@
                 img_y = (frame_h - length) / 2;
             }
 
-            // Need to know what the original offsets are...
-            // We know that the image is 1.5 * bigger than viewport
-            // var length = Math.max(frame_w, frame_h) * 1.5;
-            // var img_x = 0;
-            // var img_y = 0;
-
             // if we're resizing width / height....
             var old_w = parseInt(this.get('width'), 10);
             var old_h = parseInt(this.get('height'), 10);
@@ -657,15 +651,6 @@
                 var orig_aspect = this.get('orig_width') / this.get('orig_height');
                 var new_aspect = frame_w/frame_h;
                 var old_aspect = old_w/old_h;
-                // var available_w, available_h;   // max size we render on resize
-                // // if current rendered viewport image is wider
-                // if (old_aspect > orig_aspect) {
-                //     available_w = old_w;
-                //     available_h = old_w / orig_aspect;
-                // } else {
-                //     available_h = old_h;
-                //     available_w = old_h * orig_aspect;
-                // }
 
                 var new_aspect = frame_w/frame_h;
                 var old_aspect = old_w/old_h;
@@ -677,34 +662,6 @@
                     console.log("Reshaping.... hide!");
                     img_w = 0;
                     img_h = 0;
-                    // if new viewport is wider than original image:
-                    // if (new_aspect > orig_aspect) {
-                        // if (old_aspect < 1) {
-
-                        // } else {
-                        //     img_h = length;
-                        // img_h = (old_h / old_w) * frame_w * 1.5;
-                        // img_w = img_h;
-                        //     img_w = img_h;
-                        // }
-                        // if (old_aspect < 1) {
-                        //     // size is limited by viewport width
-                        //     img_h = frame_w * 1.5 / old_aspect;
-                        //     img_w = frame_w * 1.5 / old_aspect;
-                        // }
-                    // } else {
-                    //     if (old_aspect < orig_aspect) {
-                    //         console.log('OK?');
-                    //         img_w = (old_w / old_h) * frame_h * 1.5;
-                    //         img_h = img_w;
-                    //     }
-
-                        // if (old_aspect > 1) {
-                        //     // size is set by viewport height
-                        //     img_h = frame_h * 1.5 * old_aspect;
-                        //     img_w = frame_h * 1.5 * old_aspect;
-                        // }
-                    // }
                 }
                 img_y = (frame_h - img_h) / 2;
                 img_x = (frame_w - img_w) / 2;
