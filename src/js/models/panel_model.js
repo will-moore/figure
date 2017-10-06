@@ -671,15 +671,19 @@
                 // Don't use (new_aspect !== old_aspect) because rounding errors.
                 var reshaping = Math.abs(new_aspect - old_aspect) > 0.01;
                 if (reshaping) {
-                    console.log(new_aspect, orig_aspect);
+                    // *** Can't get this right! ***
+                    // simply hide for now!
+                    console.log("Reshaping.... hide!");
+                    img_w = 0;
+                    img_h = 0;
                     // if new viewport is wider than original image:
-                    if (new_aspect > orig_aspect) {
+                    // if (new_aspect > orig_aspect) {
                         // if (old_aspect < 1) {
 
                         // } else {
                         //     img_h = length;
-                        img_h = (old_h / old_w) * frame_w * 1.5;
-                        img_w = img_h;
+                        // img_h = (old_h / old_w) * frame_w * 1.5;
+                        // img_w = img_h;
                         //     img_w = img_h;
                         // }
                         // if (old_aspect < 1) {
@@ -687,19 +691,19 @@
                         //     img_h = frame_w * 1.5 / old_aspect;
                         //     img_w = frame_w * 1.5 / old_aspect;
                         // }
-                    } else {
-                        if (old_aspect < orig_aspect) {
-                            console.log('OK?');
-                            img_w = (old_w / old_h) * frame_h * 1.5;
-                            img_h = img_w;
-                        }
+                    // } else {
+                    //     if (old_aspect < orig_aspect) {
+                    //         console.log('OK?');
+                    //         img_w = (old_w / old_h) * frame_h * 1.5;
+                    //         img_h = img_w;
+                    //     }
 
                         // if (old_aspect > 1) {
                         //     // size is set by viewport height
                         //     img_h = frame_h * 1.5 * old_aspect;
                         //     img_w = frame_h * 1.5 * old_aspect;
                         // }
-                    }
+                    // }
                 }
                 img_y = y || ((frame_h - img_h) / 2);
                 img_x = x || ((frame_w - img_w) / 2);
