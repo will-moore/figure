@@ -726,7 +726,7 @@
             w = w || this.get('width');
             h = h || this.get('height');
             zoom = zoom || this.get('zoom');
-            var img_width = this.get_vp_img_css(zoom, w, h).width,  // not viewport width
+            var img_width = this.get_vp_full_plane_css(zoom, w, h).width,  // not viewport width
                 orig_width = this.get('orig_width'),
                 scaling = orig_width / img_width,
                 dpi = scaling * 72;
