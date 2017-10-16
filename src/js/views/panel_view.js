@@ -25,7 +25,6 @@
             this.listenTo(this.model, 'change:shapes', this.render_shapes);
 
             // During drag or resize, model isn't updated, but we trigger 'drag'
-            // TODO: Handle drag and resize independently
             this.model.on('drag_resize', this.drag_resize, this);
 
             // Used for rendering labels against page_color background
@@ -45,9 +44,14 @@
                 y = xywh[1],
                 w = xywh[2],
                 h = xywh[3];
-            this.update_resize(x, y, w, h);
+            if (w == this.model.get('width') && h == this.model.get('height')) {
+                // If we're only dragging - simply update position
+                this.$el.css({'top': y +'px', 'left': x +'px'});
+            } else {
+                this.update_resize(x, y, w, h);
+                this.render_shapes();
+            }
             this.$el.addClass('dragging');
-            this.render_shapes();
         },
 
         render_layout: function() {
