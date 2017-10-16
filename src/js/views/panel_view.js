@@ -81,6 +81,15 @@
                 svg_css = this.model.get_vp_full_plane_css(zoom, w, h),
                 panel_scale = svg_css.width / this.model.get('orig_width');
 
+            // If we're resizing a BIG image, layout can be buggy,
+            // so we simply hide while resizing
+            if (this.model.is_big_image()) {
+                if (w !== this.model.get('width') || h !== this.model.get('height')) {
+                    vp_css.width = 0;
+                    vp_css.height = 0;
+                }
+            }
+
             // These two elements are siblings under imgContainer and must
             // will be exactly on top of each other for non-big images.
             this.$img_panel.css(vp_css);
@@ -124,6 +133,16 @@
         },
 
         render_image: function() {
+
+            // For big images, layout changes will update src to render a new viewport
+            // But we don't want the previous image showing while we wait...
+            if (this.model.is_big_image()) {
+                this.$img_panel.hide();
+                this.$img_panel.one("load", function(){
+                    $(this).show();
+                });
+            }
+
             var src = this.model.get_img_src();
             this.$img_panel.attr('src', src);
 

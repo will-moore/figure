@@ -609,8 +609,10 @@
         },
 
         // For BIG images we just render the viewport
-        // Rendered image will be filling viewport, with offset or larger
-        // if we're dragging or zooming
+        // Rendered image will be filling viewport.
+        // If we're zooming image will be larger.
+        // If panning, offset from centre by x and y.
+        // NB: Reshaping (changing aspect ratio) is buggy (so PanelView hides big image while reshaping)
         get_vp_big_image_css: function(zoom, frame_w, frame_h, x, y) {
 
             // Used for static rendering, as well as during zoom, panning, panel resizing
@@ -648,21 +650,7 @@
 
             var resizing = old_w !== img_w || old_h !== img_h;
             if (resizing) {
-                var orig_aspect = this.get('orig_width') / this.get('orig_height');
-                var new_aspect = frame_w/frame_h;
-                var old_aspect = old_w/old_h;
 
-                var new_aspect = frame_w/frame_h;
-                var old_aspect = old_w/old_h;
-                // Don't use (new_aspect !== old_aspect) because rounding errors.
-                var reshaping = Math.abs(new_aspect - old_aspect) > 0.01;
-                if (reshaping) {
-                    // *** Can't get this right! ***
-                    // simply hide for now!
-                    console.log("Reshaping.... hide!");
-                    img_w = 0;
-                    img_h = 0;
-                }
                 img_y = (frame_h - img_h) / 2;
                 img_x = (frame_w - img_w) / 2;
 
