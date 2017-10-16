@@ -1224,8 +1224,17 @@
         get_imgs_css: function() {
             // Get img src & positioning css for each panel,
             var imgs_css = [];
+            var wh = this.models.getAverageWH();
+            if (wh <= 1) {
+                var frame_h = this.full_size;
+                var frame_w = this.full_size * wh;
+            } else {
+                var frame_w = this.full_size;
+                var frame_h = this.full_size / wh;
+            }
             this.models.forEach(function(m){
                 var src = m.get_img_src();
+                console.log('get_imgs_css', frame_w, frame_h);
                 var img_css = m.get_vp_img_css(m.get('zoom'), frame_w, frame_h);
                 img_css.src = src;
                 // if a 'reasonable' dpi is set, we don't pixelate
@@ -1281,11 +1290,11 @@
             this.theT_avg = theT;
 
             if (wh <= 1) {
-                frame_h = this.full_size;
-                frame_w = this.full_size * wh;
+                var frame_h = this.full_size;
+                var frame_w = this.full_size * wh;
             } else {
-                frame_w = this.full_size;
-                frame_h = this.full_size / wh;
+                var frame_w = this.full_size;
+                var frame_h = this.full_size / wh;
             }
 
             imgs_css = this.get_imgs_css();
