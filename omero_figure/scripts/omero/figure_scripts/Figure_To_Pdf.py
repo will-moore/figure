@@ -1047,6 +1047,8 @@ class FigureExport(object):
         # This limit is the same as views.py render_scaled_region()
         max_size = 2000
 
+        size_x = image.getSizeX()
+        size_y = image.getSizeY()
         x = region['x']
         y = region['y']
         width = region['width']
@@ -1071,11 +1073,37 @@ class FigureExport(object):
         y = int(y * scale)
         width = int(width * scale)
         height = int(height * scale)
+        size_x = int(size_x * scale)
+        size_y = int(size_y * scale)
+
+        canvas = None
+        # Coordinates below are all final jpeg coordinates & sizes
+        if x < 0 or y < 0 or (x + width) > size_x or (y + height) > size_y:
+            # If we're outside the bounds of the image...
+            # Need to render reduced region and paste on to full size image
+            canvas = Image.new("RGBA", (width, height), (221, 221, 221))
+            paste_x = 0
+            paste_y = 0
+            if x < 0:
+                paste_x = -x
+                width = width + x
+                x = 0
+            if y < 0:
+                paste_y = -y
+                height = height + y
+                y = 0
+
         # Render the region...
         jpeg_data = image.renderJpegRegion(z, t, x, y, width, height,
                                            level=level)
         i = StringIO(jpeg_data)
         pil_img = Image.open(i)
+
+        # paste to canvas if needed
+        if canvas is not None:
+            canvas.paste(pil_img, (paste_x, paste_y))
+            pil_img = canvas
+
         return pil_img
 
     def get_panel_big_image(self, image, panel):
