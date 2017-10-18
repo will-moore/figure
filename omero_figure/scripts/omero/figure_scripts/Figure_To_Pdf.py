@@ -1038,6 +1038,96 @@ class FigureExport(object):
                 label, (lx + lx_end)/2, ly, font_size, (red, green, blue),
                 align="center")
 
+    def render_big_image_region(self, image, z, t, region):
+        """
+        Render region of a big image at an appropriate zoom level
+        so that we get a good pixel resolution.
+        """
+
+        # This limit is the same as views.py render_scaled_region()
+        max_size = 2000
+
+        x = region['x']
+        y = region['y']
+        width = region['width']
+        height = region['height']
+
+        scale_levels = image.getZoomLevelScaling()
+        # Pick zoom such that returned image is below MAX size
+        max_level = len(scale_levels.keys()) - 1
+        longest_side = max(width, height)
+
+        # start small, and go until we reach target size
+        zm = max_level
+        while zm > 0 and scale_levels[zm - 1] * longest_side < max_size:
+            zm = zm - 1
+
+        level = max_level - zm
+
+        # We need to use final rendered jpeg coordinates
+        # Convert from original image coordinates by scaling
+        scale = scale_levels[zm]
+        x = int(x * scale)
+        y = int(y * scale)
+        width = int(width * scale)
+        height = int(height * scale)
+        # Render the region...
+        jpeg_data = image.renderJpegRegion(z, t, x, y, width, height,
+                                           level=level)
+        i = StringIO(jpeg_data)
+        pil_img = Image.open(i)
+        return pil_img
+
+    def get_panel_big_image(self, image, panel):
+        """Render the viewport region for BIG images"""
+
+        viewport_region = self.get_crop_region(panel)
+        rotation = int(panel.get('rotation', 0))
+        vp_x = viewport_region['x']
+        vp_y = viewport_region['y']
+        vp_w = viewport_region['width']
+        vp_h = viewport_region['height']
+        z = panel['theZ']
+        t = panel['theT']
+
+        # Render a larger region than viewport, to allow for rotation...
+        if rotation != 0:
+            max_length = 1.5 * max(vp_w, vp_h)
+            extra_w = max_length - vp_w
+            extra_h = max_length - vp_h
+            viewport_region = {'x': vp_x - (extra_w/2),
+                               'y': vp_y - (extra_h/2),
+                               'width': vp_w + extra_w,
+                               'height': vp_h + extra_h}
+
+        pil_img = self.render_big_image_region(image, z, t, viewport_region)
+        image._re.close()
+
+        # Optional rotation
+        if rotation != 0:
+            w, h = pil_img.size
+            # How much smaller is the scaled image compared to viewport?
+            # This will be the same 'scale' used in render_big_image_region()
+            scale = float(w) / viewport_region['width']
+            # The size we want to crop to
+            crop_target_w = scale * vp_w
+            crop_target_h = scale * vp_h
+
+            # Now we can rotate...
+            pil_img = pil_img.rotate(-rotation, Image.BICUBIC, expand=1)
+            rot_w, rot_h = pil_img.size
+
+            # ...and crop all round (keep same centre point)
+            crop_left = int((rot_w - crop_target_w) / 2)
+            crop_top = int((rot_h - crop_target_h) / 2)
+            crop_right = rot_w - crop_left
+            crop_bottom = rot_h - crop_top
+
+            pil_img = pil_img.crop((crop_left, crop_top,
+                                    crop_right, crop_bottom))
+
+        return pil_img
+
     def get_panel_image(self, image, panel, orig_name=None):
         """
         Gets the rendered image from OMERO, then crops & rotates as needed.
@@ -1046,11 +1136,18 @@ class FigureExport(object):
         """
         z = panel['theZ']
         t = panel['theT']
+        size_x = image.getSizeX()
+        size_y = image.getSizeY()
 
         if 'z_projection' in panel and panel['z_projection']:
             if 'z_start' in panel and 'z_end' in panel:
                 image.setProjection('intmax')
                 image.setProjectionRange(panel['z_start'], panel['z_end'])
+
+
+        # If big image, we don't want to render the whole plane
+        if (size_x * size_y) > (4000 * 4000):
+            return self.get_panel_big_image(image, panel)
 
         pil_img = image.renderImage(z, t, compression=1.0)
 
@@ -1061,8 +1158,6 @@ class FigureExport(object):
             pil_img.save(orig_name)
 
         # Need to crop around centre before rotating...
-        size_x = image.getSizeX()
-        size_y = image.getSizeY()
         cx = size_x/2
         cy = size_y/2
         dx = panel['dx']

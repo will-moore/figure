@@ -1234,7 +1234,6 @@
             }
             this.models.forEach(function(m){
                 var src = m.get_img_src();
-                console.log('get_imgs_css', frame_w, frame_h);
                 var img_css = m.get_vp_img_css(m.get('zoom'), frame_w, frame_h);
                 img_css.src = src;
                 // if a 'reasonable' dpi is set, we don't pixelate
