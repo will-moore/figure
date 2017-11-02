@@ -148,6 +148,7 @@ $(function(){
 
     // Header button tooltips
     $('.btn-sm').tooltip({container: 'body', placement:'bottom', toggle:"tooltip"});
+    $('.figure-title').tooltip({container: 'body', placement:'bottom', toggle:"tooltip"});
     // Footer button tooltips
     $('.btn-xs').tooltip({container: 'body', placement:'top', toggle:"tooltip"});
 
