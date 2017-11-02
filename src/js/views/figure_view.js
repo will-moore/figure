@@ -97,6 +97,7 @@
             "click .zoom-paper-to-fit": "zoom_paper_to_fit",
             "click .about_figure": "show_about_dialog",
             "click .figure-title": "start_editing_name",
+            "blur .figure-title": "stop_editing_name",
             "submit .importJsonForm": "import_json_form"
         },
 
@@ -153,7 +154,18 @@
         start_editing_name: function(event) {
             var $this = $(event.target);
             var name = $this.text();
+            // escape any double-quotes
+            name = name.replace(/"/g, '&quot;');
             $this.html('<input value="' + name + '"/>');
+            $('input', $this).focus();
+        },
+
+        stop_editing_name: function(event) {
+            var $this = $(event.target);
+            var new_name = $this.val();
+            $(".figure-title").html(new_name);
+            // Save name... will renderFigureName only if name changed
+            this.model.set('figureName', new_name);
         },
 
         // Heavy lifting of PDF generation handled by OMERO.script...
