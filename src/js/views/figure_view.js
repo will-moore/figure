@@ -96,6 +96,7 @@
             "click .export-options a": "select_export_option",
             "click .zoom-paper-to-fit": "zoom_paper_to_fit",
             "click .about_figure": "show_about_dialog",
+            "click .figure-title": "start_editing_name",
             "submit .importJsonForm": "import_json_form"
         },
 
@@ -147,6 +148,12 @@
         show_about_dialog: function(event) {
             event.preventDefault();
             $("#aboutModal").modal();
+        },
+
+        start_editing_name: function(event) {
+            var $this = $(event.target);
+            var name = $this.text();
+            $this.html('<input value="' + name + '"/>');
         },
 
         // Heavy lifting of PDF generation handled by OMERO.script...
