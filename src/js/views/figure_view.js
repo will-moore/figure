@@ -165,7 +165,7 @@
             var new_name = $this.val();
             $(".figure-title").html(new_name);
             // Save name... will renderFigureName only if name changed
-            this.model.set('figureName', new_name);
+            this.model.save('figureName', new_name);
         },
 
         // Heavy lifting of PDF generation handled by OMERO.script...
