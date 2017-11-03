@@ -97,7 +97,8 @@
             "click .zoom-paper-to-fit": "zoom_paper_to_fit",
             "click .about_figure": "show_about_dialog",
             "click .figure-title": "start_editing_name",
-            "blur .figure-title": "stop_editing_name",
+            "keyup .figure-title input": "figuretitle_keyup",
+            "blur .figure-title input": "stop_editing_name",
             "submit .importJsonForm": "import_json_form"
         },
 
@@ -151,6 +152,7 @@
             $("#aboutModal").modal();
         },
 
+        // Editing name workflow...
         start_editing_name: function(event) {
             var $this = $(event.target);
             var name = $this.text();
@@ -159,10 +161,19 @@
             $this.html('<input value="' + name + '"/>');
             $('input', $this).focus();
         },
-
-        stop_editing_name: function(event) {
-            var $this = $(event.target);
-            var new_name = $this.val();
+        figuretitle_keyup: function(event) {
+            // If user hit Enter, stop editing...
+            if (event.which === 13) {
+                this.stop_editing_name();
+            }
+        },
+        stop_editing_name: function() {
+            var $this = $(".figure-title input");
+            var new_name = $this.val().trim();
+            if (new_name.length === 0) {
+                alert("Can't have empty name.")
+                return;
+            }
             $(".figure-title").html(new_name);
             // Save name... will renderFigureName only if name changed
             this.model.save('figureName', new_name);
@@ -432,8 +443,6 @@
             var defaultName = this.model.get('figureName');
             if (!defaultName) {
                 defaultName = this.model.getDefaultFigureName();
-            } else {
-                defaultName = defaultName + "_copy";
             }
             var figureName = prompt("Enter Figure Name", defaultName);
 
