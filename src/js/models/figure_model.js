@@ -677,6 +677,31 @@
             this.notifySelectionChange();
         },
 
+        cropPageToPanels: function() {
+            // we need to resize page AND re-position panels to top-left
+            var margin = 10;
+
+            // get range of all panel coordinates
+            var left = this.panels.getMin('x');
+            var top = this.panels.getMin('y');
+            var right = Math.max.apply(window, this.panels.map(
+                function(m){return m.get('x') + m.get('width')}));
+            var bottom = Math.max.apply(window, this.panels.map(
+                function(m){return m.get('y') + m.get('height')}));
+
+            // Shift panels to top-left corner
+            var dx = margin - left;
+            var dy = margin - top;
+            this.panels.forEach(function(p){
+                p.save({'x': p.get('x') + dx,
+                        'y': p.get('y') + dy});
+            });
+
+            // Resize paper
+            this.set({'paper_width': right - left + (2 * margin),
+                      'paper_height': bottom - top + (2 * margin)});
+        },
+
         notifySelectionChange: function() {
             this.trigger('change:selection');
         }
