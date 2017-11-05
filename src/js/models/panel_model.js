@@ -661,28 +661,28 @@
         },
 
         getAverageWH: function() {
-            var sumWH = this.inject(function(memo, m){
+            var sumWH = this.reduce(function(memo, m){
                 return memo + (m.get('width')/ m.get('height'));
             }, 0);
             return sumWH / this.length;
         },
 
         getSum: function(attr) {
-            return this.inject(function(memo, m){
+            return this.reduce(function(memo, m){
                 return memo + (m.get(attr) || 0);
             }, 0);
         },
 
         getMax: function(attr) {
-            return this.inject(function(memo, m){ return Math.max(memo, m.get(attr)); }, 0);
+            return this.reduce(function(memo, m){ return Math.max(memo, m.get(attr)); }, 0);
         },
 
         getMin: function(attr) {
-            return this.inject(function(memo, m){ return Math.min(memo, m.get(attr)); }, Infinity);
+            return this.reduce(function(memo, m){ return Math.min(memo, m.get(attr)); }, Infinity);
         },
 
         allTrue: function(attr) {
-            return this.inject(function(memo, m){
+            return this.reduce(function(memo, m){
                 return (memo && m.get(attr));
             }, true);
         },
