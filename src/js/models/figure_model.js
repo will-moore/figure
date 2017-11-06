@@ -682,12 +682,14 @@
             var margin = 10;
 
             // get range of all panel coordinates
-            var left = this.panels.getMin('x');
-            var top = this.panels.getMin('y');
+            var top = Math.min.apply(window, this.panels.map(
+                function(p){return p.getBoundingBoxTop();}));
+            var left = Math.min.apply(window, this.panels.map(
+                function(p){return p.getBoundingBoxLeft();}));
             var right = Math.max.apply(window, this.panels.map(
-                function(m){return m.get('x') + m.get('width')}));
+                function(p){return p.getBoundingBoxRight()}));
             var bottom = Math.max.apply(window, this.panels.map(
-                function(m){return m.get('y') + m.get('height')}));
+                function(p){return p.getBoundingBoxBottom()}));
 
             // Shift panels to top-left corner
             var dx = margin - left;
