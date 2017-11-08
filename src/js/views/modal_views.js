@@ -84,7 +84,8 @@
                 custom_w = parseInt($("#paperWidth").val(), 10),
                 custom_h = parseInt($("#paperHeight").val(), 10),
                 units = $('.wh_units:first', $form).text(),
-                pageColor = $('.pageColor', $form).val().replace('#', '');
+                pageColor = $('.pageColor', $form).val().replace('#', ''),
+                dx, dy;
 
             var w_mm, h_m, w_pixels, h_pixels;
             if (size == 'A4') {
@@ -105,21 +106,26 @@
             } else if (size == 'letter') {
                 w_mm = 216;
                 h_mm = 280;
-            } else { // if ($.trim(units) == 'mm') {
+            } else if (size == 'mm') {
                 // get dims from custom fields and units
                 w_mm = custom_w;
                 h_mm = custom_h;
+            } else if (size == 'crop') {
+                var coords = this.model.getCropCoordinates();
+                w_pixels = coords.paper_width;
+                h_pixels = coords.paper_height;
+                dx = coords.dx;
+                dy = coords.dy;
             }
             if (w_mm && h_mm) {
                 // convert mm -> pixels (inch is 25.4 mm)
                 w_pixels = Math.round(dpi * w_mm / 25.4);
                 h_pixels = Math.round(dpi * h_mm / 25.4);
-            } // else {
-            //     w_pixels = custom_w;
-            //     h_pixels = custom_h;
-            //     w_mm = Math.round(w_pixels * 25.4 / dpi);
-            //     h_mm = Math.round(h_pixels * 25.4 / dpi);
-            // }
+            } else {
+                // convert pixels -> mm
+                w_mm = Math.round(w_pixels * 25.4 / dpi);
+                h_mm = Math.round(h_pixels * 25.4 / dpi);
+            }
 
             if (orientation == 'horizontal' && size != 'mm') {
                 var tmp = w_mm; w_mm = h_mm; h_mm = tmp;
@@ -143,12 +149,30 @@
                 'page_col_count': cols,
                 'page_color': pageColor,
             };
+            if (dx || dy) {
+                rv.dx = dx;
+                rv.dy = dy;
+            }
             return rv;
         },
 
         handlePaperSetup: function(event) {
             event.preventDefault();
             var json = this.processForm();
+
+            console.log(json);
+            // if 'crop' page to panels
+            if (json.page_size === 'crop') {
+                this.model.panels.forEach(function(p){
+                    p.save({'x': p.get('x') + json.dx,
+                            'y': p.get('y') + json.dy});
+                });
+                // paper is now a 'custom' size (not A4 etc)
+                json.page_size = 'mm';
+                // don't need these
+                delete json.dx;
+                delete json.dy;
+            }
 
             this.model.set(json);
             $("#paperSetupModal").modal('hide');

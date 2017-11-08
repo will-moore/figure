@@ -677,8 +677,9 @@
             this.notifySelectionChange();
         },
 
-        cropPageToPanels: function() {
-            // we need to resize page AND re-position panels to top-left
+        getCropCoordinates: function() {
+            // Get paper size and panel offsets (move to top-left) for cropping
+            // returns {'paper_width', 'paper_height', 'dx', 'dy'}
             var margin = 10;
 
             // get range of all panel coordinates
@@ -694,14 +695,13 @@
             // Shift panels to top-left corner
             var dx = margin - left;
             var dy = margin - top;
-            this.panels.forEach(function(p){
-                p.save({'x': p.get('x') + dx,
-                        'y': p.get('y') + dy});
-            });
 
-            // Resize paper
-            this.set({'paper_width': right - left + (2 * margin),
-                      'paper_height': bottom - top + (2 * margin)});
+            return {
+                    'paper_width': right - left + (2 * margin),
+                    'paper_height': bottom - top + (2 * margin),
+                    'dx': dx,
+                    'dy': dy
+                   };
         },
 
         notifySelectionChange: function() {
