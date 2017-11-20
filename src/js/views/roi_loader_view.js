@@ -20,7 +20,8 @@ var RoiLoaderView = Backbone.View.extend({
     roiIcons: {'Rectangle': 'rect-icon',
                'Ellipse': 'ellipse-icon',
                'Line': 'line-icon',
-               'Arrow': 'arrow-icon'},
+               'Arrow': 'arrow-icon',
+               'Polygon': 'polygon-icon'},
 
     addOmeroShape: function(event) {
         var $tr = $(event.target);

@@ -23,6 +23,15 @@ var ShapeModel = Backbone.Model.extend({
                 shape.radiusY = shape.ry;
             }
         }
+        if (shape.type === 'Polygon') {
+            // webgateway JSON uses points: 'M 229 171 L 195 214 L 285 156 z'
+            // we need points '229,171 195,214 285,156'
+            var pts = shape.points.replace('M ', '').replace(' z', '');
+            pts = pts.replace(/ L /g, "-");
+            pts = pts.replace(/ /g, ',');
+            pts = pts.replace(/-/g, " ");
+            shape.points = pts;
+        }
         return shape;
     },
 
