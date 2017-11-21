@@ -708,5 +708,38 @@
             }
         },
 
+        createLabelsFromTags(options) {
+            // Loads Tags for selected images and creates labels
+            var image_ids = this.map(function(s){return s.get('imageId')})
+            image_ids = "image=" + image_ids.join("&image=");
+            // TODO: Use /api/ when annotations is supported
+            var url = WEBINDEX_URL + "api/annotations/?type=tag&limit=1000&" + image_ids;
+            $.getJSON(url, function(data){
+                // Map {iid: {id: 'tag'}, {id: 'names'}}
+                var imageTags = data.annotations.reduce(function(prev, t){
+                    var iid = t.link.parent.id;
+                    if (!prev[iid]) {
+                        prev[iid] = {};
+                    }
+                    prev[iid][t.id] = t.textValue;
+                    return prev;
+                }, {});
+                // Apply tags to panels
+                this.forEach(function(p){
+                    var iid = p.get('imageId');
+                    var labels = _.values(imageTags[iid]).map(function(text){
+                        return {
+                            'text': text,
+                            'size': options.size,
+                            'position': options.position,
+                            'color': options.color
+                        }
+                    });
+
+                    p.add_labels(labels);
+                });
+            }.bind(this));
+        }
+
         // localStorage: new Backbone.LocalStorage("figureShop-backbone")
     });
