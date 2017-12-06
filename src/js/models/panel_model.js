@@ -575,7 +575,7 @@
         },
 
         // Turn coordinates into css object with rotation transform
-        _viewport_css(img_x, img_y, img_w, img_h, frame_w, frame_h) {
+        _viewport_css: function(img_x, img_y, img_w, img_h, frame_w, frame_h) {
             var transform_x = 100 * (frame_w/2 - img_x) / img_w,
                 transform_y = 100 * (frame_h/2 - img_y) / img_h,
                 rotation = this.get('rotation') || 0;
