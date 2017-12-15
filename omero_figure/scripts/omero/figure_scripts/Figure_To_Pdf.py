@@ -740,7 +740,7 @@ class FigureExport(object):
             try:
                 links = self.conn.getUpdateService().saveAndReturnArray(
                     links, self.conn.SERVICE_OPTS)
-            except:
+            except Exception:
                 logger.error("Failed to attach figure: %s to images %s"
                              % (file_ann, image_ids))
 
@@ -1024,8 +1024,8 @@ class FigureExport(object):
             label = "%s %s" % (sb['length'], symbol)
             font_size = 10
             try:
-                font_size = int(sb['font_size'])
-            except:
+                font_size = int(sb.get('font_size'))
+            except Exception:
                 pass
 
             # For 'bottom' scalebar, put label above
@@ -1508,7 +1508,7 @@ class TiffExport(FigureExport):
         path_to_font = os.path.join(self.GATEWAYPATH, "pilfonts", font_name)
         try:
             font = ImageFont.truetype(path_to_font, fontsize)
-        except:
+        except Exception:
             font = ImageFont.load(
                 '%s/pilfonts/B%0.2d.pil' % (self.GATEWAYPATH, 24))
         return font
