@@ -774,8 +774,8 @@ class FigureExport(object):
         zoom = float(panel['zoom'])
         frame_w = panel['width']
         frame_h = panel['height']
-        dx = panel['dx']
-        dy = panel['dy']
+        dx = panel.get('dx', 0)
+        dy = panel.get('dy', 0)
         orig_w = panel['orig_width']
         orig_h = panel['orig_height']
 
@@ -1065,8 +1065,8 @@ class FigureExport(object):
         size_y = image.getSizeY()
         cx = size_x/2
         cy = size_y/2
-        dx = panel['dx']
-        dy = panel['dy']
+        dx = panel.get('dx', 0)
+        dy = panel.get('dy', 0)
 
         cx += dx
         cy += dy
