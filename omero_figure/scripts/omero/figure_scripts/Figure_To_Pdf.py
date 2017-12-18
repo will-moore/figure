@@ -129,6 +129,8 @@ class ShapeToPdfExport(object):
                     self.draw_rectangle(shape)
                 elif shape['type'] == "Ellipse":
                     self.draw_ellipse(shape)
+                elif shape['type'] == "Polygon":
+                    self.draw_polygon(shape)
 
     @staticmethod
     def get_rgb(color):
@@ -317,6 +319,38 @@ class ShapeToPdfExport(object):
         p.lineTo(arrow_point1_x, arrow_point1_y)
         self.canvas.drawPath(p, fill=1, stroke=1)
 
+    def draw_polygon(self, shape):
+        polygon_in_viewport = False
+        points = []
+        for point in shape['points'].split(" "):
+            x, y = point.split(",")
+            coords = self.panel_to_page_coords(float(x), float(y))
+            points.append([coords['x'], self.page_height - coords['y']])
+            polygon_in_viewport = polygon_in_viewport or coords['inPanel']
+
+        # Don't draw if all points outside panel viewport
+        if not polygon_in_viewport:
+            return
+
+        stroke_width = shape['strokeWidth'] * self.scale
+        rgb = self.get_rgb(shape['strokeColor'])
+        r = float(rgb[0])/255
+        g = float(rgb[1])/255
+        b = float(rgb[2])/255
+        self.canvas.setStrokeColorRGB(r, g, b)
+        self.canvas.setLineWidth(stroke_width)
+
+        p = self.canvas.beginPath()
+        # Go to start...
+        p.moveTo(points[0][0], points[0][1])
+        # ...around other points...
+        for point in points[1:]:
+            p.lineTo(point[0], point[1])
+        # ...and back over first line
+        for point in points[0:2]:
+            p.lineTo(point[0], point[1])
+        self.canvas.drawPath(p, fill=0, stroke=1)
+
     def draw_ellipse(self, shape):
         stroke_width = shape['strokeWidth'] * self.scale
         c = self.panel_to_page_coords(shape['x'], shape['y'])
@@ -382,6 +416,8 @@ class ShapeToPilExport(object):
                     self.draw_rectangle(shape)
                 elif shape['type'] == "Ellipse":
                     self.draw_ellipse(shape)
+                elif shape['type'] == "Polygon":
+                    self.draw_polygon(shape)
 
     def get_panel_coords(self, shape_x, shape_y):
         """
@@ -462,6 +498,25 @@ class ShapeToPilExport(object):
                        fill=rgb, width=int(stroke_width))
         # Draw Arrow head, up to tip at x2, y2
         self.draw.polygon(points, fill=rgb, outline=rgb)
+
+    def draw_polygon(self, shape):
+        points = []
+        for point in shape['points'].split(" "):
+            x, y = point.split(",")
+            coords = self.get_panel_coords(float(x), float(y))
+            points.append((coords['x'], coords['y']))
+        points.append(points[0])
+
+        stroke_width = shape['strokeWidth'] * self.scale
+        rgb = ShapeToPdfExport.get_rgb(shape['strokeColor'])
+        # Draw all the lines (NB: polygon doesn't handle line width)
+        self.draw.line(points, fill=rgb, width=int(round(stroke_width)))
+        # Draw ellipse at each corner
+        # see https://stackoverflow.com/questions/33187698/
+        r = (stroke_width/2) * 0.9    # seems to look OK with this size
+        for point in points:
+            self.draw.ellipse((point[0] - r, point[1] - r,
+                               point[0] + r, point[1] + r), fill=rgb)
 
     def draw_line(self, shape):
         start = self.get_panel_coords(shape['x1'], shape['y1'])
