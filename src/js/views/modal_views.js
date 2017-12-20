@@ -149,7 +149,7 @@
                 'page_col_count': cols,
                 'page_color': pageColor,
             };
-            if (dx || dy) {
+            if (dx !== undefined || dy !== undefined) {
                 rv.dx = dx;
                 rv.dy = dy;
             }
