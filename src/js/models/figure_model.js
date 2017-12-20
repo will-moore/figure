@@ -67,6 +67,8 @@
                     'canEdit': data.canEdit,
                     'paper_width': data.paper_width,
                     'paper_height': data.paper_height,
+                    'width_mm': data.width_mm,
+                    'height_mm': data.height_mm,
                     'page_size': data.page_size || 'letter',
                     'page_count': data.page_count,
                     'paper_spacing': data.paper_spacing,
