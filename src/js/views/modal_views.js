@@ -160,7 +160,6 @@
             event.preventDefault();
             var json = this.processForm();
 
-            console.log(json);
             // if 'crop' page to panels
             if (json.page_size === 'crop') {
                 this.model.panels.forEach(function(p){
