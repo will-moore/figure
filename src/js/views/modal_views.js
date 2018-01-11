@@ -116,6 +116,8 @@
                 h_pixels = coords.paper_height;
                 dx = coords.dx;
                 dy = coords.dy;
+                // Single page is cropped to include ALL panels
+                pageCount = 1;
             }
             if (w_mm && h_mm) {
                 // convert mm -> pixels (inch is 25.4 mm)
