@@ -384,14 +384,18 @@ var CropModalView = Backbone.View.extend({
                     cachedRois[roi.id] = shapes;
                     // get display shape for picking ROI
                     // on current plane or pick median T/Z...
-                    tkeys = _.keys(shapes).sort();
+                    tkeys = _.keys(shapes)
+                            .map(function(x){return parseInt(x, 10)})
+                            .sort(function(a, b){return a - b});    // sort numerically
                     if (tkeys.length === 0) continue;   // no Rectangles
                     if (shapes[currT]) {
                         t = currT;
                     } else {
                         t = tkeys[(tkeys.length/2)>>0]
                     }
-                    zkeys = _.keys(shapes[t]).sort();
+                    zkeys = _.keys(shapes[t])
+                            .map(function(x){return parseInt(x, 10)})
+                            .sort(function(a, b){return a - b});    // sort numerically
                     if (shapes[t][currZ]) {
                         z = currZ;
                     } else {
