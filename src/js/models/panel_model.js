@@ -631,11 +631,6 @@
             return dpi.toFixed(0);
         },
 
-        getBoundingBox: function() {
-            // Return {x, y, width, height} taking into account labels!
-
-        },
-
         getBoundingBoxTop: function() {
             // get top of panel including 'top' labels
             var labels = this.get("labels");
