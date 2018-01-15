@@ -164,6 +164,7 @@
         figuretitle_keyup: function(event) {
             // If user hit Enter, stop editing...
             if (event.which === 13) {
+                event.preventDefault();
                 this.stop_editing_name();
             }
         },
@@ -174,7 +175,7 @@
                 alert("Can't have empty name.")
                 return;
             }
-            $(".figure-title").html(new_name);
+            $(".figure-title").html(_.escape(new_name));
             // Save name... will renderFigureName only if name changed
             this.model.save('figureName', new_name);
 
