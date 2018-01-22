@@ -57,6 +57,14 @@
                     <option value="mm" <% if (page_size == 'mm') { print('selected') } %> >
                         Custom (mm)
                     </option>
+                    <option value="crop" <% if (page_size == 'crop') { print('selected') } %>
+                        title="Fit a single page around all panels">
+                        <% if (page_count > 1) { %>
+                            Crop single page to panels
+                        <% } else { %>
+                            Crop page around panels
+                        <% } %>
+                    </option>
                 </select>
             </div>
             <!-- <label for="inputPassword" class="col-sm-2 control-label">Password</label> -->

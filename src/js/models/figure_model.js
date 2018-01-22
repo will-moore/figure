@@ -67,6 +67,8 @@
                     'canEdit': data.canEdit,
                     'paper_width': data.paper_width,
                     'paper_height': data.paper_height,
+                    'width_mm': data.width_mm,
+                    'height_mm': data.height_mm,
                     'page_size': data.page_size || 'letter',
                     'page_count': data.page_count,
                     'paper_spacing': data.paper_spacing,
@@ -675,6 +677,33 @@
                 ps[i].destroy();
             }
             this.notifySelectionChange();
+        },
+
+        getCropCoordinates: function() {
+            // Get paper size and panel offsets (move to top-left) for cropping
+            // returns {'paper_width', 'paper_height', 'dx', 'dy'}
+            var margin = 10;
+
+            // get range of all panel coordinates
+            var top = Math.min.apply(window, this.panels.map(
+                function(p){return p.getBoundingBoxTop();}));
+            var left = Math.min.apply(window, this.panels.map(
+                function(p){return p.getBoundingBoxLeft();}));
+            var right = Math.max.apply(window, this.panels.map(
+                function(p){return p.getBoundingBoxRight()}));
+            var bottom = Math.max.apply(window, this.panels.map(
+                function(p){return p.getBoundingBoxBottom()}));
+
+            // Shift panels to top-left corner
+            var dx = margin - left;
+            var dy = margin - top;
+
+            return {
+                    'paper_width': right - left + (2 * margin),
+                    'paper_height': bottom - top + (2 * margin),
+                    'dx': dx,
+                    'dy': dy
+                   };
         },
 
         notifySelectionChange: function() {
