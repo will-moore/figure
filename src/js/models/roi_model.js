@@ -2,6 +2,9 @@
 var ShapeModel = Backbone.Model.extend({
 
     parse: function(shape) {
+        console.log('parse Shape', shape);
+        shape.type = shape['@type'].split('#')[1];
+        shape.id = shape['@id']
         // Convert OMERO.server shapes to OMERO.figure shapes
         if (shape.markerEnd === 'Arrow' || shape.markerStart === 'Arrow') {
             shape.type = 'Arrow';
@@ -23,6 +26,10 @@ var ShapeModel = Backbone.Model.extend({
                 shape.radiusY = shape.ry;
             }
         }
+        // Convert attributes
+        _.each(["X", "Y", "Width", "Height"], function(attr) {
+            shape[attr.toLowerCase()] = shape[attr];
+        });
         return shape;
     },
 
@@ -61,6 +68,8 @@ var ShapeList = Backbone.Collection.extend({
 var RoiModel = Backbone.Model.extend({
 
     initialize: function(data) {
+        // console.log('RoiModel initialize', arguments);
+        this.set('id', data['@id']);
         this.shapes = new ShapeList(data.shapes, {'parse': true});
     }
 });
