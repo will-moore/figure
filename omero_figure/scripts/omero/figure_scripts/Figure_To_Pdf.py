@@ -1195,7 +1195,7 @@ class FigureExport(object):
             parah = h
         # If there's not enough space, start a new page
         if parah > (page_y - margin):
-            c.save()
+            c.showPage()
             page_y = maxh    # reset to top of new page
         if thumb_src is not None:
             c.drawImage(thumb_src, margin, page_y - imgh, imgw, imgh)
