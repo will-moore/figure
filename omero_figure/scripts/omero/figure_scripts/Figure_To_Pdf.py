@@ -61,6 +61,7 @@ except ImportError:
     reportlab_installed = False
     logger.error("Reportlab not installed.")
 
+DEFAULT_OFFSET = 0
 
 ORIGINAL_DIR = "1_originals"
 RESAMPLED_DIR = "2_pre_resampled"
@@ -774,8 +775,8 @@ class FigureExport(object):
         zoom = float(panel['zoom'])
         frame_w = panel['width']
         frame_h = panel['height']
-        dx = panel.get('dx', 0)
-        dy = panel.get('dy', 0)
+        dx = panel.get('dx', DEFAULT_OFFSET)
+        dy = panel.get('dy', DEFAULT_OFFSET)
         orig_w = panel['orig_width']
         orig_h = panel['orig_height']
 
@@ -1065,8 +1066,8 @@ class FigureExport(object):
         size_y = image.getSizeY()
         cx = size_x/2
         cy = size_y/2
-        dx = panel.get('dx', 0)
-        dy = panel.get('dy', 0)
+        dx = panel.get('dx', DEFAULT_OFFSET)
+        dy = panel.get('dy', DEFAULT_OFFSET)
 
         cx += dx
         cy += dy
