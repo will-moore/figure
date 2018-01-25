@@ -3,8 +3,19 @@ var ShapeModel = Backbone.Model.extend({
 
     parse: function(shape) {
         console.log('parse Shape', shape);
+        var lowerFirst = function(text) {
+            return text[0].toLowerCase() + text.slice(1);
+        }
         shape.type = shape['@type'].split('#')[1];
-        shape.id = shape['@id']
+        shape.id = shape['@id'];
+        // Convert attributes
+        _.each(["StrokeColor", "MarkerEnd", "MarkerStart", "StrokeWidth", "X", "Y", "RadiusX", "RadiusY", "X1", "Y1", "X2", "Y2", "Width", "Height", "TheZ", "TheT"], function(attr) {
+            if (shape[attr] !== undefined) {
+                shape[lowerFirst(attr)] = shape[attr];
+                delete shape[attr];
+            }
+        });
+
         // Convert OMERO.server shapes to OMERO.figure shapes
         if (shape.markerEnd === 'Arrow' || shape.markerStart === 'Arrow') {
             shape.type = 'Arrow';
@@ -17,19 +28,7 @@ var ShapeModel = Backbone.Model.extend({
                 shape.y2 = tmp.y1;
             }
         }
-        if (shape.type === 'Ellipse') {
-            // If we have < OMERO 5.3, Ellipse has cx, cy, rx, ry
-            if (shape.rx !== undefined) {
-                shape.x = shape.cx;
-                shape.y = shape.cy;
-                shape.radiusX = shape.rx;
-                shape.radiusY = shape.ry;
-            }
-        }
-        // Convert attributes
-        _.each(["X", "Y", "Width", "Height"], function(attr) {
-            shape[attr.toLowerCase()] = shape[attr];
-        });
+        console.log("...parse", shape);
         return shape;
     },
 
