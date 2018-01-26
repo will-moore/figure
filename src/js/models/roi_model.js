@@ -2,21 +2,39 @@
 var ShapeModel = Backbone.Model.extend({
 
     parse: function(shape) {
-        console.log('parse Shape', shape);
         var lowerFirst = function(text) {
             return text[0].toLowerCase() + text.slice(1);
         }
-        shape.type = shape['@type'].split('#')[1];
+        var rgbint_to_css = function(signed_integer) {
+            if (signed_integer < 0) signed_integer = signed_integer >>> 0;
+            var intAsHex = signed_integer.toString(16);
+            intAsHex = ("00000000" + intAsHex).slice(-8);
+            return '#' + intAsHex.substring(0,6);
+        }
         shape.id = shape['@id'];
-        // Convert attributes
-        _.each(["StrokeColor", "MarkerEnd", "MarkerStart", "StrokeWidth", "X", "Y", "RadiusX", "RadiusY", "X1", "Y1", "X2", "Y2", "Width", "Height", "TheZ", "TheT"], function(attr) {
+        shape.type = shape['@type'].split('#')[1];
+        delete shape['@id']
+        delete shape['@type']
+        // StrokeWidth - unwrap 'pixel' unit
+        if (shape.StrokeWidth) {
+            shape.strokeWidth = shape.StrokeWidth.Value;
+            delete shape['StrokeWidth'];
+        }
+        // handle colors:
+        _.each(["StrokeColor", "FillColor", ], function(attr) {
+            if (shape[attr] !== undefined) {
+                shape[lowerFirst(attr)] = rgbint_to_css(shape[attr]);
+                delete shape[attr];
+            }
+        });
+        // Convert other attributes
+        _.each(["MarkerEnd", "MarkerStart", "X", "Y", "RadiusX", "RadiusY", "X1", "Y1", "X2", "Y2", "Width", "Height", "TheZ", "TheT"], function(attr) {
             if (shape[attr] !== undefined) {
                 shape[lowerFirst(attr)] = shape[attr];
                 delete shape[attr];
             }
         });
-
-        // Convert OMERO.server shapes to OMERO.figure shapes
+        // Handle Arrows...
         if (shape.markerEnd === 'Arrow' || shape.markerStart === 'Arrow') {
             shape.type = 'Arrow';
             if (shape.markerEnd !== 'Arrow') {
@@ -28,7 +46,6 @@ var ShapeModel = Backbone.Model.extend({
                 shape.y2 = tmp.y1;
             }
         }
-        console.log("...parse", shape);
         return shape;
     },
 
@@ -67,7 +84,6 @@ var ShapeList = Backbone.Collection.extend({
 var RoiModel = Backbone.Model.extend({
 
     initialize: function(data) {
-        // console.log('RoiModel initialize', arguments);
         this.set('id', data['@id']);
         this.shapes = new ShapeList(data.shapes, {'parse': true});
     }
