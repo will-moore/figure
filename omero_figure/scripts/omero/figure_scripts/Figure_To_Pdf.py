@@ -1838,13 +1838,14 @@ def run_script():
         scripts.String("Export_Option", values=export_options,
                        default="PDF"),
 
-        scripts.String("Webclient_URI", grouping="4",
+        scripts.String("Webclient_URI", optional=False, grouping="4",
                        description="webclient URL for adding links to images"),
 
         scripts.String("Figure_Name", grouping="4",
                        description="Name of the Pdf Figure"),
 
-        scripts.String("Figure_URI", description="URL to the Figure")
+        scripts.String("Figure_URI", optional=False,
+                       description="URL to the Figure")
     )
 
     try:
