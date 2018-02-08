@@ -1844,7 +1844,7 @@ def run_script():
         scripts.String("Figure_Name", grouping="4",
                        description="Name of the Pdf Figure"),
 
-        scripts.String("Figure_URI", optional=False,
+        scripts.String("Figure_URI",
                        description="URL to the Figure")
     )
 
