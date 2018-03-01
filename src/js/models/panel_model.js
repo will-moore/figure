@@ -1,4 +1,7 @@
 
+    // Corresponds to css - allows us to calculate size of labels
+    var LINE_HEIGHT = 1.43;
+
     // ------------------------ Panel -----------------------------------------
     // Simple place-holder for each Panel. Will have E.g. imageId, rendering options etc
     // Attributes can be added as we need them.
@@ -628,6 +631,51 @@
             return dpi.toFixed(0);
         },
 
+        getBoundingBoxTop: function() {
+            // get top of panel including 'top' labels
+            var labels = this.get("labels");
+            var y = this.get('y');
+            // get labels by position
+            var top_labels = labels.filter(function(l) {return l.position === 'top'});
+            // offset by font-size of each
+            y = top_labels.reduce(function(prev, l){
+                return prev - (LINE_HEIGHT * l.size);
+            }, y);
+            return y;
+        },
+
+        getBoundingBoxLeft: function() {
+            // get left of panel including 'leftvert' labels (ignore
+            // left horizontal labels - hard to calculate width)
+            var labels = this.get("labels");
+            var x = this.get('x');
+            // get labels by position
+            var left_labels = labels.filter(function(l) {return l.position === 'leftvert'});
+            // offset by font-size of each
+            x = left_labels.reduce(function(prev, l){
+                return prev - (LINE_HEIGHT * l.size);
+            }, x);
+            return x;
+        },
+
+        getBoundingBoxRight: function() {
+            // Ignore right (horizontal) labels since we don't know how long they are
+            return this.get('x') + this.get('width');
+        },
+
+        getBoundingBoxBottom: function() {
+            // get bottom of panel including 'bottom' labels
+            var labels = this.get("labels");
+            var y = this.get('y') + this.get('height');
+            // get labels by position
+            var bottom_labels = labels.filter(function(l) {return l.position === 'bottom'});
+            // offset by font-size of each
+            y = bottom_labels.reduce(function(prev, l){
+                return prev + (LINE_HEIGHT * l.size);
+            }, y);
+            return y;
+        },
+
         // True if coords (x,y,width, height) overlap with panel
         regionOverlaps: function(coords) {
 
@@ -661,28 +709,28 @@
         },
 
         getAverageWH: function() {
-            var sumWH = this.inject(function(memo, m){
+            var sumWH = this.reduce(function(memo, m){
                 return memo + (m.get('width')/ m.get('height'));
             }, 0);
             return sumWH / this.length;
         },
 
         getSum: function(attr) {
-            return this.inject(function(memo, m){
+            return this.reduce(function(memo, m){
                 return memo + (m.get(attr) || 0);
             }, 0);
         },
 
         getMax: function(attr) {
-            return this.inject(function(memo, m){ return Math.max(memo, m.get(attr)); }, 0);
+            return this.reduce(function(memo, m){ return Math.max(memo, m.get(attr)); }, 0);
         },
 
         getMin: function(attr) {
-            return this.inject(function(memo, m){ return Math.min(memo, m.get(attr)); }, Infinity);
+            return this.reduce(function(memo, m){ return Math.min(memo, m.get(attr)); }, Infinity);
         },
 
         allTrue: function(attr) {
-            return this.inject(function(memo, m){
+            return this.reduce(function(memo, m){
                 return (memo && m.get(attr));
             }, true);
         },
@@ -707,6 +755,39 @@
                 return _.max(vals);
             }
         },
+
+        createLabelsFromTags(options) {
+            // Loads Tags for selected images and creates labels
+            var image_ids = this.map(function(s){return s.get('imageId')})
+            image_ids = "image=" + image_ids.join("&image=");
+            // TODO: Use /api/ when annotations is supported
+            var url = WEBINDEX_URL + "api/annotations/?type=tag&limit=1000&" + image_ids;
+            $.getJSON(url, function(data){
+                // Map {iid: {id: 'tag'}, {id: 'names'}}
+                var imageTags = data.annotations.reduce(function(prev, t){
+                    var iid = t.link.parent.id;
+                    if (!prev[iid]) {
+                        prev[iid] = {};
+                    }
+                    prev[iid][t.id] = t.textValue;
+                    return prev;
+                }, {});
+                // Apply tags to panels
+                this.forEach(function(p){
+                    var iid = p.get('imageId');
+                    var labels = _.values(imageTags[iid]).map(function(text){
+                        return {
+                            'text': text,
+                            'size': options.size,
+                            'position': options.position,
+                            'color': options.color
+                        }
+                    });
+
+                    p.add_labels(labels);
+                });
+            }.bind(this));
+        }
 
         // localStorage: new Backbone.LocalStorage("figureShop-backbone")
     });

@@ -327,6 +327,16 @@
                 return false;
             }
 
+            if (label_text == '[tags]') {
+                // Load Tags for this image and create labels
+
+                selected.createLabelsFromTags({
+                            position:position,
+                            size:font_size,
+                            color: color});
+                return false;
+            }
+
             var label = {
                 text: label_text,
                 size: parseInt(font_size, 10),

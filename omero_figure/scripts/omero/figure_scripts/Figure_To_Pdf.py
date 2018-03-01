@@ -53,7 +53,6 @@ except ImportError:
 try:
     from reportlab.pdfgen import canvas
     from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-    from reportlab.lib.units import inch
     from reportlab.platypus import Paragraph
     from reportlab.lib.enums import TA_LEFT, TA_CENTER, TA_RIGHT
     reportlab_installed = True
@@ -61,6 +60,7 @@ except ImportError:
     reportlab_installed = False
     logger.error("Reportlab not installed.")
 
+DEFAULT_OFFSET = 0
 
 ORIGINAL_DIR = "1_originals"
 RESAMPLED_DIR = "2_pre_resampled"
@@ -829,8 +829,8 @@ class FigureExport(object):
         zoom = float(panel['zoom'])
         frame_w = panel['width']
         frame_h = panel['height']
-        dx = panel['dx']
-        dy = panel['dy']
+        dx = panel.get('dx', DEFAULT_OFFSET)
+        dy = panel.get('dy', DEFAULT_OFFSET)
         orig_w = panel['orig_width']
         orig_h = panel['orig_height']
 
@@ -1120,8 +1120,8 @@ class FigureExport(object):
         size_y = image.getSizeY()
         cx = size_x/2
         cy = size_y/2
-        dx = panel['dx']
-        dy = panel['dy']
+        dx = panel.get('dx', DEFAULT_OFFSET)
+        dy = panel.get('dy', DEFAULT_OFFSET)
 
         cx += dx
         cy += dy
@@ -1231,8 +1231,9 @@ class FigureExport(object):
         """ Adds paragraph text to point on PDF info page """
 
         c = self.figure_canvas
-        aw = self.page_width - (inch * 2)
-        maxh = self.page_height - inch
+        margin = self.margin
+        aw = self.page_width - (margin * 2)
+        maxh = self.page_height - margin
         spacer = 10
         imgw = imgh = 25
         # Some html from markdown may not be compatible
@@ -1249,14 +1250,13 @@ class FigureExport(object):
         else:
             parah = h
         # If there's not enough space, start a new page
-        if parah > (page_y - inch):
-            c.save()
+        if parah > (page_y - margin):
+            c.showPage()
             page_y = maxh    # reset to top of new page
-        indent = inch
         if thumb_src is not None:
-            c.drawImage(thumb_src, inch, page_y - imgh, imgw, imgh)
-            indent = indent + imgw + spacer
-        para.drawOn(c, indent, page_y - h)
+            c.drawImage(thumb_src, margin, page_y - imgh, imgw, imgh)
+            margin = margin + imgw + spacer
+        para.drawOn(c, margin, page_y - h)
         return page_y - parah - spacer  # reduce the available height
 
     def add_read_me_file(self):
@@ -1284,10 +1284,10 @@ class FigureExport(object):
         style_h3 = styles['Heading3']
 
         scalebars = []
-        maxh = page_height - inch
+        self.margin = min(self.page_width, self.page_height) / 9.0
 
         # Start adding at the top, update page_y as we add paragraphs
-        page_y = maxh
+        page_y = page_height - self.margin
         page_y = self.add_para_with_thumb(figure_name, page_y, style=style_h)
 
         if "Figure_URI" in script_params:
@@ -1583,8 +1583,8 @@ class TiffExport(FigureExport):
         Creates a new PIL image ready to receive panels, labels etc.
         This is created for each page in the figure.
         """
-        tiff_width = self.scale_coords(self.page_width)
-        tiff_height = self.scale_coords(self.page_height)
+        tiff_width = int(self.scale_coords(self.page_width))
+        tiff_height = int(self.scale_coords(self.page_height))
         rgb = (255, 255, 255)
         page_color = self.figure_json.get('page_color')
         if page_color is not None:
@@ -1893,13 +1893,14 @@ def run_script():
         scripts.String("Export_Option", values=export_options,
                        default="PDF"),
 
-        scripts.String("Webclient_URI", grouping="4",
+        scripts.String("Webclient_URI", optional=False, grouping="4",
                        description="webclient URL for adding links to images"),
 
         scripts.String("Figure_Name", grouping="4",
                        description="Name of the Pdf Figure"),
 
-        scripts.String("Figure_URI", description="URL to the Figure")
+        scripts.String("Figure_URI",
+                       description="URL to the Figure")
     )
 
     try:
