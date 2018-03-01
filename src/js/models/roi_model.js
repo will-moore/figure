@@ -2,7 +2,39 @@
 var ShapeModel = Backbone.Model.extend({
 
     parse: function(shape) {
-        // Convert OMERO.server shapes to OMERO.figure shapes
+        var lowerFirst = function(text) {
+            return text[0].toLowerCase() + text.slice(1);
+        }
+        var rgbint_to_css = function(signed_integer) {
+            if (signed_integer < 0) signed_integer = signed_integer >>> 0;
+            var intAsHex = signed_integer.toString(16);
+            intAsHex = ("00000000" + intAsHex).slice(-8);
+            return '#' + intAsHex.substring(0,6);
+        }
+        shape.id = shape['@id'];
+        shape.type = shape['@type'].split('#')[1];
+        delete shape['@id']
+        delete shape['@type']
+        // StrokeWidth - unwrap 'pixel' unit
+        if (shape.StrokeWidth) {
+            shape.strokeWidth = shape.StrokeWidth.Value;
+            delete shape['StrokeWidth'];
+        }
+        // handle colors:
+        _.each(["StrokeColor", "FillColor", ], function(attr) {
+            if (shape[attr] !== undefined) {
+                shape[lowerFirst(attr)] = rgbint_to_css(shape[attr]);
+                delete shape[attr];
+            }
+        });
+        // Convert other attributes
+        _.each(["Points", "MarkerEnd", "MarkerStart", "X", "Y", "RadiusX", "RadiusY", "X1", "Y1", "X2", "Y2", "Width", "Height", "TheZ", "TheT"], function(attr) {
+            if (shape[attr] !== undefined) {
+                shape[lowerFirst(attr)] = shape[attr];
+                delete shape[attr];
+            }
+        });
+        // Handle Arrows...
         if (shape.markerEnd === 'Arrow' || shape.markerStart === 'Arrow') {
             shape.type = 'Arrow';
             if (shape.markerEnd !== 'Arrow') {
@@ -13,24 +45,6 @@ var ShapeModel = Backbone.Model.extend({
                 shape.x2 = tmp.x1;
                 shape.y2 = tmp.y1;
             }
-        }
-        if (shape.type === 'Ellipse') {
-            // If we have < OMERO 5.3, Ellipse has cx, cy, rx, ry
-            if (shape.rx !== undefined) {
-                shape.x = shape.cx;
-                shape.y = shape.cy;
-                shape.radiusX = shape.rx;
-                shape.radiusY = shape.ry;
-            }
-        }
-        if (shape.type === 'Polygon') {
-            // webgateway JSON uses points: 'M 229 171 L 195 214 L 285 156 z'
-            // we need points '229,171 195,214 285,156'
-            var pts = shape.points.replace('M ', '').replace(' z', '');
-            pts = pts.replace(/ L /g, "-");
-            pts = pts.replace(/ /g, ',');
-            pts = pts.replace(/-/g, " ");
-            shape.points = pts;
         }
         return shape;
     },
@@ -70,6 +84,7 @@ var ShapeList = Backbone.Collection.extend({
 var RoiModel = Backbone.Model.extend({
 
     initialize: function(data) {
+        this.set('id', data['@id']);
         this.shapes = new ShapeList(data.shapes, {'parse': true});
     }
 });

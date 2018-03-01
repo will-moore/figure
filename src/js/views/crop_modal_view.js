@@ -202,10 +202,10 @@ var CropModalView = Backbone.View.extend({
                         t = currT;
                     }
 
-                    return {'x': s.x,
-                            'y': s.y,
-                            'width': s.width,
-                            'height': s.height,
+                    return {'x': s.X,
+                            'y': s.Y,
+                            'width': s.Width,
+                            'height': s.Height,
                             'theZ': z,
                             'theT': t,
                         }
@@ -341,35 +341,37 @@ var CropModalView = Backbone.View.extend({
         loadRois: function() {
             var self = this,
                 iid = self.m.get('imageId');
-            $.getJSON(ROIS_JSON_URL + iid + "/", function(data){
-
+            $.getJSON(ROIS_JSON_URL + '?image=' + iid, function(rsp){
+                data = rsp.data;
                 // get a representative Rect from each ROI.
                 // Include a z and t index, trying to pick current z/t if ROI includes a shape there
                 var currT = self.m.get('theT'),
                     currZ = self.m.get('theZ');
                 var rects = [],
                     cachedRois = {},    // roiId: shapes (z/t dict)
-                    roi, shape, theT, theZ, z, t, rect, tkeys, zkeys,
+                    roi, roiId, shape, theT, theZ, z, t, rect, tkeys, zkeys,
                     minT, maxT,
                     shapes; // dict of all shapes by z & t index
 
                 for (var r=0; r<data.length; r++) {
                     roi = data[r];
+                    roiId = roi['@id'];
                     shapes = {};
                     minT = undefined;
                     maxT = 0;
                     for (var s=0; s<roi.shapes.length; s++) {
                         shape = roi.shapes[s];
-                        if (shape.type !== "Rectangle") continue;
+                        var type = shape['@type'].split('#')[1];
+                        if (type !== "Rectangle") continue;
                         // Handle null Z/T
-                        if (shape.theZ === undefined) {
-                            shape.theZ = currZ;
+                        if (shape.TheZ === undefined) {
+                            shape.TheZ = currZ;
                         }
-                        theZ = shape.theZ;
-                        if (shape.theT === undefined) {
-                            shape.theT = currT;
+                        theZ = shape.TheZ;
+                        if (shape.TheT === undefined) {
+                            shape.TheT = currT;
                         }
-                        theT = shape.theT;
+                        theT = shape.TheT;
                         // Keep track of min/max T for display
                         if (minT === undefined) {minT = theT}
                         else {minT = Math.min(minT, theT)}
@@ -381,30 +383,34 @@ var CropModalView = Backbone.View.extend({
                         }
                         shapes[theT][theZ] = shape;
                     }
-                    cachedRois[roi.id] = shapes;
+                    cachedRois[roiId] = shapes;
                     // get display shape for picking ROI
                     // on current plane or pick median T/Z...
-                    tkeys = _.keys(shapes).sort();
+                    tkeys = _.keys(shapes)
+                            .map(function(x){return parseInt(x, 10)})
+                            .sort(function(a, b){return a - b});    // sort numerically
                     if (tkeys.length === 0) continue;   // no Rectangles
                     if (shapes[currT]) {
                         t = currT;
                     } else {
                         t = tkeys[(tkeys.length/2)>>0]
                     }
-                    zkeys = _.keys(shapes[t]).sort();
+                    zkeys = _.keys(shapes[t])
+                            .map(function(x){return parseInt(x, 10)})
+                            .sort(function(a, b){return a - b});    // sort numerically
                     if (shapes[t][currZ]) {
                         z = currZ;
                     } else {
                         z = zkeys[(zkeys.length/2)>>0]
                     }
                     shape = shapes[t][z]
-                    rects.push({'theZ': shape.theZ,
-                                'theT': shape.theT,
-                                'x': shape.x,
-                                'y': shape.y,
-                                'width': shape.width,
-                                'height': shape.height,
-                                'roiId': roi.id,
+                    rects.push({'theZ': shape.TheZ,
+                                'theT': shape.TheT,
+                                'x': shape.X,
+                                'y': shape.Y,
+                                'width': shape.Width,
+                                'height': shape.Height,
+                                'roiId': roiId,
                                 'tStart': minT,
                                 'tEnd': maxT,
                                 'zStart': zkeys[0],
