@@ -124,7 +124,7 @@ var RoiModalView = Backbone.View.extend({
             }.bind(this));
         },
 
-        // Load Rectangles from OMERO and render them
+        // Load Shapes from OMERO and render them
         loadRois: function(event) {
             event.preventDefault();
             // hide button and tip
@@ -138,7 +138,7 @@ var RoiModalView = Backbone.View.extend({
             this.listenTo(Rois, "change:selection", this.showTempShape);  // mouseover shape
             this.listenTo(Rois, "shape_add", this.addShapeFromOmero);
             this.listenTo(Rois, "shape_click", this.showShapePlane);
-            var roiUrl = ROIS_JSON_URL + '?image=' + iid;
+            var roiUrl = ROIS_JSON_URL + '?image=' + iid + '&limit=500';
             $.getJSON(roiUrl, function(data){
                 Rois.set(data.data);
                 $(".loadRois", this.$el).prop('disabled', false);
