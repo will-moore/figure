@@ -439,29 +439,29 @@ class ShapeToPilExport(object):
         and scaling appropriately
         """
         rotation = self.panel['rotation']
-        # img coords: centre of rotation
-        cx = self.crop['x'] + (self.crop['width']/2)
-        cy = self.crop['y'] + (self.crop['height']/2)
-        dx = cx - shape_x
-        dy = cy - shape_y
-        # distance of point from centre of rotation
-        h = sqrt(dx * dx + dy * dy)
-        # and the angle (avoid division by zero!)
-        if dy == 0:
-            angle1 = 90
-        else:
+        if rotation != 0:
+            # img coords: centre of rotation
+            cx = self.crop['x'] + (self.crop['width']/2)
+            cy = self.crop['y'] + (self.crop['height']/2)
+            dx = cx - shape_x
+            dy = cy - shape_y
+            # distance of point from centre of rotation
+            h = sqrt(dx * dx + dy * dy)
+            # and the angle (avoid division by zero!)
+            if dy == 0:
+                dy = 0.000001
             angle1 = atan(dx/dy)
             if (dy < 0):
                 angle1 += radians(180)
 
-        # Add the rotation to the angle and calculate new
-        # opposite and adjacent lengths from centre of rotation
-        angle2 = angle1 - radians(rotation)
-        newo = sin(angle2) * h
-        newa = cos(angle2) * h
-        # to give correct x and y within cropped panel
-        shape_x = cx - newo
-        shape_y = cy - newa
+            # Add the rotation to the angle and calculate new
+            # opposite and adjacent lengths from centre of rotation
+            angle2 = angle1 - radians(rotation)
+            newo = sin(angle2) * h
+            newa = cos(angle2) * h
+            # to give correct x and y within cropped panel
+            shape_x = cx - newo
+            shape_y = cy - newa
 
         # convert to coords within crop region
         shape_x = (shape_x - self.crop['x']) * self.scale
@@ -514,7 +514,10 @@ class ShapeToPilExport(object):
     def draw_polygon(self, shape, closed=True):
         points = []
         for point in shape['points'].split(" "):
-            x, y = point.split(",")
+            # Older polygons/polylines may be 'x,y,'
+            xy = point.split(",")
+            x = xy[0]
+            y = xy[1]
             coords = self.get_panel_coords(float(x), float(y))
             points.append((coords['x'], coords['y']))
 
