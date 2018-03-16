@@ -169,6 +169,10 @@
                 points = [[shape.x1, shape.y1],
                         [shape.x2, shape.y2],
                         [(shape.x1 + shape.x2)/2, (shape.y1 + shape.y2)/ 2]];
+            } else if (shape.type === "Polyline" || shape.type === "Polygon") {
+                points = shape.points.split(' ').map(function(p){
+                    return p.split(",");
+                });
             }
             if (points) {
                 for (var p=0; p<points.length; p++) {
