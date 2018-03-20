@@ -23,18 +23,28 @@
         handleDpiForm: function(event) {
             event.preventDefault();
 
-            var dpiVal = $(".export_dpi", this.el).val(),
-                dpi = parseInt(dpiVal, 10),
-                sel = this.model.getSelected();
+            var dpiVal = $(".export_dpi", this.el).val();
+            var dpi = parseInt(dpiVal, 10);
+            var maxDpiVal = $(".max_export_dpi", this.el).val();
+            var maxDpi = parseInt(maxDpiVal, 10);
+            var sel = this.model.getSelected();
 
             // if we have a valid number...
-            if (dpi == dpiVal) {
-
-                sel.forEach(function(p) {
-                    p.save("export_dpi", dpi);
-                });
-                $("#dpiModal").modal('hide');
+            if (maxDpi != maxDpiVal) {
+                alert("Need to enter valid integer for dpi values");
+                return false;
             }
+
+            sel.forEach(function(p) {
+                var toset = {max_export_dpi: maxDpi};
+                if (dpi == dpiVal) {
+                    toset.export_dpi = dpi;
+                } else {
+                    p.unset("export_dpi");
+                }
+                p.save(toset);
+            });
+            $("#dpiModal").modal('hide');
             return false;
         },
 
