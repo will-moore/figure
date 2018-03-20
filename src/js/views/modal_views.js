@@ -7,6 +7,15 @@
 
         model: FigureModel,
 
+        initialize: function(options) {
+
+            var self = this;
+            // when dialog is shown, clear and render
+            $("#dpiModal").bind("show.bs.modal", function(){
+                self.render();
+            });
+        },
+
         events: {
             "submit .dpiModalForm": "handleDpiForm",
         },
@@ -27,8 +36,16 @@
                 $("#dpiModal").modal('hide');
             }
             return false;
-        }
+        },
 
+        render: function() {
+            var sel = this.model.getSelected();
+            var minDpi = sel.getIfEqual('export_dpi') || 300;
+            var maxDpi = sel.getIfEqual('max_export_dpi') || '-';
+
+            $(".export_dpi", this.el).val(minDpi);
+            $(".max_export_dpi", this.el).val(maxDpi);
+        }
     });
 
     var PaperSetupModalView = Backbone.View.extend({

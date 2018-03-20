@@ -21,6 +21,7 @@
             selected: false,
             pixel_size_x_symbol: '\xB5m',     // microns by default
             pixel_size_x_unit: 'MICROMETER',
+            max_export_dpi: 1000,
 
             // 'export_dpi' optional value to resample panel on export
             // model includes 'scalebar' object, e.g:
