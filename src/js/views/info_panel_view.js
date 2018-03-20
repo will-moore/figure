@@ -208,13 +208,13 @@ var InfoPanelView = Backbone.View.extend({
         this.rendering = true;
         var json,
             title = this.models.length + " Panels Selected...",
-            remoteUrl,
-            imageNames = [],
-            imageIds = [];
+            remoteUrl;
+
+        var imageIds = this.models.pluck('imageId');
+        var imageNames = this.models.pluck('name');
         this.models.forEach(function(m) {
-            imageIds.push(m.get('imageId'));
-            imageNames.push(m.get('name'));
             if (m.get('baseUrl')) {
+                // only used when a single image is selected
                 remoteUrl = m.get('baseUrl') + "/img_detail/" + m.get('imageId') + "/";
             }
             // start with json data from first Panel
@@ -235,7 +235,7 @@ var InfoPanelView = Backbone.View.extend({
             } else {
                 json.name = title;
                 // compare json summary so far with this Panel
-                var attrs = ["imageId", "orig_width", "orig_height", "sizeT", "sizeZ", "x", "y", "width", "height", "dpi", "export_dpi"];
+                var attrs = ["imageId", "orig_width", "orig_height", "sizeT", "sizeZ", "x", "y", "width", "height", "dpi", "export_dpi", "max_export_dpi"];
                 _.each(attrs, function(a){
                     if (json[a] != this_json[a]) {
                         if (a === 'x' || a === 'y' || a === 'width' || a === 'height') {
@@ -259,7 +259,11 @@ var InfoPanelView = Backbone.View.extend({
             }
         }.bind(this));
 
-        json.export_dpi = json.export_dpi || 0;
+        var min_dpi = json.export_dpi;
+        json.export_dpi = Math.min(json.dpi, json.max_export_dpi);
+        if (!isNaN(min_dpi)) {
+            json.export_dpi = Math.max(json.export_dpi, min_dpi);
+        }
 
         json.imageLinks = this.getImageLinks(remoteUrl, imageIds, imageNames);
 
