@@ -1038,14 +1038,11 @@ class FigureExport(object):
                 label, (lx + lx_end)/2, ly, font_size, (red, green, blue),
                 align="center")
 
-    def render_big_image_region(self, image, z, t, region):
+    def render_big_image_region(self, image, z, t, region, max_width):
         """
         Render region of a big image at an appropriate zoom level
-        so that we get a good pixel resolution.
+        so width < max_width
         """
-
-        # This limit is the same as views.py render_scaled_region()
-        max_size = 2000
 
         size_x = image.getSizeX()
         size_y = image.getSizeY()
@@ -1055,14 +1052,14 @@ class FigureExport(object):
         height = region['height']
 
         scale_levels = image.getZoomLevelScaling()
+        # e.g. {0: 1.0, 1: 0.25, 2: 0.06248944672707829, 3: 0.031237687848258006, 4: 0.014408735295773063}
         # Pick zoom such that returned image is below MAX size
         max_level = len(scale_levels.keys()) - 1
-        longest_side = max(width, height)
 
-        # start small, and go until we reach target size
-        zm = max_level
-        while zm > 0 and scale_levels[zm - 1] * longest_side < max_size:
-            zm = zm - 1
+        # start big, and go until we reach target size
+        zm = 0
+        while zm <= max_level and scale_levels[zm] * width > max_width:
+            zm = zm + 1
 
         level = max_level - zm
 
@@ -1118,6 +1115,11 @@ class FigureExport(object):
         z = panel['theZ']
         t = panel['theT']
 
+        # E.g. target is 300 dpi and width & height is '72 dpi'
+        # so we need image to be width * dpi/72 pixels
+        max_dpi = panel.get('max_export_dpi', 1000)
+        max_width = (panel['width'] * max_dpi) / 72
+
         # Render a larger region than viewport, to allow for rotation...
         if rotation != 0:
             max_length = 1.5 * max(vp_w, vp_h)
@@ -1127,8 +1129,10 @@ class FigureExport(object):
                                'y': vp_y - (extra_h/2),
                                'width': vp_w + extra_w,
                                'height': vp_h + extra_h}
+            max_width = max_width * (viewport_region['width'] / vp_w)
 
-        pil_img = self.render_big_image_region(image, z, t, viewport_region)
+        pil_img = self.render_big_image_region(image, z, t, viewport_region,
+                                               max_width)
         image._re.close()
 
         # Optional rotation
@@ -1273,7 +1277,7 @@ class FigureExport(object):
         pil_img = self.get_panel_image(image, panel, orig_name)
 
         # for PDF export, we might have a target dpi
-        dpi = 'export_dpi' in panel and panel['export_dpi'] or None
+        dpi = panel.get('min_export_dpi', None)
 
         # Paste the panel to PDF or TIFF image
         self.paste_image(pil_img, img_name, panel, page, dpi)
