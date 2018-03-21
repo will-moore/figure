@@ -1052,7 +1052,7 @@ class FigureExport(object):
         height = region['height']
 
         zm_levels = image.getZoomLevelScaling()
-        # e.g. {0: 1.0, 1: 0.25, 2: 0.06248944672707829, 3: 0.031237687848258006, 4: 0.014408735295773063}
+        # e.g. {0: 1.0, 1: 0.25, 2: 0.0625, 3: 0.03123, 4: 0.01440}
         # Pick zoom such that returned image is below MAX size
         max_level = len(zm_levels.keys()) - 1
 
