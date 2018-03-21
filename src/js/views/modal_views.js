@@ -23,24 +23,24 @@
         handleDpiForm: function(event) {
             event.preventDefault();
 
-            var dpiVal = $(".export_dpi", this.el).val();
-            var dpi = parseInt(dpiVal, 10);
+            var minDpiVal = $(".min_export_dpi", this.el).val();
+            var minDpi = parseInt(minDpiVal, 10);
             var maxDpiVal = $(".max_export_dpi", this.el).val();
             var maxDpi = parseInt(maxDpiVal, 10);
             var sel = this.model.getSelected();
 
-            // if we have a valid number...
-            if (maxDpi != maxDpiVal) {
+            // if we have invalid number...
+            if (isNaN(maxDpi)) {
                 alert("Need to enter valid integer for dpi values");
                 return false;
             }
 
             sel.forEach(function(p) {
                 var toset = {max_export_dpi: maxDpi};
-                if (dpi == dpiVal) {
-                    toset.export_dpi = dpi;
+                if (!isNaN(minDpi)) {
+                    toset.min_export_dpi = minDpi;
                 } else {
-                    p.unset("export_dpi");
+                    p.unset("min_export_dpi");
                 }
                 p.save(toset);
             });
@@ -50,10 +50,10 @@
 
         render: function() {
             var sel = this.model.getSelected();
-            var minDpi = sel.getIfEqual('export_dpi') || 300;
+            var minDpi = sel.getIfEqual('min_export_dpi') || 300;
             var maxDpi = sel.getIfEqual('max_export_dpi') || '-';
 
-            $(".export_dpi", this.el).val(minDpi);
+            $(".min_export_dpi", this.el).val(minDpi);
             $(".max_export_dpi", this.el).val(maxDpi);
         }
     });

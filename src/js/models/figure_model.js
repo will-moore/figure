@@ -1,7 +1,7 @@
     
     // Version of the json file we're saving.
     // This only needs to increment when we make breaking changes (not linked to release versions.)
-    var VERSION = 2;
+    var VERSION = 3;
 
 
     // ------------------------- Figure Model -----------------------------------
@@ -129,6 +129,16 @@
                             }
                             return shape;
                         });
+                    }
+                });
+            }
+            if (v < 3) {
+                console.log("Transforming to VERSION 3");
+                _.each(json.panels, function(p){
+                    if (p.export_dpi) {
+                        // rename 'export_dpi' attr to 'min_export_dpi'
+                        p.min_export_dpi = p.export_dpi;
+                        delete p.export_dpi;
                     }
                 });
             }

@@ -12,11 +12,11 @@ var InfoPanelView = Backbone.View.extend({
         if (opts.models.length > 1) {
             var self = this;
             this.models.forEach(function(m){
-                self.listenTo(m, 'change:x change:y change:width change:height change:imageId change:zoom change:export_dpi', self.render);
+                self.listenTo(m, 'change:x change:y change:width change:height change:imageId change:zoom change:min_export_dpi change:max_export_dpi', self.render);
             });
         } else if (opts.models.length == 1) {
             this.model = opts.models.head();
-            this.listenTo(this.model, 'change:x change:y change:width change:height change:zoom change:export_dpi', this.render);
+            this.listenTo(this.model, 'change:x change:y change:width change:height change:zoom change:min_export_dpi change:max_export_dpi', this.render);
             this.listenTo(this.model, 'drag_resize', this.drag_resize);
         }
     },
@@ -120,11 +120,11 @@ var InfoPanelView = Backbone.View.extend({
         $("#dpiModal").modal('show');
     },
 
-    // remove export_dpi attribute from selected panels
+    // remove optional min_export_dpi attribute from selected panels
     clear_dpi: function(event) {
         event.preventDefault();
         this.models.forEach(function(m) {
-            m.unset("export_dpi");
+            m.unset("min_export_dpi");
         });
     },
 
@@ -151,7 +151,7 @@ var InfoPanelView = Backbone.View.extend({
         json.x = offset.x;
         json.y = offset.y;
         json.dpi = this.model.getPanelDpi(json.width, json.height);
-        json.export_dpi = this.model.get('export_dpi');
+        json.export_dpi = this.model.get('min_export_dpi');
         this.$el.append(this.xywh_template(json));
     },
 
@@ -235,7 +235,7 @@ var InfoPanelView = Backbone.View.extend({
             } else {
                 json.name = title;
                 // compare json summary so far with this Panel
-                var attrs = ["imageId", "orig_width", "orig_height", "sizeT", "sizeZ", "x", "y", "width", "height", "dpi", "export_dpi", "max_export_dpi"];
+                var attrs = ["imageId", "orig_width", "orig_height", "sizeT", "sizeZ", "x", "y", "width", "height", "dpi", "min_export_dpi", "max_export_dpi"];
                 _.each(attrs, function(a){
                     if (json[a] != this_json[a]) {
                         if (a === 'x' || a === 'y' || a === 'width' || a === 'height') {
@@ -259,10 +259,9 @@ var InfoPanelView = Backbone.View.extend({
             }
         }.bind(this));
 
-        var min_dpi = json.export_dpi;
         json.export_dpi = Math.min(json.dpi, json.max_export_dpi);
-        if (!isNaN(min_dpi)) {
-            json.export_dpi = Math.max(json.export_dpi, min_dpi);
+        if (!isNaN(json.min_export_dpi)) {
+            json.export_dpi = Math.max(json.export_dpi, json.min_export_dpi);
         }
 
         json.imageLinks = this.getImageLinks(remoteUrl, imageIds, imageNames);
