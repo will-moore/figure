@@ -1183,15 +1183,19 @@ class FigureExport(object):
 
         # If big image, we don't want to render the whole plane
         if (size_x * size_y) > (4000 * 4000):
-            return self.get_panel_big_image(image, panel)
-
-        pil_img = image.renderImage(z, t, compression=1.0)
+            pil_img = self.get_panel_big_image(image, panel)
+        else:
+            pil_img = image.renderImage(z, t, compression=1.0)
 
         # We don't need to render again, so we can close rendering engine.
         image._re.close()
 
         if orig_name is not None:
             pil_img.save(orig_name)
+
+        # big image will already be cropped...
+        if (size_x * size_y) > (4000 * 4000):
+            return pil_img
 
         # Need to crop around centre before rotating...
         cx = size_x/2
