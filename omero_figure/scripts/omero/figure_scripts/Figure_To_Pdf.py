@@ -1051,21 +1051,26 @@ class FigureExport(object):
         width = region['width']
         height = region['height']
 
-        scale_levels = image.getZoomLevelScaling()
+        zm_levels = image.getZoomLevelScaling()
         # e.g. {0: 1.0, 1: 0.25, 2: 0.06248944672707829, 3: 0.031237687848258006, 4: 0.014408735295773063}
         # Pick zoom such that returned image is below MAX size
-        max_level = len(scale_levels.keys()) - 1
+        max_level = len(zm_levels.keys()) - 1
+
+        # Maximum size that the rendering engine will render without OOM
+        max_plane = self.conn.getDownloadAsMaxSizeSetting()
 
         # start big, and go until we reach target size
         zm = 0
-        while zm <= max_level and scale_levels[zm] * width > max_width:
+        while (zm <= max_level and
+               zm_levels[zm] * width > max_width or
+               zm_levels[zm] * width * zm_levels[zm] * height > max_plane):
             zm = zm + 1
 
         level = max_level - zm
 
         # We need to use final rendered jpeg coordinates
         # Convert from original image coordinates by scaling
-        scale = scale_levels[zm]
+        scale = zm_levels[zm]
         x = int(x * scale)
         y = int(y * scale)
         width = int(width * scale)
