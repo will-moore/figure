@@ -25,7 +25,7 @@ from datetime import datetime
 import os
 from os import path
 import zipfile
-from math import atan, sin, cos, sqrt, radians
+from math import atan2, atan, sin, cos, sqrt, radians
 
 from omero.model import ImageAnnotationLinkI, ImageI
 import omero.scripts as scripts
@@ -160,12 +160,8 @@ class ShapeToPdfExport(object):
             dy = cy - shape_y
             # distance of point from centre of rotation
             h = sqrt(dx * dx + dy * dy)
-            # and the angle (avoid division by zero!)
-            if dy == 0:
-                dy = 0.000001
-            angle1 = atan(dx/dy)
-            if (dy < 0):
-                angle1 += radians(180)
+            # and the angle
+            angle1 = atan2(dx, dy)
 
             # Add the rotation to the angle and calculate new
             # opposite and adjacent lengths from centre of rotation
@@ -447,12 +443,8 @@ class ShapeToPilExport(object):
             dy = cy - shape_y
             # distance of point from centre of rotation
             h = sqrt(dx * dx + dy * dy)
-            # and the angle (avoid division by zero!)
-            if dy == 0:
-                dy = 0.000001
-            angle1 = atan(dx/dy)
-            if (dy < 0):
-                angle1 += radians(180)
+            # and the angle
+            angle1 = atan2(dx, dy)
 
             # Add the rotation to the angle and calculate new
             # opposite and adjacent lengths from centre of rotation
