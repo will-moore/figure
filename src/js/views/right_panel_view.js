@@ -768,7 +768,7 @@
 
             this.models.forEach(function(m){
                 self.listenTo(m,
-                    'change:width change:height change:rotation change:z_projection change:z_start change:z_end change:export_dpi',
+                    'change:width change:height change:rotation change:z_projection change:z_start change:z_end change:min_export_dpi',
                     self.render);
                 self.listenTo(m,
                     'change:channels change:theZ change:theT',
@@ -969,7 +969,7 @@
                 var img_css = m.get_vp_img_css(m.get('zoom'), frame_w, frame_h);
                 img_css.src = src;
                 // if a 'reasonable' dpi is set, we don't pixelate
-                dpiSet = m.get('export_dpi') > 100;
+                var dpiSet = m.get('min_export_dpi') > 100;
                 img_css.pixelated = !dpiSet;
                 imgs_css.push(img_css);
             });

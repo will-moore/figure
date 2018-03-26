@@ -19,7 +19,7 @@
                 this.render_layout);
             this.listenTo(this.model, 'change:scalebar change:pixel_size_x', this.render_scalebar);
             this.listenTo(this.model,
-                'change:zoom change:dx change:dy change:width change:height change:channels change:theZ change:theT change:z_start change:z_end change:z_projection change:export_dpi',
+                'change:zoom change:dx change:dy change:width change:height change:channels change:theZ change:theT change:z_start change:z_end change:z_projection change:min_export_dpi',
                 this.render_image);
             this.listenTo(this.model, 'change:labels change:theT change:deltaT', this.render_labels);
             this.listenTo(this.model, 'change:shapes', this.render_shapes);
@@ -147,7 +147,7 @@
             this.$img_panel.attr('src', src);
 
             // if a 'reasonable' dpi is set, we don't pixelate
-            if (this.model.get('export_dpi') > 100) {
+            if (this.model.get('min_export_dpi') > 100) {
                 this.$img_panel.removeClass('pixelated');
             } else {
                 this.$img_panel.addClass('pixelated');

@@ -563,7 +563,6 @@
                 var rect = this.getViewportAsRect();
                 // Render a region that is 1.5 x larger
                 var length = Math.max(rect.width, rect.height) * 1.5;
-                console.log('get_img_src', rect, length, (length - rect.height) / 2);
                 rect.x = rect.x - ((length - rect.width) / 2);
                 rect.y = rect.y - ((length - rect.height) / 2);
                 rect.width = length;
