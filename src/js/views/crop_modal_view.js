@@ -448,7 +448,7 @@ var CropModalView = Backbone.View.extend({
                 rect = rects[r];
                 if (rect.theT > -1) this.m.set('theT', rect.theT, {'silent': true});
                 if (rect.theZ > -1) this.m.set('theZ', rect.theZ, {'silent': true});
-                src = this.m.get_img_src();
+                src = this.m.get_img_src(true);
                 if (rect.width > rect.height) {
                     div_w = size;
                     div_h = (rect.height/rect.width) * div_w;
@@ -520,8 +520,8 @@ var CropModalView = Backbone.View.extend({
             this.m.set('zoom', 100);
             this.m.set('width', newW);
             this.m.set('height', newH);
-            var src = this.m.get_img_src();
-            var css = this.m.get_vp_img_css(100, newW, newH);
+            var src = this.m.get_img_src(true);
+            var css = this.m.get_vp_full_plane_css(100, newW, newH);
 
             this.paper.setSize(newW, newH);
             $("#crop_paper").css({'height': newH, 'width': newW});

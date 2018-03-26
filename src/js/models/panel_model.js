@@ -535,7 +535,7 @@
             return this.get('orig_width') * this.get('orig_height') > 4000 * 4000;
         },
 
-        get_img_src: function() {
+        get_img_src: function(force_no_padding) {
             var chs = this.get('channels');
             var cStrings = chs.map(function(c, i){
                 return (c.active ? '' : '-') + (1+i) + "|" + c.window.start + ":" + c.window.end + "$" + c.color;
@@ -562,11 +562,13 @@
                 baseUrl = BASE_WEBFIGURE_URL + 'render_scaled_region/';
                 var rect = this.getViewportAsRect();
                 // Render a region that is 1.5 x larger
-                var length = Math.max(rect.width, rect.height) * 1.5;
-                rect.x = rect.x - ((length - rect.width) / 2);
-                rect.y = rect.y - ((length - rect.height) / 2);
-                rect.width = length;
-                rect.height = length;
+                if (!force_no_padding) {
+                    var length = Math.max(rect.width, rect.height) * 1.5;
+                    rect.x = rect.x - ((length - rect.width) / 2);
+                    rect.y = rect.y - ((length - rect.height) / 2);
+                    rect.width = length;
+                    rect.height = length;
+                }
                 var coords = [rect.x, rect.y, rect.width, rect.height].map(function(c){return parseInt(c)})
                 region = '&region=' + coords.join(',');
             } else {
