@@ -532,7 +532,7 @@
         },
 
         is_big_image: function() {
-            return this.get('orig_width') * this.get('orig_height') > 4000 * 4000;
+            return this.get('orig_width') * this.get('orig_height') > MAX_PLANE_SIZE;
         },
 
         get_img_src: function(force_no_padding) {

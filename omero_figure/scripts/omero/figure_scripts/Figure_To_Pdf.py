@@ -1038,6 +1038,11 @@ class FigureExport(object):
                 label, (lx + lx_end)/2, ly, font_size, (red, green, blue),
                 align="center")
 
+    def is_big_image(self, image):
+        """Return True if this is a 'big' tiled image."""
+        max_w, max_h = self.conn.getMaxPlaneSize()
+        return image.getSizeX() * image.getSizeY() > max_w * max_h
+
     def render_big_image_region(self, image, z, t, region, max_width):
         """
         Render region of a big image at an appropriate zoom level
@@ -1184,7 +1189,7 @@ class FigureExport(object):
                 image.setProjectionRange(panel['z_start'], panel['z_end'])
 
         # If big image, we don't want to render the whole plane
-        if (size_x * size_y) > (4000 * 4000):
+        if self.is_big_image(image):
             pil_img = self.get_panel_big_image(image, panel)
         else:
             pil_img = image.renderImage(z, t, compression=1.0)
@@ -1196,7 +1201,7 @@ class FigureExport(object):
             pil_img.save(orig_name)
 
         # big image will already be cropped...
-        if (size_x * size_y) > (4000 * 4000):
+        if self.is_big_image(image):
             return pil_img
 
         # Need to crop around centre before rotating...
