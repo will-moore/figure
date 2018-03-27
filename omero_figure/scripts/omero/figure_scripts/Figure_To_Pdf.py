@@ -1098,6 +1098,9 @@ class FigureExport(object):
         # Render the region...
         jpeg_data = image.renderJpegRegion(z, t, x, y, width, height,
                                            level=level)
+        if jpeg_data is None:
+            return
+
         i = StringIO(jpeg_data)
         pil_img = Image.open(i)
 
@@ -1138,10 +1141,9 @@ class FigureExport(object):
 
         pil_img = self.render_big_image_region(image, z, t, viewport_region,
                                                max_width)
-        image._re.close()
 
         # Optional rotation
-        if rotation != 0:
+        if rotation != 0 and pil_img is not None:
             w, h = pil_img.size
             # How much smaller is the scaled image compared to viewport?
             # This will be the same 'scale' used in render_big_image_region()
@@ -1187,8 +1189,8 @@ class FigureExport(object):
         else:
             pil_img = image.renderImage(z, t, compression=1.0)
 
-        # We don't need to render again, so we can close rendering engine.
-        image._re.close()
+        if pil_img is None:
+            return
 
         if orig_name is not None:
             pil_img.save(orig_name)
@@ -1271,19 +1273,24 @@ class FigureExport(object):
         image = self.conn.getObject("Image", image_id)
         if image is None:
             return None, None
-        self.apply_rdefs(image, channels)
 
-        # create name to save image
-        original_name = image.getName()
-        img_name = os.path.basename(original_name)
-        img_name = "%s_%s.tiff" % (idx, img_name)
+        try:
+            self.apply_rdefs(image, channels)
 
-        # get cropped image (saving original)
-        orig_name = None
-        if self.export_images:
-            orig_name = os.path.join(
-                self.zip_folder_name, ORIGINAL_DIR, img_name)
-        pil_img = self.get_panel_image(image, panel, orig_name)
+            # create name to save image
+            original_name = image.getName()
+            img_name = os.path.basename(original_name)
+            img_name = "%s_%s.tiff" % (idx, img_name)
+
+            # get cropped image (saving original)
+            orig_name = None
+            if self.export_images:
+                orig_name = os.path.join(
+                    self.zip_folder_name, ORIGINAL_DIR, img_name)
+            pil_img = self.get_panel_image(image, panel, orig_name)
+        finally:
+            if image._re is not None:
+                image._re.close()
 
         # for PDF export, we might have a target dpi
         dpi = panel.get('min_export_dpi', None)
