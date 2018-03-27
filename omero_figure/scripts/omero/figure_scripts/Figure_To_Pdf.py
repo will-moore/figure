@@ -1061,7 +1061,7 @@ class FigureExport(object):
 
         # start big, and go until we reach target size
         zm = 0
-        while (zm <= max_level and
+        while (zm < max_level and
                zm_levels[zm] * width > max_width or
                zm_levels[zm] * width * zm_levels[zm] * height > max_plane):
             zm = zm + 1
