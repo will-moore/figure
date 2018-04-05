@@ -20,7 +20,9 @@ var RoiLoaderView = Backbone.View.extend({
     roiIcons: {'Rectangle': 'rect-icon',
                'Ellipse': 'ellipse-icon',
                'Line': 'line-icon',
-               'Arrow': 'arrow-icon'},
+               'Arrow': 'arrow-icon',
+               'Polygon': 'polygon-icon',
+               'Polyline': 'polyline-icon'},
 
     addOmeroShape: function(event) {
         var $tr = $(event.target);
@@ -121,7 +123,7 @@ var RoiLoaderView = Backbone.View.extend({
                            shapes: []},
                 minT, maxT = 0,
                 minZ, maxZ = 0;
-            if (roi.shapes) {
+            if (roi.shapes && roi.shapes.length > 0) {
                 roiJson.shapes = roi.shapes.map(function(shapeModel){
                     var s = shapeModel.convertOMEROShape();
                     s.icon = this.roiIcons[s.type];
@@ -144,6 +146,8 @@ var RoiLoaderView = Backbone.View.extend({
                     s.tooltip = this.getTooltip(s);
                     return s;
                 }.bind(this));
+            } else {
+                return
             }
 
             roiJson.type = roiJson.shapes[0].type;
@@ -155,6 +159,9 @@ var RoiLoaderView = Backbone.View.extend({
 
             return roiJson;
         }.bind(this));
+
+        // remove any rois from above with no shapes
+        json = json.filter(function(j) {return j});
 
         var html = this.template({'rois': json});
         this.$el.html(html);

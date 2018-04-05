@@ -25,7 +25,7 @@ from datetime import datetime
 import os
 from os import path
 import zipfile
-from math import atan, sin, cos, sqrt, radians
+from math import atan2, atan, sin, cos, sqrt, radians
 
 from omero.model import ImageAnnotationLinkI, ImageI
 import omero.scripts as scripts
@@ -129,6 +129,10 @@ class ShapeToPdfExport(object):
                     self.draw_rectangle(shape)
                 elif shape['type'] == "Ellipse":
                     self.draw_ellipse(shape)
+                elif shape['type'] == "Polygon":
+                    self.draw_polygon(shape)
+                elif shape['type'] == "Polyline":
+                    self.draw_polyline(shape)
 
     @staticmethod
     def get_rgb(color):
@@ -148,29 +152,25 @@ class ShapeToPdfExport(object):
         the cropped panel region
         """
         rotation = self.panel['rotation']
-        # img coords: centre of rotation
-        cx = self.crop['x'] + (self.crop['width']/2)
-        cy = self.crop['y'] + (self.crop['height']/2)
-        dx = cx - shape_x
-        dy = cy - shape_y
-        # distance of point from centre of rotation
-        h = sqrt(dx * dx + dy * dy)
-        # and the angle (avoid division by zero!)
-        if dy == 0:
-            angle1 = 90
-        else:
-            angle1 = atan(dx/dy)
-            if (dy < 0):
-                angle1 += radians(180)
+        if rotation != 0:
+            # img coords: centre of rotation
+            cx = self.crop['x'] + (self.crop['width']/2)
+            cy = self.crop['y'] + (self.crop['height']/2)
+            dx = cx - shape_x
+            dy = cy - shape_y
+            # distance of point from centre of rotation
+            h = sqrt(dx * dx + dy * dy)
+            # and the angle
+            angle1 = atan2(dx, dy)
 
-        # Add the rotation to the angle and calculate new
-        # opposite and adjacent lengths from centre of rotation
-        angle2 = angle1 - radians(rotation)
-        newo = sin(angle2) * h
-        newa = cos(angle2) * h
-        # to give correct x and y within cropped panel
-        shape_x = cx - newo
-        shape_y = cy - newa
+            # Add the rotation to the angle and calculate new
+            # opposite and adjacent lengths from centre of rotation
+            angle2 = angle1 - radians(rotation)
+            newo = sin(angle2) * h
+            newa = cos(angle2) * h
+            # to give correct x and y within cropped panel
+            shape_x = cx - newo
+            shape_y = cy - newa
 
         # convert to coords within crop region
         shape_x = shape_x - self.crop['x']
@@ -317,6 +317,46 @@ class ShapeToPdfExport(object):
         p.lineTo(arrow_point1_x, arrow_point1_y)
         self.canvas.drawPath(p, fill=1, stroke=1)
 
+    def draw_polygon(self, shape, closed=True):
+        polygon_in_viewport = False
+        points = []
+        for point in shape['points'].split(" "):
+            # Older polygons/polylines may be 'x,y,'
+            xy = point.split(",")
+            x = xy[0]
+            y = xy[1]
+            coords = self.panel_to_page_coords(float(x), float(y))
+            points.append([coords['x'], self.page_height - coords['y']])
+            polygon_in_viewport = polygon_in_viewport or coords['inPanel']
+
+        # Don't draw if all points outside panel viewport
+        if not polygon_in_viewport:
+            return
+
+        stroke_width = shape['strokeWidth'] * self.scale
+        rgb = self.get_rgb(shape['strokeColor'])
+        r = float(rgb[0])/255
+        g = float(rgb[1])/255
+        b = float(rgb[2])/255
+        self.canvas.setStrokeColorRGB(r, g, b)
+        self.canvas.setLineWidth(stroke_width)
+
+        p = self.canvas.beginPath()
+        # Go to start...
+        p.moveTo(points[0][0], points[0][1])
+        # ...around other points...
+
+        for point in points[1:]:
+            p.lineTo(point[0], point[1])
+        # ...and back over first line
+        if closed:
+            for point in points[0:2]:
+                p.lineTo(point[0], point[1])
+        self.canvas.drawPath(p, fill=0, stroke=1)
+
+    def draw_polyline(self, shape):
+        self.draw_polygon(shape, False)
+
     def draw_ellipse(self, shape):
         stroke_width = shape['strokeWidth'] * self.scale
         c = self.panel_to_page_coords(shape['x'], shape['y'])
@@ -382,6 +422,10 @@ class ShapeToPilExport(object):
                     self.draw_rectangle(shape)
                 elif shape['type'] == "Ellipse":
                     self.draw_ellipse(shape)
+                elif shape['type'] == "Polygon":
+                    self.draw_polygon(shape)
+                elif shape['type'] == "Polyline":
+                    self.draw_polyline(shape)
 
     def get_panel_coords(self, shape_x, shape_y):
         """
@@ -391,29 +435,25 @@ class ShapeToPilExport(object):
         and scaling appropriately
         """
         rotation = self.panel['rotation']
-        # img coords: centre of rotation
-        cx = self.crop['x'] + (self.crop['width']/2)
-        cy = self.crop['y'] + (self.crop['height']/2)
-        dx = cx - shape_x
-        dy = cy - shape_y
-        # distance of point from centre of rotation
-        h = sqrt(dx * dx + dy * dy)
-        # and the angle (avoid division by zero!)
-        if dy == 0:
-            angle1 = 90
-        else:
-            angle1 = atan(dx/dy)
-            if (dy < 0):
-                angle1 += radians(180)
+        if rotation != 0:
+            # img coords: centre of rotation
+            cx = self.crop['x'] + (self.crop['width']/2)
+            cy = self.crop['y'] + (self.crop['height']/2)
+            dx = cx - shape_x
+            dy = cy - shape_y
+            # distance of point from centre of rotation
+            h = sqrt(dx * dx + dy * dy)
+            # and the angle
+            angle1 = atan2(dx, dy)
 
-        # Add the rotation to the angle and calculate new
-        # opposite and adjacent lengths from centre of rotation
-        angle2 = angle1 - radians(rotation)
-        newo = sin(angle2) * h
-        newa = cos(angle2) * h
-        # to give correct x and y within cropped panel
-        shape_x = cx - newo
-        shape_y = cy - newa
+            # Add the rotation to the angle and calculate new
+            # opposite and adjacent lengths from centre of rotation
+            angle2 = angle1 - radians(rotation)
+            newo = sin(angle2) * h
+            newa = cos(angle2) * h
+            # to give correct x and y within cropped panel
+            shape_x = cx - newo
+            shape_y = cy - newa
 
         # convert to coords within crop region
         shape_x = (shape_x - self.crop['x']) * self.scale
@@ -462,6 +502,37 @@ class ShapeToPilExport(object):
                        fill=rgb, width=int(stroke_width))
         # Draw Arrow head, up to tip at x2, y2
         self.draw.polygon(points, fill=rgb, outline=rgb)
+
+    def draw_polygon(self, shape, closed=True):
+        points = []
+        for point in shape['points'].split(" "):
+            # Older polygons/polylines may be 'x,y,'
+            xy = point.split(",")
+            x = xy[0]
+            y = xy[1]
+            coords = self.get_panel_coords(float(x), float(y))
+            points.append((coords['x'], coords['y']))
+
+        if closed:
+            points.append(points[0])
+
+        stroke_width = shape['strokeWidth'] * self.scale
+        rgb = ShapeToPdfExport.get_rgb(shape['strokeColor'])
+        # Draw all the lines (NB: polygon doesn't handle line width)
+        self.draw.line(points, fill=rgb, width=int(round(stroke_width)))
+        # Draw ellipse at each corner
+        # see https://stackoverflow.com/questions/33187698/
+        r = (stroke_width/2) * 0.9    # seems to look OK with this size
+        if closed:
+            corners = points[:]
+        else:
+            corners = points[1: -1]
+        for point in corners:
+            self.draw.ellipse((point[0] - r, point[1] - r,
+                               point[0] + r, point[1] + r), fill=rgb)
+
+    def draw_polyline(self, shape):
+        self.draw_polygon(shape, False)
 
     def draw_line(self, shape):
         start = self.get_panel_coords(shape['x1'], shape['y1'])

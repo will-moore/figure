@@ -126,7 +126,7 @@ var RoiModalView = Backbone.View.extend({
             }.bind(this));
         },
 
-        // Load Rectangles from OMERO and render them
+        // Load Shapes from OMERO and render them
         loadRois: function(event) {
             event.preventDefault();
             // hide button and tip
@@ -140,20 +140,21 @@ var RoiModalView = Backbone.View.extend({
             this.listenTo(Rois, "change:selection", this.showTempShape);  // mouseover shape
             this.listenTo(Rois, "shape_add", this.addShapeFromOmero);
             this.listenTo(Rois, "shape_click", this.showShapePlane);
-            Rois.url = ROIS_JSON_URL + iid + "/",
-            Rois.fetch({success: function(model, response, options){
+            var roiUrl = ROIS_JSON_URL + '?image=' + iid + '&limit=500';
+            $.getJSON(roiUrl, function(data){
+                Rois.set(data.data);
                 $(".loadRois", this.$el).prop('disabled', false);
                 $("#roiModalRoiList table").empty();
                 this.roisLoaded = true;
                 this.renderToolbar();
-                var roiLoaderView = new RoiLoaderView({collection: model, panel: this.m});
+                var roiLoaderView = new RoiLoaderView({collection: Rois, panel: this.m});
                 $("#roiModalRoiList table").append(roiLoaderView.el);
                 roiLoaderView.render();
-            }.bind(this),
-            error: function(m, rsp){
-                var info = rsp.status + " " + rsp.statusText
-                alert("Failed to load ROIS: " + info);
-            } });
+            }.bind(this))
+            .fail(function(jqxhr, textStatus, error){
+                console.log("fail", arguments);
+                alert("Failed to load ROIS: " + textStatus + ", " + error);
+            });
         },
 
         showShapePlane: function(args) {
