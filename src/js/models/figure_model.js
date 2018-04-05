@@ -230,8 +230,6 @@
                 colCount = Math.ceil(Math.sqrt(iIds.length)),
                 rowCount = Math.ceil(iIds.length/colCount),
                 centre = {x: paper_width/2, y: paper_height/2},
-                col = 0,
-                row = 0,
                 px, py, spacer, scale,
                 coords = {'px': px,
                           'py': py,
@@ -239,8 +237,6 @@
                           'spacer': spacer,
                           'colCount': colCount,
                           'rowCount': rowCount,
-                          'col': col,
-                          'row': row,
                           'paper_width': paper_width};
 
             // This loop sets up a load of async imports.
@@ -255,7 +251,7 @@
                 if (validId == "NaN") {
                     invalidIds.push(imgId);
                 } else {
-                    this.importImage(imgDataUrl, coords);
+                    this.importImage(imgDataUrl, coords, undefined, i);
                 }
             }
             if (invalidIds.length > 0) {
@@ -264,7 +260,7 @@
             }
         },
 
-        importImage: function(imgDataUrl, coords, baseUrl) {
+        importImage: function(imgDataUrl, coords, baseUrl, index) {
 
             var self = this,
                 callback,
@@ -273,6 +269,9 @@
             if (baseUrl) {
                 callback = "callback";
                 dataType = "jsonp";
+            }
+            if (index == undefined) {
+                index = 0;
             }
 
             // Get the json data for the image...
@@ -299,6 +298,12 @@
                     coords.px = coords.px || coords.c.x - (full_width * coords.scale)/2;
                     coords.py = coords.py || coords.c.y - (full_height * coords.scale)/2;
 
+                    // calculate panel coordinates from index...
+                    var row = parseInt(index / coords.colCount, 10);
+                    var col = index % coords.colCount;
+                    var panelX = coords.px + ((data.size.width + coords.spacer) * coords.scale * col);
+                    var panelY = coords.py + ((data.size.height + coords.spacer) * coords.scale * row);
+
                     // ****** This is the Data Model ******
                     //-------------------------------------
                     // Any changes here will create a new version
@@ -319,8 +324,8 @@
                         'channels': data.channels,
                         'orig_width': data.size.width,
                         'orig_height': data.size.height,
-                        'x': coords.px,
-                        'y': coords.py,
+                        'x': panelX,
+                        'y': panelY,
                         'datasetName': data.meta.datasetName,
                         'datasetId': data.meta.datasetId,
                         'pixel_size_x': data.pixel_size.valueX,
@@ -336,16 +341,6 @@
                     // We do some additional processing in Panel.parse()
                     self.panels.create(n, {'parse': true}).set('selected', true);
                     self.notifySelectionChange();
-
-                    // update px, py for next panel
-                    coords.col += 1;
-                    coords.px += (data.size.width + coords.spacer) * coords.scale;
-                    if (coords.col == coords.colCount) {
-                        coords.row += 1;
-                        coords.col = 0;
-                        coords.py += (data.size.height + coords.spacer) * coords.scale;
-                        coords.px = undefined; // recalculate next time
-                    }
                 },
 
                 error: function(event) {
