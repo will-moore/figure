@@ -14,8 +14,8 @@
                 <% }) %>
             </td></tr>
             <tr><td>
-                <div class="col-sm-6"><small><strong>Image ID</strong>:</small></div>
-                <div class="col-sm-6">
+                <div class="col-sm-5"><small><strong>Image ID</strong>:</small></div>
+                <div class="col-sm-7">
                     <small><%= imageId %></small>
                     <button type="button"
                             style="position:absolute; top:0px; right:0px"
@@ -25,17 +25,17 @@
                     </button>
                 </div>
 
-                <div class="col-sm-6"><small><strong>Dimensions (XY)</strong>:</small></div>
-                <div class="col-sm-6"><small><%= orig_width %> x <%= orig_height %></small></div>
+                <div class="col-sm-5"><small><strong>Dimensions (XY)</strong>:</small></div>
+                <div class="col-sm-7"><small><%= orig_width %> x <%= orig_height %></small></div>
 
-                <div class="col-sm-6"><small><strong>Z-sections</strong>:</small></div>
-                <div class="col-sm-6"><small><%= sizeZ %></small></div>
+                <div class="col-sm-5"><small><strong>Z-sections</strong>:</small></div>
+                <div class="col-sm-7"><small><%= sizeZ %></small></div>
                 <div class="clearfix"></div>
-                <div class="col-sm-6"><small><strong>Timepoints</strong>:</small></div>
-                <div class="col-sm-6"><small><%= sizeT %></small></div>
+                <div class="col-sm-5"><small><strong>Timepoints</strong>:</small></div>
+                <div class="col-sm-7"><small><%= sizeT %></small></div>
                 <div class="clearfix"></div>
-                <div class="col-sm-6"><small><strong>Channels</strong>:</small></div>
-                <div class="col-sm-6"><small>
+                <div class="col-sm-5"><small><strong>Channels</strong>:</small></div>
+                <div class="col-sm-7"><small>
                     <% _.each(channel_labels, function(c, i) {
                         print(_.escape(c)); print((i < channels.length-1) ? ", " : "");
                     }); %>
