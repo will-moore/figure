@@ -411,7 +411,6 @@
                 event.preventDefault();
             }
             this.$saveBtn.tooltip('hide');
-            this.$saveBtn.attr('disabled', 'disabled');
             this.save_figure();
         },
 
@@ -421,6 +420,8 @@
             var fileId = this.model.get('fileId'),
                 canEdit = this.model.get('canEdit');
             if (fileId && canEdit) {
+                // Prevent double-click
+                this.$saveBtn.attr('disabled', 'disabled');
                 // Save
                 options.fileId = fileId;
                 this.model.save_to_OMERO(options);
