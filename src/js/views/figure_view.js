@@ -69,6 +69,8 @@
             this.listenTo(this.model, 'change:page_color', this.render);
             this.listenTo(this.model, 'change:page_color', this.renderPanels);
 
+            this.listenTo(this.model, 'change:loading_count', this.renderLoadingSpinner);
+
             // refresh current UI
             this.renderZoom();
 
@@ -716,6 +718,14 @@
             var page_color = this.model.get('page_color');
             var view = new PanelView({model:panel, page_color:page_color});
             this.$figure.append(view.render().el);
+        },
+
+        renderLoadingSpinner: function() {
+            if (this.model.get('loading_count') > 0) {
+                $("#addImagesSpinner").show();
+            } else {
+                $("#addImagesSpinner").hide();
+            }
         },
 
         renderFigureName: function() {
