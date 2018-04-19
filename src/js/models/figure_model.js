@@ -140,6 +140,21 @@
                         p.min_export_dpi = p.export_dpi;
                         delete p.export_dpi;
                     }
+                    // update strokeWidth to page pixels/coords instead of
+                    // image pixels. Scale according to size of panel and zoom
+                    if (p.shapes && p.shapes.length > 0) {
+                        var panel = new Panel(p);
+                        var imagePixelsWidth = panel.getViewportAsRect().width;
+                        var pageCoordsWidth = panel.get('width');
+                        var strokeWidthScale = pageCoordsWidth/imagePixelsWidth;
+                        p.shapes = p.shapes.map(function(shape){
+                            var strokeWidth = shape.strokeWidth || 1;
+                            strokeWidth = parseInt(Math.round(strokeWidth * strokeWidthScale));
+                            strokeWidth = Math.max(strokeWidth, 1);
+                            shape.strokeWidth = strokeWidth;
+                            return shape;
+                        });
+                    }
                 });
             }
 
