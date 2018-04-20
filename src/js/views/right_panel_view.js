@@ -1156,7 +1156,7 @@
             // e.g. where 250 pixels of image is shown in viewport
             var max_width = this.models.getMax('orig_width');
             var max_zoom = parseInt(max_width / 250) * 100;
-            max_zoom = Math.max(this.zoom_avg, max_zoom, 10000);
+            max_zoom = Math.max(this.zoom_avg, max_zoom, 1000);
 
             // Current zoom may be larger due to small crop region
             $("#vp_zoom_slider").slider({'value': this.zoom_avg,
