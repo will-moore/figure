@@ -5,7 +5,6 @@ var InfoPanelView = Backbone.View.extend({
     xywh_template: JST["src/templates/xywh_panel_template.html"],
 
     initialize: function(opts) {
-        // if (opts.models) {
         this.render = _.debounce(this.render);
         this.figureModel = opts.figureModel;
         this.models = opts.models;
@@ -57,7 +56,7 @@ var InfoPanelView = Backbone.View.extend({
                 var offset = this.figureModel.getPageOffset(coords);
                 var newValue = old - offset[attr] + value;
                 // Keep panel within figure limits
-                if (attr === 'x'){
+                if (attr === 'x') {
                     if (newValue > figsize.w || newValue < 0) {
                         this.ignoreChange = false;
                     }
@@ -72,7 +71,7 @@ var InfoPanelView = Backbone.View.extend({
                 m.set(attr, newValue);
             }
             else {
-                if (value<1) {
+                if (value < 1) {
                     this.render();
                     return;
                 }
@@ -200,7 +199,7 @@ var InfoPanelView = Backbone.View.extend({
 
     // render BOTH templates
     render: function() {
-        // If event comes from handle_xywh() then we dont need to render()
+        // If event comes from handle_xywh() then we don't need to render()
         if (this.ignoreChange) {
             return;
         }
