@@ -138,10 +138,12 @@
             // But we don't want the previous image showing while we wait...
             if (this.model.is_big_image()) {
                 this.$img_panel.hide();
-                this.$img_panel.one("load", function(){
-                    $(this).show();
-                });
+                $(".glyphicon-refresh", this.$el).show();
             }
+            this.$img_panel.one("load", function(){
+                $(".glyphicon-refresh", this.$el).hide();
+                $(this).show();
+            });
 
             var src = this.model.get_img_src();
             this.$img_panel.attr('src', src);
