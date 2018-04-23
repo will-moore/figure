@@ -166,7 +166,7 @@ $(function(){
         $('.btn-sm, .navbar-header').tooltip({container: 'body', placement:'bottom', toggle:"tooltip"});
 
         // Also update text in dropdown menus
-        $("ul.dropdown-menu li a").each(function(){
+        $("ul.dropdown-menu li a span").each(function(){
             var $this = $(this);
                 $this.text($this.text().replace("⌘", "Ctrl+"));
         });
