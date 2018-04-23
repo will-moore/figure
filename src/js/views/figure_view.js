@@ -394,8 +394,8 @@
                     ["Cancel", "Don't Save", saveBtnTxt],
                     function(btnTxt){
                         if (btnTxt === saveBtnTxt) {
-                            self.save_figure();
-                            callback();
+                            // List files after saving current file
+                            self.save_figure({success: callback});
                         } else if (btnTxt === "Don't Save") {
                             self.model.set("unsaved", false);
                             callback();
