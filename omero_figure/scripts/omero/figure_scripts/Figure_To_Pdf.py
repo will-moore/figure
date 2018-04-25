@@ -872,9 +872,9 @@ class FigureExport(object):
 
     def get_time_label_text(self, delta_t, format):
         """ Gets the text for 'live' time-stamp labels """
-        if format == "secs":
-            text = "%s secs" % delta_t
-        elif format == "mins":
+        # format of "secs" by default
+        text = "%s secs" % delta_t
+        if format == "mins":
             text = "%s mins" % int(round(float(delta_t) / 60))
         elif format == "hrs:mins":
             h = (delta_t / 3600)
@@ -924,11 +924,13 @@ class FigureExport(object):
 
         for l in labels:
             if 'text' not in l:
-                if 'deltaT' in panel and panel['theT'] < len(panel['deltaT']):
-                    the_t = panel['theT']
+                the_t = panel['theT']
+                timestamps = panel.get('deltaT')
+                if l.get('time') == "index":
+                    l['text'] = str(the_t + 1)
+                elif timestamps and panel['theT'] < len(timestamps):
                     d_t = panel['deltaT'][the_t]
-                    text = self.get_time_label_text(d_t, l['time'])
-                    l['text'] = text
+                    l['text'] = self.get_time_label_text(d_t, l['time'])
                 else:
                     continue
 

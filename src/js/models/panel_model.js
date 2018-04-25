@@ -276,7 +276,9 @@
             var theT = this.get('theT'),
                 deltaT = this.get('deltaT')[theT] || 0,
                 text = "", h, m, s;
-            if (format === "secs") {
+            if (format === "index") {
+                text = "" + (theT + 1);
+            } else if (format === "secs") {
                 text = deltaT + " secs";
             } else if (format === "mins") {
                 text = Math.round(deltaT / 60) + " mins";
