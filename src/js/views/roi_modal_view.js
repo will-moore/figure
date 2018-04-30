@@ -66,6 +66,10 @@ var RoiModalView = Backbone.View.extend({
                     self.shapeManager.setShapesJson(shapesJson);
                 }
 
+                // Default line width depends on image size
+                var lw = self.m.is_big_image() ? 30 : 2;
+                self.shapeManager.setStrokeWidth(lw);
+
                 // remove any previous OMERO ROIs
                 $("#roiModalRoiList table").empty();
                 self.roisLoaded = false;
@@ -75,8 +79,6 @@ var RoiModalView = Backbone.View.extend({
             });
 
             this.shapeManager = new ShapeManager("roi_paper", 1, 1);
-            // Initially start with thin white lines.
-            self.shapeManager.setStrokeWidth(1);
             self.shapeManager.setStrokeColor('#FFFFFF');
 
             this.$roiImg = $('.roi_image', this.$el);
@@ -347,10 +349,17 @@ var RoiModalView = Backbone.View.extend({
                 scale = this.zoom,
                 sel = this.shapeManager.getSelectedShapes().length > 0,
                 toPaste = this.model.get('clipboard'),
-                windows = navigator.platform.toUpperCase().indexOf('WIN') > -1;
+                windows = navigator.platform.toUpperCase().indexOf('WIN') > -1,
+                lineWidths = [1,2,3,4,5,7,10,15,20,30];
             color = color ? color.replace("#", "") : 'FFFFFF';
             toPaste = (toPaste && (toPaste.SHAPES || toPaste.CROP));
+            if (this.m.is_big_image()) {
+                // Add thicker line options: 50, 100,
+                lineWidths.splice(lineWidths.length, 0, 50, 100);
+            }
+
             var json = {'state': state,
+                        'lineWidths': lineWidths,
                         'lineWidth': lineW,
                         'color': color,
                         'sel': sel,
@@ -451,29 +460,20 @@ var RoiModalView = Backbone.View.extend({
                 frame_h = maxSize / wh;
             }
 
-            var c = this.m.get_vp_img_css(this.m.get('zoom'), frame_w, frame_h, this.m.get('dx'), this.m.get('dy'));
+            // Get css for the image plane
+            var css = this.m.get_vp_img_css(this.m.get('zoom'), frame_w, frame_h);
+            this.$roiImg.css(css);
 
+            // Get css for the SVG (full plane)
+            var svg_css = this.m.get_vp_full_plane_css(this.m.get('zoom'), frame_w, frame_h);
             var w = this.m.get('orig_width'),
                 h = this.m.get('orig_height');
-            var scale = c.width / w;
+            var scale = svg_css.width / w;
             // TODO: add public methods to set w & h
             this.shapeManager._orig_width = w;
             this.shapeManager._orig_height = h;
             this.shapeManager.setZoom(scale * 100);
-
-            var css = {
-                "left": c.left + "px",
-                "top": c.top + "px",
-                "width": c.width + "px",
-                "height": c.height + "px",
-                "-webkit-transform-origin": c['transform-origin'],
-                "transform-origin": c['transform-origin'],
-                "-webkit-transform": c.transform,
-                "transform": c.transform
-            }
-            this.$roiImg.css(css);
-
-            $("#roi_paper").css(css);
+            $("#roi_paper").css(svg_css);
 
             $("#roiViewer").css({'width': frame_w + 'px', 'height': frame_h + 'px'});
 

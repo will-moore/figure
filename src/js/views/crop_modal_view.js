@@ -20,7 +20,7 @@ var CropModalView = Backbone.View.extend({
 
                 self.cropModel.set({'selected': false, 'width': 0, 'height': 0});
 
-                // get selected area
+                // get selected area...
                 var roi = self.m.getViewportAsRect();
 
                 // Show as ROI *if* it isn't the whole image
@@ -32,6 +32,9 @@ var CropModalView = Backbone.View.extend({
                         'selected': true
                     });
                 }
+
+                // ...now zoom out and centre to render whole image
+                self.m.set({'zoom': 100, 'dx': 0, 'dy': 0});
 
                 self.zoomToFit();   // includes render()
                 // disable submit until user chooses a region/ROI
@@ -447,7 +450,7 @@ var CropModalView = Backbone.View.extend({
                 rect = rects[r];
                 if (rect.theT > -1) this.m.set('theT', rect.theT, {'silent': true});
                 if (rect.theZ > -1) this.m.set('theZ', rect.theZ, {'silent': true});
-                src = this.m.get_img_src();
+                src = this.m.get_img_src(true);
                 if (rect.width > rect.height) {
                     div_w = size;
                     div_h = (rect.height/rect.width) * div_w;
@@ -496,12 +499,11 @@ var CropModalView = Backbone.View.extend({
         },
 
         zoomToFit: function() {
-            var $cropViewer = $("#cropViewer"),
-                viewer_w = $cropViewer.width(),
-                viewer_h = $cropViewer.height(),
+            var max_w = 500,
+                max_h = 450,
                 w = this.m.get('orig_width'),
                 h = this.m.get('orig_height');
-                scale = Math.min(viewer_w/w, viewer_h/h);
+                scale = Math.min(max_w/w, max_h/h);
             this.setZoom(scale * 100);
         },
 
@@ -517,12 +519,17 @@ var CropModalView = Backbone.View.extend({
                 h = this.m.get('orig_height');
             var newW = w * scale,
                 newH = h * scale;
-            var src = this.m.get_img_src()
+            this.m.set('zoom', 100);
+            this.m.set('width', newW);
+            this.m.set('height', newH);
+            var src = this.m.get_img_src(true);
+            var css = this.m.get_vp_full_plane_css(100, newW, newH);
 
             this.paper.setSize(newW, newH);
             $("#crop_paper").css({'height': newH, 'width': newW});
+            $("#cropViewer").css({'height': newH, 'width': newW});
 
-            this.$cropImg.css({'height': newH, 'width': newW})
+            this.$cropImg.css(css)
                     .attr('src', src);
 
             var roiX = this.currentROI.x * scale,
@@ -530,7 +537,8 @@ var CropModalView = Backbone.View.extend({
                 roiW = this.currentROI.width * scale,
                 roiH = this.currentROI.height * scale;
             this.cropModel.set({
-                'x': roiX, 'y': roiY, 'width': roiW, 'height': roiH
+                'x': roiX, 'y': roiY, 'width': roiW, 'height': roiH,
+                'selected': true
             });
         }
     });

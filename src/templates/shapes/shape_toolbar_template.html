@@ -67,7 +67,7 @@
     </button>
     <ul class="dropdown-menu dropdownSelect lineWidth" role="menu">
 
-        <% _.each([1,2,3,4,5,7,10,15,20,30],function(p){
+        <% _.each(lineWidths,function(p){
             print ("<li><a href='#'>"+p+"<span title='Line Width: "+p+"' data-line-width='"+p+"' class='linewidthOption' style='height:"+p+"px'></span></a></li>")
         }); %>
 

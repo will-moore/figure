@@ -690,284 +690,6 @@
     });
 
 
-    var InfoPanelView = Backbone.View.extend({
-
-        template: JST["src/templates/info_panel_template.html"],
-        xywh_template: JST["src/templates/xywh_panel_template.html"],
-
-        initialize: function(opts) {
-            // if (opts.models) {
-            this.render = _.debounce(this.render);
-            this.figureModel = opts.figureModel;
-            this.models = opts.models;
-            if (opts.models.length > 1) {
-                var self = this;
-                this.models.forEach(function(m){
-                    self.listenTo(m, 'change:x change:y change:width change:height change:imageId change:zoom change:export_dpi', self.render);
-                });
-            } else if (opts.models.length == 1) {
-                this.model = opts.models.head();
-                this.listenTo(this.model, 'change:x change:y change:width change:height change:zoom change:export_dpi', this.render);
-                this.listenTo(this.model, 'drag_resize', this.drag_resize);
-            }
-        },
-
-        events: {
-            "click .setId": "setImageId",
-            "click .set_dpi": "set_dpi",
-            "click .clear_dpi": "clear_dpi",
-            "blur .xywh_form input": "handle_xywh",
-            "keyup .xywh_form input": "handle_xywh",
-            "click .setAspectRatio": "lockAspectRatio"
-        },
-
-        handle_xywh: function(event) {
-            // Ignore the 2nd blur event generated during render()
-            if (this.rendering) {
-                return;
-            }
-            if (event.type === "keyup" && event.which !== 13) {
-                return;
-            }
-            var attr = event.target.getAttribute("name");
-            var value = parseInt(event.target.value, 10);
-            if (isNaN(value)) {
-                return;
-            }
-
-            var figsize = this.figureModel.getFigureSize();
-            // Avoid re-rendering and losing focus everytime there is a Blur event
-            // set(attr, value) will not cause render()
-            this.ignoreChange = true;
-            var aspectRatioStatus = false;
-            this.models.forEach(function(m) {
-                if (attr === 'x' || attr ==='y') {
-                    var old = m.get(attr);
-                    var coords = {};
-                    coords[attr] = old;
-                    var offset = this.figureModel.getPageOffset(coords);
-                    var newValue = old - offset[attr] + value;
-                    // Keep panel within figure limits
-                    if (attr === 'x'){
-                        if (newValue > figsize.w || newValue < 0) {
-                            this.ignoreChange = false;
-                        }
-                        newValue = Math.min(figsize.w, newValue);
-                    } else if (attr === 'y') {
-                        if (newValue > figsize.h || newValue < 0) {
-                            this.ignoreChange = false;
-                        }
-                        newValue = Math.min(figsize.h, newValue);
-                    }
-                    newValue = Math.max(0, newValue);
-                    m.set(attr, newValue);
-                }
-                else {
-                    if (value<1) {
-                        this.render();
-                        return;
-                    }
-
-                    //Check aspect ratio button state
-                    //If selected, check attribute and value and then recalculate other attribute value
-                    //Set both values parallely
-                    var newWidthHeight = {};
-                    newWidthHeight[attr] = value;
-
-                    if ($(".setAspectRatio", this.$el).hasClass("aspectRatioSelected")) {
-                        aspectRatioStatus = true;
-                        var widthCur = m.get('width');
-                        var heightCur = m.get('height');
-                        var aspRatio = widthCur/heightCur;
-
-                        if (attr === 'width'){
-                            var heightNew = value/aspRatio;
-                            newWidthHeight['height'] = heightNew;
-                        }
-                        else {
-                            var widthNew = value * aspRatio;
-                            newWidthHeight['width'] = widthNew;
-                        }
-                        this.ignoreChange = false;
-                    }
-                    m.save(newWidthHeight);
-                }
-            }.bind(this));
-            // Timout for ignoreChange
-            // Only reset this AFTER render() is called
-            setTimeout(function(){
-                this.ignoreChange = false;
-                // keep locked status of the aspect ratio button the same,
-                // when the focus shifts because of a blur event
-                if (aspectRatioStatus) {
-                    $(".setAspectRatio", this.$el).addClass("aspectRatioSelected");
-                }
-            }.bind(this), 50);
-
-        },
-
-        set_dpi: function(event) {
-            event.preventDefault();
-            $("#dpiModal").modal('show');
-        },
-
-        // remove export_dpi attribute from selected panels
-        clear_dpi: function(event) {
-            event.preventDefault();
-            this.models.forEach(function(m) {
-                m.unset("export_dpi");
-            });
-        },
-
-        setImageId: function(event) {
-            event.preventDefault();
-            // Simply show dialog - Everything else handled by SetIdModalView
-            $("#setIdModal").modal('show');
-            $("#setIdModal .imgId").val("").focus();
-        },
-
-        lockAspectRatio: function(event) {
-            event.preventDefault();
-            $(".setAspectRatio", this.$el).toggleClass("aspectRatioSelected");
-        },
-
-        // just update x,y,w,h by rendering ONE template
-        drag_resize: function(xywh) {
-            $("#xywh_table").remove();
-            var json = {'x': xywh[0].toFixed(0),
-                        'y': xywh[1].toFixed(0),
-                        'width': xywh[2].toFixed(0),
-                        'height': xywh[3].toFixed(0)};
-            var offset = this.figureModel.getPageOffset(json);
-            json.x = offset.x;
-            json.y = offset.y;
-            json.dpi = this.model.getPanelDpi(json.width, json.height);
-            json.export_dpi = this.model.get('export_dpi');
-            this.$el.append(this.xywh_template(json));
-        },
-
-        getImageLinks: function(remoteUrl, imageIds, imageNames) {
-            // Link if we have a single remote image, E.g. http://jcb-dataviewer.rupress.org/jcb/img_detail/625679/
-            var imageLinks = [];
-            if (remoteUrl) {
-                if (imageIds.length == 1) {
-                    imageLinks.push({'text': 'Image viewer', 'url': remoteUrl});
-                }
-            // OR all the images are local...
-            } else {
-                imageLinks.push({'text': 'Webclient', 'url': WEBINDEX_URL + "?show=image-" + imageIds.join('|image-')});
-
-                // Handle other 'Open With' options
-                OPEN_WITH.forEach(function(v){
-                    var selectedObjs = imageIds.map(function(id, i){
-                        return {'id': id, 'name': imageNames[i], 'type': 'image'};
-                    });
-                    var enabled = false;
-                    if (typeof v.isEnabled === "function") {
-                        enabled = v.isEnabled(selectedObjs);
-                    } else if (typeof v.supported_objects === "object" && v.supported_objects.length > 0) {
-                        enabled = v.supported_objects.reduce(function(prev, supported){
-                            // enabled if plugin supports 'images' or 'image' (if we've selected a single image)
-                            return prev || supported === 'images' || (supported === 'image' && imageIds.length === 1);
-                        }, false);
-                    }
-                    if (!enabled) return;
-
-                    // Get the link via url provider...
-                    var url = v.url + '?image=' + imageIds.join('&image=');
-                    if (v.getUrl) {
-                        url = v.getUrl(selectedObjs, v.url);
-                    }
-                    // Ignore any 'Open with OMERO.figure' urls
-                    if (url.indexOf(BASE_WEBFIGURE_URL) === 0) {
-                        return;
-                    }
-                    var label = v.label || v.id;
-                    imageLinks.push({'text': label, 'url': url});
-                });
-            }
-            return imageLinks;
-        },
-
-        // render BOTH templates
-        render: function() {
-            // If event comes from handle_xywh() then we dont need to render()
-            if (this.ignoreChange) {
-                return;
-            }
-            // Flag to ignore blur events caused by $el.html() below
-            this.rendering = true;
-            var json,
-                title = this.models.length + " Panels Selected...",
-                remoteUrl,
-                imageNames = [],
-                imageIds = [];
-            this.models.forEach(function(m) {
-                imageIds.push(m.get('imageId'));
-                imageNames.push(m.get('name'));
-                if (m.get('baseUrl')) {
-                    remoteUrl = m.get('baseUrl') + "/img_detail/" + m.get('imageId') + "/";
-                }
-                // start with json data from first Panel
-                var this_json = m.toJSON();
-                // Format floating point values
-                _.each(["x", "y", "width", "height"], function(a){
-                    if (this_json[a] != "-") {
-                        this_json[a] = this_json[a].toFixed(0);
-                    }
-                });
-                var offset = this.figureModel.getPageOffset(this_json);
-                this_json.x = offset.x;
-                this_json.y = offset.y;
-                this_json.dpi = m.getPanelDpi();
-                this_json.channel_labels = this_json.channels.map(function(c){return c.label})
-                if (!json) {
-                    json = this_json;
-                } else {
-                    json.name = title;
-                    // compare json summary so far with this Panel
-                    var attrs = ["imageId", "orig_width", "orig_height", "sizeT", "sizeZ", "x", "y", "width", "height", "dpi", "export_dpi"];
-                    _.each(attrs, function(a){
-                        if (json[a] != this_json[a]) {
-                            if (a === 'x' || a === 'y' || a === 'width' || a === 'height') {
-                                json[a] = "";
-                            } else {
-                                json[a] = "-";
-                            }
-                        }
-                    });
-                    // handle channel names
-                    if (this_json.channels.length != json.channel_labels.length) {
-                        json.channel_labels = ["-"];
-                    } else {
-                        _.each(this_json.channels, function(c, idx){
-                            if (json.channel_labels[idx] != c.label) {
-                                json.channel_labels[idx] = '-';
-                            }
-                        });
-                    }
-
-                }
-            }.bind(this));
-
-            json.export_dpi = json.export_dpi || 0;
-
-            json.imageLinks = this.getImageLinks(remoteUrl, imageIds, imageNames);
-
-            // all setId if we have a single Id
-            json.setImageId = _.uniq(imageIds).length == 1;
-
-            if (json) {
-                var html = this.template(json),
-                    xywh_html = this.xywh_template(json);
-                this.$el.html(html + xywh_html);
-            }
-            this.rendering = false;
-            return this;
-        }
-    });
-
-
     // This simply handles buttons to increment time/z
     // since other views don't have an appropriate container
     var SliderButtonsView = Backbone.View.extend({
@@ -1029,6 +751,7 @@
     var ImageViewerView = Backbone.View.extend({
 
         template: JST["src/templates/viewport_template.html"],
+        inner_template: JST["src/templates/viewport_inner_template.html"],
 
         className: "imageViewer",
 
@@ -1041,22 +764,21 @@
             this.full_size = 250;
 
             this.models = opts.models;
-            var self = this,
-                zoom_sum = 0;
+            var self = this;
 
             this.models.forEach(function(m){
                 self.listenTo(m,
-                    'change:width change:height change:channels change:zoom change:theZ change:theT change:rotation change:z_projection change:z_start change:z_end change:export_dpi',
+                    'change:width change:height change:rotation change:z_projection change:z_start change:z_end change:min_export_dpi',
                     self.render);
-                zoom_sum += m.get('zoom');
-
+                self.listenTo(m,
+                    'change:channels change:theZ change:theT',
+                    self.rerender_image_change);
             });
 
-            this.zoom_avg = parseInt(zoom_sum/ this.models.length, 10);
 
             $("#vp_zoom_slider").slider({
-                // zoom may be > 1000 if set by 'crop'
-                max: Math.max(self.zoom_avg, 1000),
+                // NB: these values are updated on render()
+                max: 1000,
                 min: 100,
                 value: self.zoom_avg,
                 slide: function(event, ui) {
@@ -1072,6 +794,8 @@
                     self.models.forEach(function(m){
                         m.save(to_save);
                     });
+                    // we don't listenTo zoom change...
+                    self.rerender_image_change();
                 }
             });
             this.$vp_zoom_value = $("#vp_zoom_value");
@@ -1106,7 +830,10 @@
                 dx = xy.dx;
                 dy = xy.dy;
             }
+            // Save then re-render
             this.update_img_css(this.zoom_avg, dx, dy, true);
+            // Need to re-render for BIG images
+            this.rerender_image_change();
             this.dragging = false;
             return false;
         },
@@ -1162,8 +889,12 @@
         // TODO: Update each panel separately.
         update_img_css: function(zoom, dx, dy, save) {
 
-            dx = dx / (zoom/100);
-            dy = dy / (zoom/100);
+            var scaled_dx = dx / (zoom/100);
+            var scaled_dy = dy / (zoom/100);
+
+            var big_image = this.models.reduce(function(prev, m){
+                return prev || m.is_big_image();
+            }, false);
 
             var avg_dx = this.models.getAverage('dx'),
                 avg_dy = this.models.getAverage('dy');
@@ -1174,24 +905,32 @@
                     zm_w = this.models.head().get('orig_width') / frame_w,
                     zm_h = this.models.head().get('orig_height') / frame_h,
                     scale = Math.min(zm_w, zm_h);
-                dx = dx * scale;
-                dy = dy * scale;
-                dx += avg_dx;
-                dy += avg_dy;
-                this.$vp_img.css( this.models.head().get_vp_img_css(zoom, frame_w, frame_h, dx, dy) );
+                scaled_dx = scaled_dx * scale;
+                scaled_dy = scaled_dy * scale;
+                scaled_dx += avg_dx;
+                scaled_dy += avg_dy;
+
+                var offset_x = scaled_dx;
+                var offset_y = scaled_dy;
+                if (big_image) {
+                    // For big images, we simply offset the image that fills the viewport
+                    offset_x = dx;
+                    offset_y = dy;
+                }
+                this.$vp_img.css( this.models.head().get_vp_img_css(zoom, frame_w, frame_h, offset_x, offset_y) );
                 this.$vp_zoom_value.text(zoom + "%");
 
                 if (save) {
                     if (typeof dx === "undefined") dx = 0;  // rare crazy-dragging case!
                     if (typeof dy === "undefined") dy = 0;
                     this.models.forEach(function(m){
-                        m.save({'dx': dx,
-                                'dy': dy});
+                        m.save({'dx': scaled_dx,
+                                'dy': scaled_dy});
                     });
                 }
             }
 
-            this.zmView.renderXYWH(zoom, dx, dy);
+            this.zmView.renderXYWH(zoom, scaled_dx, scaled_dy);
         },
 
         formatTime: function(seconds) {
@@ -1214,6 +953,48 @@
             }
         },
 
+        get_imgs_css: function() {
+            // Get img src & positioning css for each panel,
+            var imgs_css = [];
+            var wh = this.models.getAverageWH();
+            if (wh <= 1) {
+                var frame_h = this.full_size;
+                var frame_w = this.full_size * wh;
+            } else {
+                var frame_w = this.full_size;
+                var frame_h = this.full_size / wh;
+            }
+            this.models.forEach(function(m){
+                var src = m.get_img_src();
+                var img_css = m.get_vp_img_css(m.get('zoom'), frame_w, frame_h);
+                img_css.src = src;
+                // if a 'reasonable' dpi is set, we don't pixelate
+                var dpiSet = m.get('min_export_dpi') > 100;
+                img_css.pixelated = !dpiSet;
+                imgs_css.push(img_css);
+            });
+            return imgs_css;
+        },
+
+        rerender_image_change: function() {
+            // Render a change to image without removing old image
+            // by adding new image over top!
+            var json = {};
+            json.imgs_css = this.get_imgs_css();
+            json.opacity = 1/json.imgs_css.length;
+            var html = this.inner_template(json);
+            // We add this over the top of existing images
+            // So they remain visible while new image is loading
+            // If we're viewing multiple images (with opacity) we
+            // don't want to see through to old images
+            if (json.imgs_css.length > 1) {
+                this.$vp_img.remove();
+            }
+            this.$vp_frame.append(html);
+            // update this to include new images
+            this.$vp_img = $(".vp_img", this.$el);
+        },
+
         render: function() {
 
             // render child view
@@ -1222,7 +1003,7 @@
             // only show viewport if original w / h ratio is same for all models
             var model = this.models.head(),
                 self = this;
-            var imgs_css = [];
+            var imgs_css;
 
             // get average viewport frame w/h & zoom
             var wh = this.models.getAverageWH(),
@@ -1240,23 +1021,14 @@
             this.theT_avg = theT;
 
             if (wh <= 1) {
-                frame_h = this.full_size;
-                frame_w = this.full_size * wh;
+                var frame_h = this.full_size;
+                var frame_w = this.full_size * wh;
             } else {
-                frame_w = this.full_size;
-                frame_h = this.full_size / wh;
+                var frame_w = this.full_size;
+                var frame_h = this.full_size / wh;
             }
 
-            // Now get img src & positioning css for each panel, 
-            this.models.forEach(function(m){
-                var src = m.get_img_src(),
-                    img_css = m.get_vp_img_css(m.get('zoom'), frame_w, frame_h, m.get('dx'), m.get('dy'));
-                img_css.src = src;
-                // if a 'reasonable' dpi is set, we don't pixelate
-                dpiSet = m.get('export_dpi') > 100;
-                img_css.pixelated = !dpiSet;
-                imgs_css.push(img_css);
-            });
+            imgs_css = this.get_imgs_css();
 
             // update sliders
             var Z_disabled = false,
@@ -1348,7 +1120,7 @@
             });
 
             var json = {};
-
+            json.inner_template = this.inner_template;
             json.opacity = 1 / imgs_css.length;
             json.imgs_css = imgs_css;
             json.frame_w = frame_w;
@@ -1379,8 +1151,16 @@
             this.zoom_avg = zoom >> 0;
             this.$vp_zoom_value.text(this.zoom_avg + "%");
             // zoom may be > 1000 if set by 'crop'
+
+            // We want to be able to zoom Big images to 'actual size' in viewport
+            // e.g. where 250 pixels of image is shown in viewport
+            var max_width = this.models.getMax('orig_width');
+            var max_zoom = parseInt(max_width / 250) * 100;
+            max_zoom = Math.max(this.zoom_avg, max_zoom, 1000);
+
+            // Current zoom may be larger due to small crop region
             $("#vp_zoom_slider").slider({'value': this.zoom_avg,
-                                         'max': Math.max(this.zoom_avg, 1000)});
+                                         'max': max_zoom});
 
             return this;
         }

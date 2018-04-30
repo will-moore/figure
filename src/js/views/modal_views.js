@@ -7,6 +7,15 @@
 
         model: FigureModel,
 
+        initialize: function(options) {
+
+            var self = this;
+            // when dialog is shown, clear and render
+            $("#dpiModal").bind("show.bs.modal", function(){
+                self.render();
+            });
+        },
+
         events: {
             "submit .dpiModalForm": "handleDpiForm",
         },
@@ -14,21 +23,39 @@
         handleDpiForm: function(event) {
             event.preventDefault();
 
-            var dpiVal = $(".export_dpi", this.el).val(),
-                dpi = parseInt(dpiVal, 10),
-                sel = this.model.getSelected();
+            var minDpiVal = $(".min_export_dpi", this.el).val();
+            var minDpi = parseInt(minDpiVal, 10);
+            var maxDpiVal = $(".max_export_dpi", this.el).val();
+            var maxDpi = parseInt(maxDpiVal, 10);
+            var sel = this.model.getSelected();
 
-            // if we have a valid number...
-            if (dpi == dpiVal) {
-
-                sel.forEach(function(p) {
-                    p.save("export_dpi", dpi);
-                });
-                $("#dpiModal").modal('hide');
+            // if we have invalid number...
+            if (isNaN(maxDpi)) {
+                alert("Need to enter valid integer for dpi values");
+                return false;
             }
-            return false;
-        }
 
+            sel.forEach(function(p) {
+                var toset = {max_export_dpi: maxDpi};
+                if (!isNaN(minDpi)) {
+                    toset.min_export_dpi = minDpi;
+                } else {
+                    p.unset("min_export_dpi");
+                }
+                p.save(toset);
+            });
+            $("#dpiModal").modal('hide');
+            return false;
+        },
+
+        render: function() {
+            var sel = this.model.getSelected();
+            var minDpi = sel.getIfEqual('min_export_dpi') || 300;
+            var maxDpi = sel.getIfEqual('max_export_dpi') || '-';
+
+            $(".min_export_dpi", this.el).val(minDpi);
+            $(".max_export_dpi", this.el).val(maxDpi);
+        }
     });
 
     var PaperSetupModalView = Backbone.View.extend({
@@ -246,12 +273,6 @@
 
             // get image Data
             $.getJSON(BASE_WEBFIGURE_URL + 'imgData/' + parseInt(idInput, 10) + '/', function(data){
-
-                // Don't allow BIG images
-                if (data.size.width * data.size.height > 5000 * 5000) {
-                    alert("Image '" + data.meta.imageName + "' is too big for OMERO.figure");
-                    return;
-                }
 
                 // just pick what we need
                 var newImg = {

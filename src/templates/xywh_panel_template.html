@@ -10,11 +10,13 @@
                     <div class="checkbox">
                         <%= dpi %> dpi
 
-                        <% if (export_dpi) { %>
+                        <% if (export_dpi != dpi && !isNaN(export_dpi)) { %>
                         (Export at <%= export_dpi %> dpi
-                        <button type="button" title="Delete Label" class="close clear_dpi"
-                            title="Remove (don't change dpi on export)"
-                            aria-hidden="true" style="float: none; left: 0; margin: 0; top: -2px;">×</button>
+                            <% if (export_dpi > dpi) { %>
+                            <button type="button" title="Delete Label" class="close clear_dpi"
+                                title="Remove (don't change dpi on export)"
+                                aria-hidden="true" style="float: none; left: 0; margin: 0; top: -2px;">×</button>
+                            <% } %>
                         <label>)</label>
                         <% } %>
                     </div>

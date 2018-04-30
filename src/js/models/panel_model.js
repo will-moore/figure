@@ -21,6 +21,7 @@
             selected: false,
             pixel_size_x_symbol: '\xB5m',     // microns by default
             pixel_size_x_unit: 'MICROMETER',
+            max_export_dpi: 1000,
 
             // 'export_dpi' optional value to resample panel on export
             // model includes 'scalebar' object, e.g:
@@ -480,7 +481,9 @@
                 scale = Math.max(xPercent, yPercent);
 
             // if not zoomed or panned and panel shape is approx same as image...
-            if (dx === 0 && dy === 0 && zoom == 100 && Math.abs(xPercent - yPercent) < 0.01) {
+            var orig_wh = orig_width / orig_height,
+                view_wh = width / height;
+            if (dx === 0 && dy === 0 && zoom == 100 && Math.abs(orig_wh - view_wh) < 0.01) {
                 // ...ROI is whole image
                 return {'x': 0, 'y': 0, 'width': orig_width, 'height': orig_height}
             }
@@ -534,7 +537,11 @@
                 'y':this.get('y') + (this.get('height')/2)};
         },
 
-        get_img_src: function() {
+        is_big_image: function() {
+            return this.get('orig_width') * this.get('orig_height') > MAX_PLANE_SIZE;
+        },
+
+        get_img_src: function(force_no_padding) {
             var chs = this.get('channels');
             var cStrings = chs.map(function(c, i){
                 return (c.active ? '' : '-') + (1+i) + "|" + c.window.start + ":" + c.window.end + "$" + c.color;
@@ -555,13 +562,126 @@
             }
             baseUrl = baseUrl || WEBGATEWAYINDEX.slice(0, -1);  // remove last /
 
-            return baseUrl + '/render_image/' + imageId + "/" + theZ + "/" + theT
-                    + '/?c=' + renderString + proj + maps +"&m=c";
+            // If BIG image, render scaled region
+            var region = "";
+            if (this.is_big_image()) {
+                baseUrl = BASE_WEBFIGURE_URL + 'render_scaled_region/';
+                var rect = this.getViewportAsRect();
+                // Render a region that is 1.5 x larger
+                if (!force_no_padding) {
+                    var length = Math.max(rect.width, rect.height) * 1.5;
+                    rect.x = rect.x - ((length - rect.width) / 2);
+                    rect.y = rect.y - ((length - rect.height) / 2);
+                    rect.width = length;
+                    rect.height = length;
+                }
+                var coords = [rect.x, rect.y, rect.width, rect.height].map(function(c){return parseInt(c)})
+                region = '&region=' + coords.join(',');
+            } else {
+                baseUrl += '/render_image/';
+            }
+
+            return baseUrl + imageId + "/" + theZ + "/" + theT
+                    + '/?c=' + renderString + proj + maps + region + "&m=c";
+        },
+
+        // Turn coordinates into css object with rotation transform
+        _viewport_css: function(img_x, img_y, img_w, img_h, frame_w, frame_h) {
+            var transform_x = 100 * (frame_w/2 - img_x) / img_w,
+                transform_y = 100 * (frame_h/2 - img_y) / img_h,
+                rotation = this.get('rotation') || 0;
+
+            var css = {'left':img_x,
+                       'top':img_y,
+                       'width':img_w,
+                       'height':img_h,
+                       '-webkit-transform-origin': transform_x + '% ' + transform_y + '%',
+                       'transform-origin': transform_x + '% ' + transform_y + '%',
+                       '-webkit-transform': 'rotate(' + rotation + 'deg)',
+                       'transform': 'rotate(' + rotation + 'deg)'
+                   };
+            return css;
         },
 
         // used by the PanelView and ImageViewerView to get the size and
         // offset of the img within it's frame
-        get_vp_img_css: function(zoom, frame_w, frame_h, dx, dy, fit) {
+        get_vp_img_css: function(zoom, frame_w, frame_h, x, y) {
+
+            // For non-big images, we have the full plane in hand
+            // css just shows the viewport region
+            if (!this.is_big_image()) {
+                return this.get_vp_full_plane_css(zoom, frame_w, frame_h, x, y);
+
+            // For 'big' images, we render just the viewport, so the rendered
+            // image fully fills the viewport.
+            } else {
+                return this.get_vp_big_image_css(zoom, frame_w, frame_h, x, y);
+            }
+        },
+
+        // For BIG images we just render the viewport
+        // Rendered image will be filling viewport.
+        // If we're zooming image will be larger.
+        // If panning, offset from centre by x and y.
+        // NB: Reshaping (changing aspect ratio) is buggy (so PanelView hides big image while reshaping)
+        get_vp_big_image_css: function(zoom, frame_w, frame_h, x, y) {
+
+            // Used for static rendering, as well as during zoom, panning, panel resizing
+            // and panel re-shaping (stretch/squash).
+
+            var zooming = zoom !== this.get('zoom');
+            var panning = (x !== undefined && y!== undefined);
+
+            // Need to know what the original offsets are...
+            // We know that the image is 1.5 * bigger than viewport
+            var length = Math.max(frame_w, frame_h) * 1.5;
+
+            var img_x;
+            var img_y;
+            var img_w = length;
+            var img_h = length;
+
+            // if we're zooming...
+            if (zooming) {
+                img_w = length * zoom / this.get('zoom');
+                img_h = length * zoom / this.get('zoom');
+                img_y = y || ((frame_h - img_h) / 2);
+                img_x = x || ((frame_w - img_w) / 2);
+                return this._viewport_css(img_x, img_y, img_w, img_h, frame_w, frame_h);
+            } else {
+                img_x = (frame_w - length) / 2;
+                img_y = (frame_h - length) / 2;
+            }
+
+            // if we're resizing width / height....
+            var old_w = parseInt(this.get('width'), 10);
+            var old_h = parseInt(this.get('height'), 10);
+            frame_w = parseInt(frame_w);
+            frame_h = parseInt(frame_h);
+
+            var resizing = old_w !== img_w || old_h !== img_h;
+            if (resizing) {
+
+                img_y = (frame_h - img_h) / 2;
+                img_x = (frame_w - img_w) / 2;
+
+                // If we're panning...
+                if (panning) {
+                    // ...we need to simply increment existing offset
+                    img_x += x;
+                    img_y += y;
+                }
+            }
+
+            return this._viewport_css(img_x, img_y, img_w, img_h, frame_w, frame_h);
+        },
+
+        // get CSS that positions and scales a full image plane so that
+        // only the 'viewport' shows in the parent container
+        get_vp_full_plane_css: function(zoom, frame_w, frame_h, x, y) {
+
+            var dx = x;
+            var dy = y;
 
             var orig_w = this.get('orig_width'),
                 orig_h = this.get('orig_height');
@@ -597,32 +717,7 @@
             img_x = (dx * vp_scale) - img_x;
             img_y = (dy * vp_scale) - img_y;
 
-            var transform_x = 100 * (frame_w/2 - img_x) / img_w,
-                transform_y = 100 * (frame_h/2 - img_y) / img_h,
-                rotation = this.get('rotation') || 0;
-
-            // option to align image within viewport (not used now)
-            if (fit) {
-                img_x = Math.min(img_x, 0);
-                if (img_x + img_w < frame_w) {
-                    img_x = frame_w - img_w;
-                }
-                img_y = Math.min(img_y, 0);
-                if (img_y + img_h < frame_h) {
-                    img_y = frame_h - img_h;
-                }
-            }
-
-            var css = {'left':img_x,
-                       'top':img_y,
-                       'width':img_w,
-                       'height':img_h,
-                       '-webkit-transform-origin': transform_x + '% ' + transform_y + '%',
-                       'transform-origin': transform_x + '% ' + transform_y + '%',
-                       '-webkit-transform': 'rotate(' + rotation + 'deg)',
-                       'transform': 'rotate(' + rotation + 'deg)'
-                   };
-            return css;
+            return this._viewport_css(img_x, img_y, img_w, img_h, frame_w, frame_h);
         },
 
         getPanelDpi: function(w, h, zoom) {
@@ -630,7 +725,7 @@
             w = w || this.get('width');
             h = h || this.get('height');
             zoom = zoom || this.get('zoom');
-            var img_width = this.get_vp_img_css(zoom, w, h).width,  // not viewport width
+            var img_width = this.get_vp_full_plane_css(zoom, w, h).width,  // not viewport width
                 orig_width = this.get('orig_width'),
                 scaling = orig_width / img_width,
                 dpi = scaling * 72;

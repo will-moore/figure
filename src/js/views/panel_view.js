@@ -19,13 +19,12 @@
                 this.render_layout);
             this.listenTo(this.model, 'change:scalebar change:pixel_size_x', this.render_scalebar);
             this.listenTo(this.model,
-                'change:channels change:theZ change:theT change:z_start change:z_end change:z_projection change:export_dpi',
+                'change:zoom change:dx change:dy change:width change:height change:channels change:theZ change:theT change:z_start change:z_end change:z_projection change:min_export_dpi',
                 this.render_image);
             this.listenTo(this.model, 'change:labels change:theT change:deltaT', this.render_labels);
             this.listenTo(this.model, 'change:shapes', this.render_shapes);
-            // This could be handled by backbone.relational, but do it manually for now...
-            // this.listenTo(this.model.channels, 'change', this.render);
-            // During drag, model isn't updated, but we trigger 'drag'
+
+            // During drag or resize, model isn't updated, but we trigger 'drag'
             this.model.on('drag_resize', this.drag_resize, this);
 
             // Used for rendering labels against page_color background
@@ -45,9 +44,14 @@
                 y = xywh[1],
                 w = xywh[2],
                 h = xywh[3];
-            this.update_resize(x, y, w, h);
+            if (w == this.model.get('width') && h == this.model.get('height')) {
+                // If we're only dragging - simply update position
+                this.$el.css({'top': y +'px', 'left': x +'px'});
+            } else {
+                this.update_resize(x, y, w, h);
+                this.render_shapes();
+            }
             this.$el.addClass('dragging');
-            this.render_shapes();
         },
 
         render_layout: function() {
@@ -74,12 +78,22 @@
             // update the img within the panel
             var zoom = this.model.get('zoom'),
                 vp_css = this.model.get_vp_img_css(zoom, w, h),
-                panel_scale = vp_css.width / this.model.get('orig_width');
+                svg_css = this.model.get_vp_full_plane_css(zoom, w, h),
+                panel_scale = svg_css.width / this.model.get('orig_width');
+
+            // If we're resizing a BIG image, layout can be buggy,
+            // so we simply hide while resizing
+            if (this.model.is_big_image()) {
+                if (w !== this.model.get('width') || h !== this.model.get('height')) {
+                    vp_css.width = 0;
+                    vp_css.height = 0;
+                }
+            }
 
             // These two elements are siblings under imgContainer and must
-            // maintain exactly on top of each other
+            // will be exactly on top of each other for non-big images.
             this.$img_panel.css(vp_css);
-            this.$panel_canvas.css(vp_css);
+            this.$panel_canvas.css(svg_css);
 
             // panel_canvas contains the shapeManager svg, which we zoom:
             if (this.shapeManager) {
@@ -105,7 +119,7 @@
                 if (!this.shapeManager) {
                     var canvasId = this.$panel_canvas.attr('id');
                     this.$panel_canvas.attr({'width': w + 'px', 'height': h + 'px'});
-                    var panel_scale = this.$img_panel.width() / w;
+                    var panel_scale = this.$panel_canvas.width() / w;
                     this.shapeManager = new ShapeManager(canvasId, w, h, {'readOnly': true});
                     this.shapeManager.setZoom(panel_scale * 100);
                 }
@@ -119,11 +133,23 @@
         },
 
         render_image: function() {
+
+            // For big images, layout changes will update src to render a new viewport
+            // But we don't want the previous image showing while we wait...
+            if (this.model.is_big_image()) {
+                this.$img_panel.hide();
+                $(".glyphicon-refresh", this.$el).show();
+            }
+            this.$img_panel.one("load", function(){
+                $(".glyphicon-refresh", this.$el).hide();
+                $(this).show();
+            });
+
             var src = this.model.get_img_src();
             this.$img_panel.attr('src', src);
 
             // if a 'reasonable' dpi is set, we don't pixelate
-            if (this.model.get('export_dpi') > 100) {
+            if (this.model.get('min_export_dpi') > 100) {
                 this.$img_panel.removeClass('pixelated');
             } else {
                 this.$img_panel.addClass('pixelated');
