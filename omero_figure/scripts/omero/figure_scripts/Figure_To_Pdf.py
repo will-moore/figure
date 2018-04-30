@@ -632,7 +632,7 @@ class FigureExport(object):
         figure_json_string = script_params['Figure_JSON']
         # Since unicode can't be wrapped by rstring
         figure_json_string = figure_json_string.decode('utf8')
-        self.figure_json = self.version_transform_JSON(
+        self.figure_json = self.version_transform_json(
             json.loads(figure_json_string))
 
         n = datetime.now()
@@ -646,7 +646,7 @@ class FigureExport(object):
         self.page_width = self.figure_json['paper_width']
         self.page_height = self.figure_json['paper_height']
 
-    def version_transform_JSON(self, figure_json):
+    def version_transform_json(self, figure_json):
 
         v = figure_json.get('version')
         if v < 3:
@@ -666,7 +666,7 @@ class FigureExport(object):
                         stroke_width = int(round(shape.get('strokeWidth', 1) *
                                                  stroke_width_scale))
                         stroke_width = max(stroke_width, 1)
-                        shape['strokeWidth'] = stroke_width;
+                        shape['strokeWidth'] = stroke_width
         return figure_json
 
     def get_zip_name(self):
