@@ -632,7 +632,8 @@ class FigureExport(object):
         figure_json_string = script_params['Figure_JSON']
         # Since unicode can't be wrapped by rstring
         figure_json_string = figure_json_string.decode('utf8')
-        self.figure_json = json.loads(figure_json_string)
+        self.figure_json = self.version_transform_JSON(
+            json.loads(figure_json_string))
 
         n = datetime.now()
         # time-stamp name by default: Figure_2013-10-29_22-43-53.pdf
@@ -644,6 +645,29 @@ class FigureExport(object):
         # get Figure width & height...
         self.page_width = self.figure_json['paper_width']
         self.page_height = self.figure_json['paper_height']
+
+    def version_transform_JSON(self, figure_json):
+
+        v = figure_json.get('version')
+        if v < 3:
+            print "Transforming to VERSION 3"
+            for p in figure_json['panels']:
+                if p.get('export_dpi'):
+                    # rename 'export_dpi' attr to 'min_export_dpi'
+                    p['min_export_dpi'] = p.get('export_dpi')
+                    del p['export_dpi']
+                # update strokeWidth to page pixels/coords instead of
+                # image pixels. Scale according to size of panel and zoom
+                if p.get('shapes') and len(p['shapes']) > 0:
+                    image_pixels_width = self.get_crop_region(p)['width']
+                    page_coords_width = float(p.get('width'))
+                    stroke_width_scale = page_coords_width/image_pixels_width
+                    for shape in p['shapes']:
+                        stroke_width = int(round(shape.get('strokeWidth', 1) *
+                                                 stroke_width_scale))
+                        stroke_width = max(stroke_width, 1)
+                        shape['strokeWidth'] = stroke_width;
+        return figure_json
 
     def get_zip_name(self):
 
