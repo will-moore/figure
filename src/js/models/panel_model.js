@@ -762,7 +762,7 @@
             }
         },
 
-        createLabelsFromTags(options) {
+        createLabelsFromTags: function(options) {
             // Loads Tags for selected images and creates labels
             var image_ids = this.map(function(s){return s.get('imageId')})
             image_ids = "image=" + image_ids.join("&image=");

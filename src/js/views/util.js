@@ -153,22 +153,11 @@ $(function(){
     $('.btn-xs').tooltip({container: 'body', placement:'top', toggle:"tooltip"});
 
 
-    // If we're on Windows, update tool-tips for keyboard short cuts:
-    if (navigator.platform.toUpperCase().indexOf('WIN') > -1) {
-        $('.btn-sm').each(function(){
-            var $this = $(this),
-                tooltip = $this.attr('data-original-title');
-            if ($this.attr('data-original-title')) {
-                $this.attr('data-original-title', tooltip.replace("⌘", "Ctrl+"));
-            }
-        });
-        // refresh tooltips
-        $('.btn-sm, .navbar-header').tooltip({container: 'body', placement:'bottom', toggle:"tooltip"});
-
-        // Also update text in dropdown menus
-        $("ul.dropdown-menu li a").each(function(){
+    // If we're on Mac, update dropdown menus for keyboard short cuts:
+    if (navigator.platform.toUpperCase().indexOf('MAC') > -1) {
+        $("ul.dropdown-menu li a span").each(function(){
             var $this = $(this);
-                $this.text($this.text().replace("⌘", "Ctrl+"));
+                $this.text($this.text().replace("Ctrl+", "⌘"));
         });
     }
 
