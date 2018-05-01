@@ -391,6 +391,9 @@
                 rv = new RectView({'model':multiSelectRect, 'paper':this.raphael_paper,
                         'handle_wh':7, 'handles_toFront': true, 'fixed_ratio': true});
             rv.selected_line_attrs = {'stroke-width': 1, 'stroke':'#4b80f9'};
+
+            // set svg size for current window and zoom
+            this.renderZoom();
         },
 
         // A panel has been added - We add a corresponding Raphael Rect 
