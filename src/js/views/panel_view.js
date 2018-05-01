@@ -142,8 +142,8 @@
             }
             this.$img_panel.one("load", function(){
                 $(".glyphicon-refresh", this.$el).hide();
-                $(this).show();
-            });
+                this.$img_panel.show();
+            }.bind(this));
 
             var src = this.model.get_img_src();
             this.$img_panel.attr('src', src);
