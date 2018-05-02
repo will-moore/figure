@@ -28,6 +28,7 @@
             'height_mm': 297,
             'legend': '',       // Figure legend in markdown format.
             'legend_collapsed': true,   // collapse or expand legend
+            'loading_count': 0,         // images being loaded (show spinner if > 0)
         },
 
         initialize: function() {
@@ -284,6 +285,8 @@
                 index = 0;
             }
 
+            this.set('loading_count', this.get('loading_count') + 1);
+
             // Get the json data for the image...
             $.ajax({
                 url: imgDataUrl,
@@ -291,6 +294,8 @@
                 dataType: dataType,
                 // work with the response
                 success: function( data ) {
+
+                    self.set('loading_count', self.get('loading_count') - 1);
 
                     coords.spacer = coords.spacer || data.size.width/20;
                     var full_width = (coords.colCount * (data.size.width + coords.spacer)) - coords.spacer,
@@ -349,6 +354,7 @@
                 },
 
                 error: function(event) {
+                    self.set('loading_count', self.get('loading_count') - 1);
                     alert("Image not found on the server, " +
                         "or you don't have permission to access it at " + imgDataUrl);
                 },
