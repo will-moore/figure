@@ -149,8 +149,15 @@
                         var strokeWidthScale = pageCoordsWidth/imagePixelsWidth;
                         p.shapes = p.shapes.map(function(shape){
                             var strokeWidth = shape.strokeWidth || 1;
-                            strokeWidth = parseInt(Math.round(strokeWidth * strokeWidthScale));
-                            strokeWidth = Math.max(strokeWidth, 1);
+                            strokeWidth = strokeWidth * strokeWidthScale;
+                            // Set stroke-width to 0.25, 0.5, 1 or greater
+                            if (strokeWidth > 0.7) {
+                                strokeWidth = parseInt(Math.round(strokeWidth));
+                            } else if (strokeWidth > 0.375) {
+                                strokeWidth = 0.5;
+                            } else {
+                                strokeWidth = 0.25;
+                            }
                             shape.strokeWidth = strokeWidth;
                             return shape;
                         });
