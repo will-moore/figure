@@ -50,14 +50,14 @@
         <button type="button" class="line-width btn btn-default btn-sm dropdown-toggle" title="Line Width: <%= lineWidth %>"
             <% if (roiCount === 0) print('disabled') %>
             data-toggle="dropdown">
-            <span data-line-width="<%= lineWidth %>" class='linewidthOption' style='height:<%= lineWidth %>px; width:20px'></span>
+            <span data-line-width="<%= lineWidth %>"><%= lineWidth %> pt</span>
             <span class="caret"></span>
         </button>
         <ul class="dropdown-menu dropdownSelect lineWidth" role="menu">
 
-            <% _.each([1,2,3,4,5,7,10,15,20,30],function(p){
-                print ("<li><a href='#'>"+p+"<span title='Line Width: "+p+"' data-line-width='"+p+"' class='linewidthOption' style='height:"+p+"px; width:20px'></span></a></li>")
-            }); %>
+            <% _.each([0.25,0.5,1,2,3,4,5,7,10,15,20,30],function(p){ %>
+                <li><a href='#'><span data-line-width='<%= p %>'><%= p %> pt</span></a></li>
+            <% }); %>
 
         </ul>
     </div>

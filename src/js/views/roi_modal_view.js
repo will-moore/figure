@@ -268,7 +268,7 @@ var RoiModalView = Backbone.View.extend({
 
         changeLineWidth: function(event) {
             var lineWidth = $("span:first", event.target).attr('data-line-width');
-            lineWidth = parseInt(lineWidth, 10);
+            lineWidth = parseFloat(lineWidth, 10);
             this.shapeManager.setStrokeWidth(lineWidth);
         },
 
@@ -349,7 +349,7 @@ var RoiModalView = Backbone.View.extend({
                 sel = this.shapeManager.getSelectedShapes().length > 0,
                 toPaste = this.model.get('clipboard'),
                 windows = navigator.platform.toUpperCase().indexOf('WIN') > -1,
-                lineWidths = [1,2,3,4,5,7,10,15,20,30];
+                lineWidths = [0.25,0.5,1,2,3,4,5,7,10,15,20,30];
             color = color ? color.replace("#", "") : 'FFFFFF';
             toPaste = (toPaste && (toPaste.SHAPES || toPaste.CROP));
 
