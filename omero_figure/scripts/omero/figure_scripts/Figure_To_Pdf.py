@@ -663,7 +663,8 @@ class FigureExport(object):
                     page_coords_width = float(p.get('width'))
                     stroke_width_scale = page_coords_width/image_pixels_width
                     for shape in p['shapes']:
-                        stroke_width = shape.get('strokeWidth', 1) * stroke_width_scale
+                        stroke_width = shape.get('strokeWidth', 1)
+                        stroke_width = stroke_width * stroke_width_scale
                         # Set stroke-width to 0.25, 0.5, 0.75, 1 or greater
                         if stroke_width > 0.875:
                             stroke_width = int(round(stroke_width))
