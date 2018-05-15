@@ -1389,8 +1389,10 @@
                 // save this value to init rotation slider etc
                 this.rotation = avg_rotation;
 
+                var anyBig = this.models.any(function(m){return m.is_big_image()});
                 // if all panels have sizeZ == 1, don't allow z_projection
-                z_projection_disabled = (sum_sizeZ === this.models.length);
+                // Don't currently support Z_projection on Big images.
+                z_projection_disabled = ((sum_sizeZ === this.models.length) || anyBig);
 
                 html = this.template({
                     'z_projection_disabled': z_projection_disabled,
