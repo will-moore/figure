@@ -475,7 +475,7 @@ class ShapeToPilExport(object):
         y1 = start['y']
         x2 = end['x']
         y2 = end['y']
-        head_size = ((shape['strokeWidth'] * 2) + 20)
+        head_size = ((shape['strokeWidth'] * 4) + 5)
         head_size = scale_to_export_dpi(head_size)
         stroke_width = scale_to_export_dpi(shape.get('strokeWidth', 2))
         rgb = ShapeToPdfExport.get_rgb(shape['strokeColor'])
