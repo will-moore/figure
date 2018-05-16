@@ -288,7 +288,6 @@ class ShapeToPdfExport(object):
         dx = x2 - x1
         dy = y2 - y1
 
-        stroke_width = stroke_width * self.scale
         self.canvas.setLineWidth(stroke_width)
 
         p = self.canvas.beginPath()
