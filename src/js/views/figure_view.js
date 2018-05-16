@@ -536,7 +536,7 @@
                 if (!allOK) {
                     figureConfirmDialog("Paste Failure",
                         "Some shapes may be outside the visible 'viewport' of panel" + plural + ". " +
-                        "Target image" + plural + " may too small or zoomed in too much. " +
+                        "Target image" + plural + " may be too small or zoomed in too much. " +
                         "Try zooming out before pasting again, or paste to a bigger image.",
                         ["OK"]);
                 }
