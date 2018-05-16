@@ -141,6 +141,30 @@
                         p.min_export_dpi = p.export_dpi;
                         delete p.export_dpi;
                     }
+                    // update strokeWidth to page pixels/coords instead of
+                    // image pixels. Scale according to size of panel and zoom
+                    if (p.shapes && p.shapes.length > 0) {
+                        var panel = new Panel(p);
+                        var imagePixelsWidth = panel.getViewportAsRect().width;
+                        var pageCoordsWidth = panel.get('width');
+                        var strokeWidthScale = pageCoordsWidth/imagePixelsWidth;
+                        p.shapes = p.shapes.map(function(shape){
+                            var strokeWidth = shape.strokeWidth || 1;
+                            strokeWidth = strokeWidth * strokeWidthScale;
+                            // Set stroke-width to 0.25, 0.5, 0.75, 1 or greater
+                            if (strokeWidth > 0.875) {
+                                strokeWidth = parseInt(Math.round(strokeWidth));
+                            } else if (strokeWidth > 0.625) {
+                                strokeWidth = 0.75;
+                            } else if (strokeWidth > 0.375) {
+                                strokeWidth = 0.5;
+                            } else {
+                                strokeWidth = 0.25;
+                            }
+                            shape.strokeWidth = strokeWidth;
+                            return shape;
+                        });
+                    }
                 });
             }
 

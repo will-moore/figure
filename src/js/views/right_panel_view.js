@@ -89,7 +89,7 @@
         changeLineWidth: function() {
             var width = $('button.line-width span:first', this.$el).attr('data-line-width'),
                 sel = this.model.getSelected();
-            width = parseInt(width, 10);
+            width = parseFloat(width, 10);
 
             sel.forEach(function(panel){
                 panel.setROIStrokeWidth(width);

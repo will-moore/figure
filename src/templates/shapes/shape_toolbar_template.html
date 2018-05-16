@@ -62,15 +62,13 @@
 <div class="btn-group">
     <button type="button" class="line-width btn btn-default dropdown-toggle" title="Line Width: <%= lineWidth %>"
         data-toggle="dropdown">
-        <span data-line-width="<%= lineWidth %>" class='linewidthOption' style='height:<%= lineWidth %>px'></span>
+        <span data-line-width="<%= lineWidth %>"><%= lineWidth %> pt</span>
         <span class="caret"></span>
     </button>
-    <ul class="dropdown-menu dropdownSelect lineWidth" role="menu">
-
-        <% _.each(lineWidths,function(p){
-            print ("<li><a href='#'>"+p+"<span title='Line Width: "+p+"' data-line-width='"+p+"' class='linewidthOption' style='height:"+p+"px'></span></a></li>")
-        }); %>
-
+    <ul class="dropdown-menu dropdownSelect lineWidth" style="min-width: 0" role="menu">
+        <% _.each(lineWidths,function(p){ %>
+            <li><a href='#'><span data-line-width='<%= p %>'><%= p %> pt</span></a></li>
+        <% }); %>
     </ul>
 </div>
 

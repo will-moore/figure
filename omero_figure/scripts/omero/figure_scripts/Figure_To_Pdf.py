@@ -86,6 +86,14 @@ processing steps:
 """
 
 
+def scale_to_export_dpi(pixels):
+    """
+    Original figure coordinates assume 72 dpi figure, but we want to
+    export at 300 dpi, so everything needs scaling accordingly
+    """
+    return pixels * 300/72
+
+
 def compress(target, base):
     """
     Creates a ZIP recursively from a given base directory.
@@ -215,8 +223,7 @@ class ShapeToPdfExport(object):
         g = float(rgb[1])/255
         b = float(rgb[2])/255
         self.canvas.setStrokeColorRGB(r, g, b)
-        stroke_width = shape['strokeWidth'] if 'strokeWidth' in shape else 2
-        stroke_width = stroke_width * self.scale
+        stroke_width = shape.get('strokeWidth', 2)
         self.canvas.setLineWidth(stroke_width)
 
         rotation = self.panel['rotation'] * -1
@@ -250,7 +257,7 @@ class ShapeToPdfExport(object):
         g = float(rgb[1])/255
         b = float(rgb[2])/255
         self.canvas.setStrokeColorRGB(r, g, b)
-        stroke_width = shape['strokeWidth'] * self.scale
+        stroke_width = shape['strokeWidth']
         self.canvas.setLineWidth(stroke_width)
 
         p = self.canvas.beginPath()
@@ -277,8 +284,7 @@ class ShapeToPdfExport(object):
         self.canvas.setStrokeColorRGB(r, g, b)
         self.canvas.setFillColorRGB(r, g, b)
 
-        head_size = (stroke_width * 5) + 9
-        head_size = head_size * self.scale
+        head_size = (stroke_width * 4) + 5
         dx = x2 - x1
         dy = y2 - y1
 
@@ -333,7 +339,7 @@ class ShapeToPdfExport(object):
         if not polygon_in_viewport:
             return
 
-        stroke_width = shape['strokeWidth'] * self.scale
+        stroke_width = shape['strokeWidth']
         rgb = self.get_rgb(shape['strokeColor'])
         r = float(rgb[0])/255
         g = float(rgb[1])/255
@@ -358,7 +364,7 @@ class ShapeToPdfExport(object):
         self.draw_polygon(shape, False)
 
     def draw_ellipse(self, shape):
-        stroke_width = shape['strokeWidth'] * self.scale
+        stroke_width = shape['strokeWidth']
         c = self.panel_to_page_coords(shape['x'], shape['y'])
         cx = c['x']
         cy = self.page_height - c['y']
@@ -469,8 +475,9 @@ class ShapeToPilExport(object):
         y1 = start['y']
         x2 = end['x']
         y2 = end['y']
-        head_size = ((shape['strokeWidth'] * 5) + 9) * self.scale
-        stroke_width = shape['strokeWidth'] * self.scale
+        head_size = ((shape['strokeWidth'] * 4) + 5)
+        head_size = scale_to_export_dpi(head_size)
+        stroke_width = scale_to_export_dpi(shape.get('strokeWidth', 2))
         rgb = ShapeToPdfExport.get_rgb(shape['strokeColor'])
 
         # Do some trigonometry to get the line angle can calculate arrow points
@@ -516,7 +523,7 @@ class ShapeToPilExport(object):
         if closed:
             points.append(points[0])
 
-        stroke_width = shape['strokeWidth'] * self.scale
+        stroke_width = scale_to_export_dpi(shape.get('strokeWidth', 2))
         rgb = ShapeToPdfExport.get_rgb(shape['strokeColor'])
         # Draw all the lines (NB: polygon doesn't handle line width)
         self.draw.line(points, fill=rgb, width=int(round(stroke_width)))
@@ -541,14 +548,14 @@ class ShapeToPilExport(object):
         y1 = start['y']
         x2 = end['x']
         y2 = end['y']
-        stroke_width = shape['strokeWidth'] * self.scale
+        stroke_width = scale_to_export_dpi(shape.get('strokeWidth', 2))
         rgb = ShapeToPdfExport.get_rgb(shape['strokeColor'])
 
         self.draw.line([(x1, y1), (x2, y2)], fill=rgb, width=int(stroke_width))
 
     def draw_rectangle(self, shape):
         # clockwise list of corner points on the OUTSIDE of thick line
-        w = shape['strokeWidth'] if 'strokeWidth' in shape else 2
+        w = scale_to_export_dpi(shape.get('strokeWidth', 2))
         cx = shape['x'] + (shape['width']/2)
         cy = shape['y'] + (shape['height']/2)
         rotation = self.panel['rotation'] * -1
@@ -557,12 +564,12 @@ class ShapeToPilExport(object):
         centre = self.get_panel_coords(cx, cy)
         cx = centre['x']
         cy = centre['y']
-        scale_w = w * self.scale
+        scale_w = w
         rgb = ShapeToPdfExport.get_rgb(shape['strokeColor'])
 
         # To support rotation, draw rect on temp canvas, rotate and paste
-        width = int((shape['width'] + w) * self.scale)
-        height = int((shape['height'] + w) * self.scale)
+        width = int((shape['width'] * self.scale) + w)
+        height = int((shape['height'] * self.scale) + w)
         temp_rect = Image.new('RGBA', (width, height), (255, 255, 255, 0))
         rect_draw = ImageDraw.Draw(temp_rect)
 
@@ -581,7 +588,7 @@ class ShapeToPilExport(object):
 
     def draw_ellipse(self, shape):
 
-        w = int(shape['strokeWidth'] * self.scale)
+        w = int(scale_to_export_dpi(shape.get('strokeWidth', 2)))
         ctr = self.get_panel_coords(shape['x'], shape['y'])
         cx = ctr['x']
         cy = ctr['y']
@@ -625,7 +632,8 @@ class FigureExport(object):
         figure_json_string = script_params['Figure_JSON']
         # Since unicode can't be wrapped by rstring
         figure_json_string = figure_json_string.decode('utf8')
-        self.figure_json = json.loads(figure_json_string)
+        self.figure_json = self.version_transform_json(
+            json.loads(figure_json_string))
 
         n = datetime.now()
         # time-stamp name by default: Figure_2013-10-29_22-43-53.pdf
@@ -637,6 +645,38 @@ class FigureExport(object):
         # get Figure width & height...
         self.page_width = self.figure_json['paper_width']
         self.page_height = self.figure_json['paper_height']
+
+    def version_transform_json(self, figure_json):
+
+        v = figure_json.get('version')
+        if v < 3:
+            print "Transforming to VERSION 3"
+            for p in figure_json['panels']:
+                if p.get('export_dpi'):
+                    # rename 'export_dpi' attr to 'min_export_dpi'
+                    p['min_export_dpi'] = p.get('export_dpi')
+                    del p['export_dpi']
+                # update strokeWidth to page pixels/coords instead of
+                # image pixels. Scale according to size of panel and zoom
+                if p.get('shapes') and len(p['shapes']) > 0:
+                    image_pixels_width = self.get_crop_region(p)['width']
+                    page_coords_width = float(p.get('width'))
+                    stroke_width_scale = page_coords_width/image_pixels_width
+                    for shape in p['shapes']:
+                        stroke_width = shape.get('strokeWidth', 1)
+                        stroke_width = stroke_width * stroke_width_scale
+                        # Set stroke-width to 0.25, 0.5, 0.75, 1 or greater
+                        if stroke_width > 0.875:
+                            stroke_width = int(round(stroke_width))
+                        elif stroke_width > 0.625:
+                            stroke_width = 0.75
+                        elif stroke_width > 0.375:
+                            stroke_width = 0.5
+                        else:
+                            stroke_width = 0.25
+                        print 'strokewidth', shape['strokeWidth'], stroke_width
+                        shape['strokeWidth'] = stroke_width
+        return figure_json
 
     def get_zip_name(self):
 
@@ -1733,13 +1773,6 @@ class TiffExport(FigureExport):
                 '%s/pilfonts/B%0.2d.pil' % (self.GATEWAYPATH, 24))
         return font
 
-    def scale_coords(self, coord):
-        """
-        Origianl figure coordinates assume 72 dpi figure, but we want to
-        export at 300 dpi, so everything needs scaling accordingly
-        """
-        return (coord * 300)/72
-
     def get_figure_file_ext(self):
         return "tiff"
 
@@ -1748,8 +1781,8 @@ class TiffExport(FigureExport):
         Creates a new PIL image ready to receive panels, labels etc.
         This is created for each page in the figure.
         """
-        tiff_width = int(self.scale_coords(self.page_width))
-        tiff_height = int(self.scale_coords(self.page_height))
+        tiff_width = int(scale_to_export_dpi(self.page_width))
+        tiff_height = int(scale_to_export_dpi(self.page_height))
         rgb = (255, 255, 255)
         page_color = self.figure_json.get('page_color')
         if page_color is not None:
@@ -1772,10 +1805,10 @@ class TiffExport(FigureExport):
         x = x - page['x']
         y = y - page['y']
 
-        x = self.scale_coords(x)
-        y = self.scale_coords(y)
-        width = self.scale_coords(width)
-        height = self.scale_coords(height)
+        x = scale_to_export_dpi(x)
+        y = scale_to_export_dpi(y)
+        width = scale_to_export_dpi(width)
+        height = scale_to_export_dpi(height)
 
         x = int(round(x))
         y = int(round(y))
@@ -1807,11 +1840,11 @@ class TiffExport(FigureExport):
         """ Draw line on the current figure page """
         draw = ImageDraw.Draw(self.tiff_figure)
 
-        x = self.scale_coords(x)
-        y = self.scale_coords(y)
-        x2 = self.scale_coords(x2)
-        y2 = self.scale_coords(y2)
-        width = self.scale_coords(width)
+        x = scale_to_export_dpi(x)
+        y = scale_to_export_dpi(y)
+        x2 = scale_to_export_dpi(x2)
+        y2 = scale_to_export_dpi(y2)
+        width = scale_to_export_dpi(width)
 
         for l in range(width):
             draw.line([(x, y), (x2, y2)], fill=rgb)
@@ -1894,10 +1927,10 @@ class TiffExport(FigureExport):
 
     def draw_text(self, text, x, y, fontsize, rgb, align="center"):
         """ Add text to the current figure page """
-        x = self.scale_coords(x)
+        x = scale_to_export_dpi(x)
         y = y - 5       # seems to help, but would be nice to fix this!
-        y = self.scale_coords(y)
-        fontsize = self.scale_coords(fontsize)
+        y = scale_to_export_dpi(y)
+        fontsize = scale_to_export_dpi(fontsize)
 
         if markdown_imported:
             # convert markdown to html
