@@ -648,8 +648,8 @@ class FigureExport(object):
     def _fix_figure_json(self, figure_json):
         """Ensure that the figure JSON is proper.
         """
-        ## In some cases, dx and dy end up missing or set to null.
-        ## See issue #257 (missing) and #292 (null value).
+        # In some cases, dx and dy end up missing or set to null.
+        # See issue #257 (missing) and #292 (null value).
         for panel in figure_json['panels']:
             for key in ['dx', 'dy']:
                 offset = panel.get(key)
