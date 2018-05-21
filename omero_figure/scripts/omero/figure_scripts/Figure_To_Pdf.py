@@ -60,8 +60,6 @@ except ImportError:
     reportlab_installed = False
     logger.error("Reportlab not installed.")
 
-DEFAULT_OFFSET = 0
-
 ORIGINAL_DIR = "1_originals"
 RESAMPLED_DIR = "2_pre_resampled"
 FINAL_DIR = "3_final"
@@ -632,7 +630,7 @@ class FigureExport(object):
         # Since unicode can't be wrapped by rstring
         figure_json_string = figure_json_string.decode('utf8')
         self.figure_json = self.version_transform_json(
-            json.loads(figure_json_string))
+            self._fix_figure_json(json.loads(figure_json_string)))
 
         n = datetime.now()
         # time-stamp name by default: Figure_2013-10-29_22-43-53.pdf
@@ -644,6 +642,18 @@ class FigureExport(object):
         # get Figure width & height...
         self.page_width = self.figure_json['paper_width']
         self.page_height = self.figure_json['paper_height']
+
+    def _fix_figure_json(self, figure_json):
+        """Ensure that the figure JSON is proper.
+        """
+        ## In some cases, dx and dy end up missing or set to null.
+        ## See issue #257 (missing) and #292 (null value).
+        for key in ['dx', 'dy']:
+            offset = figure_json.get(key)
+            if offset is None or offset < 0:
+                figure_json[key] = 0
+
+        return figure_json
 
     def version_transform_json(self, figure_json):
 
@@ -884,8 +894,8 @@ class FigureExport(object):
         zoom = float(panel['zoom'])
         frame_w = panel['width']
         frame_h = panel['height']
-        dx = panel.get('dx', DEFAULT_OFFSET)
-        dy = panel.get('dy', DEFAULT_OFFSET)
+        dx = panel['dx']
+        dy = panel['dy']
         orig_w = panel['orig_width']
         orig_h = panel['orig_height']
 
@@ -1319,8 +1329,8 @@ class FigureExport(object):
         # Need to crop around centre before rotating...
         cx = size_x/2
         cy = size_y/2
-        dx = panel.get('dx', DEFAULT_OFFSET)
-        dy = panel.get('dy', DEFAULT_OFFSET)
+        dx = panel['dx']
+        dy = panel['dy']
 
         cx += dx
         cy += dy
