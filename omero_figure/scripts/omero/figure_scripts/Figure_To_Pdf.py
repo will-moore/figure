@@ -60,6 +60,8 @@ except ImportError:
     reportlab_installed = False
     logger.error("Reportlab not installed.")
 
+DEFAULT_OFFSET = 0
+
 ORIGINAL_DIR = "1_originals"
 RESAMPLED_DIR = "2_pre_resampled"
 FINAL_DIR = "3_final"
@@ -648,11 +650,11 @@ class FigureExport(object):
         """
         ## In some cases, dx and dy end up missing or set to null.
         ## See issue #257 (missing) and #292 (null value).
-        for key in ['dx', 'dy']:
-            offset = figure_json.get(key)
-            if offset is None or offset < 0:
-                figure_json[key] = 0
-
+        for panel in figure_json['panels']:
+            for key in ['dx', 'dy']:
+                offset = panel.get(key)
+                if offset is None:
+                    panel[key] = DEFAULT_OFFSET
         return figure_json
 
     def version_transform_json(self, figure_json):
