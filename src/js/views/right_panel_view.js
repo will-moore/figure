@@ -269,8 +269,9 @@
             }
             // All others, we take the <span> from the <a> and place it in the <button>
             if ($span.length === 0) $span = $a;  // in case we clicked on <span>
-            var $li = $span.parent().parent(),
-                $button = $li.parent().prev();
+            var $li = $span.parent().parent();
+            // Don't use $li.parent().prev() since bootstrap inserts a div.dropdown-backdrop on Windows
+            var $button = $("button.dropdown-toggle", $li.parent().parent());
             $span = $span.clone();
 
             if ($span.hasClass('colorpickerOption')) {
