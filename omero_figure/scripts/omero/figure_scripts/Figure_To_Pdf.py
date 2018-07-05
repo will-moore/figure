@@ -54,6 +54,7 @@ except ImportError:
 try:
     from reportlab.pdfgen import canvas
     from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.lib.colors import Color
     from reportlab.platypus import Paragraph
     from reportlab.lib.enums import TA_LEFT, TA_CENTER, TA_RIGHT
     reportlab_installed = True
@@ -153,6 +154,15 @@ class ShapeToPdfExport(object):
         blue = int(color[5:7], 16)
         return (red, green, blue)
 
+    @staticmethod
+    def get_rgba(color):
+        # Convert from E.g. '#ff0000ff' to (255, 0, 0, 1.0)
+        red = int(color[1:3], 16) / 255.0
+        green = int(color[3:5], 16) / 255.0
+        blue = int(color[5:7], 16) / 255.0
+        alpha = int(color[7:9] or 'ff', 16) / 255.0
+        return (red, green, blue, alpha)
+
     def panel_to_page_coords(self, shape_x, shape_y):
         """
         Convert coordinate from the image onto the PDF page.
@@ -200,49 +210,27 @@ class ShapeToPdfExport(object):
         shape_y = (shape_y * self.scale) + y
         return {'x': shape_x, 'y': shape_y, 'inPanel': in_panel}
 
+    @staticmethod
+    def apply_transform(transform, point):
+        return [
+            point[0] * transform['A00'] + point[1] * transform['A01'] + transform['A02'],
+            point[0] * transform['A10'] + point[1] * transform['A11'] + transform['A12'],
+        ] if transform else point
+
     def draw_rectangle(self, shape):
-        top_left = self.panel_to_page_coords(shape['x'], shape['y'])
-
-        # Don't draw if all corners are outside the panel
-        top_right = self.panel_to_page_coords(shape['x'] + shape['width'],
-                                              shape['y'])
-        bottom_left = self.panel_to_page_coords(shape['x'],
-                                                shape['y'] + shape['height'])
-        bottom_right = self.panel_to_page_coords(shape['x'] + shape['width'],
-                                                 shape['y'] + shape['height'])
-        if (top_left['inPanel'] is False) and (
-                top_right['inPanel'] is False) and (
-                bottom_left['inPanel'] is False) and (
-                bottom_right['inPanel'] is False):
-            return
-
-        width = shape['width'] * self.scale
-        height = shape['height'] * self.scale
-        x = top_left['x']
-        y = self.page_height - top_left['y']    # - height
-
-        rgb = self.get_rgb(shape['strokeColor'])
-        r = float(rgb[0])/255
-        g = float(rgb[1])/255
-        b = float(rgb[2])/255
-        self.canvas.setStrokeColorRGB(r, g, b)
-        stroke_width = shape.get('strokeWidth', 2)
-        self.canvas.setLineWidth(stroke_width)
-
-        rotation = self.panel['rotation'] * -1
-        if rotation != 0:
-            self.canvas.saveState()
-            self.canvas.translate(x, y)
-            self.canvas.rotate(rotation)
-            # top-left is now at 0, 0
-            x = 0
-            y = 0
-
-        self.canvas.rect(x, y, width, height * -1, stroke=1)
-
-        if rotation != 0:
-            # Restore coordinates, rotation etc.
-            self.canvas.restoreState()
+        # to support rotation/transforms, convert rectangle to a simple
+        # four point polygon and draw that instead
+        s = deepcopy(shape)
+        t = shape.get('transform')
+        points = [
+            (shape['x'], shape['y']),
+            (shape['x'] + shape['width'], shape['y']),
+            (shape['x'] + shape['width'], shape['y'] + shape['height']),
+            (shape['x'], shape['y'] + shape['height']),
+        ]
+        s['points'] = ' '.join(','.join(
+            map(str, self.apply_transform(t, point))) for point in points)
+        self.draw_polygon(s)
 
     def draw_line(self, shape):
         start = self.panel_to_page_coords(shape['x1'], shape['y1'])
@@ -342,12 +330,16 @@ class ShapeToPdfExport(object):
             return
 
         stroke_width = shape['strokeWidth']
-        rgb = self.get_rgb(shape['strokeColor'])
-        r = float(rgb[0])/255
-        g = float(rgb[1])/255
-        b = float(rgb[2])/255
-        self.canvas.setStrokeColorRGB(r, g, b)
+        r, g, b, a = self.get_rgba(shape['strokeColor'])
+        self.canvas.setStrokeColorRGB(r, g, b, alpha=a)
         self.canvas.setLineWidth(stroke_width)
+
+        if 'fillColor' in shape:
+            r, g, b, a = self.get_rgba(shape['fillColor'])
+            self.canvas.setFillColorRGB(r, g, b, alpha=a)
+            fill = 1 if closed else 0
+        else:
+            fill = 0
 
         p = self.canvas.beginPath()
         # Go to start...
@@ -360,7 +352,7 @@ class ShapeToPdfExport(object):
         if closed:
             for point in points[0:2]:
                 p.lineTo(point[0], point[1])
-        self.canvas.drawPath(p, fill=0, stroke=1)
+        self.canvas.drawPath(p, fill=fill, stroke=1)
 
     def draw_polyline(self, shape):
         self.draw_polygon(shape, False)
@@ -368,19 +360,25 @@ class ShapeToPdfExport(object):
     def draw_ellipse(self, shape):
         stroke_width = shape['strokeWidth']
         c = self.panel_to_page_coords(shape['x'], shape['y'])
+
+        # Don't draw if centre outside panel
+        if c['inPanel'] is False:
+            return
+
         cx = c['x']
         cy = self.page_height - c['y']
         rx = shape['radiusX'] * self.scale
         ry = shape['radiusY'] * self.scale
         rotation = (shape['rotation'] + self.panel['rotation']) * -1
-        rgb = self.get_rgb(shape['strokeColor'])
-        r = float(rgb[0])/255
-        g = float(rgb[1])/255
-        b = float(rgb[2])/255
-        self.canvas.setStrokeColorRGB(r, g, b)
-        # Don't draw if centre outside panel
-        if c['inPanel'] is False:
-            return
+        r, g, b, a = self.get_rgba(shape['strokeColor'])
+        self.canvas.setStrokeColorRGB(r, g, b, alpha=a)
+
+        if 'fillColor' in shape:
+            r, g, b, a = self.get_rgba(shape['fillColor'])
+            self.canvas.setFillColorRGB(r, g, b, alpha=a)
+            fill = 1
+        else:
+            fill = 0
 
         # For rotation, we reset our coordinates around cx, cy
         # so that rotation applies around cx, cy
@@ -399,7 +397,7 @@ class ShapeToPdfExport(object):
         p = self.canvas.beginPath()
         self.canvas.setLineWidth(stroke_width)
         p.ellipse(left, bottom, width, height)
-        self.canvas.drawPath(p, stroke=1)
+        self.canvas.drawPath(p, stroke=1, fill=fill)
 
         # Restore coordinates, rotation etc.
         self.canvas.restoreState()
