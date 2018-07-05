@@ -26,6 +26,7 @@ import os
 from os import path
 import zipfile
 from math import atan2, atan, sin, cos, sqrt, radians
+from copy import deepcopy
 
 from omero.model import ImageAnnotationLinkI, ImageI
 import omero.scripts as scripts
@@ -141,6 +142,8 @@ class ShapeToPdfExport(object):
                     self.draw_polygon(shape)
                 elif shape['type'] == "Polyline":
                     self.draw_polyline(shape)
+                elif shape['type'] == "Point":
+                    self.draw_point(shape)
 
     @staticmethod
     def get_rgb(color):
@@ -400,6 +403,12 @@ class ShapeToPdfExport(object):
 
         # Restore coordinates, rotation etc.
         self.canvas.restoreState()
+
+    def draw_point(self, shape):
+        s = deepcopy(shape)
+        s['radiusX'] = 5 / self.scale
+        s['radiusY'] = 5 / self.scale
+        self.draw_ellipse(s)
 
 
 class ShapeToPilExport(object):
