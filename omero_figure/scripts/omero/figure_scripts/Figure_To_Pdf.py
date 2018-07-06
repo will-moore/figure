@@ -143,35 +143,13 @@ class Bounds(object):
         return (self.minx + self.maxx) / 2.0, (self.miny + self.maxy) / 2.0
 
 
-class ShapeToPdfExport(object):
+class ShapeExport(object):
+    # base class for different export formats
 
-    def __init__(self, canvas, panel, page, crop, page_height):
-
-        self.canvas = canvas
+    def __init__(self, panel):
         self.panel = panel
-        self.page = page
-        # The crop region on the original image coordinates...
-        self.crop = crop
-        self.page_height = page_height
-        # Get a mapping from original coordinates to the actual size of panel
-        self.scale = float(panel['width']) / crop['width']
-
-        if "shapes" in panel:
-            for shape in panel["shapes"]:
-                if shape['type'] == "Arrow":
-                    self.draw_arrow(shape)
-                elif shape['type'] == "Line":
-                    self.draw_line(shape)
-                elif shape['type'] == "Rectangle":
-                    self.draw_rectangle(shape)
-                elif shape['type'] == "Ellipse":
-                    self.draw_ellipse(shape)
-                elif shape['type'] == "Polygon":
-                    self.draw_polygon(shape)
-                elif shape['type'] == "Polyline":
-                    self.draw_polyline(shape)
-                elif shape['type'] == "Point":
-                    self.draw_point(shape)
+        for s in panel.get("shapes", ()):
+            getattr(self, 'draw_%s' % s['type'].lower(), lambda s: None)(s)
 
     @staticmethod
     def get_rgb(color):
@@ -189,6 +167,50 @@ class ShapeToPdfExport(object):
         blue = int(color[5:7], 16) / 255.0
         alpha = int(color[7:9] or 'ff', 16) / 255.0
         return (red, green, blue, alpha)
+
+    @staticmethod
+    def apply_transform(tf, point):
+        return [
+            point[0] * tf['A00'] + point[1] * tf['A01'] + tf['A02'],
+            point[0] * tf['A10'] + point[1] * tf['A11'] + tf['A12'],
+        ] if tf else point
+
+    def draw_rectangle(self, shape):
+        # to support rotation/transforms, convert rectangle to a simple
+        # four point polygon and draw that instead
+        s = deepcopy(shape)
+        t = shape.get('transform')
+        points = [
+            (shape['x'], shape['y']),
+            (shape['x'] + shape['width'], shape['y']),
+            (shape['x'] + shape['width'], shape['y'] + shape['height']),
+            (shape['x'], shape['y'] + shape['height']),
+        ]
+        s['points'] = ' '.join(','.join(
+            map(str, self.apply_transform(t, point))) for point in points)
+        self.draw_polygon(s)
+
+    def draw_point(self, shape):
+        s = deepcopy(shape)
+        s['radiusX'] = s['radiusY'] = self.point_radius / self.scale
+        self.draw_ellipse(s)
+
+
+class ShapeToPdfExport(ShapeExport):
+
+    point_radius = 5
+
+    def __init__(self, canvas, panel, page, crop, page_height):
+
+        self.canvas = canvas
+        self.page = page
+        # The crop region on the original image coordinates...
+        self.crop = crop
+        self.page_height = page_height
+        # Get a mapping from original coordinates to the actual size of panel
+        self.scale = float(panel['width']) / crop['width']
+
+        super(ShapeToPdfExport, self).__init__(panel)
 
     def panel_to_page_coords(self, shape_x, shape_y):
         """
@@ -237,13 +259,6 @@ class ShapeToPdfExport(object):
         shape_y = (shape_y * self.scale) + y
         return {'x': shape_x, 'y': shape_y, 'inPanel': in_panel}
 
-    @staticmethod
-    def apply_transform(tf, point):
-        return [
-            point[0] * tf['A00'] + point[1] * tf['A01'] + tf['A02'],
-            point[0] * tf['A10'] + point[1] * tf['A11'] + tf['A12'],
-        ] if tf else point
-
     def draw_shape_label(self, shape, bounds):
         center = bounds.get_center()
         text = cgi.escape(shape['text'])
@@ -264,21 +279,6 @@ class ShapeToPdfExport(object):
         para = Paragraph(text, style)
         w, h = para.wrap(10000, 100)
         para.drawOn(self.canvas, center[0] - w / 2, center[1] - h / 2 + size / 4)
-
-    def draw_rectangle(self, shape):
-        # to support rotation/transforms, convert rectangle to a simple
-        # four point polygon and draw that instead
-        s = deepcopy(shape)
-        t = shape.get('transform')
-        points = [
-            (shape['x'], shape['y']),
-            (shape['x'] + shape['width'], shape['y']),
-            (shape['x'] + shape['width'], shape['y'] + shape['height']),
-            (shape['x'], shape['y'] + shape['height']),
-        ]
-        s['points'] = ' '.join(','.join(
-            map(str, self.apply_transform(t, point))) for point in points)
-        self.draw_polygon(s)
 
     def draw_line(self, shape):
         start = self.panel_to_page_coords(shape['x1'], shape['y1'])
@@ -460,18 +460,14 @@ class ShapeToPdfExport(object):
 
         self.draw_shape_label(shape, label_bounds)
 
-    def draw_point(self, shape):
-        s = deepcopy(shape)
-        s['radiusX'] = 5 / self.scale
-        s['radiusY'] = 5 / self.scale
-        self.draw_ellipse(s)
 
-
-class ShapeToPilExport(object):
+class ShapeToPilExport(ShapeExport):
     """
     Class for drawing panel shapes onto a PIL image.
     We get a PIL image, the panel dict, and crop coordinates
     """
+
+    point_radius = 25
 
     def __init__(self, pil_img, panel, crop):
 
@@ -482,20 +478,8 @@ class ShapeToPilExport(object):
         self.scale = pil_img.size[0] / crop['width']
         self.draw = ImageDraw.Draw(pil_img)
 
-        if "shapes" in panel:
-            for shape in panel["shapes"]:
-                if shape['type'] == "Arrow":
-                    self.draw_arrow(shape)
-                elif shape['type'] == "Line":
-                    self.draw_line(shape)
-                elif shape['type'] == "Rectangle":
-                    self.draw_rectangle(shape)
-                elif shape['type'] == "Ellipse":
-                    self.draw_ellipse(shape)
-                elif shape['type'] == "Polygon":
-                    self.draw_polygon(shape)
-                elif shape['type'] == "Polyline":
-                    self.draw_polyline(shape)
+        super(ShapeToPilExport, self).__init__(panel)
+
 
     def get_panel_coords(self, shape_x, shape_y):
         """
@@ -616,39 +600,6 @@ class ShapeToPilExport(object):
         rgb = ShapeToPdfExport.get_rgb(shape['strokeColor'])
 
         self.draw.line([(x1, y1), (x2, y2)], fill=rgb, width=int(stroke_width))
-
-    def draw_rectangle(self, shape):
-        # clockwise list of corner points on the OUTSIDE of thick line
-        w = scale_to_export_dpi(shape.get('strokeWidth', 2))
-        cx = shape['x'] + (shape['width']/2)
-        cy = shape['y'] + (shape['height']/2)
-        rotation = self.panel['rotation'] * -1
-
-        # Centre of rect rotation in PIL image
-        centre = self.get_panel_coords(cx, cy)
-        cx = centre['x']
-        cy = centre['y']
-        scale_w = w
-        rgb = ShapeToPdfExport.get_rgb(shape['strokeColor'])
-
-        # To support rotation, draw rect on temp canvas, rotate and paste
-        width = int((shape['width'] * self.scale) + w)
-        height = int((shape['height'] * self.scale) + w)
-        temp_rect = Image.new('RGBA', (width, height), (255, 255, 255, 0))
-        rect_draw = ImageDraw.Draw(temp_rect)
-
-        # Draw outer rectangle, then remove inner rect with full opacity
-        rect_draw.rectangle((0, 0, width, height), fill=rgb)
-        rgba = (255, 255, 255, 0)
-        rect_draw.rectangle((scale_w, scale_w, width-scale_w, height-scale_w),
-                            fill=rgba)
-        temp_rect = temp_rect.rotate(rotation, resample=Image.BICUBIC,
-                                     expand=True)
-        # Use rect as mask, so transparent part is not pasted
-        paste_x = cx - (temp_rect.size[0]/2)
-        paste_y = cy - (temp_rect.size[1]/2)
-        self.pil_img.paste(temp_rect, (int(paste_x), int(paste_y)),
-                           mask=temp_rect)
 
     def draw_ellipse(self, shape):
 
