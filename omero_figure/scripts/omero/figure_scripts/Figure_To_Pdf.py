@@ -20,6 +20,7 @@ import logging
 import json
 import unicodedata
 import numpy
+import cgi
 
 from datetime import datetime
 import os
@@ -114,6 +115,32 @@ def compress(target, base):
                 zip_file.write(fullpath, archive_name)
     finally:
         zip_file.close()
+
+
+class Bounds(object):
+
+    def __init__(self, *points):
+        self.minx = None
+        self.maxx = None
+        self.miny = None
+        self.maxy = None
+        for point in points:
+            self.add_point(*point)
+
+    def add_point(self, x, y):
+        if self.minx is None or x < self.minx:
+            self.minx = x
+        if self.maxx is None or x > self.maxx:
+            self.maxx = x
+        if self.miny is None or y < self.miny:
+            self.miny = y
+        if self.maxy is None or y > self.maxy:
+            self.maxy = y
+
+    def get_center(self):
+        if self.minx is None:
+            return None
+        return (self.minx + self.maxx) / 2.0, (self.miny + self.maxy) / 2.0
 
 
 class ShapeToPdfExport(object):
@@ -211,11 +238,32 @@ class ShapeToPdfExport(object):
         return {'x': shape_x, 'y': shape_y, 'inPanel': in_panel}
 
     @staticmethod
-    def apply_transform(transform, point):
+    def apply_transform(tf, point):
         return [
-            point[0] * transform['A00'] + point[1] * transform['A01'] + transform['A02'],
-            point[0] * transform['A10'] + point[1] * transform['A11'] + transform['A12'],
-        ] if transform else point
+            point[0] * tf['A00'] + point[1] * tf['A01'] + tf['A02'],
+            point[0] * tf['A10'] + point[1] * tf['A11'] + tf['A12'],
+        ] if tf else point
+
+    def draw_shape_label(self, shape, bounds):
+        center = bounds.get_center()
+        text = cgi.escape(shape['text'])
+        size = shape['fontSize'] * 2 / 3
+        if not text or not center:
+            return
+        r, g, b, a = self.get_rgba(shape['strokeColor'])
+        # bump up alpha a bit to make text more readable
+        rgba = (r, g, b, 0.5 + a / 2.0)
+        style = ParagraphStyle(
+            'label',
+            parent=getSampleStyleSheet()['Normal'],
+            alignment=TA_CENTER,
+            textColor=Color(*rgba),
+            fontSize=size,
+            leading=size,
+        )
+        para = Paragraph(text, style)
+        w, h = para.wrap(10000, 100)
+        para.drawOn(self.canvas, center[0] - w / 2, center[1] - h / 2 + size / 4)
 
     def draw_rectangle(self, shape):
         # to support rotation/transforms, convert rectangle to a simple
@@ -255,6 +303,8 @@ class ShapeToPdfExport(object):
         p.moveTo(x1, y1)
         p.lineTo(x2, y2)
         self.canvas.drawPath(p, fill=1, stroke=1)
+
+        self.draw_shape_label(shape, Bounds((x1, y1), (x2, y2)))
 
     def draw_arrow(self, shape):
         start = self.panel_to_page_coords(shape['x1'], shape['y1'])
@@ -313,6 +363,8 @@ class ShapeToPdfExport(object):
         p.lineTo(arrow_point1_x, arrow_point1_y)
         self.canvas.drawPath(p, fill=1, stroke=1)
 
+        self.draw_shape_label(shape, Bounds((x1, y1), (x2, y2)))
+
     def draw_polygon(self, shape, closed=True):
         polygon_in_viewport = False
         points = []
@@ -354,6 +406,8 @@ class ShapeToPdfExport(object):
                 p.lineTo(point[0], point[1])
         self.canvas.drawPath(p, fill=fill, stroke=1)
 
+        self.draw_shape_label(shape, Bounds(*points))
+
     def draw_polyline(self, shape):
         self.draw_polygon(shape, False)
 
@@ -380,6 +434,8 @@ class ShapeToPdfExport(object):
         else:
             fill = 0
 
+        label_bounds = Bounds((cx, cy))
+
         # For rotation, we reset our coordinates around cx, cy
         # so that rotation applies around cx, cy
         self.canvas.saveState()
@@ -401,6 +457,8 @@ class ShapeToPdfExport(object):
 
         # Restore coordinates, rotation etc.
         self.canvas.restoreState()
+
+        self.draw_shape_label(shape, label_bounds)
 
     def draw_point(self, shape):
         s = deepcopy(shape)
