@@ -169,6 +169,15 @@ class ShapeExport(object):
         return (red, green, blue, alpha)
 
     @staticmethod
+    def get_rgba_int(color):
+        # Convert from E.g. '#ff0000ff' to (255, 0, 0, 1.0)
+        red = int(color[1:3], 16)
+        green = int(color[3:5], 16)
+        blue = int(color[5:7], 16)
+        alpha = int(color[7:9] or 'ff', 16)
+        return (red, green, blue, alpha)
+
+    @staticmethod
     def apply_transform(tf, point):
         return [
             point[0] * tf['A00'] + point[1] * tf['A01'] + tf['A02'],
@@ -610,7 +619,6 @@ class ShapeToPilExport(ShapeExport):
         rx = self.scale * shape['radiusX']
         ry = self.scale * shape['radiusY']
         rotation = (shape['rotation'] + self.panel['rotation']) * -1
-        rgb = ShapeToPdfExport.get_rgb(shape['strokeColor'])
 
         width = int((rx * 2) + w)
         height = int((ry * 2) + w)
@@ -618,8 +626,9 @@ class ShapeToPilExport(ShapeExport):
                                  (255, 255, 255, 0))
         ellipse_draw = ImageDraw.Draw(temp_ellipse)
         # Draw outer ellipse, then remove inner ellipse with full opacity
-        ellipse_draw.ellipse((0, 0, width, height), fill=rgb)
-        rgba = (255, 255, 255, 0)
+        rgba = ShapeToPdfExport.get_rgba_int(shape['strokeColor'])
+        ellipse_draw.ellipse((0, 0, width, height), fill=rgba)
+        rgba = self.get_rgba_int(shape.get('fillColor', '#00000000'))
         ellipse_draw.ellipse((w, w, width - w, height - w), fill=rgba)
         temp_ellipse = temp_ellipse.rotate(rotation, resample=Image.BICUBIC,
                                            expand=True)
