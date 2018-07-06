@@ -26,7 +26,7 @@ from datetime import datetime
 import os
 from os import path
 import zipfile
-from math import atan2, atan, sin, cos, sqrt, radians
+from math import atan2, atan, sin, cos, sqrt, radians, floor, ceil
 from copy import deepcopy
 
 from omero.model import ImageAnnotationLinkI, ImageI
@@ -141,6 +141,27 @@ class Bounds(object):
         if self.minx is None:
             return None
         return (self.minx + self.maxx) / 2.0, (self.miny + self.maxy) / 2.0
+
+    def grow(self, pixels):
+        if self.minx is None:
+            return self
+        self.minx -= pixels
+        self.miny -= pixels
+        self.maxx += pixels
+        self.maxy += pixels
+        return self
+
+    def round(self):
+        self.minx = int(floor(self.minx))
+        self.miny = int(floor(self.miny))
+        self.maxx = int(ceil(self.maxx))
+        self.maxy = int(ceil(self.maxy))
+        return self
+
+    def get_size(self):
+        if self.minx is None:
+            return None
+        return (self.maxx - self.minx, self.maxy - self.miny)
 
 
 class ShapeExport(object):
@@ -581,9 +602,29 @@ class ShapeToPilExport(ShapeExport):
             points.append(points[0])
 
         stroke_width = scale_to_export_dpi(shape.get('strokeWidth', 2))
-        rgb = ShapeToPdfExport.get_rgb(shape['strokeColor'])
+
+        # if fill, draw filled polygon without outline, then add line later
+        # with correct stroke width
+        rgba = self.get_rgba_int(shape.get('fillColor', '#00000000'))
+
+        # need to draw on separate image and then paste on to get transparency
+        bounds = Bounds(*points).round()
+        offset = (bounds.minx, bounds.miny)
+        points = [
+            (point[0] - offset[0], point[1] - offset[1])
+            for point in points
+        ]
+        bounds.grow(ceil(stroke_width / 2.0)).round()
+        temp_image = Image.new('RGBA', bounds.get_size())
+        temp_draw = ImageDraw.Draw(temp_image)
+
+        # if fill color, draw polygon without outline first
+        if rgba[3]:
+            temp_draw.polygon(points, fill=rgba, outline=(0, 0, 0, 0))
+
         # Draw all the lines (NB: polygon doesn't handle line width)
-        self.draw.line(points, fill=rgb, width=int(round(stroke_width)))
+        rgba = self.get_rgba_int(shape['strokeColor'])
+        temp_draw.line(points, fill=rgba, width=int(round(stroke_width)))
         # Draw ellipse at each corner
         # see https://stackoverflow.com/questions/33187698/
         r = (stroke_width/2) * 0.9    # seems to look OK with this size
@@ -592,8 +633,11 @@ class ShapeToPilExport(ShapeExport):
         else:
             corners = points[1: -1]
         for point in corners:
-            self.draw.ellipse((point[0] - r, point[1] - r,
-                               point[0] + r, point[1] + r), fill=rgb)
+            temp_draw.ellipse((point[0] - r, point[1] - r,
+                               point[0] + r, point[1] + r), fill=rgba)
+
+        self.pil_img.paste(temp_image, (bounds.minx, bounds.miny), mask=temp_image)
+
 
     def draw_polyline(self, shape):
         self.draw_polygon(shape, False)
