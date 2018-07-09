@@ -650,9 +650,8 @@ class ShapeToPilExport(ShapeExport):
         x2 = end['x']
         y2 = end['y']
         stroke_width = scale_to_export_dpi(shape.get('strokeWidth', 2))
-        rgb = ShapeToPdfExport.get_rgb(shape['strokeColor'])
-
-        self.draw.line([(x1, y1), (x2, y2)], fill=rgb, width=int(stroke_width))
+        rgba = ShapeToPdfExport.get_rgba_int(shape['strokeColor'])
+        self.draw.line([(x1, y1), (x2, y2)], fill=rgba, width=int(stroke_width))
 
     def draw_ellipse(self, shape):
 
