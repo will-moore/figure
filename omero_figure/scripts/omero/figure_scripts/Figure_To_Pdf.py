@@ -181,22 +181,18 @@ class ShapeExport(object):
         return (red, green, blue)
 
     @staticmethod
-    def get_rgba(color):
-        # Convert from E.g. '#ff0000ff' to (255, 0, 0, 1.0)
-        red = int(color[1:3], 16) / 255.0
-        green = int(color[3:5], 16) / 255.0
-        blue = int(color[5:7], 16) / 255.0
-        alpha = int(color[7:9] or 'ff', 16) / 255.0
-        return (red, green, blue, alpha)
-
-    @staticmethod
     def get_rgba_int(color):
-        # Convert from E.g. '#ff0000ff' to (255, 0, 0, 1.0)
+        # Convert from E.g. '#ff0000ff' to (255, 0, 0, 255)
         red = int(color[1:3], 16)
         green = int(color[3:5], 16)
         blue = int(color[5:7], 16)
         alpha = int(color[7:9] or 'ff', 16)
         return (red, green, blue, alpha)
+
+    @staticmethod
+    def get_rgba(color):
+        # Convert from E.g. '#ff0000ff' to (1.0, 0, 0, 1.0)
+        return tuple(map(lambda i: i / 255.0, ShapeExport.get_rgba_int(color)))
 
     @staticmethod
     def apply_transform(tf, point):
@@ -545,6 +541,27 @@ class ShapeToPilExport(ShapeExport):
 
         return {'x': shape_x, 'y': shape_y}
 
+    def draw_shape_label(self, shape, bounds):
+        center = bounds.get_center()
+        text = shape['text']
+        size = int(shape['fontSize'] * 2.5)
+        if not text or not center:
+            return
+        r, g, b, a = self.get_rgba_int(shape['strokeColor'])
+        # bump up alpha a bit to make text more readable
+        rgba = (r, g, b, 128 + a / 2)
+        font_name = "FreeSans.ttf"
+        from omero.gateway import THISPATH
+        path_to_font = os.path.join(THISPATH, "pilfonts", font_name)
+        try:
+            font = ImageFont.truetype(path_to_font, size)
+        except Exception:
+            font = ImageFont.load(
+                '%s/pilfonts/B%0.2d.pil' % (self.GATEWAYPATH, size))
+        textsize = font.getsize(text)
+        xy = (center[0] - textsize[0] / 2.0, center[1] - textsize[1] / 2.0)
+        self.draw.text(xy, text, fill=rgba, font=font)
+
     def draw_arrow(self, shape):
 
         start = self.get_panel_coords(shape['x1'], shape['y1'])
@@ -587,6 +604,7 @@ class ShapeToPilExport(ShapeExport):
                        fill=rgb, width=int(stroke_width))
         # Draw Arrow head, up to tip at x2, y2
         self.draw.polygon(points, fill=rgb, outline=rgb)
+        self.draw_shape_label(shape, Bounds((x1, y1), (x2, y2)))
 
     def draw_polygon(self, shape, closed=True):
         points = []
@@ -637,7 +655,7 @@ class ShapeToPilExport(ShapeExport):
                                point[0] + r, point[1] + r), fill=rgba)
 
         self.pil_img.paste(temp_image, (bounds.minx, bounds.miny), mask=temp_image)
-
+        self.draw_shape_label(shape, bounds)
 
     def draw_polyline(self, shape):
         self.draw_polygon(shape, False)
@@ -652,6 +670,7 @@ class ShapeToPilExport(ShapeExport):
         stroke_width = scale_to_export_dpi(shape.get('strokeWidth', 2))
         rgba = ShapeToPdfExport.get_rgba_int(shape['strokeColor'])
         self.draw.line([(x1, y1), (x2, y2)], fill=rgba, width=int(stroke_width))
+        self.draw_shape_label(shape, Bounds((x1, y1), (x2, y2)))
 
     def draw_ellipse(self, shape):
 
@@ -680,6 +699,7 @@ class ShapeToPilExport(ShapeExport):
         paste_y = cy - (temp_ellipse.size[1]/2)
         self.pil_img.paste(temp_ellipse, (int(paste_x), int(paste_y)),
                            mask=temp_ellipse)
+        self.draw_shape_label(shape, Bounds((cx, cy)))
 
 
 class FigureExport(object):
