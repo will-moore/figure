@@ -1851,6 +1851,8 @@ class FigureExport(object):
         pil_img.save(img_name)
         # Since coordinate system is 'bottom-up', convert from 'top-down'
         y = self.page_height - height - y
+        # set fill color alpha to fully opaque, since this impacts drawImage
+        self.figure_canvas.setFillColorRGB(0, 0, 0, alpha=1)
         self.figure_canvas.drawImage(img_name, x, y, width, height)
 
 
