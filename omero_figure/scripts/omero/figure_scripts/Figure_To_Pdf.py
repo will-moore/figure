@@ -287,7 +287,7 @@ class ShapeToPdfExport(ShapeExport):
 
     def draw_shape_label(self, shape, bounds):
         center = bounds.get_center()
-        text = cgi.escape(shape['text'])
+        text = cgi.escape(shape.get('text'))
         size = shape['fontSize'] * 2 / 3
         if not text or not center:
             return
@@ -543,7 +543,7 @@ class ShapeToPilExport(ShapeExport):
 
     def draw_shape_label(self, shape, bounds):
         center = bounds.get_center()
-        text = shape['text']
+        text = shape.get('text')
         size = int(shape['fontSize'] * 2.5)
         if not text or not center:
             return
