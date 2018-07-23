@@ -287,10 +287,10 @@ class ShapeToPdfExport(ShapeExport):
 
     def draw_shape_label(self, shape, bounds):
         center = bounds.get_center()
-        text = cgi.escape(shape.get('text'))
-        size = shape['fontSize'] * 2 / 3
+        text = cgi.escape(shape.get('text', ''))
         if not text or not center:
             return
+        size = shape.get('fontSize', 12) * 2 / 3
         r, g, b, a = self.get_rgba(shape['strokeColor'])
         # bump up alpha a bit to make text more readable
         rgba = (r, g, b, 0.5 + a / 2.0)
@@ -544,7 +544,7 @@ class ShapeToPilExport(ShapeExport):
     def draw_shape_label(self, shape, bounds):
         center = bounds.get_center()
         text = shape.get('text')
-        size = int(shape['fontSize'] * 2.5)
+        size = int(shape.get('fontSize', 12) * 2.5)
         if not text or not center:
             return
         r, g, b, a = self.get_rgba_int(shape['strokeColor'])
