@@ -304,7 +304,8 @@ class ShapeToPdfExport(ShapeExport):
         )
         para = Paragraph(text, style)
         w, h = para.wrap(10000, 100)
-        para.drawOn(self.canvas, center[0] - w / 2, center[1] - h / 2 + size / 4)
+        para.drawOn(
+            self.canvas, center[0] - w / 2, center[1] - h / 2 + size / 4)
 
     def draw_line(self, shape):
         start = self.panel_to_page_coords(shape['x1'], shape['y1'])
@@ -506,7 +507,6 @@ class ShapeToPilExport(ShapeExport):
 
         super(ShapeToPilExport, self).__init__(panel)
 
-
     def get_panel_coords(self, shape_x, shape_y):
         """
         Convert coordinate from the image onto the panel.
@@ -654,7 +654,8 @@ class ShapeToPilExport(ShapeExport):
             temp_draw.ellipse((point[0] - r, point[1] - r,
                                point[0] + r, point[1] + r), fill=rgba)
 
-        self.pil_img.paste(temp_image, (bounds.minx, bounds.miny), mask=temp_image)
+        self.pil_img.paste(
+            temp_image, (bounds.minx, bounds.miny), mask=temp_image)
         self.draw_shape_label(shape, bounds)
 
     def draw_polyline(self, shape):
@@ -669,7 +670,8 @@ class ShapeToPilExport(ShapeExport):
         y2 = end['y']
         stroke_width = scale_to_export_dpi(shape.get('strokeWidth', 2))
         rgba = ShapeToPdfExport.get_rgba_int(shape['strokeColor'])
-        self.draw.line([(x1, y1), (x2, y2)], fill=rgba, width=int(stroke_width))
+        self.draw.line(
+            [(x1, y1), (x2, y2)], fill=rgba, width=int(stroke_width))
         self.draw_shape_label(shape, Bounds((x1, y1), (x2, y2)))
 
     def draw_ellipse(self, shape):
