@@ -1787,6 +1787,9 @@ class FigureExport(object):
             alignment = TA_CENTER
             x = x - (para_width/2)
 
+        # set fully opaque background color to avoid transparent text
+        c.setFillColorRGB(0, 0, 0, 1)
+
         style_n = getSampleStyleSheet()['Normal']
         style = ParagraphStyle(
             'label',
@@ -1814,7 +1817,7 @@ class FigureExport(object):
         y2 = self.page_height - y2
         c = self.figure_canvas
         c.setLineWidth(width)
-        c.setStrokeColorRGB(red, green, blue)
+        c.setStrokeColorRGB(red, green, blue, 1)
         c.line(x, y, x2, y2,)
 
     def paste_image(self, pil_img, img_name, panel, page, dpi):
