@@ -993,6 +993,45 @@
             this.$vp_frame.append(html);
             // update this to include new images
             this.$vp_img = $(".vp_img", this.$el);
+
+            this.render_z_t_labels();
+        },
+
+        render_z_t_labels: function() {
+            // Rendering Z/T labels without rendering whole component
+            // means we don't re-build z/t sliders (they don't lose focus)
+            var sizeZ = this.models.getIfEqual('sizeZ');
+            var sizeT = this.models.getIfEqual('sizeT');
+            var theT = this.models.getAverage('theT');
+            var theZ = this.models.getAverage('theZ');
+            var z_projection = this.models.allTrue('z_projection');
+            var deltaT = this.models.getDeltaTIfEqual();
+
+            var z_label = theZ + 1;
+            if (z_projection) {
+                var z_start = Math.round(this.models.getAverage('z_start'));
+                var z_end = Math.round(this.models.getAverage('z_end'));
+                z_label = (z_start + 1) + "-" + (z_end + 1);
+            } else if (!this.models.allEqual('theZ')) {
+                z_label = "-";
+            }
+            $("#vp_z_slider").slider({'value': theZ + 1});
+            $("#vp_z_value").text(z_label + "/" + (sizeZ || '-'));
+
+            var t_label = theT + 1;
+            var dt_label;
+            if (!this.models.allEqual('theT')) {
+                t_label = "-";
+            }
+            $("#vp_t_slider").slider({'value': theT + 1});
+            $("#vp_t_value").text(t_label + "/" + (sizeT || '-'));
+
+            if ((deltaT === 0 || deltaT) && sizeT > 1) {
+                dt_label = this.formatTime(deltaT);
+            } else {
+                dt_label = "";
+            }
+            $("#vp_deltaT").text(dt_label);
         },
 
         render: function() {
@@ -1017,8 +1056,6 @@
                 sizeT = this.models.getIfEqual('sizeT'),
                 deltaT = this.models.getDeltaTIfEqual(),
                 z_projection = this.models.allTrue('z_projection');
-            
-            this.theT_avg = theT;
 
             if (wh <= 1) {
                 var frame_h = this.full_size;
@@ -1090,7 +1127,7 @@
             if (T_slider_max === 1) {
                 T_disabled = true;
             }
-            self.theT_avg = Math.min(self.theT_avg, T_slider_max);
+            var t_slider_value = Math.min(theT, T_slider_max);
             // in case it's already been initialised:
             try {
                 $("#vp_t_slider").slider("destroy");
@@ -1100,7 +1137,7 @@
                 max: T_slider_max,
                 disabled: T_disabled,
                 min: 1,             // model is 0-based, UI is 1-based
-                value: self.theT_avg + 1,
+                value: t_slider_value + 1,
                 slide: function(event, ui) {
                     var theT = ui.value;
                     $("#vp_t_value").text(theT + "/" + (sizeT || '-'));
@@ -1125,26 +1162,12 @@
             json.imgs_css = imgs_css;
             json.frame_w = frame_w;
             json.frame_h = frame_h;
-            json.sizeZ = sizeZ || "-";
-            json.theZ = theZ+1;
-            json.sizeT = sizeT || "-";
-            json.theT = theT+1;
-            json.deltaT = deltaT;
-            if (z_projection) {
-                json.theZ = (z_start + 1) + "-" + (z_end + 1);
-            } else if (!this.models.allEqual('theZ')) {
-                json.theZ = "-";
-            }
-            if (!this.models.allEqual('theT')) {
-                json.theT = "-";
-            }
-            if (!deltaT || sizeT == 1) {
-                json.deltaT = "";
-            } else {
-                json.deltaT = this.formatTime(deltaT);
-            }
+
+            // We render without z/t labels...
             var html = this.template(json);
             this.$el.html(html);
+            // ...then update them dynamically 
+            this.render_z_t_labels();
 
             this.$vp_frame = $(".vp_frame", this.$el);  // cache for later
             this.$vp_img = $(".vp_img", this.$el);

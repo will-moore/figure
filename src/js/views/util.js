@@ -135,6 +135,18 @@ OME.setOpenWithUrlProvider = function(id, fn) {
 };
 
 
+// Extend the jQuery UI $.slider() function to silence
+// keyboard events on the handle, so we don't nudge selected panels
+$.prototype.slider_old = $.prototype.slider;
+$.prototype.slider = function() {
+    var result = $.prototype.slider_old.apply(this, arguments);
+    this.find(".ui-slider-handle").bind("keydown", function(){
+        return false;
+    });
+    return result;
+}
+
+
 $(function(){
 
 
