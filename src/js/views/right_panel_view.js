@@ -1026,7 +1026,6 @@
             $("#vp_t_slider").slider({'value': theT + 1});
             $("#vp_t_value").text(t_label + "/" + (sizeT || '-'));
 
-            console.log('deltaT', deltaT);
             if ((deltaT === 0 || deltaT) && sizeT > 1) {
                 dt_label = this.formatTime(deltaT);
             } else {
