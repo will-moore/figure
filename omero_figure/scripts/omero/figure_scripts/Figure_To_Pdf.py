@@ -1284,7 +1284,6 @@ class FigureExport(object):
             w, h = pil_img.size
             # How much smaller is the scaled image compared to viewport?
             # This will be the same 'scale' used in render_big_image_region()
-            # scale = float(w) / viewport_region['width']
             scale = panel['zoom_level_scale']
             # The size we want to crop to
             crop_target_w = scale * vp_w
