@@ -637,7 +637,7 @@ class ShapeToPilExport(ShapeExport):
         temp_draw = ImageDraw.Draw(temp_image)
 
         # if fill color, draw polygon without outline first
-        if rgba[3]:
+        if closed and rgba[3]:
             temp_draw.polygon(points, fill=rgba, outline=(0, 0, 0, 0))
 
         # Draw all the lines (NB: polygon doesn't handle line width)
