@@ -10,8 +10,16 @@
         <td>
             <span class="glyphicon <% if (shape.icon) { %><%= shape.icon %><% } %>"></span>
         </td>
-        <td><%= shape.theZ + 1 %> </td>
-        <td><%= shape.theT + 1 %> </td>
+        <td>
+            <% if (shape.theZ !== undefined) { %>
+                <%= shape.theZ + 1 %>
+            <% } %>
+        </td>
+        <td>
+            <% if (shape.theT !== undefined) { %>
+                <%= shape.theT + 1 %>
+            <% } %>
+        </td>
         <td>
             <% if (shape.icon) { %>
             <button type="button" class="addOmeroShape btn btn-success btn-sm"
