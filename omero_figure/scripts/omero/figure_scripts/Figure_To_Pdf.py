@@ -620,6 +620,7 @@ class ShapeToPilExport(ShapeExport):
             points.append(points[0])
 
         stroke_width = scale_to_export_dpi(shape.get('strokeWidth', 2))
+        buffer = int(ceil(stroke_width))
 
         # if fill, draw filled polygon without outline, then add line later
         # with correct stroke width
@@ -629,10 +630,10 @@ class ShapeToPilExport(ShapeExport):
         bounds = Bounds(*points).round()
         offset = (bounds.minx, bounds.miny)
         points = [
-            (point[0] - offset[0], point[1] - offset[1])
+            (point[0] - offset[0] + buffer, point[1] - offset[1] + buffer)
             for point in points
         ]
-        bounds.grow(ceil(stroke_width / 2.0)).round()
+        bounds.grow(buffer)
         temp_image = Image.new('RGBA', bounds.get_size())
         temp_draw = ImageDraw.Draw(temp_image)
 
