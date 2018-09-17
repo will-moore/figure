@@ -606,6 +606,66 @@ class ShapeToPilExport(ShapeExport):
         self.draw.polygon(points, fill=rgb, outline=rgb)
         self.draw_shape_label(shape, Bounds((x1, y1), (x2, y2)))
 
+    # Override to not just call draw_polygon, because we want square corners
+    # for rectangles and not the rounded corners draw_polygon creates
+    def draw_rectangle(self, shape):
+        points = [
+            (shape['x'], shape['y']),
+            (shape['x'] + shape['width'], shape['y']),
+            (shape['x'] + shape['width'], shape['y'] + shape['height']),
+            (shape['x'], shape['y'] + shape['height']),
+        ]
+        p = []
+        for point in points:
+            coords = self.get_panel_coords(*point)
+            p.append((coords['x'], coords['y']))
+        p.append(p[0])
+        points = p
+
+        stroke_width = scale_to_export_dpi(shape.get('strokeWidth', 2))
+        buffer = int(ceil(stroke_width) * 1.5)
+
+        # if fill, draw filled polygon without outline, then add line later
+        # with correct stroke width
+        rgba = self.get_rgba_int(shape.get('fillColor', '#00000000'))
+
+        # need to draw on separate image and then paste on to get transparency
+        bounds = Bounds(*points).round()
+        offset = (bounds.minx, bounds.miny)
+        points = [
+            (point[0] - offset[0] + buffer, point[1] - offset[1] + buffer)
+            for point in points
+        ]
+        bounds.grow(buffer)
+        temp_image = Image.new('RGBA', bounds.get_size())
+        temp_draw = ImageDraw.Draw(temp_image)
+
+        # if fill color, draw polygon without outline first
+        if rgba[3]:
+            temp_draw.polygon(points, fill=rgba, outline=(0, 0, 0, 0))
+
+        def extend_line(p0, p1, pixels):
+            dx = p1[0] - p0[0]
+            dy = p1[1] - p0[1]
+            d = sqrt(dx * dx + dy * dy)
+            return (
+                p0,
+                (p1[0] + dx * pixels / d, p1[1] + dy * pixels / d)
+            )
+
+        # Draw all the lines (NB: polygon doesn't handle line width)
+        rgba = self.get_rgba_int(shape['strokeColor'])
+        width = int(round(stroke_width))
+        for i in range(4):
+            # extend each line a little bit to fill in the corners
+            line = extend_line(points[i], points[i + 1], width / 2)
+            temp_draw.line(line, fill=rgba, width=width)
+
+        self.pil_img.paste(
+            temp_image, (bounds.minx, bounds.miny), mask=temp_image)
+        self.draw_shape_label(shape, bounds)
+
+
     def draw_polygon(self, shape, closed=True):
         points = []
         for point in shape['points'].split(" "):
