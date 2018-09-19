@@ -665,7 +665,6 @@ class ShapeToPilExport(ShapeExport):
             temp_image, (bounds.minx, bounds.miny), mask=temp_image)
         self.draw_shape_label(shape, bounds)
 
-
     def draw_polygon(self, shape, closed=True):
         points = []
         for point in shape['points'].split(" "):
