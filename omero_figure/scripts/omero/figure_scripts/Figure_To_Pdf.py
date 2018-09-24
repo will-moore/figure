@@ -20,12 +20,14 @@ import logging
 import json
 import unicodedata
 import numpy
+import cgi
 
 from datetime import datetime
 import os
 from os import path
 import zipfile
-from math import atan2, atan, sin, cos, sqrt, radians
+from math import atan2, atan, sin, cos, sqrt, radians, floor, ceil
+from copy import deepcopy
 
 from omero.model import ImageAnnotationLinkI, ImageI
 import omero.scripts as scripts
@@ -53,6 +55,7 @@ except ImportError:
 try:
     from reportlab.pdfgen import canvas
     from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.lib.colors import Color
     from reportlab.platypus import Paragraph
     from reportlab.lib.enums import TA_LEFT, TA_CENTER, TA_RIGHT
     reportlab_installed = True
@@ -114,33 +117,60 @@ def compress(target, base):
         zip_file.close()
 
 
-class ShapeToPdfExport(object):
+class Bounds(object):
 
-    def __init__(self, canvas, panel, page, crop, page_height):
+    def __init__(self, *points):
+        self.minx = None
+        self.maxx = None
+        self.miny = None
+        self.maxy = None
+        for point in points:
+            self.add_point(*point)
 
-        self.canvas = canvas
+    def add_point(self, x, y):
+        if self.minx is None or x < self.minx:
+            self.minx = x
+        if self.maxx is None or x > self.maxx:
+            self.maxx = x
+        if self.miny is None or y < self.miny:
+            self.miny = y
+        if self.maxy is None or y > self.maxy:
+            self.maxy = y
+
+    def get_center(self):
+        if self.minx is None:
+            return None
+        return (self.minx + self.maxx) / 2.0, (self.miny + self.maxy) / 2.0
+
+    def grow(self, pixels):
+        if self.minx is None:
+            return self
+        self.minx -= pixels
+        self.miny -= pixels
+        self.maxx += pixels
+        self.maxy += pixels
+        return self
+
+    def round(self):
+        self.minx = int(floor(self.minx))
+        self.miny = int(floor(self.miny))
+        self.maxx = int(ceil(self.maxx))
+        self.maxy = int(ceil(self.maxy))
+        return self
+
+    def get_size(self):
+        if self.minx is None:
+            return None
+        return (self.maxx - self.minx, self.maxy - self.miny)
+
+
+class ShapeExport(object):
+    # base class for different export formats
+
+    def __init__(self, panel):
         self.panel = panel
-        self.page = page
-        # The crop region on the original image coordinates...
-        self.crop = crop
-        self.page_height = page_height
-        # Get a mapping from original coordinates to the actual size of panel
-        self.scale = float(panel['width']) / crop['width']
-
-        if "shapes" in panel:
-            for shape in panel["shapes"]:
-                if shape['type'] == "Arrow":
-                    self.draw_arrow(shape)
-                elif shape['type'] == "Line":
-                    self.draw_line(shape)
-                elif shape['type'] == "Rectangle":
-                    self.draw_rectangle(shape)
-                elif shape['type'] == "Ellipse":
-                    self.draw_ellipse(shape)
-                elif shape['type'] == "Polygon":
-                    self.draw_polygon(shape)
-                elif shape['type'] == "Polyline":
-                    self.draw_polyline(shape)
+        for s in panel.get("shapes", ()):
+            getattr(self, 'draw_%s' % s['type'].lower(), lambda s: None)(s)
 
     @staticmethod
     def get_rgb(color):
@@ -149,6 +179,64 @@ class ShapeToPdfExport(object):
         green = int(color[3:5], 16)
         blue = int(color[5:7], 16)
         return (red, green, blue)
+
+    @staticmethod
+    def get_rgba_int(color):
+        # Convert from E.g. '#ff0000ff' to (255, 0, 0, 255)
+        red = int(color[1:3], 16)
+        green = int(color[3:5], 16)
+        blue = int(color[5:7], 16)
+        alpha = int(color[7:9] or 'ff', 16)
+        return (red, green, blue, alpha)
+
+    @staticmethod
+    def get_rgba(color):
+        # Convert from E.g. '#ff0000ff' to (1.0, 0, 0, 1.0)
+        return tuple(map(lambda i: i / 255.0, ShapeExport.get_rgba_int(color)))
+
+    @staticmethod
+    def apply_transform(tf, point):
+        return [
+            point[0] * tf['A00'] + point[1] * tf['A01'] + tf['A02'],
+            point[0] * tf['A10'] + point[1] * tf['A11'] + tf['A12'],
+        ] if tf else point
+
+    def draw_rectangle(self, shape):
+        # to support rotation/transforms, convert rectangle to a simple
+        # four point polygon and draw that instead
+        s = deepcopy(shape)
+        t = shape.get('transform')
+        points = [
+            (shape['x'], shape['y']),
+            (shape['x'] + shape['width'], shape['y']),
+            (shape['x'] + shape['width'], shape['y'] + shape['height']),
+            (shape['x'], shape['y'] + shape['height']),
+        ]
+        s['points'] = ' '.join(','.join(
+            map(str, self.apply_transform(t, point))) for point in points)
+        self.draw_polygon(s)
+
+    def draw_point(self, shape):
+        s = deepcopy(shape)
+        s['radiusX'] = s['radiusY'] = self.point_radius / self.scale
+        self.draw_ellipse(s)
+
+
+class ShapeToPdfExport(ShapeExport):
+
+    point_radius = 5
+
+    def __init__(self, canvas, panel, page, crop, page_height):
+
+        self.canvas = canvas
+        self.page = page
+        # The crop region on the original image coordinates...
+        self.crop = crop
+        self.page_height = page_height
+        # Get a mapping from original coordinates to the actual size of panel
+        self.scale = float(panel['width']) / crop['width']
+
+        super(ShapeToPdfExport, self).__init__(panel)
 
     def panel_to_page_coords(self, shape_x, shape_y):
         """
@@ -197,49 +285,27 @@ class ShapeToPdfExport(object):
         shape_y = (shape_y * self.scale) + y
         return {'x': shape_x, 'y': shape_y, 'inPanel': in_panel}
 
-    def draw_rectangle(self, shape):
-        top_left = self.panel_to_page_coords(shape['x'], shape['y'])
-
-        # Don't draw if all corners are outside the panel
-        top_right = self.panel_to_page_coords(shape['x'] + shape['width'],
-                                              shape['y'])
-        bottom_left = self.panel_to_page_coords(shape['x'],
-                                                shape['y'] + shape['height'])
-        bottom_right = self.panel_to_page_coords(shape['x'] + shape['width'],
-                                                 shape['y'] + shape['height'])
-        if (top_left['inPanel'] is False) and (
-                top_right['inPanel'] is False) and (
-                bottom_left['inPanel'] is False) and (
-                bottom_right['inPanel'] is False):
+    def draw_shape_label(self, shape, bounds):
+        center = bounds.get_center()
+        text = cgi.escape(shape.get('text', ''))
+        if not text or not center:
             return
-
-        width = shape['width'] * self.scale
-        height = shape['height'] * self.scale
-        x = top_left['x']
-        y = self.page_height - top_left['y']    # - height
-
-        rgb = self.get_rgb(shape['strokeColor'])
-        r = float(rgb[0])/255
-        g = float(rgb[1])/255
-        b = float(rgb[2])/255
-        self.canvas.setStrokeColorRGB(r, g, b)
-        stroke_width = shape.get('strokeWidth', 2)
-        self.canvas.setLineWidth(stroke_width)
-
-        rotation = self.panel['rotation'] * -1
-        if rotation != 0:
-            self.canvas.saveState()
-            self.canvas.translate(x, y)
-            self.canvas.rotate(rotation)
-            # top-left is now at 0, 0
-            x = 0
-            y = 0
-
-        self.canvas.rect(x, y, width, height * -1, stroke=1)
-
-        if rotation != 0:
-            # Restore coordinates, rotation etc.
-            self.canvas.restoreState()
+        size = shape.get('fontSize', 12) * 2 / 3
+        r, g, b, a = self.get_rgba(shape['strokeColor'])
+        # bump up alpha a bit to make text more readable
+        rgba = (r, g, b, 0.5 + a / 2.0)
+        style = ParagraphStyle(
+            'label',
+            parent=getSampleStyleSheet()['Normal'],
+            alignment=TA_CENTER,
+            textColor=Color(*rgba),
+            fontSize=size,
+            leading=size,
+        )
+        para = Paragraph(text, style)
+        w, h = para.wrap(10000, 100)
+        para.drawOn(
+            self.canvas, center[0] - w / 2, center[1] - h / 2 + size / 4)
 
     def draw_line(self, shape):
         start = self.panel_to_page_coords(shape['x1'], shape['y1'])
@@ -264,6 +330,8 @@ class ShapeToPdfExport(object):
         p.moveTo(x1, y1)
         p.lineTo(x2, y2)
         self.canvas.drawPath(p, fill=1, stroke=1)
+
+        self.draw_shape_label(shape, Bounds((x1, y1), (x2, y2)))
 
     def draw_arrow(self, shape):
         start = self.panel_to_page_coords(shape['x1'], shape['y1'])
@@ -322,6 +390,8 @@ class ShapeToPdfExport(object):
         p.lineTo(arrow_point1_x, arrow_point1_y)
         self.canvas.drawPath(p, fill=1, stroke=1)
 
+        self.draw_shape_label(shape, Bounds((x1, y1), (x2, y2)))
+
     def draw_polygon(self, shape, closed=True):
         polygon_in_viewport = False
         points = []
@@ -339,12 +409,16 @@ class ShapeToPdfExport(object):
             return
 
         stroke_width = shape['strokeWidth']
-        rgb = self.get_rgb(shape['strokeColor'])
-        r = float(rgb[0])/255
-        g = float(rgb[1])/255
-        b = float(rgb[2])/255
-        self.canvas.setStrokeColorRGB(r, g, b)
+        r, g, b, a = self.get_rgba(shape['strokeColor'])
+        self.canvas.setStrokeColorRGB(r, g, b, alpha=a)
         self.canvas.setLineWidth(stroke_width)
+
+        if 'fillColor' in shape:
+            r, g, b, a = self.get_rgba(shape['fillColor'])
+            self.canvas.setFillColorRGB(r, g, b, alpha=a)
+            fill = 1 if closed else 0
+        else:
+            fill = 0
 
         p = self.canvas.beginPath()
         # Go to start...
@@ -357,7 +431,9 @@ class ShapeToPdfExport(object):
         if closed:
             for point in points[0:2]:
                 p.lineTo(point[0], point[1])
-        self.canvas.drawPath(p, fill=0, stroke=1)
+        self.canvas.drawPath(p, fill=fill, stroke=1)
+
+        self.draw_shape_label(shape, Bounds(*points))
 
     def draw_polyline(self, shape):
         self.draw_polygon(shape, False)
@@ -365,19 +441,27 @@ class ShapeToPdfExport(object):
     def draw_ellipse(self, shape):
         stroke_width = shape['strokeWidth']
         c = self.panel_to_page_coords(shape['x'], shape['y'])
+
+        # Don't draw if centre outside panel
+        if c['inPanel'] is False:
+            return
+
         cx = c['x']
         cy = self.page_height - c['y']
         rx = shape['radiusX'] * self.scale
         ry = shape['radiusY'] * self.scale
         rotation = (shape['rotation'] + self.panel['rotation']) * -1
-        rgb = self.get_rgb(shape['strokeColor'])
-        r = float(rgb[0])/255
-        g = float(rgb[1])/255
-        b = float(rgb[2])/255
-        self.canvas.setStrokeColorRGB(r, g, b)
-        # Don't draw if centre outside panel
-        if c['inPanel'] is False:
-            return
+        r, g, b, a = self.get_rgba(shape['strokeColor'])
+        self.canvas.setStrokeColorRGB(r, g, b, alpha=a)
+
+        if 'fillColor' in shape:
+            r, g, b, a = self.get_rgba(shape['fillColor'])
+            self.canvas.setFillColorRGB(r, g, b, alpha=a)
+            fill = 1
+        else:
+            fill = 0
+
+        label_bounds = Bounds((cx, cy))
 
         # For rotation, we reset our coordinates around cx, cy
         # so that rotation applies around cx, cy
@@ -396,17 +480,21 @@ class ShapeToPdfExport(object):
         p = self.canvas.beginPath()
         self.canvas.setLineWidth(stroke_width)
         p.ellipse(left, bottom, width, height)
-        self.canvas.drawPath(p, stroke=1)
+        self.canvas.drawPath(p, stroke=1, fill=fill)
 
         # Restore coordinates, rotation etc.
         self.canvas.restoreState()
 
+        self.draw_shape_label(shape, label_bounds)
 
-class ShapeToPilExport(object):
+
+class ShapeToPilExport(ShapeExport):
     """
     Class for drawing panel shapes onto a PIL image.
     We get a PIL image, the panel dict, and crop coordinates
     """
+
+    point_radius = 25
 
     def __init__(self, pil_img, panel, crop):
 
@@ -417,20 +505,7 @@ class ShapeToPilExport(object):
         self.scale = pil_img.size[0] / crop['width']
         self.draw = ImageDraw.Draw(pil_img)
 
-        if "shapes" in panel:
-            for shape in panel["shapes"]:
-                if shape['type'] == "Arrow":
-                    self.draw_arrow(shape)
-                elif shape['type'] == "Line":
-                    self.draw_line(shape)
-                elif shape['type'] == "Rectangle":
-                    self.draw_rectangle(shape)
-                elif shape['type'] == "Ellipse":
-                    self.draw_ellipse(shape)
-                elif shape['type'] == "Polygon":
-                    self.draw_polygon(shape)
-                elif shape['type'] == "Polyline":
-                    self.draw_polyline(shape)
+        super(ShapeToPilExport, self).__init__(panel)
 
     def get_panel_coords(self, shape_x, shape_y):
         """
@@ -465,6 +540,27 @@ class ShapeToPilExport(object):
         shape_y = (shape_y - self.crop['y']) * self.scale
 
         return {'x': shape_x, 'y': shape_y}
+
+    def draw_shape_label(self, shape, bounds):
+        center = bounds.get_center()
+        text = shape.get('text')
+        size = int(shape.get('fontSize', 12) * 2.5)
+        if not text or not center:
+            return
+        r, g, b, a = self.get_rgba_int(shape['strokeColor'])
+        # bump up alpha a bit to make text more readable
+        rgba = (r, g, b, 128 + a / 2)
+        font_name = "FreeSans.ttf"
+        from omero.gateway import THISPATH
+        path_to_font = os.path.join(THISPATH, "pilfonts", font_name)
+        try:
+            font = ImageFont.truetype(path_to_font, size)
+        except Exception:
+            font = ImageFont.load(
+                '%s/pilfonts/B%0.2d.pil' % (self.GATEWAYPATH, size))
+        textsize = font.getsize(text)
+        xy = (center[0] - textsize[0] / 2.0, center[1] - textsize[1] / 2.0)
+        self.draw.text(xy, text, fill=rgba, font=font)
 
     def draw_arrow(self, shape):
 
@@ -508,6 +604,66 @@ class ShapeToPilExport(object):
                        fill=rgb, width=int(stroke_width))
         # Draw Arrow head, up to tip at x2, y2
         self.draw.polygon(points, fill=rgb, outline=rgb)
+        self.draw_shape_label(shape, Bounds((x1, y1), (x2, y2)))
+
+    # Override to not just call draw_polygon, because we want square corners
+    # for rectangles and not the rounded corners draw_polygon creates
+    def draw_rectangle(self, shape):
+        points = [
+            (shape['x'], shape['y']),
+            (shape['x'] + shape['width'], shape['y']),
+            (shape['x'] + shape['width'], shape['y'] + shape['height']),
+            (shape['x'], shape['y'] + shape['height']),
+        ]
+        p = []
+        for point in points:
+            coords = self.get_panel_coords(*point)
+            p.append((coords['x'], coords['y']))
+        p.append(p[0])
+        points = p
+
+        stroke_width = scale_to_export_dpi(shape.get('strokeWidth', 2))
+        buffer = int(ceil(stroke_width) * 1.5)
+
+        # if fill, draw filled polygon without outline, then add line later
+        # with correct stroke width
+        rgba = self.get_rgba_int(shape.get('fillColor', '#00000000'))
+
+        # need to draw on separate image and then paste on to get transparency
+        bounds = Bounds(*points).round()
+        offset = (bounds.minx, bounds.miny)
+        points = [
+            (point[0] - offset[0] + buffer, point[1] - offset[1] + buffer)
+            for point in points
+        ]
+        bounds.grow(buffer)
+        temp_image = Image.new('RGBA', bounds.get_size())
+        temp_draw = ImageDraw.Draw(temp_image)
+
+        # if fill color, draw polygon without outline first
+        if rgba[3]:
+            temp_draw.polygon(points, fill=rgba, outline=(0, 0, 0, 0))
+
+        def extend_line(p0, p1, pixels):
+            dx = p1[0] - p0[0]
+            dy = p1[1] - p0[1]
+            d = sqrt(dx * dx + dy * dy)
+            return (
+                p0,
+                (p1[0] + dx * pixels / d, p1[1] + dy * pixels / d)
+            )
+
+        # Draw all the lines (NB: polygon doesn't handle line width)
+        rgba = self.get_rgba_int(shape['strokeColor'])
+        width = int(round(stroke_width))
+        for i in range(4):
+            # extend each line a little bit to fill in the corners
+            line = extend_line(points[i], points[i + 1], width / 2)
+            temp_draw.line(line, fill=rgba, width=width)
+
+        self.pil_img.paste(
+            temp_image, (bounds.minx, bounds.miny), mask=temp_image)
+        self.draw_shape_label(shape, bounds)
 
     def draw_polygon(self, shape, closed=True):
         points = []
@@ -523,9 +679,30 @@ class ShapeToPilExport(object):
             points.append(points[0])
 
         stroke_width = scale_to_export_dpi(shape.get('strokeWidth', 2))
-        rgb = ShapeToPdfExport.get_rgb(shape['strokeColor'])
+        buffer = int(ceil(stroke_width))
+
+        # if fill, draw filled polygon without outline, then add line later
+        # with correct stroke width
+        rgba = self.get_rgba_int(shape.get('fillColor', '#00000000'))
+
+        # need to draw on separate image and then paste on to get transparency
+        bounds = Bounds(*points).round()
+        offset = (bounds.minx, bounds.miny)
+        points = [
+            (point[0] - offset[0] + buffer, point[1] - offset[1] + buffer)
+            for point in points
+        ]
+        bounds.grow(buffer)
+        temp_image = Image.new('RGBA', bounds.get_size())
+        temp_draw = ImageDraw.Draw(temp_image)
+
+        # if fill color, draw polygon without outline first
+        if closed and rgba[3]:
+            temp_draw.polygon(points, fill=rgba, outline=(0, 0, 0, 0))
+
         # Draw all the lines (NB: polygon doesn't handle line width)
-        self.draw.line(points, fill=rgb, width=int(round(stroke_width)))
+        rgba = self.get_rgba_int(shape['strokeColor'])
+        temp_draw.line(points, fill=rgba, width=int(round(stroke_width)))
         # Draw ellipse at each corner
         # see https://stackoverflow.com/questions/33187698/
         r = (stroke_width/2) * 0.9    # seems to look OK with this size
@@ -534,8 +711,12 @@ class ShapeToPilExport(object):
         else:
             corners = points[1: -1]
         for point in corners:
-            self.draw.ellipse((point[0] - r, point[1] - r,
-                               point[0] + r, point[1] + r), fill=rgb)
+            temp_draw.ellipse((point[0] - r, point[1] - r,
+                               point[0] + r, point[1] + r), fill=rgba)
+
+        self.pil_img.paste(
+            temp_image, (bounds.minx, bounds.miny), mask=temp_image)
+        self.draw_shape_label(shape, bounds)
 
     def draw_polyline(self, shape):
         self.draw_polygon(shape, False)
@@ -548,42 +729,10 @@ class ShapeToPilExport(object):
         x2 = end['x']
         y2 = end['y']
         stroke_width = scale_to_export_dpi(shape.get('strokeWidth', 2))
-        rgb = ShapeToPdfExport.get_rgb(shape['strokeColor'])
-
-        self.draw.line([(x1, y1), (x2, y2)], fill=rgb, width=int(stroke_width))
-
-    def draw_rectangle(self, shape):
-        # clockwise list of corner points on the OUTSIDE of thick line
-        w = scale_to_export_dpi(shape.get('strokeWidth', 2))
-        cx = shape['x'] + (shape['width']/2)
-        cy = shape['y'] + (shape['height']/2)
-        rotation = self.panel['rotation'] * -1
-
-        # Centre of rect rotation in PIL image
-        centre = self.get_panel_coords(cx, cy)
-        cx = centre['x']
-        cy = centre['y']
-        scale_w = w
-        rgb = ShapeToPdfExport.get_rgb(shape['strokeColor'])
-
-        # To support rotation, draw rect on temp canvas, rotate and paste
-        width = int((shape['width'] * self.scale) + w)
-        height = int((shape['height'] * self.scale) + w)
-        temp_rect = Image.new('RGBA', (width, height), (255, 255, 255, 0))
-        rect_draw = ImageDraw.Draw(temp_rect)
-
-        # Draw outer rectangle, then remove inner rect with full opacity
-        rect_draw.rectangle((0, 0, width, height), fill=rgb)
-        rgba = (255, 255, 255, 0)
-        rect_draw.rectangle((scale_w, scale_w, width-scale_w, height-scale_w),
-                            fill=rgba)
-        temp_rect = temp_rect.rotate(rotation, resample=Image.BICUBIC,
-                                     expand=True)
-        # Use rect as mask, so transparent part is not pasted
-        paste_x = cx - (temp_rect.size[0]/2)
-        paste_y = cy - (temp_rect.size[1]/2)
-        self.pil_img.paste(temp_rect, (int(paste_x), int(paste_y)),
-                           mask=temp_rect)
+        rgba = ShapeToPdfExport.get_rgba_int(shape['strokeColor'])
+        self.draw.line(
+            [(x1, y1), (x2, y2)], fill=rgba, width=int(stroke_width))
+        self.draw_shape_label(shape, Bounds((x1, y1), (x2, y2)))
 
     def draw_ellipse(self, shape):
 
@@ -594,7 +743,6 @@ class ShapeToPilExport(object):
         rx = self.scale * shape['radiusX']
         ry = self.scale * shape['radiusY']
         rotation = (shape['rotation'] + self.panel['rotation']) * -1
-        rgb = ShapeToPdfExport.get_rgb(shape['strokeColor'])
 
         width = int((rx * 2) + w)
         height = int((ry * 2) + w)
@@ -602,8 +750,9 @@ class ShapeToPilExport(object):
                                  (255, 255, 255, 0))
         ellipse_draw = ImageDraw.Draw(temp_ellipse)
         # Draw outer ellipse, then remove inner ellipse with full opacity
-        ellipse_draw.ellipse((0, 0, width, height), fill=rgb)
-        rgba = (255, 255, 255, 0)
+        rgba = ShapeToPdfExport.get_rgba_int(shape['strokeColor'])
+        ellipse_draw.ellipse((0, 0, width, height), fill=rgba)
+        rgba = self.get_rgba_int(shape.get('fillColor', '#00000000'))
         ellipse_draw.ellipse((w, w, width - w, height - w), fill=rgba)
         temp_ellipse = temp_ellipse.rotate(rotation, resample=Image.BICUBIC,
                                            expand=True)
@@ -612,6 +761,7 @@ class ShapeToPilExport(object):
         paste_y = cy - (temp_ellipse.size[1]/2)
         self.pil_img.paste(temp_ellipse, (int(paste_x), int(paste_y)),
                            mask=temp_ellipse)
+        self.draw_shape_label(shape, Bounds((cx, cy)))
 
 
 class FigureExport(object):
@@ -1697,6 +1847,9 @@ class FigureExport(object):
             alignment = TA_CENTER
             x = x - (para_width/2)
 
+        # set fully opaque background color to avoid transparent text
+        c.setFillColorRGB(0, 0, 0, 1)
+
         style_n = getSampleStyleSheet()['Normal']
         style = ParagraphStyle(
             'label',
@@ -1724,7 +1877,7 @@ class FigureExport(object):
         y2 = self.page_height - y2
         c = self.figure_canvas
         c.setLineWidth(width)
-        c.setStrokeColorRGB(red, green, blue)
+        c.setStrokeColorRGB(red, green, blue, 1)
         c.line(x, y, x2, y2,)
 
     def paste_image(self, pil_img, img_name, panel, page, dpi):
@@ -1763,6 +1916,8 @@ class FigureExport(object):
         pil_img.save(img_name)
         # Since coordinate system is 'bottom-up', convert from 'top-down'
         y = self.page_height - height - y
+        # set fill color alpha to fully opaque, since this impacts drawImage
+        self.figure_canvas.setFillColorRGB(0, 0, 0, alpha=1)
         self.figure_canvas.drawImage(img_name, x, y, width, height)
 
 
