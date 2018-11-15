@@ -618,8 +618,8 @@ class ShapeToPilExport(ShapeExport):
         p = []
         t = shape.get('transform')
         for point in points:
-            point = self.apply_transform(t, point)
-            coords = self.get_panel_coords(*point)
+            transformed = self.apply_transform(t, point)
+            coords = self.get_panel_coords(*transformed)
             p.append((coords['x'], coords['y']))
         p.append(p[0])
         points = p
