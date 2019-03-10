@@ -328,6 +328,15 @@
                 return false;
             }
 
+            if (label_text == '[key-values]') {
+                // Load Map Anns for this image and create labels
+                $("#labelsFromMapAnns").modal("show", {
+                    position:position,
+                    size:font_size,
+                    color: color});
+                return false;
+            }
+
             if (label_text == '[tags]') {
                 // Load Tags for this image and create labels
 

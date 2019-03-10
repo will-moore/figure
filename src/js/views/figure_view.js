@@ -18,6 +18,7 @@
             new RoiModalView({model: this.model});
             new DpiModalView({model: this.model});
             new LegendView({model: this.model});
+            new LabelFromMapsModal({model: this.model});
 
             this.figureFiles = new FileList();
             new FileListView({model:this.figureFiles, figureModel: this.model});
