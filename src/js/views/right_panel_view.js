@@ -330,7 +330,7 @@
             }
 
             if (label_text == '[key-values]') {
-                // Load Map Anns for this image and create labels
+                // Load Map Annotations for this image and create labels
                 $("#labelsFromMapAnns").modal("show", {
                     position:position,
                     size:font_size,
