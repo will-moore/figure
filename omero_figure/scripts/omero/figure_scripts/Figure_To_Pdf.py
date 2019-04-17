@@ -2214,6 +2214,16 @@ class OmeroExport(TiffExport):
         if legend is not None:
             description = "%s\n\n%s" % (description, legend)
 
+        img_ids = set()
+        lines = []
+        for p in self.figure_json['panels']:
+            iid = p['imageId']
+            if iid in img_ids:
+                continue    # ignore images we've already handled
+            img_ids.add(iid)
+            lines.append('- Image ID: %s %s' % (iid, p['name']))
+        description += "Contains images:\n%s" % "\n".join(lines)
+
         np_array = numpy.asarray(self.tiff_figure)
         red = np_array[::, ::, 0]
         green = np_array[::, ::, 1]
