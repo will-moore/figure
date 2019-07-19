@@ -8,6 +8,8 @@
 class="btn btn-default channel-btn lutBg"
                     data-index="<%= idx %>"
                     style="background-color:#<%= color %>; background-position: <%= lutBgPos %>">
+
+                    <%= label %>
                 <div class="<% if(active) { %>ch-btn-down<% } else if (typeof active == 'boolean') { %>ch-btn-up<% } else { %>ch-btn-flat<% }%>">&nbsp</div>&nbsp
             </button>
             <button type="button" class="btn btn-default dropdown-toggle"

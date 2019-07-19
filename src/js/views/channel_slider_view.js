@@ -124,6 +124,11 @@ var ChannelSliderView = Backbone.View.extend({
                     return ch[idx].color;
                 }
             }
+            var getLabel = function(idx) {
+                return function(ch) {
+                    return ch[idx].label;
+                }
+            }
             var getReverse = function(idx) {
                 return function(ch) {
                     // For older figures (created pre 5.3.0) might be undefined
@@ -175,6 +180,7 @@ var ChannelSliderView = Backbone.View.extend({
                 var colors = chData.map(getColor(chIdx));
                 var reverses = chData.map(getReverse(chIdx));
                 var actives = chData.map(getActive(chIdx));
+                var labels = chData.map(getLabel(chIdx));
                 // Reduce lists into summary for this channel
                 var startAvg = parseInt(starts.reduce(addFn, 0) / starts.length, 10);
                 var endAvg = parseInt(ends.reduce(addFn, 0) / ends.length, 10);
@@ -184,6 +190,7 @@ var ChannelSliderView = Backbone.View.extend({
                 var max = maxs.reduce(reduceFn(Math.max));
                 var color = colors.reduce(allEqualFn, colors[0]) ? colors[0] : 'ccc';
                 // allEqualFn for booleans will return undefined if not or equal
+                var label = labels.reduce(allEqualFn, labels[0]);
                 var reverse = reverses.reduce(allEqualFn, reverses[0]) ? true : false;
                 var active = actives.reduce(allEqualFn, actives[0]);
                 var style = {'background-position': '0 0'}
@@ -205,6 +212,7 @@ var ChannelSliderView = Backbone.View.extend({
                 max = Math.max(max, endAvg);
 
                 var sliderHtml = self.template({'idx': chIdx,
+                                                'label': label,
                                                 'startAvg': startAvg,
                                                 'startsNotEqual': startsNotEqual,
                                                 'endAvg': endAvg,
