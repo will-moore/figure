@@ -5,7 +5,7 @@
     <div class="btn-group">
             <button type="button"
             title="<%= _.escape(label) %>"
-class="btn btn-default channel-btn lutBg"
+                    class="btn btn-default channel-btn lutBg <% if (isDark) { print('font-white') } %>"
                     data-index="<%= idx %>"
                     style="background-color:#<%= color %>; background-position: <%= lutBgPos %>">
 
