@@ -2221,7 +2221,7 @@ class OmeroExport(TiffExport):
             if iid in img_ids:
                 continue    # ignore images we've already handled
             img_ids.add(iid)
-            lines.append('- Image ID: %s %s' % (iid, p['name']))
+            lines.append('- Image: %s %s' % (iid, p['name']))
         description += "Contains images:\n%s" % "\n".join(lines)
 
         np_array = numpy.asarray(self.tiff_figure)
