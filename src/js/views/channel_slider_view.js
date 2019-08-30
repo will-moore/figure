@@ -97,7 +97,9 @@ var ChannelSliderView = Backbone.View.extend({
             s = 0;
             h = 0;
         }
-        if (c.r==max) {
+        if (delta === 0) {
+            h = 0;
+        } else if (c.r==max) {
             h = (c.g-c.b)/delta;
         } else if (c.g == max) {
             h = 2 + (c.b-c.r)/delta;
