@@ -61,6 +61,60 @@ var ChannelSliderView = Backbone.View.extend({
         }
     },
 
+    hexToRgb: function hexToRgb(hex) {
+        // handle #ff00ff
+        var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        if (result) return {
+            r: parseInt(result[1], 16),
+            g: parseInt(result[2], 16),
+            b: parseInt(result[3], 16)
+        };
+        // handle #ccc
+        result = /^#?([a-f\d]{1})([a-f\d]{1})([a-f\d]{1})$/i.exec(hex);
+        if (result) return {
+            r: parseInt(result[1]+'0', 16),
+            g: parseInt(result[2]+'0', 16),
+            b: parseInt(result[3]+'0', 16)
+        };
+    },
+
+    isDark: function(color) {
+        if (color.endsWith('.lut')) {
+            return false;
+        }
+        var c = this.hexToRgb(color);
+        var min, max, delta;
+        var v, s, h;
+        min = Math.min(c.r, c.g, c.b);
+        max = Math.max(c.r, c.g, c.b);
+        v = max;
+        delta = max-min;
+        if (max !== 0) {
+            s = delta/max;
+        }
+        else {
+            v = 0;
+            s = 0;
+            h = 0;
+        }
+        if (delta === 0) {
+            h = 0;
+        } else if (c.r==max) {
+            h = (c.g-c.b)/delta;
+        } else if (c.g == max) {
+            h = 2 + (c.b-c.r)/delta;
+        } else {
+            h = 4 +(c.r-c.g)/delta;
+        }
+        h = h * 60;
+        if (h < 0) {
+            h += 360;
+        }
+        h = h/360;
+        v = v/255;
+        return (v < 0.6 || (h > 0.6 && s > 0.7));
+    },
+
     toggle_channel: function(e) {
         var idx = e.currentTarget.getAttribute('data-index');
 
@@ -124,6 +178,11 @@ var ChannelSliderView = Backbone.View.extend({
                     return ch[idx].color;
                 }
             }
+            var getLabel = function(idx) {
+                return function(ch) {
+                    return ch[idx].label;
+                }
+            }
             var getReverse = function(idx) {
                 return function(ch) {
                     // For older figures (created pre 5.3.0) might be undefined
@@ -175,6 +234,7 @@ var ChannelSliderView = Backbone.View.extend({
                 var colors = chData.map(getColor(chIdx));
                 var reverses = chData.map(getReverse(chIdx));
                 var actives = chData.map(getActive(chIdx));
+                var labels = chData.map(getLabel(chIdx));
                 // Reduce lists into summary for this channel
                 var startAvg = parseInt(starts.reduce(addFn, 0) / starts.length, 10);
                 var endAvg = parseInt(ends.reduce(addFn, 0) / ends.length, 10);
@@ -184,6 +244,7 @@ var ChannelSliderView = Backbone.View.extend({
                 var max = maxs.reduce(reduceFn(Math.max));
                 var color = colors.reduce(allEqualFn, colors[0]) ? colors[0] : 'ccc';
                 // allEqualFn for booleans will return undefined if not or equal
+                var label = labels.reduce(allEqualFn, labels[0]);
                 var reverse = reverses.reduce(allEqualFn, reverses[0]) ? true : false;
                 var active = actives.reduce(allEqualFn, actives[0]);
                 var style = {'background-position': '0 0'}
@@ -205,6 +266,7 @@ var ChannelSliderView = Backbone.View.extend({
                 max = Math.max(max, endAvg);
 
                 var sliderHtml = self.template({'idx': chIdx,
+                                                'label': label,
                                                 'startAvg': startAvg,
                                                 'startsNotEqual': startsNotEqual,
                                                 'endAvg': endAvg,
@@ -212,7 +274,8 @@ var ChannelSliderView = Backbone.View.extend({
                                                 'active': active,
                                                 'lutBgPos': lutBgPos,
                                                 'reverse': reverse,
-                                                'color': color});
+                                                'color': color,
+                                                'isDark': this.isDark(color)});
                 var $div = $(sliderHtml).appendTo(this.$el);
 
                 $div.find('.ch_slider').slider({

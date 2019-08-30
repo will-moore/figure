@@ -4,10 +4,12 @@
 
     <div class="btn-group">
             <button type="button"
-            title="Turn channel on/off"
-class="btn btn-default channel-btn lutBg"
+            title="<%= _.escape(label) %>"
+                    class="btn btn-default channel-btn lutBg <% if (isDark) { print('font-white') } %>"
                     data-index="<%= idx %>"
                     style="background-color:#<%= color %>; background-position: <%= lutBgPos %>">
+
+                    <%= _.escape(label) %>
                 <div class="<% if(active) { %>ch-btn-down<% } else if (typeof active == 'boolean') { %>ch-btn-up<% } else { %>ch-btn-flat<% }%>">&nbsp</div>&nbsp
             </button>
             <button type="button" class="btn btn-default dropdown-toggle"
