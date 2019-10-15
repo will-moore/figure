@@ -146,7 +146,7 @@
                             width: rect.width,
                             height: rect.height,
                             strokeColor: "#" + color,
-                            lineWidth: width}];
+                            strokeWidth: width}];
             } else {
                 return;
             }
