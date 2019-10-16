@@ -104,8 +104,13 @@
             var sb = this.model.get('scalebar');
             if (sb && sb.show) {
                 // this.$scalebar.css('width':);
-                var sb_pixels = sb.length / this.model.get('pixel_size_x'),
-                    sb_width = panel_scale * sb_pixels;
+                var physical_length = sb.length;
+                // convert units
+                var pixel_unit = this.model.get('pixel_size_x_unit');
+                var scalebar_unit = sb.units;
+                var convert_factor = UNIT_SYMBOLS[scalebar_unit].microns / UNIT_SYMBOLS[pixel_unit].microns;
+                var sb_pixels = convert_factor * physical_length / this.model.get('pixel_size_x');
+                var sb_width = panel_scale * sb_pixels;
                 this.$scalebar.css('width', sb_width);
             }
         },

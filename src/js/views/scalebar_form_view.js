@@ -1,21 +1,20 @@
 
+window.UNIT_SYMBOLS = {"PICOMETER": {symbol: "pm", microns: 0.000001},
+    "ANGSTROM": {symbol: "Å", microns: 0.0001},
+    "NANOMETER": {symbol: "nm", microns: 0.001},
+    "MICROMETER": {symbol: "µm", microns: 1},
+    "MILLIMETER": {symbol: "mm", microns: 1000},
+    "CENTIMETER": {symbol: "cm", microns: 10000},
+    "METER": {symbol: "m", microns: 1000000},
+    "KILOMETER": {symbol: "km", microns: 1000000000},
+    "MEGAMETER": {symbol: "Mm", microns: 1000000000000},
+    // "GIGAMETER", symbol: "Gm"},
+    // "ASTRONOMICALUNIT", symbol: "ua"},
+    // "LIGHTYEAR", symbol: "ly"}
+}
+
 // Created new for each selection change
 var ScalebarFormView = Backbone.View.extend({
-
-    unit_symbols: [
-        {unit: "PICOMETER", symbol: "pm"},
-        {unit: "ANGSTROM", symbol: "Å"},
-        {unit: "NANOMETER", symbol: "nm"},
-        {unit: "MICROMETER", symbol: "µm"},
-        {unit: "MILLIMETER", symbol: "mm"},
-        {unit: "CENTIMETER", symbol: "cm"},
-        {unit: "METER", symbol: "m"},
-        {unit: "KILOMETER", symbol: "km"},
-        {unit: "MEGAMETER", symbol: "Mm"},
-        {unit: "GIGAMETER", symbol: "Gm"},
-        {unit: "ASTRONOMICALUNIT", symbol: "ua"},
-        {unit: "LIGHTYEAR", symbol: "ly"}
-    ],
 
     template: JST["src/templates/scalebar_form_template.html"],
 
@@ -113,15 +112,25 @@ var ScalebarFormView = Backbone.View.extend({
     },
 
     render: function() {
-        var json = {show: false, show_label: false, unit_symbols: this.unit_symbols},
+        var json = {show: false, show_label: false},
             hidden = false,
             sb;
+
+        // Turn dict into list of units we can sort by size
+        var unit_symbols = Object.keys(UNIT_SYMBOLS).map(function(unit){
+            return $.extend({unit: unit}, UNIT_SYMBOLS[unit]);
+        });
+        unit_symbols.sort(function(a, b){
+            return a.microns > b.microns ? 1 : -1;
+        })
+        json.unit_symbols = unit_symbols;
 
         this.models.forEach(function(m){
             // start with json data from first Panel
             if (!json.pixel_size_x) {
                 json.pixel_size_x = m.get('pixel_size_x');
-                json.symbol = m.get('pixel_size_x_symbol');
+                json.pixel_size_symbol = m.get('pixel_size_x_symbol');
+                json.pixel_size_unit = m.get('pixel_size_x_unit');
             } else {
                 pix_sze = m.get('pixel_size_x');
                 // account for floating point imprecision when comparing
@@ -129,8 +138,11 @@ var ScalebarFormView = Backbone.View.extend({
                     json.pixel_size_x.toFixed(10) != pix_sze.toFixed(10)) {
                         json.pixel_size_x = '-';
                 }
-                if (json.symbol != m.get('pixel_size_x_symbol')) {
-                    json.symbol = '-';
+                if (json.pixel_size_symbol != m.get('pixel_size_x_symbol')) {
+                    json.pixel_size_symbol = '-';
+                }
+                if (json.pixel_size_unit != m.get('pixel_size_x_unit')) {
+                    json.pixel_size_unit = '-';
                 }
             }
             sb = m.get('scalebar');
@@ -163,16 +175,17 @@ var ScalebarFormView = Backbone.View.extend({
             json.show = true;
         }
         json.length = json.length || 10;
-        json.units = json.units || 'MICROMETER';
+        // If no units chosen, use pixel size units
+        json.units = json.units || json.pixel_size_unit;
         json.units_symbol = '-';
         if (json.units !== '-') {
             // find the symbol e.g. 'mm' from units 'MILLIMETER'
-            json.units_symbol = this.unit_symbols.filter(function(u){return u.unit == json.units})[0].symbol;
+            json.units_symbol = UNIT_SYMBOLS[json.units].symbol;
         }
         json.position = json.position || 'bottomright';
         json.color = json.color || 'FFFFFF';
         json.font_size = json.font_size || 10;
-        json.symbol = json.symbol || '-';
+        json.pixel_size_symbol = json.pixel_size_symbol || '-';
 
         var html = this.template(json);
         this.$el.html(html);
