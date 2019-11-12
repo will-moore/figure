@@ -869,9 +869,7 @@ class FigureExport(object):
         # Extension is pdf or tiff
         fext = self.get_figure_file_ext()
 
-        # file names can't include unicode characters
-        name = unicodedata.normalize(
-            'NFKD', self.figure_name).encode('ascii', 'ignore')
+        name = self.figure_name
         # in case we have path/to/name, just use name
         name = path.basename(name)
 
@@ -890,6 +888,7 @@ class FigureExport(object):
         if self.zip_folder_name is not None:
             full_name = os.path.join(self.zip_folder_name, full_name)
 
+        print(type(full_name))
         while(os.path.exists(full_name)):
             index += 1
             full_name = "%s_page_%02d.%s" % (name, index, fext)
