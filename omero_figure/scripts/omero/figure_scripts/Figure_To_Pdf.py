@@ -18,7 +18,6 @@
 
 import logging
 import json
-import unicodedata
 import numpy
 import cgi
 
@@ -846,9 +845,7 @@ class FigureExport(object):
 
     def get_zip_name(self):
 
-        # file names can't include unicode characters
-        name = unicodedata.normalize(
-            'NFKD', self.figure_name).encode('ascii', 'ignore')
+        name = self.figure_name
         # in case we have path/to/name.pdf, just use name.pdf
         name = path.basename(name)
         # Remove commas: causes problems 'duplicate headers' in file download
