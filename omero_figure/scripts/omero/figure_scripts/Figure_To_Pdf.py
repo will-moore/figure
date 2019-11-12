@@ -35,7 +35,7 @@ from omero.gateway import BlitzGateway
 from omero.rtypes import rstring, robject
 
 
-from cStringIO import StringIO
+from io import BytesIO
 try:
     from PIL import Image, ImageDraw, ImageFont
 except ImportError:
@@ -781,8 +781,12 @@ class FigureExport(object):
         self.mimetype = "application/pdf"
 
         figure_json_string = script_params['Figure_JSON']
-        # Since unicode can't be wrapped by rstring
-        figure_json_string = figure_json_string.decode('utf8')
+        try:
+            # Since unicode can't be wrapped by rstring, py2
+            figure_json_string = figure_json_string.decode('utf8')
+        except AttributeError:
+            # python 3
+            pass
         self.figure_json = self.version_transform_json(
             self._fix_figure_json(json.loads(figure_json_string)))
 
@@ -813,7 +817,7 @@ class FigureExport(object):
 
         v = figure_json.get('version')
         if v < 3:
-            print "Transforming to VERSION 3"
+            print("Transforming to VERSION 3")
             for p in figure_json['panels']:
                 if p.get('export_dpi'):
                     # rename 'export_dpi' attr to 'min_export_dpi'
@@ -837,7 +841,6 @@ class FigureExport(object):
                             stroke_width = 0.5
                         else:
                             stroke_width = 0.25
-                        print 'strokewidth', shape['strokeWidth'], stroke_width
                         shape['strokeWidth'] = stroke_width
         return figure_json
 
@@ -1402,7 +1405,7 @@ class FigureExport(object):
         if jpeg_data is None:
             return
 
-        i = StringIO(jpeg_data)
+        i = BytesIO(jpeg_data)
         pil_img = Image.open(i)
 
         # paste to canvas if needed
@@ -1609,7 +1612,7 @@ class FigureExport(object):
         if image is None:
             return
         thumb_data = image.getThumbnail(size=(96, 96))
-        i = StringIO(thumb_data)
+        i = BytesIO(thumb_data)
         pil_img = Image.open(i)
         temp_name = str(image_id) + "thumb.jpg"
         pil_img.save(temp_name)
