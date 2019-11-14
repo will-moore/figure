@@ -18,6 +18,7 @@
 
 import logging
 import json
+import unicodedata
 import numpy
 import cgi
 
@@ -104,6 +105,8 @@ def compress(target, base):
                         "folder.zip"
     @param base:        Name of folder that we want to zip up E.g. "folder"
     """
+    target = unicodedata.normalize('NFKD', target).encode('ascii', 'ignore')
+    print('compress: %s - %s' % (target, base))
     zip_file = zipfile.ZipFile(target, 'w')
     try:
         for root, dirs, files in os.walk(base):
@@ -111,6 +114,7 @@ def compress(target, base):
             for f in files:
                 fullpath = os.path.join(root, f)
                 archive_name = os.path.join(archive_root, f)
+                print('zip_file.write', fullpath, archive_name)
                 zip_file.write(fullpath, archive_name)
     finally:
         zip_file.close()
@@ -885,12 +889,15 @@ class FigureExport(object):
         if self.zip_folder_name is not None:
             full_name = os.path.join(self.zip_folder_name, full_name)
 
+        full_name = unicodedata.normalize('NFKD', full_name).encode('ascii', 'ignore')
+        print(full_name)
         print(type(full_name))
         while(os.path.exists(full_name)):
             index += 1
             full_name = "%s_page_%02d.%s" % (name, index, fext)
             if self.zip_folder_name is not None:
                 full_name = os.path.join(self.zip_folder_name, full_name)
+            full_name = unicodedata.normalize('NFKD', full_name).encode('ascii', 'ignore')
 
         # Handy to know what the last created file is:
         self.figure_file_name = full_name
@@ -915,7 +922,7 @@ class FigureExport(object):
         paper_spacing = ('paper_spacing' in self.figure_json and
                          self.figure_json['paper_spacing'] or 50)
         page_col_count = ('page_col_count' in self.figure_json and
-                          self.figure_json['page_col_count'] or 1)
+                          int(self.figure_json['page_col_count']) or 1)
 
         # Create a zip if we have multiple TIFF pages or we're exporting Images
         export_option = self.script_params['Export_Option']
@@ -998,7 +1005,7 @@ class FigureExport(object):
             mimetype = "application/zip"
 
         file_ann = self.conn.createFileAnnfromLocalFile(
-            output_file,
+            output_file.decode('utf-8'),
             mimetype=mimetype,
             ns=ns)
 
@@ -2144,7 +2151,7 @@ class TiffExport(FigureExport):
         """
         self.figure_file_name = self.get_figure_file_name()
 
-        self.tiff_figure.save(self.figure_file_name)
+        self.tiff_figure.save(self.figure_file_name.decode('utf-8'))
 
         # Create a new blank tiffFigure for subsequent pages
         self.create_figure()
