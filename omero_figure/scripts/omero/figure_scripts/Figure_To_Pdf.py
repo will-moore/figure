@@ -18,7 +18,6 @@
 
 import logging
 import json
-import unicodedata
 import numpy
 import cgi
 
@@ -105,8 +104,6 @@ def compress(target, base):
                         "folder.zip"
     @param base:        Name of folder that we want to zip up E.g. "folder"
     """
-    target = unicodedata.normalize('NFKD', target).encode('ascii', 'ignore')
-    print('compress: %s - %s' % (target, base))
     zip_file = zipfile.ZipFile(target, 'w')
     try:
         for root, dirs, files in os.walk(base):
@@ -114,7 +111,6 @@ def compress(target, base):
             for f in files:
                 fullpath = os.path.join(root, f)
                 archive_name = os.path.join(archive_root, f)
-                print('zip_file.write', fullpath, archive_name)
                 zip_file.write(fullpath, archive_name)
     finally:
         zip_file.close()
@@ -850,6 +846,7 @@ class FigureExport(object):
     def get_zip_name(self):
 
         name = self.figure_name
+        name = ''.join([i if ord(i) < 128 else '' for i in name])
         # in case we have path/to/name.pdf, just use name.pdf
         name = path.basename(name)
         # Remove commas: causes problems 'duplicate headers' in file download
@@ -871,6 +868,7 @@ class FigureExport(object):
         fext = self.get_figure_file_ext()
 
         name = self.figure_name
+        name = ''.join([i if ord(i) < 128 else '' for i in name])
         # in case we have path/to/name, just use name
         name = path.basename(name)
 
@@ -889,15 +887,11 @@ class FigureExport(object):
         if self.zip_folder_name is not None:
             full_name = os.path.join(self.zip_folder_name, full_name)
 
-        full_name = unicodedata.normalize('NFKD', full_name).encode('ascii', 'ignore')
-        print(full_name)
-        print(type(full_name))
         while(os.path.exists(full_name)):
             index += 1
             full_name = "%s_page_%02d.%s" % (name, index, fext)
             if self.zip_folder_name is not None:
                 full_name = os.path.join(self.zip_folder_name, full_name)
-            full_name = unicodedata.normalize('NFKD', full_name).encode('ascii', 'ignore')
 
         # Handy to know what the last created file is:
         self.figure_file_name = full_name
@@ -1005,7 +999,7 @@ class FigureExport(object):
             mimetype = "application/zip"
 
         file_ann = self.conn.createFileAnnfromLocalFile(
-            output_file.decode('utf-8'),
+            output_file,
             mimetype=mimetype,
             ns=ns)
 
@@ -2151,7 +2145,7 @@ class TiffExport(FigureExport):
         """
         self.figure_file_name = self.get_figure_file_name()
 
-        self.tiff_figure.save(self.figure_file_name.decode('utf-8'))
+        self.tiff_figure.save(self.figure_file_name)
 
         # Create a new blank tiffFigure for subsequent pages
         self.create_figure()
