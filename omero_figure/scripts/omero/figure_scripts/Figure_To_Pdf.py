@@ -93,7 +93,7 @@ def scale_to_export_dpi(pixels):
     Original figure coordinates assume 72 dpi figure, but we want to
     export at 300 dpi, so everything needs scaling accordingly
     """
-    return pixels * 300/72
+    return pixels * 300//72
 
 
 def compress(target, base):
