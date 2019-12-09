@@ -231,7 +231,12 @@
                 sb_json.length = sb.length;
                 sb_json.font_size = sb.font_size;
                 sb_json.show_label = sb.show_label;
-                sb_json.symbol = this.model.get('pixel_size_x_symbol');
+                sb_json.symbol = sb.units;
+
+                // Use global UNIT_SYMBOLS to get symbol for unit.
+                if (window.UNIT_SYMBOLS && window.UNIT_SYMBOLS[sb.units]){
+                    sb_json.symbol = window.UNIT_SYMBOLS[sb.units].symbol;
+                }
 
                 var sb_html = this.scalebar_template(sb_json);
                 this.$el.append(sb_html);
