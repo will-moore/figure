@@ -18,7 +18,6 @@
 
 import logging
 import json
-import unicodedata
 import numpy
 import cgi
 
@@ -35,7 +34,7 @@ from omero.gateway import BlitzGateway
 from omero.rtypes import rstring, robject
 
 
-from cStringIO import StringIO
+from io import BytesIO
 try:
     from PIL import Image, ImageDraw, ImageFont
 except ImportError:
@@ -781,8 +780,12 @@ class FigureExport(object):
         self.mimetype = "application/pdf"
 
         figure_json_string = script_params['Figure_JSON']
-        # Since unicode can't be wrapped by rstring
-        figure_json_string = figure_json_string.decode('utf8')
+        try:
+            # Since unicode can't be wrapped by rstring, py2
+            figure_json_string = figure_json_string.decode('utf8')
+        except AttributeError:
+            # python 3
+            pass
         self.figure_json = self.version_transform_json(
             self._fix_figure_json(json.loads(figure_json_string)))
 
@@ -813,7 +816,7 @@ class FigureExport(object):
 
         v = figure_json.get('version')
         if v < 3:
-            print "Transforming to VERSION 3"
+            print("Transforming to VERSION 3")
             for p in figure_json['panels']:
                 if p.get('export_dpi'):
                     # rename 'export_dpi' attr to 'min_export_dpi'
@@ -837,15 +840,12 @@ class FigureExport(object):
                             stroke_width = 0.5
                         else:
                             stroke_width = 0.25
-                        print 'strokewidth', shape['strokeWidth'], stroke_width
                         shape['strokeWidth'] = stroke_width
         return figure_json
 
     def get_zip_name(self):
 
-        # file names can't include unicode characters
-        name = unicodedata.normalize(
-            'NFKD', self.figure_name).encode('ascii', 'ignore')
+        name = self.figure_name
         # in case we have path/to/name.pdf, just use name.pdf
         name = path.basename(name)
         # Remove commas: causes problems 'duplicate headers' in file download
@@ -866,9 +866,7 @@ class FigureExport(object):
         # Extension is pdf or tiff
         fext = self.get_figure_file_ext()
 
-        # file names can't include unicode characters
-        name = unicodedata.normalize(
-            'NFKD', self.figure_name).encode('ascii', 'ignore')
+        name = self.figure_name
         # in case we have path/to/name, just use name
         name = path.basename(name)
 
@@ -887,6 +885,7 @@ class FigureExport(object):
         if self.zip_folder_name is not None:
             full_name = os.path.join(self.zip_folder_name, full_name)
 
+        print(type(full_name))
         while(os.path.exists(full_name)):
             index += 1
             full_name = "%s_page_%02d.%s" % (name, index, fext)
@@ -1402,7 +1401,7 @@ class FigureExport(object):
         if jpeg_data is None:
             return
 
-        i = StringIO(jpeg_data)
+        i = BytesIO(jpeg_data)
         pil_img = Image.open(i)
 
         # paste to canvas if needed
@@ -1609,7 +1608,7 @@ class FigureExport(object):
         if image is None:
             return
         thumb_data = image.getThumbnail(size=(96, 96))
-        i = StringIO(thumb_data)
+        i = BytesIO(thumb_data)
         pil_img = Image.open(i)
         temp_name = str(image_id) + "thumb.jpg"
         pil_img.save(temp_name)
