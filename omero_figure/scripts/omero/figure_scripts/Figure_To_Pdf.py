@@ -1294,6 +1294,25 @@ class FigureExport(object):
         scale_to_canvas = panel['width'] / float(region_width)
         canvas_length = pixels_length * scale_to_canvas
 
+        UNIT_SYMBOLS = {
+            "PICOMETER": {'symbol': "pm", 'microns': 0.000001},
+            "ANGSTROM": {'symbol': "Å", 'microns': 0.0001},
+            "NANOMETER": {'symbol': "nm", 'microns': 0.001},
+            "MICROMETER": {'symbol': "µm", 'microns': 1},
+            "MILLIMETER": {'symbol': "mm", 'microns': 1000},
+            "CENTIMETER": {'symbol': "cm", 'microns': 10000},
+            "METER": {'symbol': "m", 'microns': 1000000},
+            "KILOMETER": {'symbol': "km", 'microns': 1000000000},
+            "MEGAMETER": {'symbol': "Mm", 'microns': 1000000000000}
+        }
+
+        pixel_unit = panel.get('pixel_size_x_unit')
+        scalebar_unit = sb.get('units')
+        if pixel_unit in UNIT_SYMBOLS and scalebar_unit in UNIT_SYMBOLS:
+            convert_factor = (UNIT_SYMBOLS[scalebar_unit]['microns'] /
+                              UNIT_SYMBOLS[pixel_unit]['microns'])
+            canvas_length = convert_factor * canvas_length
+
         if align == 'left':
             lx_end = lx + canvas_length
         else:
@@ -1305,6 +1324,8 @@ class FigureExport(object):
             symbol = u"\u00B5m"
             if 'pixel_size_x_symbol' in panel:
                 symbol = panel['pixel_size_x_symbol']
+            if scalebar_unit and scalebar_unit in UNIT_SYMBOLS:
+                symbol = UNIT_SYMBOLS[scalebar_unit]['symbol']
             label = "%s %s" % (sb['length'], symbol)
             font_size = 10
             try:
