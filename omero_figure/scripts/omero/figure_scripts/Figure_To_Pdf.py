@@ -1313,6 +1313,7 @@ class FigureExport(object):
                               UNIT_SYMBOLS[pixel_unit]['microns'])
             canvas_length = convert_factor * canvas_length
 
+        canvas_length = int(round(canvas_length))
         if align == 'left':
             lx_end = lx + canvas_length
         else:
