@@ -1294,7 +1294,7 @@ class FigureExport(object):
         scale_to_canvas = panel['width'] / float(region_width)
         canvas_length = pixels_length * scale_to_canvas
 
-        UNIT_SYMBOLS = {
+        unit_symbols = {
             "PICOMETER": {'symbol': "pm", 'microns': 0.000001},
             "ANGSTROM": {'symbol': "Å", 'microns': 0.0001},
             "NANOMETER": {'symbol': "nm", 'microns': 0.001},
@@ -1308,9 +1308,9 @@ class FigureExport(object):
 
         pixel_unit = panel.get('pixel_size_x_unit')
         scalebar_unit = sb.get('units')
-        if pixel_unit in UNIT_SYMBOLS and scalebar_unit in UNIT_SYMBOLS:
-            convert_factor = (UNIT_SYMBOLS[scalebar_unit]['microns'] /
-                              UNIT_SYMBOLS[pixel_unit]['microns'])
+        if pixel_unit in unit_symbols and scalebar_unit in unit_symbols:
+            convert_factor = (unit_symbols[scalebar_unit]['microns'] /
+                              unit_symbols[pixel_unit]['microns'])
             canvas_length = convert_factor * canvas_length
 
         canvas_length = int(round(canvas_length))
@@ -1325,8 +1325,8 @@ class FigureExport(object):
             symbol = u"\u00B5m"
             if 'pixel_size_x_symbol' in panel:
                 symbol = panel['pixel_size_x_symbol']
-            if scalebar_unit and scalebar_unit in UNIT_SYMBOLS:
-                symbol = UNIT_SYMBOLS[scalebar_unit]['symbol']
+            if scalebar_unit and scalebar_unit in unit_symbols:
+                symbol = unit_symbols[scalebar_unit]['symbol']
             label = "%s %s" % (sb['length'], symbol)
             font_size = 10
             try:
@@ -2153,7 +2153,7 @@ class TiffExport(FigureExport):
         elif align == "center":
             x = x - (temp_label.size[0] / 2)
         elif align == "right":
-                x = x - temp_label.size[0]
+            x = x - temp_label.size[0]
         x = int(round(x))
         y = int(round(y))
         # Use label as mask, so transparent part is not pasted
