@@ -846,7 +846,6 @@ class FigureExport(object):
     def get_zip_name(self):
 
         name = self.figure_name
-        name = ''.join([i if ord(i) < 128 else '' for i in name])
         # in case we have path/to/name.pdf, just use name.pdf
         name = path.basename(name)
         # Remove commas: causes problems 'duplicate headers' in file download
@@ -868,7 +867,6 @@ class FigureExport(object):
         fext = self.get_figure_file_ext()
 
         name = self.figure_name
-        name = ''.join([i if ord(i) < 128 else '' for i in name])
         # in case we have path/to/name, just use name
         name = path.basename(name)
 
