@@ -885,7 +885,6 @@ class FigureExport(object):
         if self.zip_folder_name is not None:
             full_name = os.path.join(self.zip_folder_name, full_name)
 
-        print(type(full_name))
         while(os.path.exists(full_name)):
             index += 1
             full_name = "%s_page_%02d.%s" % (name, index, fext)
@@ -915,7 +914,7 @@ class FigureExport(object):
         paper_spacing = ('paper_spacing' in self.figure_json and
                          self.figure_json['paper_spacing'] or 50)
         page_col_count = ('page_col_count' in self.figure_json and
-                          self.figure_json['page_col_count'] or 1)
+                          int(self.figure_json['page_col_count']) or 1)
 
         # Create a zip if we have multiple TIFF pages or we're exporting Images
         export_option = self.script_params['Export_Option']
