@@ -322,7 +322,7 @@ class ShapeToPdfExport(ShapeExport):
         g = float(rgb[1])/255
         b = float(rgb[2])/255
         self.canvas.setStrokeColorRGB(r, g, b)
-        stroke_width = shape['strokeWidth']
+        stroke_width = shape.get('strokeWidth', 1)
         self.canvas.setLineWidth(stroke_width)
 
         p = self.canvas.beginPath()
@@ -339,7 +339,7 @@ class ShapeToPdfExport(ShapeExport):
         y1 = self.page_height - start['y']
         x2 = end['x']
         y2 = self.page_height - end['y']
-        stroke_width = shape['strokeWidth']
+        stroke_width = shape.get('strokeWidth', 1)
         # Don't draw if both points outside panel
         if (start['inPanel'] is False) and (end['inPanel'] is False):
             return
@@ -407,7 +407,7 @@ class ShapeToPdfExport(ShapeExport):
         if not polygon_in_viewport:
             return
 
-        stroke_width = shape['strokeWidth']
+        stroke_width = shape.get('strokeWidth', 1)
         r, g, b, a = self.get_rgba(shape['strokeColor'])
         self.canvas.setStrokeColorRGB(r, g, b, alpha=a)
         self.canvas.setLineWidth(stroke_width)
@@ -438,7 +438,7 @@ class ShapeToPdfExport(ShapeExport):
         self.draw_polygon(shape, False)
 
     def draw_ellipse(self, shape):
-        stroke_width = shape['strokeWidth']
+        stroke_width = shape.get('strokeWidth', 1)
         c = self.panel_to_page_coords(shape['x'], shape['y'])
 
         # Don't draw if centre outside panel
@@ -569,7 +569,7 @@ class ShapeToPilExport(ShapeExport):
         y1 = start['y']
         x2 = end['x']
         y2 = end['y']
-        head_size = ((shape['strokeWidth'] * 4) + 5)
+        head_size = ((shape.get('strokeWidth', 1) * 4) + 5)
         head_size = scale_to_export_dpi(head_size)
         stroke_width = scale_to_export_dpi(shape.get('strokeWidth', 2))
         rgb = ShapeToPdfExport.get_rgb(shape['strokeColor'])

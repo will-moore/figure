@@ -1,7 +1,7 @@
     
     // Version of the json file we're saving.
     // This only needs to increment when we make breaking changes (not linked to release versions.)
-    var VERSION = 3;
+    var VERSION = 4;
 
 
     // ------------------------- Figure Model -----------------------------------
@@ -162,6 +162,22 @@
                                 strokeWidth = 0.25;
                             }
                             shape.strokeWidth = strokeWidth;
+                            return shape;
+                        });
+                    }
+                });
+            }
+
+            if (v < 4) {
+                console.log("Transforming to VERSION 4");
+                _.each(json.panels, function(p){
+                    // rename lineWidth to strokeWidth
+                    if (p.shapes && p.shapes.length > 0) {
+                        p.shapes = p.shapes.map(function(shape){
+                            shape.strokeWidth = shape.strokeWidth || shape.lineWidth || 1;
+                            if (shape.lineWidth) {
+                                delete shape.lineWidth;
+                            }
                             return shape;
                         });
                     }
