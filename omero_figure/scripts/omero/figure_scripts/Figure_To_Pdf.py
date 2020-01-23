@@ -1296,9 +1296,9 @@ class FigureExport(object):
 
         unit_symbols = {
             "PICOMETER": {'symbol': "pm", 'microns': 0.000001},
-            "ANGSTROM": {'symbol': "Å", 'microns': 0.0001},
+            "ANGSTROM": {'symbol': "A", 'microns': 0.0001},
             "NANOMETER": {'symbol': "nm", 'microns': 0.001},
-            "MICROMETER": {'symbol': "µm", 'microns': 1},
+            "MICROMETER": {'symbol': "um", 'microns': 1},
             "MILLIMETER": {'symbol': "mm", 'microns': 1000},
             "CENTIMETER": {'symbol': "cm", 'microns': 10000},
             "METER": {'symbol': "m", 'microns': 1000000},
