@@ -98,9 +98,22 @@ var ScalebarFormView = Backbone.View.extend({
             font_size = $('.scalebar_font_size span:first', $form).text().trim();
 
         this.models.forEach(function(m){
+            var old_sb = m.get('scalebar');
             var sb = {show: true};
             if (length != '-') sb.length = parseInt(length, 10);
-            sb.units = units;
+            if (units != '-') {
+                sb.units = units;
+            } else {
+                // various images have different units
+                // keep existing scalebar units OR use image pixel_size units
+                if (old_sb && old_sb.units) {
+                    sb.units = old_sb.units;
+                } else if (m.get('pixel_size_x_unit')) {
+                    sb.units = m.get('pixel_size_x_unit');
+                } else {
+                    sb.units = "MICROMETER";
+                }
+            }
             if (position != '-') sb.position = position;
             if (color != '-') sb.color = color;
             sb.show_label = show_label;
