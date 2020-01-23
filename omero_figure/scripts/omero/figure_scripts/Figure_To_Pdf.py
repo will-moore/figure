@@ -1307,7 +1307,8 @@ class FigureExport(object):
         }
 
         pixel_unit = panel.get('pixel_size_x_unit')
-        scalebar_unit = sb.get('units')
+        # if older file doesn't have scalebar.unit, use pixel unit
+        scalebar_unit = sb.get('units', pixel_unit)
         if pixel_unit in unit_symbols and scalebar_unit in unit_symbols:
             convert_factor = (unit_symbols[scalebar_unit]['microns'] /
                               unit_symbols[pixel_unit]['microns'])
