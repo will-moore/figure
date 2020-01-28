@@ -66,6 +66,7 @@ $(function(){
         routes: {
             "": "index",
             "new(/)": "newFigure",
+            "open(/)": "openFigure",
             "file/:id(/)": "loadFigure",
         },
 
@@ -116,6 +117,14 @@ $(function(){
             $(".modal").modal('hide'); // hide any existing dialogs
             var cb = function() {
                 $('#welcomeModal').modal();
+            };
+            this.checkSaveAndClear(cb);
+        },
+
+        openFigure: function() {
+            $(".modal").modal('hide'); // hide any existing dialogs
+            var cb = function() {
+                $("#openFigureModal").modal();
             };
             this.checkSaveAndClear(cb);
         },
