@@ -105,6 +105,9 @@ var FileListView = Backbone.View.extend({
         this.$tbody = $('tbody', this.$el);
         this.$fileFilter = $('#file-filter');
         this.owner = USER_FULL_NAME;
+        if (window.IS_PUBLIC_USER) {
+            delete this.owner;
+        }
         var self = this;
         // we automatically 'sort' on fetch, add etc.
         this.model.bind("sync remove sort", this.render, this);
