@@ -29,10 +29,11 @@ import zipfile
 from math import atan2, atan, sin, cos, sqrt, radians, floor, ceil
 from copy import deepcopy
 
-from omero.model import ImageAnnotationLinkI, ImageI
+from omero.model import ImageAnnotationLinkI, ImageI, LengthI
 import omero.scripts as scripts
 from omero.gateway import BlitzGateway
 from omero.rtypes import rstring, robject
+from omero.model.enums import UnitsLength
 
 
 from io import BytesIO
@@ -87,6 +88,21 @@ processing steps:
  - 3_final: These are the image panels that are inserted into the
    final figure, saved following any cropping, rotation and resampling steps.
 """
+
+# Create a dict we can use for scalebar unit conversions
+unit_symbols = {}
+unit_names = [
+    "PICOMETER", "ANGSTROM", "NANOMETER", "MICROMETER", "MILLIMETER",
+    "CENTIMETER", "METER", "KILOMETER", "MEGAMETER"
+]
+for name in unit_names:
+    klass = getattr(UnitsLength, name)
+    unit = LengthI(1, klass)
+    to_microns = LengthI(unit, UnitsLength.MICROMETER)
+    unit_symbols[name] = {
+        'symbol': unit.getSymbol(),
+        'microns': to_microns.getValue()
+    }
 
 
 def scale_to_export_dpi(pixels):
@@ -1293,18 +1309,6 @@ class FigureExport(object):
 
         scale_to_canvas = panel['width'] / float(region_width)
         canvas_length = pixels_length * scale_to_canvas
-
-        unit_symbols = {
-            "PICOMETER": {'symbol': "pm", 'microns': 0.000001},
-            "ANGSTROM": {'symbol': "A", 'microns': 0.0001},
-            "NANOMETER": {'symbol': "nm", 'microns': 0.001},
-            "MICROMETER": {'symbol': "um", 'microns': 1},
-            "MILLIMETER": {'symbol': "mm", 'microns': 1000},
-            "CENTIMETER": {'symbol': "cm", 'microns': 10000},
-            "METER": {'symbol': "m", 'microns': 1000000},
-            "KILOMETER": {'symbol': "km", 'microns': 1000000000},
-            "MEGAMETER": {'symbol': "Mm", 'microns': 1000000000000}
-        }
 
         pixel_unit = panel.get('pixel_size_x_unit')
         # if older file doesn't have scalebar.unit, use pixel unit
