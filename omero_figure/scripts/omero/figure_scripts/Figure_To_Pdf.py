@@ -91,11 +91,9 @@ processing steps:
 
 # Create a dict we can use for scalebar unit conversions
 unit_symbols = {}
-unit_names = [
-    "PICOMETER", "ANGSTROM", "NANOMETER", "MICROMETER", "MILLIMETER",
-    "CENTIMETER", "METER", "KILOMETER", "MEGAMETER"
-]
-for name in unit_names:
+for name in LengthI.SYMBOLS.keys():
+    if name in ("PIXEL", "REFERENCEFRAME"):
+        continue
     klass = getattr(UnitsLength, name)
     unit = LengthI(1, klass)
     to_microns = LengthI(unit, UnitsLength.MICROMETER)
