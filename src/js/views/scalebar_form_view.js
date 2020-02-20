@@ -100,7 +100,7 @@ var ScalebarFormView = Backbone.View.extend({
         this.models.forEach(function(m){
             var old_sb = m.get('scalebar');
             var sb = {show: true};
-            if (length != '-') sb.length = parseInt(length, 10);
+            if (length != '-') sb.length = parseFloat(length, 10);
             if (units != '-') {
                 sb.units = units;
             } else {
