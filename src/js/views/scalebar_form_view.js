@@ -1,18 +1,4 @@
 
-window.UNIT_SYMBOLS = {"PICOMETER": {symbol: "pm", microns: 0.000001},
-    "ANGSTROM": {symbol: "Å", microns: 0.0001},
-    "NANOMETER": {symbol: "nm", microns: 0.001},
-    "MICROMETER": {symbol: "µm", microns: 1},
-    "MILLIMETER": {symbol: "mm", microns: 1000},
-    "CENTIMETER": {symbol: "cm", microns: 10000},
-    "METER": {symbol: "m", microns: 1000000},
-    "KILOMETER": {symbol: "km", microns: 1000000000},
-    "MEGAMETER": {symbol: "Mm", microns: 1000000000000},
-    // "GIGAMETER", symbol: "Gm"},
-    // "ASTRONOMICALUNIT", symbol: "ua"},
-    // "LIGHTYEAR", symbol: "ly"}
-}
-
 // Created new for each selection change
 var ScalebarFormView = Backbone.View.extend({
 
@@ -130,9 +116,15 @@ var ScalebarFormView = Backbone.View.extend({
             sb;
 
         // Turn dict into list of units we can sort by size
-        var unit_symbols = Object.keys(UNIT_SYMBOLS).map(function(unit){
-            return $.extend({unit: unit}, UNIT_SYMBOLS[unit]);
-        });
+        var scalebarUnits = ["PICOMETER", "ANGSTROM", "NANOMETER", "MICROMETER",
+            "MILLIMETER", "CENTIMETER", "METER", "KILOMETER", "MEGAMETER"]
+        var unit_symbols = Object.keys(window.LENGTH_UNITS)
+            .filter(function(unit){
+                return (scalebarUnits.indexOf(unit) > -1);
+            })
+            .map(function(unit){
+                return $.extend({unit: unit}, window.LENGTH_UNITS[unit]);
+            });
         unit_symbols.sort(function(a, b){
             return a.microns > b.microns ? 1 : -1;
         })
@@ -193,7 +185,7 @@ var ScalebarFormView = Backbone.View.extend({
         json.units_symbol = '-';
         if (json.units !== '-') {
             // find the symbol e.g. 'mm' from units 'MILLIMETER'
-            json.units_symbol = UNIT_SYMBOLS[json.units].symbol;
+            json.units_symbol = LENGTH_UNITS[json.units].symbol;
         }
         json.position = json.position || 'bottomright';
         json.color = json.color || 'FFFFFF';
