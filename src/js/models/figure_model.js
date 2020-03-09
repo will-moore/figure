@@ -1,7 +1,7 @@
     
     // Version of the json file we're saving.
     // This only needs to increment when we make breaking changes (not linked to release versions.)
-    var VERSION = 4;
+    var VERSION = 5;
 
 
     // ------------------------- Figure Model -----------------------------------
@@ -180,6 +180,18 @@
                             }
                             return shape;
                         });
+                    }
+                });
+            }
+
+            if (v < 5) {
+                console.log("Transforming to VERSION 5");
+                // scalebar now has 'units' attribute.
+                _.each(json.panels, function(p){
+                    // rename lineWidth to strokeWidth
+                    if (p.scalebar && !p.scalebar.units) {
+                        var units = p.pixel_size_x_unit || "MICROMETER";
+                        p.scalebar.units = units;
                     }
                 });
             }

@@ -104,8 +104,13 @@
             var sb = this.model.get('scalebar');
             if (sb && sb.show) {
                 // this.$scalebar.css('width':);
-                var sb_pixels = sb.length / this.model.get('pixel_size_x'),
-                    sb_width = panel_scale * sb_pixels;
+                var physical_length = sb.length;
+                // convert units
+                var pixel_unit = this.model.get('pixel_size_x_unit');
+                var scalebar_unit = sb.units;
+                var convert_factor = LENGTH_UNITS[scalebar_unit].microns / LENGTH_UNITS[pixel_unit].microns;
+                var sb_pixels = convert_factor * physical_length / this.model.get('pixel_size_x');
+                var sb_width = panel_scale * sb_pixels;
                 this.$scalebar.css('width', sb_width);
             }
         },
@@ -226,7 +231,12 @@
                 sb_json.length = sb.length;
                 sb_json.font_size = sb.font_size;
                 sb_json.show_label = sb.show_label;
-                sb_json.symbol = this.model.get('pixel_size_x_symbol');
+                sb_json.symbol = sb.units;
+
+                // Use global LENGTH_UNITS to get symbol for unit.
+                if (window.LENGTH_UNITS && window.LENGTH_UNITS[sb.units]){
+                    sb_json.symbol = window.LENGTH_UNITS[sb.units].symbol;
+                }
 
                 var sb_html = this.scalebar_template(sb_json);
                 this.$el.append(sb_html);

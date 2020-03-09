@@ -2,15 +2,15 @@
     <div class="pixel_size_form" style="position:relative">
         <div class="pixel_size_div">
             Pixel Size:
-            <input class="input-sm form-control pixel_size_input" placeholder="Pixel Size (<%= symbol %>)"
+            <input class="input-sm form-control pixel_size_input" placeholder="Pixel Size (<%= pixel_size_symbol %>)"
                     style="width:100px; display:none" value="<%= pixel_size_x %>">
             <span class="pixel_size_display">
                 <% if (!pixel_size_x)
                     {print('<span style="color:red">NOT SET</span>')}
                 else if (typeof pixel_size_x === 'number')
-                    {print(pixel_size_x.toFixed(3) + " " + symbol)}
+                    {print(pixel_size_x.toFixed(3) + " " + pixel_size_symbol)}
                 else
-                    {print(pixel_size_x + " " + symbol)} %>
+                    {print(pixel_size_x + " " + pixel_size_symbol)} %>
             </span>
         </div>
 
@@ -23,9 +23,18 @@
                 placeholder="Length" value="<%= length %>" />
     </div>
 
-    <div class="form-group"><div class="checkbox checkbox-inline">
-        <label><%= symbol %></label>
-        </div>
+    <!-- units -->
+    <div class="btn-group">
+        <button type="button" class="scalebar-units btn btn-default btn-sm dropdown-toggle"
+                title="Units" data-toggle="dropdown">
+            <span data-unit="<%= units %>"><%= units_symbol %></span>
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" role="menu">
+            <% _.each(unit_symbols, function(u){ %>
+                <li><a href='#'><%= u.unit %> (<span data-unit="<%= u.unit %>"><%= u.symbol %></span>)</a></li>
+            <% }); %>
+        </ul>
     </div>
 
     <div class="btn-group">
