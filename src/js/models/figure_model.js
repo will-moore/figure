@@ -472,7 +472,7 @@
 
             selected.forEach(function(p){
                 pos = p.get(axis);
-                p.set(axis, pos + delta);
+                p.save(axis, pos + delta);
             });
         },
 
@@ -485,7 +485,7 @@
             var min_x = Math.min.apply(window, x_vals);
 
             selected.forEach(function(p){
-                p.set('x', min_x);
+                p.save('x', min_x);
             });
         },
 
@@ -498,7 +498,7 @@
             var min_y = Math.min.apply(window, y_vals);
 
             selected.forEach(function(p){
-                p.set('y', min_y);
+                p.save('y', min_y);
             });
         },
 
