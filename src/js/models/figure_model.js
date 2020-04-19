@@ -210,6 +210,7 @@
                     tsUrl += '?image=' + iids.join('&image=');
                     $.getJSON(tsUrl, function(data){
                         // Update all panels
+                        // NB: By the time that this callback runs, the panels will have been created
                         self.panels.forEach(function(p){
                             var iid = p.get('imageId');
                             if (data[iid] && data[iid].length > 0) {
