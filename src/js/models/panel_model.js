@@ -279,18 +279,24 @@
                 text = "", h, m, s;
             if (format === "index") {
                 text = "" + (theT + 1);
+            } else if (format === "millisecs") {
+                text = Math.round(deltaT*1000) + " ms";
             } else if (format === "secs") {
-                text = deltaT + " secs";
+                text = Math.round(deltaT) + " secs";
+            } else if (format === "mins:secs") {
+                m = parseInt(deltaT / 60);
+                s = pad(Math.round(deltaT % 60));
+                text = m + ":" + s;
             } else if (format === "mins") {
                 text = Math.round(deltaT / 60) + " mins";
             } else if (format === "hrs:mins") {
-                h = (deltaT / 3600) >> 0;
+                h = parseInt(deltaT / 3600);
                 m = pad(Math.round((deltaT % 3600) / 60));
                 text = h + ":" + m;
             } else if (format === "hrs:mins:secs") {
-                h = (deltaT / 3600) >> 0;
-                m = pad(((deltaT % 3600) / 60) >> 0);
-                s = pad(deltaT % 60);
+                h = parseInt(deltaT / 3600);
+                m = pad(parseInt((deltaT % 3600) / 60));
+                s = pad(Math.round(deltaT % 60));
                 text = h + ":" + m + ":" + s;
             }
             return text;
