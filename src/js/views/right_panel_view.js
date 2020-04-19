@@ -791,7 +791,7 @@
                 return "";
             }
             else if (seconds < 60) {
-                return seconds + " secs";
+                return seconds.toFixed(2) + " secs";
             } else if (seconds < 3600) {
                 mins = (seconds / 60) >> 0;
                 secs = (seconds % 60) >> 0;
