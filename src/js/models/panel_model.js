@@ -313,7 +313,7 @@
         },
 
         get_label_key: function(label) {
-            var key = label.text + '_' + label.size + '_' + label.color + '_' + label.position;
+            var key = (label.text || label.time) + '_' + label.size + '_' + label.color + '_' + label.position;
             key = _.escape(key);
             return key;
         },
