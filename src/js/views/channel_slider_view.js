@@ -244,7 +244,7 @@ var ChannelSliderView = Backbone.View.extend({
                 var max = maxs.reduce(reduceFn(Math.max));
                 var color = colors.reduce(allEqualFn, colors[0]) ? colors[0] : 'ccc';
                 // allEqualFn for booleans will return undefined if not or equal
-                var label = labels.reduce(allEqualFn, labels[0]);
+                var label = labels.reduce(allEqualFn, labels[0]) ? labels[0] : ' ';
                 var reverse = reverses.reduce(allEqualFn, reverses[0]) ? true : false;
                 var active = actives.reduce(allEqualFn, actives[0]);
                 var style = {'background-position': '0 0'}
