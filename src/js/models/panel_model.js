@@ -279,7 +279,7 @@
                 text = "", h, m, s;
             if (format === "index") {
                 text = "" + (theT + 1);
-            } else if (format === "millisecs") {
+            } else if (format === "milliseconds") {
                 text = Math.round(deltaT*1000) + " ms";
             } else if (format === "secs") {
                 text = Math.round(deltaT) + " secs";
