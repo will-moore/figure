@@ -282,7 +282,7 @@
             } else if (format === "milliseconds") {
                 text = Math.round(deltaT*1000) + " ms";
             } else if (format === "secs") {
-                text = Math.round(deltaT) + " secs";
+                text = Math.round(deltaT) + " s";
             } else if (format === "mins:secs") {
                 m = parseInt(deltaT / 60);
                 s = pad(Math.round(deltaT % 60));
