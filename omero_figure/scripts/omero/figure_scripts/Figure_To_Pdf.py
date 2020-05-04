@@ -1089,17 +1089,23 @@ class FigureExport(object):
     def get_time_label_text(self, delta_t, format):
         """ Gets the text for 'live' time-stamp labels """
         # format of "secs" by default
-        text = "%s secs" % delta_t
-        if format == "mins":
-            text = "%s mins" % int(round(float(delta_t) / 60))
+        text = "%d s" % int(round(delta_t))
+        if format == "milliseconds":
+            text = "%s ms" % int(round(delta_t * 1000))
+        elif format == "mins":
+            text = "%s mins" % int(round(delta_t / 60))
+        elif format == "mins:secs":
+            m = int(delta_t // 60)
+            s = round(delta_t % 60)
+            text = "%s:%02d" % (m, s)
         elif format == "hrs:mins":
-            h = (delta_t / 3600)
-            m = int(round((float(delta_t) % 3600) / 60))
+            h = int(delta_t // 3600)
+            m = int(round((delta_t % 3600) / 60))
             text = "%s:%02d" % (h, m)
         elif format == "hrs:mins:secs":
-            h = (delta_t / 3600)
-            m = (delta_t % 3600) / 60
-            s = delta_t % 60
+            h = int(delta_t // 3600)
+            m = (delta_t % 3600) // 60
+            s = round(delta_t % 60)
             text = "%s:%02d:%02d" % (h, m, s)
         return text
 

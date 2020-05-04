@@ -786,22 +786,18 @@
 
         formatTime: function(seconds) {
 
-            var mins, secs, hours;
             if (typeof seconds === 'undefined') {
                 return "";
             }
-            else if (seconds < 60) {
-                return seconds + " secs";
-            } else if (seconds < 3600) {
-                mins = (seconds / 60) >> 0;
-                secs = (seconds % 60) >> 0;
-                return mins + "min " + secs + "s";
-            } else {
-                hours = (seconds / 3600) >> 0;
-                mins = (seconds % 3600 / 60) >> 0;
-                secs = (seconds % 60) >> 0;
-                return hours + "h " + mins + "min " + secs + "s";
+            function leftPad(s) {
+                s = s + '';
+                if (s.split('.')[0].length === 1) return '0' + s;
+                return s;
             }
+            var hours = parseInt(seconds / 3600);
+            var mins = parseInt(seconds % 3600 / 60);
+            var secs = (seconds % 60).toFixed(2);
+            return leftPad(hours) + ":" + leftPad(mins) + ":" + leftPad(secs);
         },
 
         get_imgs_css: function() {
