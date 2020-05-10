@@ -1742,8 +1742,8 @@ class FigureExport(object):
         for p in panels_json:
             iid = p['imageId']
             # list unique scalebar lengths
-            if 'scalebar' in p:
-                sb_length = p['scalebar']['length']
+            if 'scalebar' in p and p['scalebar'].get('show'):
+                sb_length = p['scalebar'].get('length')
                 symbol = u"\u00B5m"
                 if 'pixel_size_x_symbol' in p:
                     symbol = p['pixel_size_x_symbol']
