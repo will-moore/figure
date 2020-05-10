@@ -1089,6 +1089,8 @@ class FigureExport(object):
     def get_time_label_text(self, delta_t, format):
         """ Gets the text for 'live' time-stamp labels """
         # format of "secs" by default
+        isNegative = delta_t < 0
+        delta_t = abs(delta_t)
         text = "%d s" % int(round(delta_t))
         if format == "milliseconds":
             text = "%s ms" % int(round(delta_t * 1000))
@@ -1107,7 +1109,7 @@ class FigureExport(object):
             m = (delta_t % 3600) // 60
             s = round(delta_t % 60)
             text = "%s:%02d:%02d" % (h, m, s)
-        return text
+        return ('-' if isNegative else '') + text
 
     def add_rois(self, panel, page):
         """
