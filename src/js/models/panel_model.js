@@ -280,6 +280,7 @@
                 text = "", h, m, s;
             deltaT = Math.abs(deltaT);
             if (format === "index") {
+                isNegative = false;
                 text = "" + (theT + 1);
             } else if (format === "milliseconds") {
                 text = Math.round(deltaT*1000) + " ms";
