@@ -789,7 +789,7 @@
             if (typeof seconds === 'undefined') {
                 return "";
             }
-            var isNegative = seconds < 1;
+            var isNegative = seconds < 0;
             seconds = Math.abs(seconds);
             function leftPad(s) {
                 s = s + '';
