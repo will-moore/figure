@@ -276,8 +276,11 @@
             };
             var theT = this.get('theT'),
                 deltaT = this.get('deltaT')[theT] || 0,
+                isNegative = (deltaT < 0),
                 text = "", h, m, s;
+            deltaT = Math.abs(deltaT);
             if (format === "index") {
+                isNegative = false;
                 text = "" + (theT + 1);
             } else if (format === "milliseconds") {
                 text = Math.round(deltaT*1000) + " ms";
@@ -299,7 +302,10 @@
                 s = pad(Math.round(deltaT % 60));
                 text = h + ":" + m + ":" + s;
             }
-            return text;
+            if (["0 s", "0:00", "0 mins", "0:00:00"].indexOf(text) > -1) {
+                isNegative = false;
+            }
+            return (isNegative ? '-' : '') + text;
         },
 
         create_labels_from_time: function(options) {

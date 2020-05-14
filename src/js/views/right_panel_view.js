@@ -789,6 +789,8 @@
             if (typeof seconds === 'undefined') {
                 return "";
             }
+            var isNegative = seconds < 0;
+            seconds = Math.abs(seconds);
             function leftPad(s) {
                 s = s + '';
                 if (s.split('.')[0].length === 1) return '0' + s;
@@ -797,7 +799,7 @@
             var hours = parseInt(seconds / 3600);
             var mins = parseInt(seconds % 3600 / 60);
             var secs = (seconds % 60).toFixed(2);
-            return leftPad(hours) + ":" + leftPad(mins) + ":" + leftPad(secs);
+            return (isNegative ? '-' : '') + leftPad(hours) + ":" + leftPad(mins) + ":" + leftPad(secs);
         },
 
         get_imgs_css: function() {
