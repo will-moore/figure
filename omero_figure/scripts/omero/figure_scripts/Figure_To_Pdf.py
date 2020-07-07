@@ -20,7 +20,7 @@
 import logging
 import json
 import numpy
-import cgi
+import html
 
 from datetime import datetime
 import os
@@ -301,7 +301,7 @@ class ShapeToPdfExport(ShapeExport):
 
     def draw_shape_label(self, shape, bounds):
         center = bounds.get_center()
-        text = cgi.escape(shape.get('text', ''))
+        text = html.escape(shape.get('text', ''))
         if not text or not center:
             return
         size = shape.get('fontSize', 12) * 2 / 3
