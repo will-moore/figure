@@ -638,7 +638,7 @@ class ShapeToPilExport(ShapeExport):
         p.append(p[0])
         points = p
 
-        stroke_width = scale_to_export_dpi(shape.get('strokeWidth', 2))
+        stroke_width = scale_to_export_dpi(int(shape.get('strokeWidth', 2)))
         buffer = int(ceil(stroke_width) * 1.5)
 
         # if fill, draw filled polygon without outline, then add line later
