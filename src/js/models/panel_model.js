@@ -481,6 +481,7 @@
             zoom = zoom !== undefined ? zoom : this.get('zoom');
             dx = dx !== undefined ? dx : this.get('dx');
             dy = dy !== undefined ? dy : this.get('dy');
+            var rotation = this.get('rotation');
 
             var width = this.get('width'),
                 height = this.get('height'),
@@ -497,7 +498,8 @@
                 view_wh = width / height;
             if (dx === 0 && dy === 0 && zoom == 100 && Math.abs(orig_wh - view_wh) < 0.01) {
                 // ...ROI is whole image
-                return {'x': 0, 'y': 0, 'width': orig_width, 'height': orig_height}
+                return {'x': 0, 'y': 0, 'width': orig_width,
+                    'height': orig_height, 'rotation': rotation}
             }
 
             // Factor in the applied zoom...
@@ -512,7 +514,8 @@
                 roiX = cX - (roiW / 2),
                 roiY = cY - (roiH / 2);
 
-            return {'x': roiX, 'y': roiY, 'width': roiW, 'height': roiH};
+            return {'x': roiX, 'y': roiY, 'width': roiW,
+                'height': roiH, 'rotation': rotation};
         },
 
         // Drag resizing - notify the PanelView without saving

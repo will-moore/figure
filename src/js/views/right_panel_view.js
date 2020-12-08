@@ -124,6 +124,31 @@
             this.render();
         },
 
+        rotatePoint: function(x, y, cx, cy, rotation) {
+            // Get coordinates for point x, y rotate around cx, cy, by rotation degrees
+            let length = Math.sqrt(Math.pow((x - cx), 2) + Math.pow((y - cy), 2));
+            let rot = Math.atan2((y - cy), (x - cx));
+            rot = rot + (rotation * (Math.PI / 180));  // degrees to rad
+            let dx = Math.cos(rot) * length;
+            let dy = Math.sin(rot) * length;
+            return {x: cx + dx, y: cy + dy};
+        },
+
+        rectToPolygon: function(rect, rotation) {
+            // rotate Rect around centre point - return points "x,y, x,y, x,y, x,y"
+            let cx = rect.x + (rect.width / 2);
+            let cy = rect.y + (rect.height / 2);
+            // topleft
+            let tl = this.rotatePoint(rect.x, rect.y, cx, cy, rotation);
+            // topright
+            let tr = this.rotatePoint(rect.x + rect.width, rect.y, cx, cy, rotation);
+            // bottomright
+            let br = this.rotatePoint(rect.x + rect.width, rect.y + rect.height, cx, cy, rotation);
+            // bottomleft
+            let bl = this.rotatePoint(rect.x, rect.y + rect.height, cx, cy, rotation);
+            return [tl, tr, br, bl].map(point => point.x + ',' + point.y).join(', ');
+        },
+
         pasteROIs: function(event) {
             event.preventDefault();
             var sel = this.model.getSelected(),
@@ -140,13 +165,25 @@
                 var color = $('button.shape-color span:first', this.$el).attr('data-color'),
                     width = $('button.line-width span:first', this.$el).attr('data-line-width'),
                     rect = roiJson.CROP;
-                roiJson = [{type: "Rectangle",
+                // If rotated, need to create a Polygon since Rectangle doesn't support rotation
+                if (rect.rotation && !isNaN(rect.rotation)) {
+                    // rotate around centre point
+                    var points = this.rectToPolygon(rect, -rect.rotation);
+                    roiJson = [{
+                        type: "Polygon",
+                        strokeColor: "#" + color,
+                        points: points,
+                        strokeWidth: width
+                    }]
+                } else {
+                    roiJson = [{type: "Rectangle",
                             x: rect.x,
                             y: rect.y,
                             width: rect.width,
                             height: rect.height,
                             strokeColor: "#" + color,
                             strokeWidth: width}];
+                }
             } else {
                 return;
             }
@@ -1116,7 +1153,7 @@
 
         getXYWH: function(zoom, dx, dy) {
 
-            var x, y, w, h;
+            var x, y, w, h, rotation;
             this.models.forEach(function(m, i){
                 var r = m.getViewportAsRect(zoom, dx, dy);
                 if (i === 0) {
@@ -1124,11 +1161,14 @@
                     y = r.y;
                     w = r.width;
                     h = r.height;
+                    rotation = r.rotation;
                 } else {
+                    // if any models have different values, return '-'
                     if (x !== r.x) x = "-";
                     if (y !== r.y) y = "-";
                     if (w !== r.width) w = "-";
                     if (h !== r.height) h = "-";
+                    if (rotation !== r.rotation) rotation = "-";
                 }
             });
             var json = {
@@ -1136,6 +1176,7 @@
                 y: (y !== "-" ? parseInt(y, 10) : y),
                 width: (w !== "-" ? parseInt(w, 10) : w),
                 height: (h !== "-" ? parseInt(h, 10) : h),
+                rotation: (rotation !== "-" ? parseInt(rotation, 10) : "-"),
             }
             return json;
         },
