@@ -1,6 +1,6 @@
 
 //
-// Copyright (C) 2014 University of Dundee & Open Microscopy Environment.
+// Copyright (C) 2014-2020 University of Dundee & Open Microscopy Environment.
 // All rights reserved.
 //
 // This program is free software: you can redistribute it and/or modify
@@ -39,6 +39,11 @@ var FigureFile = Backbone.Model.extend({
     isVisible: function(filter) {
         if (filter.owner) {
             if (this.get('ownerFullName') !== filter.owner) {
+                return false;
+            }
+        }
+        if (filter.group) {
+            if (this.get('group').name !== filter.group) {
                 return false;
             }
         }
@@ -133,6 +138,7 @@ var FileListView = Backbone.View.extend({
         "click .sort-name": "sort_name",
         "click .sort-name-reverse": "sort_name_reverse",
         "click .pick-owner": "pick_owner",
+        "click .pick-group": "pick_group",
         "keyup #file-filter": "filter_files",
         "click .refresh-files": "refresh_files",
     },
@@ -197,6 +203,17 @@ var FileListView = Backbone.View.extend({
         this.render();
     },
 
+    pick_group: function (event) {
+        event.preventDefault()
+        var group = $(event.target).text();
+        if (group != " -- Show All -- ") {
+            this.group = group;
+        } else {
+            delete this.group;
+        }
+        this.render();
+    },
+
     render:function () {
         var self = this,
             filter = {},
@@ -204,6 +221,9 @@ var FileListView = Backbone.View.extend({
             currentFileId = this.figureModel.get('fileId');
         if (this.owner && this.owner.length > 0) {
             filter.owner = this.owner;
+        }
+        if (this.group && this.group.length > 0) {
+            filter.group = this.group;
         }
         if (filterVal.length > 0) {
             filter.name = filterVal.toLowerCase();
@@ -223,7 +243,7 @@ var FileListView = Backbone.View.extend({
                 self.$tbody.prepend(e);
             }
         });
-        owners = this.model.pluck("ownerFullName");
+        var owners = this.model.pluck("ownerFullName");
         owners = _.uniq(owners, false);
         // Sort by last name
         owners.sort(function compare(a, b) {
@@ -239,6 +259,15 @@ var FileListView = Backbone.View.extend({
             ownersHtml += "<li><a class='pick-owner' href='#'>" + owner + "</a></li>";
         });
         $("#owner-menu").html(ownersHtml);
+
+        // render groups chooser
+        var groups = this.model.pluck("group");
+        var groupNames = groups.map(function(g){return g.name});
+        groupNames = _.uniq(groupNames, false);
+        groupNames.sort();
+        var groupsHtml = "<li><a class='pick-group' href='#'> -- Show All -- </a></li><li class='divider'></li>";
+        groupsHtml += groupNames.map(function (g) { return "<li><a class='pick-group' href='#'>" + g + "</a></li>"}).join('\n');
+        $("#group-menu").html(groupsHtml);
         return this;
     }
 });
