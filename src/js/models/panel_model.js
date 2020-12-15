@@ -450,6 +450,7 @@
 
         // resize, zoom and pan to show the specified region.
         // new panel will fit inside existing panel
+        // coords is {x:x, y:y, width:w, height:h, rotation?:r}
         cropToRoi: function(coords) {
             var targetWH = coords.width/coords.height,
                 currentWH = this.get('width')/this.get('height'),
@@ -473,7 +474,14 @@
                 yPercent = this.get('orig_height') / coords.height,
                 zoom = Math.min(xPercent, yPercent) * 100;
 
-            this.set({'width': newW, 'height': newH, 'dx': dx, 'dy': dy, 'zoom': zoom});
+            var toSet = { 'width': newW, 'height': newH, 'dx': dx, 'dy': dy, 'zoom': zoom };
+            if (coords.rotation) {
+                var rotation = parseInt(coords.rotation);
+                if (!isNaN(rotation)) {
+                    toSet.rotation = rotation;
+                }
+            }
+            this.save(toSet);
         },
 
         // returns the current viewport as a Rect {x, y, width, height}
