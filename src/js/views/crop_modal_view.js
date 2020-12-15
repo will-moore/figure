@@ -8,6 +8,16 @@ var CropModalView = Backbone.View.extend({
 
         model:FigureModel,
 
+        rotatePoint: function (x, y, cx, cy, rotation) {
+            // Get coordinates for point x, y rotate around cx, cy, by rotation degrees
+            let length = Math.sqrt(Math.pow((x - cx), 2) + Math.pow((y - cy), 2));
+            let rot = Math.atan2((y - cy), (x - cx));
+            rot = rot + (rotation * (Math.PI / 180));  // degrees to rad
+            let dx = Math.cos(rot) * length;
+            let dy = Math.sin(rot) * length;
+            return { x: cx + dx, y: cy + dy };
+        },
+
         initialize: function() {
 
             var self = this;
@@ -22,6 +32,16 @@ var CropModalView = Backbone.View.extend({
 
                 // get selected area...
                 var roi = self.m.getViewportAsRect();
+                var rotation = self.m.get('rotation');
+                if (rotation != 0) {
+                    var img_cx = self.m.get('orig_width') / 2;
+                    var img_cy = self.m.get('orig_height') / 2;
+                    var rect_cx = roi.x + (roi.width / 2);
+                    var rect_cy = roi.y + (roi.height / 2);
+                    var new_c = self.rotatePoint(rect_cx, rect_cy, img_cx, img_cy, rotation);
+                    roi.x = new_c.x - (roi.width / 2);
+                    roi.y = new_c.y - (roi.height / 2);
+                }
 
                 // Show as ROI *if* it isn't the whole image
                 if (roi.x !== 0 || roi.y !== 0
@@ -167,6 +187,18 @@ var CropModalView = Backbone.View.extend({
                 if (sameT) {
                     t = self.m.get('theT');
                 }
+
+                var rotation = self.m.get('rotation');
+                if (rotation != 0) {
+                    var img_cx = self.m.get('orig_width') / 2;
+                    var img_cy = self.m.get('orig_height') / 2;
+                    var rect_cx = r.x + (r.width / 2);
+                    var rect_cy = r.y + (r.height / 2);
+                    var new_c = self.rotatePoint(rect_cx, rect_cy, img_cx, img_cy, -rotation);
+                    r.x = new_c.x - (r.width / 2);
+                    r.y = new_c.y - (r.height / 2);
+                }
+
                 var rv = {'x': r.x,
                         'y': r.y,
                         'width': r.width,
