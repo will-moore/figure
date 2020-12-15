@@ -124,28 +124,18 @@
             this.render();
         },
 
-        rotatePoint: function(x, y, cx, cy, rotation) {
-            // Get coordinates for point x, y rotate around cx, cy, by rotation degrees
-            let length = Math.sqrt(Math.pow((x - cx), 2) + Math.pow((y - cy), 2));
-            let rot = Math.atan2((y - cy), (x - cx));
-            rot = rot + (rotation * (Math.PI / 180));  // degrees to rad
-            let dx = Math.cos(rot) * length;
-            let dy = Math.sin(rot) * length;
-            return {x: cx + dx, y: cy + dy};
-        },
-
         rectToPolygon: function(rect, rotation) {
             // rotate Rect around centre point - return points "x,y, x,y, x,y, x,y"
             let cx = rect.x + (rect.width / 2);
             let cy = rect.y + (rect.height / 2);
             // topleft
-            let tl = this.rotatePoint(rect.x, rect.y, cx, cy, rotation);
+            let tl = rotatePoint(rect.x, rect.y, cx, cy, rotation);
             // topright
-            let tr = this.rotatePoint(rect.x + rect.width, rect.y, cx, cy, rotation);
+            let tr = rotatePoint(rect.x + rect.width, rect.y, cx, cy, rotation);
             // bottomright
-            let br = this.rotatePoint(rect.x + rect.width, rect.y + rect.height, cx, cy, rotation);
+            let br = rotatePoint(rect.x + rect.width, rect.y + rect.height, cx, cy, rotation);
             // bottomleft
-            let bl = this.rotatePoint(rect.x, rect.y + rect.height, cx, cy, rotation);
+            let bl = rotatePoint(rect.x, rect.y + rect.height, cx, cy, rotation);
             return [tl, tr, br, bl].map(point => point.x + ',' + point.y).join(', ');
         },
 
