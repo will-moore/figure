@@ -297,6 +297,27 @@
                     if (options.success) {
                         options.success(data);
                     }
+                })
+                .error(function(rsp){
+                    console.log('Save Error', rsp.responseText);
+                    var errorTitle = `${rsp.status} ${rsp.statusText}`;
+                    var loginMsg = `
+                        <p>Please <a href="${WEBINDEX_URL}" target="_blank">open the webclient in a new tab</a>
+                        to check you are logged-in.</p>`
+                    var message = `
+                        ${rsp.status === 403 ? loginMsg : ""}
+                        <p>To ensure you don't lose the current Figure, please <b>Export as JSON</b>, then copy
+                        the figure data and save it on your machine.</p>
+                        <p>You may need to refresh this page.</p>
+                        <p>You can recreate the Figure using <b>File > Import from JSON</b>, then paste in the figure data.</p>
+                    `;
+                    var buttons = ['Close', 'Export as JSON'];
+                    var callback = function(btnText) {
+                        if (btnText === "Export as JSON") {
+                            showExporAsJsonModal(figureJSON);
+                        }
+                    }
+                    figureConfirmDialog(errorTitle, message, buttons, callback);
                 });
         },
 

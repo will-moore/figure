@@ -471,11 +471,7 @@
 
         export_json: function(event) {
             event.preventDefault();
-
-            var figureJSON = this.model.figure_toJSON(),
-                figureText = JSON.stringify(figureJSON);
-            $('#exportJsonModal').modal('show');
-            $('#exportJsonModal textarea').text(figureText);
+            showExportAsJsonModal(this.model.figure_toJSON());
         },
         
         import_json: function(event) {

@@ -53,6 +53,11 @@ if (!String.prototype.endsWith)
                          searchStr.length) === searchStr;
   };
 
+var showExporAsJsonModal = function(figureJSON) {
+    var figureText = JSON.stringify(figureJSON);
+    $('#exportJsonModal').modal('show');
+    $('#exportJsonModal textarea').text(figureText);
+}
 
 var figureConfirmDialog = function(title, message, buttons, callback) {
     var $confirmModal = $("#confirmModal"),
