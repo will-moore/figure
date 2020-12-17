@@ -4,10 +4,9 @@ var ChgrpModalView = Backbone.View.extend({
 
     el: $("#chgrpModal"),
 
-    // template: JST["src/templates/modal_dialogs/chgrp_modal.html"],
-
     model: FigureModel,
 
+    imagesByGroup: {},
     targetGroups: [],
 
     initialize: function () {
@@ -19,12 +18,31 @@ var ChgrpModalView = Backbone.View.extend({
         $("#chgrpModal").bind("show.bs.modal", function () {
             $('#chgrpModal .modal-body').html("");
             self.loadGroups();
+            self.loadImageDetails();
         });
     },
 
     events: {
         "click .chgrpForm input": "inputClicked",
         "submit .chgrpForm": "handleSubmit"
+    },
+
+    loadImageDetails: function() {
+        var imgIds = this.model.panels.pluck('imageId');
+        console.log('imgIds', imgIds);
+        var url = `${BASE_WEBFIGURE_URL}images_details/?image=${_.uniq(imgIds).join(',')}`;
+        $.getJSON(url, function (data) {
+            console.log(data);
+            // Sort images by Group
+            this.imagesByGroup = data.data.reduce(function(prev, img){
+                if (!prev[img.group.id]) {
+                    prev[img.group.id] = [];
+                }
+                prev[img.group.id].push(img);
+                return prev;
+            }, {});
+            this.render();
+        }.bind(this));
     },
 
     loadGroups: function() {
@@ -77,7 +95,17 @@ var ChgrpModalView = Backbone.View.extend({
     },
 
     render: function() {
-        var html = '<p>This figure is currently in Group: <strong>' + this.model.get('groupName') + '</strong></p>';
+        var html = '<p>This figure is currently in Group: <strong>' + this.model.get('groupName') + '</strong>.</p>';
+
+        var groupCount = Object.keys(this.imagesByGroup).length;
+        html += `<p>Images in this figure belong to ${groupCount} Group${groupCount == 1 ? '' : 's'}: `
+        html += Object.keys(this.imagesByGroup).map(groupId => {
+            var imgIds = this.imagesByGroup[groupId].map(i => i.id);
+            var groupName = this.imagesByGroup[groupId][0].group.name;
+            return `
+                <b>${groupName}</b>
+                (<a target="_blank" href="${WEBINDEX_URL}?show=image-${imgIds.join('|image-')}">${imgIds.length} image${imgIds.length == 1 ? '' : 's'}</a>)`}).join(", ") + '.</p>';
+
         if (this.targetGroups.length === 0) {
             html += "<p>No other Groups available (You are not a member of any other groups)</p>";
         } else {
