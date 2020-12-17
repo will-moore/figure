@@ -15,6 +15,7 @@
             new SetIdModalView({model: this.model});
             new PaperSetupModalView({model: this.model});
             new CropModalView({model: this.model});
+            new ChgrpModalView({ model: this.model });
             new RoiModalView({model: this.model});
             new DpiModalView({model: this.model});
             new LegendView({model: this.model});
@@ -95,6 +96,7 @@
             "click .export_json": "export_json",
             "click .import_json": "import_json",
             "click .delete_figure": "delete_figure",
+            "click .chgrp_figure": "chgrp_figure",
             "click .paper_setup": "paper_setup",
             "click .export-options a": "select_export_option",
             "click .zoom-paper-to-fit": "zoom_paper_to_fit",
@@ -373,6 +375,12 @@
                 this.model.set("unsaved", false);   // prevent "Save?" dialog
                 this.figureFiles.deleteFile(fileId, figName);
             }
+        },
+
+        chgrp_figure: function (event) {
+            event.preventDefault();
+            $(".modal").modal('hide');
+            $("#chgrpModal").modal('show');
         },
 
         open_figure: function(event) {

@@ -65,6 +65,8 @@
             var name = data.figureName || "UN-NAMED",
                 n = {'fileId': data.fileId,
                     'figureName': name,
+                    'groupId': data.group.id,
+                    'groupName': data.group.name,
                     'canEdit': data.canEdit,
                     'paper_width': data.paper_width,
                     'paper_height': data.paper_height,
