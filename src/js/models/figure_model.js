@@ -264,6 +264,35 @@
             this.set('unsaved', true);
         },
 
+        // handle /recover/ page
+        recoverFromLocalStorage: function() {
+            var storage = window.localStorage;
+            var recoveredFigure = storage.getItem(LOCAL_STORAGE_RECOVERED_FIGURE);
+            var figureObject;
+            try {
+                figureObject = JSON.parse(recoveredFigure);
+            } catch (e) {
+                console.log("recovered Figure not valid JSON " + recoveredFigure);
+            }
+            if (!figureObject) {
+                var message = "No valid figure was found in local storage."
+                figureConfirmDialog("No Figure found", message, ["OK"]);
+            } else {
+                this.figure_fromJSON(recoveredFigure);
+                var recoverDialogCallback = function(btnText) {
+                    if (btnText === "Clear local storage") {
+                        storage.removeItem(LOCAL_STORAGE_RECOVERED_FIGURE)
+                    }
+                }
+                var buttons = ["Clear local storage", "OK"];
+                var html = `<p>This figure has been recovered from the browser's local storage.</p>
+                        <p>If you wish to clear this data from local storage, click 'Clear local storage'.</p>`
+                figureConfirmDialog(
+                    "Figure recovered",
+                    html, buttons, recoverDialogCallback);
+            }
+        },
+
         save_to_OMERO: function(options) {
 
             var self = this,
@@ -300,21 +329,25 @@
                 })
                 .error(function(rsp){
                     console.log('Save Error', rsp.responseText);
-                    var errorTitle = `${rsp.status} ${rsp.statusText}`;
-                    var loginMsg = `
-                        <p>Please <a href="${WEBINDEX_URL}" target="_blank">open the webclient in a new tab</a>
-                        to check you are logged-in.</p>`
+
+                    // Save to local storage to avoid data loss
+                    var storage = window.localStorage;
+                    storage.setItem(LOCAL_STORAGE_RECOVERED_FIGURE, JSON.stringify(figureJSON));
+
+                    var errorTitle = `Save Error`;
                     var message = `
-                        ${rsp.status === 403 ? loginMsg : ""}
-                        <p>To ensure you don't lose the current Figure, please <b>Export as JSON</b>, then copy
-                        the figure data and save it on your machine.</p>
-                        <p>You may need to refresh this page.</p>
-                        <p>You can recreate the Figure using <b>File > Import from JSON</b>, then paste in the figure data.</p>
+                        <p>${rsp.status} ${rsp.statusText}</p>
+                        <p>The current figure has been saved to local storage and will be
+                        recovered when you reload the app. Reloading will also check your
+                        connection to OMERO.
+                        </p>
                     `;
-                    var buttons = ['Close', 'Export as JSON'];
+                    var buttons = ['Close', 'Reload in new Tab'];
                     var callback = function(btnText) {
-                        if (btnText === "Export as JSON") {
-                            showExportAsJsonModal(figureJSON);
+                        if (btnText === "Reload in new Tab") {
+                            var recoverUrl = BASE_WEBFIGURE_URL + 'recover/';
+
+                            window.open(WEBLOGIN_URL + '?url=' + recoverUrl, '_blank')
                         }
                     }
                     figureConfirmDialog(errorTitle, message, buttons, callback);

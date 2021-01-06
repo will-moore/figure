@@ -66,6 +66,7 @@ $(function(){
         routes: {
             "": "index",
             "new(/)": "newFigure",
+            "recover(/)": "recoverFigure",
             "open(/)": "openFigure",
             "file/:id(/)": "loadFigure",
         },
@@ -127,6 +128,11 @@ $(function(){
                 $("#openFigureModal").modal();
             };
             this.checkSaveAndClear(cb);
+        },
+
+        recoverFigure: function() {
+            $(".modal").modal('hide'); // hide any existing dialogs
+            figureModel.recoverFromLocalStorage();
         },
 
         newFigure: function() {
