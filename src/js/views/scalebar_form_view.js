@@ -111,7 +111,7 @@ var ScalebarFormView = Backbone.View.extend({
     },
 
     render: function() {
-        var json = {show: false, show_label: false},
+        var json = {show: false, show_label: true},
             hidden = false,
             sb;
 
