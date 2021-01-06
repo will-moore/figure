@@ -314,7 +314,7 @@
                     var buttons = ['Close', 'Export as JSON'];
                     var callback = function(btnText) {
                         if (btnText === "Export as JSON") {
-                            showExporAsJsonModal(figureJSON);
+                            showExportAsJsonModal(figureJSON);
                         }
                     }
                     figureConfirmDialog(errorTitle, message, buttons, callback);
