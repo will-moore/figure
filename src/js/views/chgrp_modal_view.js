@@ -7,19 +7,23 @@ var ChgrpModalView = Backbone.View.extend({
     model: FigureModel,
 
     imagesByGroup: {},
-    targetGroups: [],
+    omeroGroups: [],
 
     initialize: function () {
 
         var self = this;
 
-        this.enableSubmit(false);
         // Here we handle init of the dialog when it's shown...
         $("#chgrpModal").bind("show.bs.modal", function () {
-            $('#chgrpModal .modal-body').html("");
-            self.loadGroups();
-            self.loadImageDetails();
-        });
+            this.enableSubmit(false);
+            if (!this.model.get('fileId')) {
+                $('#chgrpModal .modal-body').html("<p>Figure not saved. Please Save the Figure first.</p>");
+            } else {
+                $('#chgrpModal .modal-body').html("");
+                self.loadGroups();
+                self.loadImageDetails();
+            }
+        }.bind(this));
     },
 
     events: {
@@ -29,10 +33,8 @@ var ChgrpModalView = Backbone.View.extend({
 
     loadImageDetails: function() {
         var imgIds = this.model.panels.pluck('imageId');
-        console.log('imgIds', imgIds);
         var url = `${BASE_WEBFIGURE_URL}images_details/?image=${_.uniq(imgIds).join(',')}`;
         $.getJSON(url, function (data) {
-            console.log(data);
             // Sort images by Group
             this.imagesByGroup = data.data.reduce(function(prev, img){
                 if (!prev[img.group.id]) {
@@ -46,11 +48,10 @@ var ChgrpModalView = Backbone.View.extend({
     },
 
     loadGroups: function() {
-        var groupId = this.model.get('groupId');
         var url = `${API_BASE_URL_V0}m/experimenters/${USER_ID}/experimentergroups/`;
         $.getJSON(url, function(data){
-            this.targetGroups = data.data.map(group => {return {id: group['@id'], name: group.Name}})
-                .filter(group => group.id != groupId && group.name != 'user');
+            this.omeroGroups = data.data.map(group => {return {id: group['@id'], name: group.Name}})
+                .filter(group => group.name != 'user');
             this.render();
         }.bind(this));
     },
@@ -74,7 +75,7 @@ var ChgrpModalView = Backbone.View.extend({
     handleSubmit: function (event) {
         event.preventDefault();
         var group_id = parseInt($('input[name="target_group"]:checked', this.$el).val());
-        var group_name = this.targetGroups.filter(group => group.id === group_id)[0].name;
+        var group_name = this.omeroGroups.filter(group => group.id === group_id)[0].name;
         var fileId = this.model.get('fileId');
         var url = BASE_WEBFIGURE_URL + 'chgrp/';
         this.enableSubmit(false);
@@ -85,7 +86,7 @@ var ChgrpModalView = Backbone.View.extend({
             .done(function (data) {
                 $("#chgrpModal").modal('hide');
                 if (data.success) {
-                    this.model.set({groupId: group_id, groupName: group_name});
+                    this.model.set({groupId: group_id});
                     figureConfirmDialog("Success", "Figure moved to Group: " + group_name, ["OK"]);
                 } else {
                     var errorMsg = data.error || "No error message available";
@@ -95,7 +96,12 @@ var ChgrpModalView = Backbone.View.extend({
     },
 
     render: function() {
-        var html = '<p>This figure is currently in Group: <strong>' + this.model.get('groupName') + '</strong>.</p>';
+        var html = '';
+        var groupId = this.model.get('groupId');
+        var currentGroup = this.omeroGroups.filter(group => group.id === groupId)[0];
+        if (currentGroup) {
+            html += '<p>This figure is currently in Group: <strong>' + currentGroup.name + '</strong>.</p>';
+        }
 
         var groupCount = Object.keys(this.imagesByGroup).length;
         html += `<p>Images in this figure belong to ${groupCount} Group${groupCount == 1 ? '' : 's'}: `
@@ -106,11 +112,12 @@ var ChgrpModalView = Backbone.View.extend({
                 <b>${groupName}</b>
                 (<a target="_blank" href="${WEBINDEX_URL}?show=image-${imgIds.join('|image-')}">${imgIds.length} image${imgIds.length == 1 ? '' : 's'}</a>)`}).join(", ") + '.</p>';
 
-        if (this.targetGroups.length === 0) {
+        var targetGroups = this.omeroGroups.filter(group => group.id != groupId);
+        if (targetGroups.length === 0) {
             html += "<p>No other Groups available (You are not a member of any other groups)</p>";
         } else {
             html += "<p>Move to Group...</p>";
-            html += this.targetGroups.map(group => `<div class="radio">
+            html += targetGroups.map(group => `<div class="radio">
                 <label><input type="radio" name="target_group" value="${group.id}">
                     ${group.name}
                 </label></div>`)

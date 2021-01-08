@@ -65,8 +65,7 @@
             var name = data.figureName || "UN-NAMED",
                 n = {'fileId': data.fileId,
                     'figureName': name,
-                    'groupId': data.group.id,
-                    'groupName': data.group.name,
+                    'groupId': data.group ? data.group.id : undefined,
                     'canEdit': data.canEdit,
                     'paper_width': data.paper_width,
                     'paper_height': data.paper_height,
@@ -305,6 +304,7 @@
         clearFigure: function() {
             var figureModel = this;
             figureModel.unset('fileId');
+            figureModel.unset('groupId');
             figureModel.delete_panels();
             figureModel.unset("figureName");
             figureModel.set(figureModel.defaults);
