@@ -279,17 +279,10 @@
                 figureConfirmDialog("No Figure found", message, ["OK"]);
             } else {
                 this.figure_fromJSON(recoveredFigure);
-                var recoverDialogCallback = function(btnText) {
-                    if (btnText === "Clear local storage") {
-                        storage.removeItem(LOCAL_STORAGE_RECOVERED_FIGURE)
-                    }
-                }
-                var buttons = ["Clear local storage", "OK"];
                 var html = `<p>This figure has been recovered from the browser's local storage.</p>
-                        <p>If you wish to clear this data from local storage, click 'Clear local storage'.</p>`
+                        <p>If you wish to clear this data from local storage, click File > Local storage.</p>`
                 figureConfirmDialog(
-                    "Figure recovered",
-                    html, buttons, recoverDialogCallback);
+                    "Figure recovered", html, ["OK"]);
             }
         },
 
@@ -337,7 +330,8 @@
                     var errorTitle = `Save Error`;
                     var message = `
                         <p>${rsp.status} ${rsp.statusText}</p>
-                        <p>The current figure has been saved to local storage and will be
+                        <p>The current figure has failed to Save to OMERO.</p>
+                        <p>A copy has been placed in your browser's local storage and will be
                         recovered when you reload the app. Reloading will also check your
                         connection to OMERO.
                         </p>
@@ -346,7 +340,6 @@
                     var callback = function(btnText) {
                         if (btnText === "Reload in new Tab") {
                             var recoverUrl = BASE_WEBFIGURE_URL + 'recover/';
-
                             window.open(WEBLOGIN_URL + '?url=' + recoverUrl, '_blank')
                         }
                     }
