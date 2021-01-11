@@ -334,6 +334,20 @@
             this.model.nudge_up();
         },
 
+        local_storage: function (event) {
+            var buttons = ['Cancel', 'Clear Storage', 'Recover Figure'];
+            var callback = function (btnText) {
+                if (btnText === "Clear Storage") {
+                    window.localStorage.removeItem(LOCAL_STORAGE_RECOVERED_FIGURE);
+                } else if (btnText === "Recover Figure") {
+                    window.location = BASE_WEBFIGURE_URL + 'recover/';
+                }
+            }
+            var message = `<p>Any figure that fails to Save is stored in the browser's local storage.
+                You can Clear local storage or Recover a figure from local storage with the options below:</p>`
+            figureConfirmDialog("Local Storage", message, buttons, callback);
+        },
+
         goto_newfigure: function(event) {
             if (event) event.preventDefault();
             $(".modal").modal('hide');
@@ -374,20 +388,6 @@
                 this.model.set("unsaved", false);   // prevent "Save?" dialog
                 this.figureFiles.deleteFile(fileId, figName);
             }
-        },
-
-        local_storage: function(event) {
-            var buttons = ['Cancel', 'Clear Storage', 'Recover Figure'];
-            var callback = function (btnText) {
-                if (btnText === "Clear Storage") {
-                    window.localStorage.removeItem(LOCAL_STORAGE_RECOVERED_FIGURE);
-                } else if (btnText === "Recover Figure") {
-                    window.location = BASE_WEBFIGURE_URL + 'recover/';
-                }
-            }
-            var message = `<p>Any figure that fails to Save is stored in the browser's local storage.
-                You can Clear local storage or Recover a figure from local storage with the options below:</p>`
-            figureConfirmDialog("Local Storage", message, buttons, callback);
         },
 
         open_figure: function(event) {
