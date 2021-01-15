@@ -266,19 +266,12 @@
 
         // handle /recover/ page
         recoverFromLocalStorage: function() {
-            var storage = window.localStorage;
-            var recoveredFigure = storage.getItem(LOCAL_STORAGE_RECOVERED_FIGURE);
-            var figureObject;
-            try {
-                figureObject = JSON.parse(recoveredFigure);
-            } catch (e) {
-                console.log("recovered Figure not valid JSON " + recoveredFigure);
-            }
+            var figureObject = recoverFigureFromStorage();
             if (!figureObject) {
                 var message = "No valid figure was found in local storage."
                 figureConfirmDialog("No Figure found", message, ["OK"]);
             } else {
-                this.figure_fromJSON(recoveredFigure);
+                this.figure_fromJSON(JSON.stringify(figureObject));
                 var html = `<p>This figure has been recovered from the browser's local storage.</p>
                         <p>If you wish to clear this data from local storage, click File > Local storage.</p>`
                 figureConfirmDialog(

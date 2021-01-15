@@ -59,6 +59,18 @@ var showExportAsJsonModal = function(figureJSON) {
     $('#exportJsonModal textarea').text(figureText);
 }
 
+var recoverFigureFromStorage = function() {
+    var storage = window.localStorage;
+    var recoveredFigure = storage.getItem(LOCAL_STORAGE_RECOVERED_FIGURE);
+    var figureObject;
+    try {
+        figureObject = JSON.parse(recoveredFigure);
+    } catch (e) {
+        console.log("recovered Figure not valid JSON " + recoveredFigure);
+    }
+    return figureObject;
+}
+
 var figureConfirmDialog = function(title, message, buttons, callback) {
     var $confirmModal = $("#confirmModal"),
         $title = $(".modal-title", $confirmModal),
