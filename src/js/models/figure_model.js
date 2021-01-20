@@ -320,9 +320,8 @@
                     var storage = window.localStorage;
                     storage.setItem(LOCAL_STORAGE_RECOVERED_FIGURE, JSON.stringify(figureJSON));
 
-                    var errorTitle = `Save Error`;
+                    var errorTitle = `Save Error: ${rsp.status}`;
                     var message = `
-                        <p>${rsp.status} ${rsp.statusText}</p>
                         <p>The current figure has failed to Save to OMERO.</p>
                         <p>A copy has been placed in your browser's local storage and will be
                         recovered when you reload the app. Reloading will also check your
