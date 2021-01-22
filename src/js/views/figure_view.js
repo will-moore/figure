@@ -342,7 +342,7 @@
                 buttons = buttons.concat(['Clear Storage', 'Recover Figure']);
                 message += `<p>You can Clear local storage or Recover the figure from local storage with the options below:</p>`;
             } else {
-                message += `<p>No Figure currectly found.</p>`;
+                message += `<p>No Figure currently found.</p>`;
             }
             var callback = function (btnText) {
                 if (btnText === "Clear Storage") {
