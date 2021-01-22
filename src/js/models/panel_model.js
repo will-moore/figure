@@ -609,10 +609,12 @@
         },
 
         // Turn coordinates into css object with rotation transform
-        _viewport_css: function(img_x, img_y, img_w, img_h, frame_w, frame_h) {
+        _viewport_css: function(img_x, img_y, img_w, img_h, frame_w, frame_h, rotation) {
             var transform_x = 100 * (frame_w/2 - img_x) / img_w,
-                transform_y = 100 * (frame_h/2 - img_y) / img_h,
+                transform_y = 100 * (frame_h/2 - img_y) / img_h;
+            if (rotation == undefined) {
                 rotation = this.get('rotation') || 0;
+            }
 
             var css = {'left':img_x,
                        'top':img_y,
