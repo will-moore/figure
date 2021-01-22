@@ -265,6 +265,21 @@
             this.set('unsaved', true);
         },
 
+        // handle /recover/ page
+        recoverFromLocalStorage: function() {
+            var figureObject = recoverFigureFromStorage();
+            if (!figureObject) {
+                var message = "No valid figure was found in local storage."
+                figureConfirmDialog("No Figure found", message, ["OK"]);
+            } else {
+                this.figure_fromJSON(JSON.stringify(figureObject));
+                var html = `<p>This figure has been recovered from the browser's local storage.</p>
+                        <p>If you wish to clear this data from local storage, click File > Local storage.</p>`
+                figureConfirmDialog(
+                    "Figure recovered", html, ["OK"]);
+            }
+        },
+
         save_to_OMERO: function(options) {
 
             var self = this,
@@ -298,6 +313,30 @@
                     if (options.success) {
                         options.success(data);
                     }
+                })
+                .error(function(rsp){
+                    console.log('Save Error', rsp.responseText);
+
+                    // Save to local storage to avoid data loss
+                    var storage = window.localStorage;
+                    storage.setItem(LOCAL_STORAGE_RECOVERED_FIGURE, JSON.stringify(figureJSON));
+
+                    var errorTitle = `Save Error: ${rsp.status}`;
+                    var message = `
+                        <p>The current figure has failed to Save to OMERO.</p>
+                        <p>A copy has been placed in your browser's local storage and will be
+                        recovered when you reload the app. Reloading will also check your
+                        connection to OMERO.
+                        </p>
+                    `;
+                    var buttons = ['Close', 'Reload in new Tab'];
+                    var callback = function(btnText) {
+                        if (btnText === "Reload in new Tab") {
+                            var recoverUrl = BASE_WEBFIGURE_URL + 'recover/';
+                            window.open(WEBLOGIN_URL + '?url=' + recoverUrl, '_blank')
+                        }
+                    }
+                    figureConfirmDialog(errorTitle, message, buttons, callback);
                 });
         },
 

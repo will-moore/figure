@@ -66,8 +66,10 @@ var LabelFromMapsModal = Backbone.View.extend({
                 prev[iid] = [];
             }
             t.values.forEach(function(kv) {
-                if (kv[0] === key) {
-                    prev[iid].push(kv[1]);
+                var value = kv[1];
+                // If key matches, add to values for the image (no duplicates)
+                if (kv[0] === key && prev[iid].indexOf(value) === -1) {
+                    prev[iid].push(value);
                 }
             });
             return prev;
