@@ -110,7 +110,11 @@ var ChgrpModalView = Backbone.View.extend({
             var groupName = this.imagesByGroup[groupId][0].group.name;
             return `
                 <b>${groupName}</b>
-                (<a target="_blank" href="${WEBINDEX_URL}?show=image-${imgIds.join('|image-')}">${imgIds.length} image${imgIds.length == 1 ? '' : 's'}</a>)`}).join(", ") + '.</p>';
+                (<a target="_blank" href="${WEBINDEX_URL}?show=image-${imgIds.join('|image-')}">${imgIds.length} image${imgIds.length == 1 ? '' : 's'}</a>)`
+            }
+        ).join(", ") + '.</p>';
+        html += `<p><b>NB:</b> If a figure contains images from a <i>different</i> group, it is possible that some
+            users may be able to open the figure but not see those images in it.</p>`
 
         var targetGroups = this.omeroGroups.filter(group => group.id != groupId);
         if (targetGroups.length === 0) {
