@@ -901,6 +901,4 @@
                 });
             }.bind(this));
         }
-
-        // localStorage: new Backbone.LocalStorage("figureShop-backbone")
     });
