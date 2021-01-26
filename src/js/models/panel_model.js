@@ -475,11 +475,9 @@
                 zoom = Math.min(xPercent, yPercent) * 100;
 
             var toSet = { 'width': newW, 'height': newH, 'dx': dx, 'dy': dy, 'zoom': zoom };
-            if (coords.rotation) {
-                var rotation = parseInt(coords.rotation);
-                if (!isNaN(rotation)) {
-                    toSet.rotation = rotation;
-                }
+            var rotation = coords.rotation || 0;
+            if (!isNaN(rotation)) {
+                toSet.rotation = rotation;
             }
             this.save(toSet);
         },
