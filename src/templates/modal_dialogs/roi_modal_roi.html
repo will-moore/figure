@@ -49,8 +49,13 @@
 
 <% }) %>
 
-<tr <% if (!showLoadMore){ %>style="display:none" <% } %> >
-    <td colspan="5">
-        <button style="float: right" class="loadMoreRois btn btn-success btn-sm">Load more...</button>
+<tr>
+    <td colspan="4" style="color: #999; vertical-align: middle">
+        Loaded <%= count %> / <%= totalCount %> ROIs
+    </td>
+    <td>
+        <button style="float: right;  <% if (!showLoadMore){ %>display:none<% } %>" class="loadMoreRois btn btn-success btn-sm">
+            Load more...
+        </button>
     </td>
 </tr>

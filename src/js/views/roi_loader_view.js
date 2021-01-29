@@ -169,6 +169,8 @@ var RoiLoaderView = Backbone.View.extend({
         var html = this.template({
             rois: json,
             showLoadMore: this.totalCount > this.collection.length,
+            totalCount: this.totalCount,
+            count: this.collection.length,
         });
         this.$el.html(html);
 
