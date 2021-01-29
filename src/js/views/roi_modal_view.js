@@ -16,10 +16,19 @@ var RoiModalView = Backbone.View.extend({
         // This gets populated when dialog loads
         omeroRoiCount: 0,
         roisLoaded: false,
+        roisPageSize: 500,
+        roisPage: 0,
 
         initialize: function() {
 
             var self = this;
+
+            // We create a new Model and RoiLoaderView.
+            // Then listen for selection events etc coming from RoiLoaderView
+            this.Rois = new RoiList();
+            this.listenTo(this.Rois, "change:selection", this.showTempShape);  // mouseover shape
+            this.listenTo(this.Rois, "shape_add", this.addShapeFromOmero);
+            this.listenTo(this.Rois, "shape_click", this.showShapePlane);
 
             // We manually bind Mousetrap keyboardEvents to body so as
             // not to clash with the global keyboardEvents in figure_view.js
@@ -97,6 +106,7 @@ var RoiModalView = Backbone.View.extend({
             "click .deleteShape": "deleteShapes",
             "click .selectAll": "selectAllShapes",
             "click .loadRois": "loadRois",
+            "click .loadMoreRois": "loadMoreRois",
             "click .revert_theZ": "revertTheZ",
             "click .revert_theT": "revertTheT",
         },
@@ -131,22 +141,16 @@ var RoiModalView = Backbone.View.extend({
             // hide button and tip
             $(".loadRois", this.$el).prop('disabled', true);
             $("#roiModalTip").hide();
-
+            this.roisPage = 0;
             var iid = this.m.get('imageId');
-            // We create a new Model and RoiLoaderView.
-            // Then listen for selection events etc coming from RoiLoaderView
-            var Rois = new RoiList();
-            this.listenTo(Rois, "change:selection", this.showTempShape);  // mouseover shape
-            this.listenTo(Rois, "shape_add", this.addShapeFromOmero);
-            this.listenTo(Rois, "shape_click", this.showShapePlane);
-            var roiUrl = ROIS_JSON_URL + '?image=' + iid + '&limit=500';
+            var roiUrl = ROIS_JSON_URL + '?image=' + iid + '&limit=' + this.roisPageSize;
             $.getJSON(roiUrl, function(data){
-                Rois.set(data.data);
+                this.Rois.set(data.data);
                 $(".loadRois", this.$el).prop('disabled', false);
                 $("#roiModalRoiList table").empty();
                 this.roisLoaded = true;
                 this.renderToolbar();
-                var roiLoaderView = new RoiLoaderView({collection: Rois, panel: this.m});
+                var roiLoaderView = new RoiLoaderView({ collection: this.Rois, panel: this.m, totalCount: this.omeroRoiCount});
                 $("#roiModalRoiList table").append(roiLoaderView.el);
                 roiLoaderView.render();
             }.bind(this))
@@ -154,6 +158,23 @@ var RoiModalView = Backbone.View.extend({
                 console.log("fail", arguments);
                 alert("Failed to load ROIS: " + textStatus + ", " + error);
             });
+        },
+
+        loadMoreRois: function (event) {
+            event.preventDefault();
+            $(event.target).prop('disabled', true);
+            var iid = this.m.get('imageId');
+            this.roisPage += 1;
+            var offset = this.roisPageSize * this.roisPage;
+            var roiUrl = ROIS_JSON_URL + '?image=' + iid + '&limit=' + this.roisPageSize + '&offset=' + offset;
+            $.getJSON(roiUrl, function (data) {
+                // causes RoiLoaderView to re-render
+                this.Rois.add(data.data);
+            }.bind(this))
+                .fail(function (jqxhr, textStatus, error) {
+                    console.log("fail", arguments);
+                    alert("Failed to load ROIS: " + textStatus + ", " + error);
+                });
         },
 
         showShapePlane: function(args) {
