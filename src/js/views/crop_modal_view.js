@@ -8,7 +8,7 @@ var CropModalView = Backbone.View.extend({
 
         model: FigureModel,
 
-        roisPageSize: 10,
+        roisPageSize: 200,
         roisPage: 0,
         roisCount: 0,
         // not all these ROIs will contain Rects
