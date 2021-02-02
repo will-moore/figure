@@ -360,7 +360,7 @@ var CropModalView = Backbone.View.extend({
             var self = this,
                 iid = self.m.get('imageId');
             var offset = this.roisPageSize * this.roisPage;
-            var url = ROIS_JSON_URL + '?image=' + iid + '&limit=' + self.roisPageSize + '&offset=' + offset;
+            var url = BASE_WEBFIGURE_URL + 'roiRectangles/' + iid + '/?limit=' + self.roisPageSize + '&offset=' + offset;
             $.getJSON(url, function(rsp){
                 data = rsp.data;
                 self.roisLoaded += data.length;
