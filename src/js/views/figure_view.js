@@ -348,7 +348,7 @@
             }
             var callback = function (btnText) {
                 if (btnText === "Clear Storage") {
-                    window.localStorage.removeItem(LOCAL_STORAGE_RECOVERED_FIGURE);
+                    clearFigureFromStorage();
                 } else if (btnText === "Recover Figure") {
                     window.location = BASE_WEBFIGURE_URL + 'recover/';
                 }
