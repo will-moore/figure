@@ -84,6 +84,7 @@ var RoiModalView = Backbone.View.extend({
 
                 self.render();
                 self.checkForRois();
+                self.renderPagination();
             });
 
             this.shapeManager = new ShapeManager("roi_paper", 1, 1);
@@ -105,8 +106,10 @@ var RoiModalView = Backbone.View.extend({
             "click .pasteShape": "pasteShapes",
             "click .deleteShape": "deleteShapes",
             "click .selectAll": "selectAllShapes",
-            "click .loadRois": "loadRois",
-            "click .loadMoreRois": "loadMoreRois",
+            "click .loadRois": "loadRoisFirstPage",
+            "click .roisPrevPage": "roisPrevPage",
+            "click .roisNextPage": "roisNextPage",
+            "click .roisJumpPage": "roisJumpPage",
             "click .revert_theZ": "revertTheZ",
             "click .revert_theT": "revertTheT",
         },
@@ -135,15 +138,40 @@ var RoiModalView = Backbone.View.extend({
             }.bind(this));
         },
 
-        // Load Shapes from OMERO and render them
-        loadRois: function(event) {
+        loadRoisFirstPage: function (event) {
             event.preventDefault();
             // hide button and tip
             $(".loadRois", this.$el).prop('disabled', true);
             $("#roiModalTip").hide();
             this.roisPage = 0;
+            this.loadRois();
+        },
+
+        roisPrevPage: function (event) {
+            event.preventDefault();
+            this.roisPage -= 1;
+            this.loadRois();
+        },
+
+        roisNextPage: function (event) {
+            event.preventDefault();
+            this.roisPage += 1;
+            this.loadRois();
+        },
+
+        roisJumpPage: function (event) {
+            event.preventDefault();
+            var page = $(event.target).data('page');
+            if (!isNaN(page)) {
+                this.roisPage = parseInt(page);
+                this.loadRois();
+            }
+        },
+
+        // Load Shapes from OMERO and render them
+        loadRois: function() {
             var iid = this.m.get('imageId');
-            var roiUrl = ROIS_JSON_URL + '?image=' + iid + '&limit=' + this.roisPageSize;
+            var roiUrl = ROIS_JSON_URL + '?image=' + iid + '&limit=' + this.roisPageSize + '&offset=' + (this.roisPageSize * this.roisPage);
             $.getJSON(roiUrl, function(data){
                 this.Rois.set(data.data);
                 $(".loadRois", this.$el).prop('disabled', false);
@@ -153,28 +181,12 @@ var RoiModalView = Backbone.View.extend({
                 var roiLoaderView = new RoiLoaderView({ collection: this.Rois, panel: this.m, totalCount: this.omeroRoiCount});
                 $("#roiModalRoiList table").append(roiLoaderView.el);
                 roiLoaderView.render();
+                this.renderPagination();
             }.bind(this))
             .fail(function(jqxhr, textStatus, error){
                 console.log("fail", arguments);
                 alert("Failed to load ROIS: " + textStatus + ", " + error);
             });
-        },
-
-        loadMoreRois: function (event) {
-            event.preventDefault();
-            $(event.target).prop('disabled', true);
-            var iid = this.m.get('imageId');
-            this.roisPage += 1;
-            var offset = this.roisPageSize * this.roisPage;
-            var roiUrl = ROIS_JSON_URL + '?image=' + iid + '&limit=' + this.roisPageSize + '&offset=' + offset;
-            $.getJSON(roiUrl, function (data) {
-                // causes RoiLoaderView to re-render
-                this.Rois.add(data.data);
-            }.bind(this))
-                .fail(function (jqxhr, textStatus, error) {
-                    console.log("fail", arguments);
-                    alert("Failed to load ROIS: " + textStatus + ", " + error);
-                });
         },
 
         showShapePlane: function(args) {
@@ -461,6 +473,35 @@ var RoiModalView = Backbone.View.extend({
                         'origT': orig_model.get('theT')}
             var html = this.roi_zt_buttons_template(json);
             $("#roi_zt_buttons").html(html);
+        },
+
+        renderPagination: function() {
+            if (!this.roisLoaded) {
+                $("#roiPageControls").html("").hide();
+                return;
+            }
+            var pageCount = Math.ceil(this.omeroRoiCount / this.roisPageSize);
+            var html = `
+                <span>${ this.omeroRoiCount} ROIs: page ${ this.roisPage + 1}/${pageCount}</span>
+                <div class="btn-group" style="float:right">
+                    <button title="Load previous page of ROIs" ${this.roisPage === 0 ? "disabled='disabled'":'' }
+                        type="button" class="btn btn-default btn-sm roisPrevPage">
+                        Prev
+                    </button>
+                    <button title="Load next page of ROIs" ${(this.roisPage + 1) >= pageCount ? "disabled='disabled'" : '' }
+                        type="button" class="btn btn-default btn-sm roisNextPage">
+                        Next
+                    </button>
+                    <button type="button" class="btn btn-default btn-sm dropdown-toggle" title="Export Options" data-toggle="dropdown">
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu export_options" role="menu">
+                    ${
+                        _.range(pageCount).map(p => `<li><a class="roisJumpPage" href="#" data-page="${p}">Page ${p + 1}</a></li>`).join(`\n`)
+                    }
+                    </ul>
+                </div>`
+            $("#roiPageControls").html(html).show();
         },
 
         render: function() {
