@@ -22,16 +22,7 @@ var CropModalView = Backbone.View.extend({
 
                 // get selected area...
                 var roi = self.m.getViewportAsRect();
-                var rotation = self.m.get('rotation');
-                if (rotation != 0) {
-                    var img_cx = self.m.get('orig_width') / 2;
-                    var img_cy = self.m.get('orig_height') / 2;
-                    var rect_cx = roi.x + (roi.width / 2);
-                    var rect_cy = roi.y + (roi.height / 2);
-                    var new_c = rotatePoint(rect_cx, rect_cy, img_cx, img_cy, rotation);
-                    roi.x = new_c.x - (roi.width / 2);
-                    roi.y = new_c.y - (roi.height / 2);
-                }
+                self.applyRotation(roi);
 
                 // Show as ROI *if* it isn't the whole image
                 if (roi.x !== 0 || roi.y !== 0
@@ -163,6 +154,22 @@ var CropModalView = Backbone.View.extend({
             this.currentRoiId = $roi.attr('data-roiId');
         },
 
+        applyRotation: function(rect, factor=1) {
+            // Update the x and y coordinates of a Rectangle ROI to take account of rotation of the
+            // underlying image around it's centre point. The image is rotated on the canvas, so any
+            // Rectangle not at the centre will need to be rotated around the centre, updating rect.x and rect.y.
+            var rotation = this.m.get('rotation');
+            if (rotation != 0) {
+                var img_cx = this.m.get('orig_width') / 2;
+                var img_cy = this.m.get('orig_height') / 2;
+                var rect_cx = rect.x + (rect.width / 2);
+                var rect_cy = rect.y + (rect.height / 2);
+                var new_c = rotatePoint(rect_cx, rect_cy, img_cx, img_cy, rotation * factor);
+                rect.x = new_c.x - (rect.width / 2);
+                rect.y = new_c.y - (rect.height / 2);
+            }
+        },
+
         handleRoiForm: function(event) {
             event.preventDefault();
             // var json = this.processForm();
@@ -180,16 +187,7 @@ var CropModalView = Backbone.View.extend({
                     t = self.m.get('theT');
                 }
 
-                var rotation = self.m.get('rotation');
-                if (rotation != 0) {
-                    var img_cx = self.m.get('orig_width') / 2;
-                    var img_cy = self.m.get('orig_height') / 2;
-                    var rect_cx = r.x + (r.width / 2);
-                    var rect_cy = r.y + (r.height / 2);
-                    var new_c = rotatePoint(rect_cx, rect_cy, img_cx, img_cy, -rotation);
-                    r.x = new_c.x - (r.width / 2);
-                    r.y = new_c.y - (r.height / 2);
-                }
+                self.applyRotation(r, -1);
 
                 var rv = {'x': r.x,
                         'y': r.y,
