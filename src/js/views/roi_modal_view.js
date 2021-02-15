@@ -481,8 +481,10 @@ var RoiModalView = Backbone.View.extend({
                 return;
             }
             var pageCount = Math.ceil(this.omeroRoiCount / this.roisPageSize);
-            var html = `
-                <span>${ this.omeroRoiCount} ROIs: page ${ this.roisPage + 1}/${pageCount}</span>
+            var html = `<span>${ this.omeroRoiCount} ROIs`
+            // Only show pagination controls if needed
+            if (pageCount > 1) {
+                html += `: page ${ this.roisPage + 1}/${pageCount}</span>
                 <div class="btn-group" style="float:right">
                     <button title="Load previous page of ROIs" ${this.roisPage === 0 ? "disabled='disabled'":'' }
                         type="button" class="btn btn-default btn-sm roisPrevPage">
@@ -492,15 +494,23 @@ var RoiModalView = Backbone.View.extend({
                         type="button" class="btn btn-default btn-sm roisNextPage">
                         Next
                     </button>
-                    <button type="button" class="btn btn-default btn-sm dropdown-toggle" title="Export Options" data-toggle="dropdown">
+                    <button type="button" class="btn btn-default btn-sm dropdown-toggle" title="Select page" data-toggle="dropdown">
                         <span class="caret"></span>
                     </button>
-                    <ul class="dropdown-menu export_options" role="menu">
+                    <ul class="dropdown-menu" role="menu">
                     ${
-                        _.range(pageCount).map(p => `<li><a class="roisJumpPage" href="#" data-page="${p}">Page ${p + 1}</a></li>`).join(`\n`)
+                        _.range(pageCount).map(p => `<li>
+                        <a class="roisJumpPage" href="#" data-page="${p}">
+                            <span class="glyphicon glyphicon-ok" ${ this.roisPage !== p ? "style='visibility:hidden'" : ""}></span>
+                            Page ${p + 1}
+                        </a>
+                        </li>`).join(`\n`)
                     }
                     </ul>
                 </div>`
+            } else {
+                html += `</span>`;
+            }
             $("#roiPageControls").html(html).show();
         },
 
