@@ -136,13 +136,16 @@ var CropModalView = Backbone.View.extend({
                 theZ = parseInt($roi.attr('data-theZ'), 10);
 
             // Rectangle ROIs have NO rotation. Copy of crop might have rotation
-            this.m.set('rotation', parseInt(rotation));
+            rotation = parseInt(rotation);
+            this.m.set('rotation', rotation);
 
             this.m.set({'theT': theT, 'theZ': theZ});
 
             this.currentROI = {
                 'x':x, 'y':y, 'width':width, 'height':height
             }
+            // Update coords based on any rotation (if coords come from rotated crop region)
+            this.applyRotation(this.currentROI, 1, rotation);
 
             this.render();
 
@@ -154,11 +157,13 @@ var CropModalView = Backbone.View.extend({
             this.currentRoiId = $roi.attr('data-roiId');
         },
 
-        applyRotation: function(rect, factor=1) {
+        applyRotation: function(rect, factor=1, rotation) {
             // Update the x and y coordinates of a Rectangle ROI to take account of rotation of the
             // underlying image around it's centre point. The image is rotated on the canvas, so any
             // Rectangle not at the centre will need to be rotated around the centre, updating rect.x and rect.y.
-            var rotation = this.m.get('rotation');
+            if (rotation === undefined) {
+                rotation = this.m.get('rotation');
+            }
             if (rotation != 0) {
                 var img_cx = this.m.get('orig_width') / 2;
                 var img_cy = this.m.get('orig_height') / 2;
@@ -470,6 +475,7 @@ var CropModalView = Backbone.View.extend({
 
             for (var r=0; r<rects.length; r++) {
                 rect = rects[r];
+                let rotation = rect.rotation || 0;
                 if (rect.theT > -1) this.m.set('theT', rect.theT, {'silent': true});
                 if (rect.theZ > -1) this.m.set('theZ', rect.theZ, {'silent': true});
                 src = this.m.get_img_src(true);
@@ -487,8 +493,7 @@ var CropModalView = Backbone.View.extend({
                 left = -(zoom * rect.x);
                 rect.theT = rect.theT !== undefined ? rect.theT : origT;
                 rect.theZ = rect.theZ !== undefined ? rect.theZ : origZ;
-                let rotation = rect.rotation || 0;
-                let css = this.m._viewport_css(top, left, img_w, img_h, size, size, rotation);
+                let css = this.m._viewport_css(left, top, img_w, img_h, size, size, rotation);
 
                 var json = {
                     'msg': msg,
