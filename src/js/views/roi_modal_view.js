@@ -16,10 +16,19 @@ var RoiModalView = Backbone.View.extend({
         // This gets populated when dialog loads
         omeroRoiCount: 0,
         roisLoaded: false,
+        roisPageSize: 500,
+        roisPage: 0,
 
         initialize: function() {
 
             var self = this;
+
+            // We create a new Model and RoiLoaderView.
+            // Then listen for selection events etc coming from RoiLoaderView
+            this.Rois = new RoiList();
+            this.listenTo(this.Rois, "change:selection", this.showTempShape);  // mouseover shape
+            this.listenTo(this.Rois, "shape_add", this.addShapeFromOmero);
+            this.listenTo(this.Rois, "shape_click", this.showShapePlane);
 
             // We manually bind Mousetrap keyboardEvents to body so as
             // not to clash with the global keyboardEvents in figure_view.js
@@ -75,6 +84,7 @@ var RoiModalView = Backbone.View.extend({
 
                 self.render();
                 self.checkForRois();
+                self.renderPagination();
             });
 
             this.shapeManager = new ShapeManager("roi_paper", 1, 1);
@@ -96,7 +106,10 @@ var RoiModalView = Backbone.View.extend({
             "click .pasteShape": "pasteShapes",
             "click .deleteShape": "deleteShapes",
             "click .selectAll": "selectAllShapes",
-            "click .loadRois": "loadRois",
+            "click .loadRois": "loadRoisFirstPage",
+            "click .roisPrevPage": "roisPrevPage",
+            "click .roisNextPage": "roisNextPage",
+            "click .roisJumpPage": "roisJumpPage",
             "click .revert_theZ": "revertTheZ",
             "click .revert_theT": "revertTheT",
         },
@@ -125,30 +138,50 @@ var RoiModalView = Backbone.View.extend({
             }.bind(this));
         },
 
-        // Load Shapes from OMERO and render them
-        loadRois: function(event) {
+        loadRoisFirstPage: function (event) {
             event.preventDefault();
             // hide button and tip
             $(".loadRois", this.$el).prop('disabled', true);
             $("#roiModalTip").hide();
+            this.roisPage = 0;
+            this.loadRois();
+        },
 
+        roisPrevPage: function (event) {
+            event.preventDefault();
+            this.roisPage -= 1;
+            this.loadRois();
+        },
+
+        roisNextPage: function (event) {
+            event.preventDefault();
+            this.roisPage += 1;
+            this.loadRois();
+        },
+
+        roisJumpPage: function (event) {
+            event.preventDefault();
+            var page = $(event.target).data('page');
+            if (!isNaN(page)) {
+                this.roisPage = parseInt(page);
+                this.loadRois();
+            }
+        },
+
+        // Load Shapes from OMERO and render them
+        loadRois: function() {
             var iid = this.m.get('imageId');
-            // We create a new Model and RoiLoaderView.
-            // Then listen for selection events etc coming from RoiLoaderView
-            var Rois = new RoiList();
-            this.listenTo(Rois, "change:selection", this.showTempShape);  // mouseover shape
-            this.listenTo(Rois, "shape_add", this.addShapeFromOmero);
-            this.listenTo(Rois, "shape_click", this.showShapePlane);
-            var roiUrl = ROIS_JSON_URL + '?image=' + iid + '&limit=500';
+            var roiUrl = ROIS_JSON_URL + '?image=' + iid + '&limit=' + this.roisPageSize + '&offset=' + (this.roisPageSize * this.roisPage);
             $.getJSON(roiUrl, function(data){
-                Rois.set(data.data);
+                this.Rois.set(data.data);
                 $(".loadRois", this.$el).prop('disabled', false);
                 $("#roiModalRoiList table").empty();
                 this.roisLoaded = true;
                 this.renderToolbar();
-                var roiLoaderView = new RoiLoaderView({collection: Rois, panel: this.m});
+                var roiLoaderView = new RoiLoaderView({ collection: this.Rois, panel: this.m, totalCount: this.omeroRoiCount});
                 $("#roiModalRoiList table").append(roiLoaderView.el);
                 roiLoaderView.render();
+                this.renderPagination();
             }.bind(this))
             .fail(function(jqxhr, textStatus, error){
                 console.log("fail", arguments);
@@ -440,6 +473,45 @@ var RoiModalView = Backbone.View.extend({
                         'origT': orig_model.get('theT')}
             var html = this.roi_zt_buttons_template(json);
             $("#roi_zt_buttons").html(html);
+        },
+
+        renderPagination: function() {
+            if (!this.roisLoaded) {
+                $("#roiPageControls").html("").hide();
+                return;
+            }
+            var pageCount = Math.ceil(this.omeroRoiCount / this.roisPageSize);
+            var html = `<span>${ this.omeroRoiCount} ROIs`
+            // Only show pagination controls if needed
+            if (pageCount > 1) {
+                html += `: page ${ this.roisPage + 1}/${pageCount}</span>
+                <div class="btn-group" style="float:right">
+                    <button title="Load previous page of ROIs" ${this.roisPage === 0 ? "disabled='disabled'":'' }
+                        type="button" class="btn btn-default btn-sm roisPrevPage">
+                        Prev
+                    </button>
+                    <button title="Load next page of ROIs" ${(this.roisPage + 1) >= pageCount ? "disabled='disabled'" : '' }
+                        type="button" class="btn btn-default btn-sm roisNextPage">
+                        Next
+                    </button>
+                    <button type="button" class="btn btn-default btn-sm dropdown-toggle" title="Select page" data-toggle="dropdown">
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" role="menu">
+                    ${
+                        _.range(pageCount).map(p => `<li>
+                        <a class="roisJumpPage" href="#" data-page="${p}">
+                            <span class="glyphicon glyphicon-ok" ${ this.roisPage !== p ? "style='visibility:hidden'" : ""}></span>
+                            Page ${p + 1}
+                        </a>
+                        </li>`).join(`\n`)
+                    }
+                    </ul>
+                </div>`
+            } else {
+                html += `</span>`;
+            }
+            $("#roiPageControls").html(html).show();
         },
 
         render: function() {

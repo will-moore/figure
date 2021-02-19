@@ -6,7 +6,15 @@ var CropModalView = Backbone.View.extend({
 
         roiTemplate: JST["src/templates/modal_dialogs/crop_modal_roi.html"],
 
-        model:FigureModel,
+        model: FigureModel,
+
+        roisPageSize: 200,
+        roisPage: 0,
+        roisCount: 0,
+        // not all these ROIs will contain Rects
+        roisLoaded: 0,
+        // Rectangles from ROIs
+        roiRects: [],
 
         initialize: function() {
 
@@ -40,8 +48,11 @@ var CropModalView = Backbone.View.extend({
                 // disable submit until user chooses a region/ROI
                 self.enableSubmit(false);
 
-                // Load ROIs from OMERO...
-                self.loadRois();
+                // Reset ROIs from OMERO...
+                self.roiRects = [];
+                self.roisLoaded = 0;
+                self.roisPage = 0;
+                self.loadRoiRects();
                 // ...along with ROIs from clipboard or on this image in the figure
                 self.showClipboardFigureRois();
             });
@@ -89,6 +100,7 @@ var CropModalView = Backbone.View.extend({
 
         events: {
             "click .roiPickMe": "roiPicked",
+            "click .loadRoiRects": "loadRoiRects",
             "mousedown svg": "mousedown",
             "mousemove svg": "mousemove",
             "mouseup svg": "mouseup",
@@ -318,7 +330,7 @@ var CropModalView = Backbone.View.extend({
                     }
                 });
             }
-            var msg = "[No Regions copied to clipboard]";
+            var msg = "No Regions copied to clipboard";
             this.renderRois(clipboardRects, ".roisFromClipboard", msg);
 
             // Show Rectangles from panels in figure
@@ -336,22 +348,29 @@ var CropModalView = Backbone.View.extend({
                     });
                 }
             });
-            msg = "[No Rectangular ROIs on selected panel in figure]";
+            msg = "No Rectangular ROIs on selected panel in figure";
             this.renderRois(figureRois, ".roisFromFigure", msg);
         },
 
         // Load Rectangles from OMERO and render them
-        loadRois: function() {
+        loadRoiRects: function(event) {
+            if (event) {
+                event.preventDefault();
+            }
             var self = this,
                 iid = self.m.get('imageId');
-            $.getJSON(ROIS_JSON_URL + '?image=' + iid, function(rsp){
+            var offset = this.roisPageSize * this.roisPage;
+            var url = BASE_WEBFIGURE_URL + 'roiRectangles/' + iid + '/?limit=' + self.roisPageSize + '&offset=' + offset;
+            $.getJSON(url, function(rsp){
                 data = rsp.data;
+                self.roisLoaded += data.length;
+                self.roisPage += 1;
+                self.roisCount = rsp.meta.totalCount;
                 // get a representative Rect from each ROI.
                 // Include a z and t index, trying to pick current z/t if ROI includes a shape there
                 var currT = self.m.get('theT'),
                     currZ = self.m.get('theZ');
-                var rects = [],
-                    cachedRois = {},    // roiId: shapes (z/t dict)
+                var cachedRois = {},    // roiId: shapes (z/t dict)
                     roi, roiId, shape, theT, theZ, z, t, rect, tkeys, zkeys,
                     minT, maxT,
                     shapes; // dict of all shapes by z & t index
@@ -407,7 +426,7 @@ var CropModalView = Backbone.View.extend({
                         z = zkeys[(zkeys.length/2)>>0]
                     }
                     shape = shapes[t][z]
-                    rects.push({'theZ': shape.TheZ,
+                    self.roiRects.push({'theZ': shape.TheZ,
                                 'theT': shape.TheT,
                                 'x': shape.X,
                                 'y': shape.Y,
@@ -420,12 +439,20 @@ var CropModalView = Backbone.View.extend({
                                 'zEnd': zkeys[zkeys.length-1]});
                 }
                 // Show ROIS from OMERO...
-                var msg = "[No rectangular ROIs found on this image in OMERO]";
-                self.renderRois(rects, ".roisFromOMERO", msg);
+                var msg = "No rectangular ROIs found on this image in OMERO";
+                self.renderRois(self.roiRects, ".roisFromOMERO", msg);
+
+                if (self.roisLoaded < self.roisCount) {
+                    // Show the 'Load' button if more are available
+                    $(".loadRoiRects", this.$el).show();
+                } else {
+                    $(".loadRoiRects", this.$el).hide();
+                }
+                $("#cropRoiMessage").html(`Loaded ${self.roisLoaded} / ${self.roisCount} ROIs`);
 
                 self.cachedRois = cachedRois;
             }).error(function(){
-                var msg = "[No rectangular ROIs found on this image in OMERO]";
+                var msg = "No rectangular ROIs found on this image in OMERO";
                 self.renderRois([], ".roisFromOMERO", msg);
             });
         },
@@ -490,7 +517,7 @@ var CropModalView = Backbone.View.extend({
                 html += this.roiTemplate(json);
             }
             if (html.length === 0) {
-                html = "<tr><td colspan='3'>" + msg + "</td></tr>";
+                html = "<tr><td colspan='3' style='color: #999'>" + msg + "</td></tr>";
             }
             $(target + " tbody", this.$el).html(html);
 
@@ -514,7 +541,6 @@ var CropModalView = Backbone.View.extend({
 
         render: function() {
             var scale = this.zoom / 100,
-                roi = this.currentROI,
                 w = this.m.get('orig_width'),
                 h = this.m.get('orig_height');
             var newW = w * scale,
