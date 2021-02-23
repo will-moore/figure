@@ -172,6 +172,16 @@ $.prototype.slider = function() {
 }
 
 
+// Get coordinates for point x, y rotated around cx, cy, by rotation degrees
+var rotatePoint = function (x, y, cx, cy, rotation) {
+    let length = Math.sqrt(Math.pow((x - cx), 2) + Math.pow((y - cy), 2));
+    let rot = Math.atan2((y - cy), (x - cx));
+    rot = rot + (rotation * (Math.PI / 180));  // degrees to rad
+    let dx = Math.cos(rot) * length;
+    let dy = Math.sin(rot) * length;
+    return { x: cx + dx, y: cy + dy };
+}
+
 $(function(){
 
 

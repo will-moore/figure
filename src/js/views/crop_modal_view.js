@@ -30,6 +30,7 @@ var CropModalView = Backbone.View.extend({
 
                 // get selected area...
                 var roi = self.m.getViewportAsRect();
+                self.applyRotation(roi);
 
                 // Show as ROI *if* it isn't the whole image
                 if (roi.x !== 0 || roi.y !== 0
@@ -142,14 +143,21 @@ var CropModalView = Backbone.View.extend({
                 y = parseInt($roi.attr('data-y'), 10),
                 width = parseInt($roi.attr('data-width'), 10),
                 height = parseInt($roi.attr('data-height'), 10),
+                rotation = $roi.attr('data-rotation') || 0,
                 theT = parseInt($roi.attr('data-theT'), 10),
                 theZ = parseInt($roi.attr('data-theZ'), 10);
+
+            // Rectangle ROIs have NO rotation. Copy of crop might have rotation
+            rotation = parseInt(rotation);
+            this.m.set('rotation', rotation);
 
             this.m.set({'theT': theT, 'theZ': theZ});
 
             this.currentROI = {
                 'x':x, 'y':y, 'width':width, 'height':height
             }
+            // Update coords based on any rotation (if coords come from rotated crop region)
+            this.applyRotation(this.currentROI, 1, rotation);
 
             this.render();
 
@@ -161,13 +169,29 @@ var CropModalView = Backbone.View.extend({
             this.currentRoiId = $roi.attr('data-roiId');
         },
 
+        applyRotation: function(rect, factor=1, rotation) {
+            // Update the x and y coordinates of a Rectangle ROI to take account of rotation of the
+            // underlying image around it's centre point. The image is rotated on the canvas, so any
+            // Rectangle not at the centre will need to be rotated around the centre, updating rect.x and rect.y.
+            if (rotation === undefined) {
+                rotation = this.m.get('rotation');
+            }
+            if (rotation != 0) {
+                var img_cx = this.m.get('orig_width') / 2;
+                var img_cy = this.m.get('orig_height') / 2;
+                var rect_cx = rect.x + (rect.width / 2);
+                var rect_cy = rect.y + (rect.height / 2);
+                var new_c = rotatePoint(rect_cx, rect_cy, img_cx, img_cy, rotation * factor);
+                rect.x = new_c.x - (rect.width / 2);
+                rect.y = new_c.y - (rect.height / 2);
+            }
+        },
+
         handleRoiForm: function(event) {
             event.preventDefault();
             // var json = this.processForm();
             var self = this,
                 r = this.currentROI,
-                theZ = this.m.get('theZ'),
-                theT = this.m.get('theT'),
                 sel = this.model.getSelected(),
                 sameT = sel.allEqual('theT');
                 // sameZT = sel.allEqual('theT') && sel.allEqual('theT');
@@ -179,6 +203,9 @@ var CropModalView = Backbone.View.extend({
                 if (sameT) {
                     t = self.m.get('theT');
                 }
+
+                self.applyRotation(r, -1);
+
                 var rv = {'x': r.x,
                         'y': r.y,
                         'width': r.width,
@@ -242,7 +269,7 @@ var CropModalView = Backbone.View.extend({
                         m.unset('shapes');
                     }
                     // 'save' to trigger 'unsaved': true
-                    m.save({'theZ': newZ, 'theT': newT});
+                    m.save({ 'theZ': newZ, 'theT': newT, 'rotation': self.m.get('rotation')});
                 });
             }
 
@@ -313,13 +340,13 @@ var CropModalView = Backbone.View.extend({
 
         showClipboardFigureRois: function() {
             // Show Rectangles from clipboard
-            var imageRects = [],
-                clipboardRects = [],
+            var clipboardRects = [],
                 clipboard = this.model.get('clipboard');
             if (clipboard && clipboard.CROP) {
                 roi = clipboard.CROP;
                 clipboardRects.push({
-                    x: roi.x, y: roi.y, width: roi.width, height: roi.height
+                    x: roi.x, y: roi.y, width: roi.width, height: roi.height,
+                    rotation: roi.rotation
                 });
             } else if (clipboard && clipboard.SHAPES) {
                 clipboard.SHAPES.forEach(function(roi){
@@ -475,6 +502,7 @@ var CropModalView = Backbone.View.extend({
 
             for (var r=0; r<rects.length; r++) {
                 rect = rects[r];
+                let rotation = rect.rotation || 0;
                 if (rect.theT > -1) this.m.set('theT', rect.theT, {'silent': true});
                 if (rect.theZ > -1) this.m.set('theZ', rect.theZ, {'silent': true});
                 src = this.m.get_img_src(true);
@@ -492,6 +520,7 @@ var CropModalView = Backbone.View.extend({
                 left = -(zoom * rect.x);
                 rect.theT = rect.theT !== undefined ? rect.theT : origT;
                 rect.theZ = rect.theZ !== undefined ? rect.theZ : origZ;
+                let css = this.m._viewport_css(left, top, img_w, img_h, size, size, rotation);
 
                 var json = {
                     'msg': msg,
@@ -499,6 +528,7 @@ var CropModalView = Backbone.View.extend({
                     'rect': rect,
                     'w': div_w,
                     'h': div_h,
+                    'css': css,
                     'top': top,
                     'left': left,
                     'img_w': img_w,
