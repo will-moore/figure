@@ -153,7 +153,7 @@
             } else if (roiJson.CROP) {
                 // Need to create Rectangle with current color & line width
                 var color = $('button.shape-color span:first', this.$el).attr('data-color'),
-                    width = $('button.line-width span:first', this.$el).attr('data-line-width'),
+                    width = parseFloat($('button.line-width span:first', this.$el).attr('data-line-width')),
                     rect = roiJson.CROP;
                 // If rotated, need to create a Polygon since Rectangle doesn't support rotation
                 if (rect.rotation && !isNaN(rect.rotation)) {
