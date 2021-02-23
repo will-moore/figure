@@ -15,6 +15,7 @@
             new SetIdModalView({model: this.model});
             new PaperSetupModalView({model: this.model});
             new CropModalView({model: this.model});
+            new ChgrpModalView({ model: this.model });
             new RoiModalView({model: this.model});
             new DpiModalView({model: this.model});
             new LegendView({model: this.model});
@@ -95,6 +96,8 @@
             "click .export_json": "export_json",
             "click .import_json": "import_json",
             "click .delete_figure": "delete_figure",
+            "click .chgrp_figure": "chgrp_figure",
+            "click .local_storage": "local_storage",
             "click .paper_setup": "paper_setup",
             "click .export-options a": "select_export_option",
             "click .zoom-paper-to-fit": "zoom_paper_to_fit",
@@ -333,6 +336,26 @@
             this.model.nudge_up();
         },
 
+        local_storage: function (event) {
+            var buttons = ['Close'];
+            let figureObject = recoverFigureFromStorage();
+            var message = `<p>Any figure that fails to Save is stored in the browser's local storage.</p>`;
+            if (figureObject) {
+                buttons = buttons.concat(['Clear Storage', 'Recover Figure']);
+                message += `<p>You can Clear local storage or Recover the figure from local storage with the options below:</p>`;
+            } else {
+                message += `<p>No Figure currently found.</p>`;
+            }
+            var callback = function (btnText) {
+                if (btnText === "Clear Storage") {
+                    clearFigureFromStorage();
+                } else if (btnText === "Recover Figure") {
+                    window.location = BASE_WEBFIGURE_URL + 'recover/';
+                }
+            }
+            figureConfirmDialog("Local Storage", message, buttons, callback);
+        },
+
         goto_newfigure: function(event) {
             if (event) event.preventDefault();
             $(".modal").modal('hide');
@@ -373,6 +396,12 @@
                 this.model.set("unsaved", false);   // prevent "Save?" dialog
                 this.figureFiles.deleteFile(fileId, figName);
             }
+        },
+
+        chgrp_figure: function (event) {
+            event.preventDefault();
+            $(".modal").modal('hide');
+            $("#chgrpModal").modal('show');
         },
 
         open_figure: function(event) {
@@ -471,11 +500,7 @@
 
         export_json: function(event) {
             event.preventDefault();
-
-            var figureJSON = this.model.figure_toJSON(),
-                figureText = JSON.stringify(figureJSON);
-            $('#exportJsonModal').modal('show');
-            $('#exportJsonModal textarea').text(figureText);
+            showExportAsJsonModal(this.model.figure_toJSON());
         },
         
         import_json: function(event) {

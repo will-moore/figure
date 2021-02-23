@@ -65,6 +65,7 @@
             var name = data.figureName || "UN-NAMED",
                 n = {'fileId': data.fileId,
                     'figureName': name,
+                    'groupId': data.group ? data.group.id : undefined,
                     'canEdit': data.canEdit,
                     'paper_width': data.paper_width,
                     'paper_height': data.paper_height,
@@ -264,6 +265,22 @@
             this.set('unsaved', true);
         },
 
+        // handle /recover/ page
+        recoverFromLocalStorage: function() {
+            var figureObject = recoverFigureFromStorage();
+            if (!figureObject) {
+                var message = "No valid figure was found in local storage."
+                figureConfirmDialog("No Figure found", message, ["OK"]);
+            } else {
+                this.figure_fromJSON(JSON.stringify(figureObject));
+                clearFigureFromStorage();
+                var html = `<p>This figure has been recovered from the browser's local storage and
+                        the local storage cleared.</p>`;
+                figureConfirmDialog(
+                    "Figure recovered", html, ["OK"]);
+            }
+        },
+
         save_to_OMERO: function(options) {
 
             var self = this,
@@ -297,12 +314,35 @@
                     if (options.success) {
                         options.success(data);
                     }
+                })
+                .error(function(rsp){
+                    console.log('Save Error', rsp.responseText);
+
+                    // Save to local storage to avoid data loss
+                    saveFigureToStorage(figureJSON);
+
+                    var errorTitle = `Save Error: ${rsp.status}`;
+                    var message = `
+                        <p>The current figure has failed to Save to OMERO.</p>
+                        <p>A copy has been placed in your browser's local storage for this session
+                        and can be recovered with File > Local Storage or by reloading the app.</p>
+                        <p>Reloading will also check your connection to OMERO.</p>
+                    `;
+                    var buttons = ['Close', 'Reload in new Tab'];
+                    var callback = function(btnText) {
+                        if (btnText === "Reload in new Tab") {
+                            var recoverUrl = BASE_WEBFIGURE_URL + 'recover/';
+                            window.open(WEBLOGIN_URL + '?url=' + recoverUrl, '_blank')
+                        }
+                    }
+                    figureConfirmDialog(errorTitle, message, buttons, callback);
                 });
         },
 
         clearFigure: function() {
             var figureModel = this;
             figureModel.unset('fileId');
+            figureModel.unset('groupId');
             figureModel.delete_panels();
             figureModel.unset("figureName");
             figureModel.set(figureModel.defaults);

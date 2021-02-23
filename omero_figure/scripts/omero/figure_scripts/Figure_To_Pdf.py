@@ -1749,8 +1749,9 @@ class FigureExport(object):
             if 'scalebar' in p and p['scalebar'].get('show'):
                 sb_length = p['scalebar'].get('length')
                 symbol = u"\u00B5m"
-                if 'pixel_size_x_symbol' in p:
-                    symbol = p['pixel_size_x_symbol']
+                sb_units = p['scalebar'].get('units')
+                if sb_units and sb_units in unit_symbols:
+                    symbol = unit_symbols[sb_units]['symbol']
                 scalebars.append("%s %s" % (sb_length, symbol))
             if iid in img_ids:
                 continue    # ignore images we've already handled

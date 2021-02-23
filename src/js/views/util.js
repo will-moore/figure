@@ -53,6 +53,31 @@ if (!String.prototype.endsWith)
                          searchStr.length) === searchStr;
   };
 
+var showExportAsJsonModal = function(figureJSON) {
+    var figureText = JSON.stringify(figureJSON);
+    $('#exportJsonModal').modal('show');
+    $('#exportJsonModal textarea').text(figureText);
+}
+
+var saveFigureToStorage = function (figureJSON) {
+    window.sessionStorage.setItem(LOCAL_STORAGE_RECOVERED_FIGURE, JSON.stringify(figureJSON));
+}
+
+var clearFigureFromStorage = function() {
+    window.sessionStorage.removeItem(LOCAL_STORAGE_RECOVERED_FIGURE);
+}
+
+var recoverFigureFromStorage = function() {
+    var storage = window.sessionStorage;
+    var recoveredFigure = storage.getItem(LOCAL_STORAGE_RECOVERED_FIGURE);
+    var figureObject;
+    try {
+        figureObject = JSON.parse(recoveredFigure);
+    } catch (e) {
+        console.log("recovered Figure not valid JSON " + recoveredFigure);
+    }
+    return figureObject;
+}
 
 var figureConfirmDialog = function(title, message, buttons, callback) {
     var $confirmModal = $("#confirmModal"),
@@ -146,6 +171,16 @@ $.prototype.slider = function() {
     return result;
 }
 
+
+// Get coordinates for point x, y rotated around cx, cy, by rotation degrees
+var rotatePoint = function (x, y, cx, cy, rotation) {
+    let length = Math.sqrt(Math.pow((x - cx), 2) + Math.pow((y - cy), 2));
+    let rot = Math.atan2((y - cy), (x - cx));
+    rot = rot + (rotation * (Math.PI / 180));  // degrees to rad
+    let dx = Math.cos(rot) * length;
+    let dy = Math.sin(rot) * length;
+    return { x: cx + dx, y: cy + dy };
+}
 
 $(function(){
 

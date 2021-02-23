@@ -450,6 +450,7 @@
 
         // resize, zoom and pan to show the specified region.
         // new panel will fit inside existing panel
+        // coords is {x:x, y:y, width:w, height:h, rotation?:r}
         cropToRoi: function(coords) {
             var targetWH = coords.width/coords.height,
                 currentWH = this.get('width')/this.get('height'),
@@ -473,7 +474,12 @@
                 yPercent = this.get('orig_height') / coords.height,
                 zoom = Math.min(xPercent, yPercent) * 100;
 
-            this.set({'width': newW, 'height': newH, 'dx': dx, 'dy': dy, 'zoom': zoom});
+            var toSet = { 'width': newW, 'height': newH, 'dx': dx, 'dy': dy, 'zoom': zoom };
+            var rotation = coords.rotation || 0;
+            if (!isNaN(rotation)) {
+                toSet.rotation = rotation;
+            }
+            this.save(toSet);
         },
 
         // returns the current viewport as a Rect {x, y, width, height}
@@ -481,6 +487,7 @@
             zoom = zoom !== undefined ? zoom : this.get('zoom');
             dx = dx !== undefined ? dx : this.get('dx');
             dy = dy !== undefined ? dy : this.get('dy');
+            var rotation = this.get('rotation');
 
             var width = this.get('width'),
                 height = this.get('height'),
@@ -497,7 +504,8 @@
                 view_wh = width / height;
             if (dx === 0 && dy === 0 && zoom == 100 && Math.abs(orig_wh - view_wh) < 0.01) {
                 // ...ROI is whole image
-                return {'x': 0, 'y': 0, 'width': orig_width, 'height': orig_height}
+                return {'x': 0, 'y': 0, 'width': orig_width,
+                    'height': orig_height, 'rotation': rotation}
             }
 
             // Factor in the applied zoom...
@@ -512,7 +520,8 @@
                 roiX = cX - (roiW / 2),
                 roiY = cY - (roiH / 2);
 
-            return {'x': roiX, 'y': roiY, 'width': roiW, 'height': roiH};
+            return {'x': roiX, 'y': roiY, 'width': roiW,
+                'height': roiH, 'rotation': rotation};
         },
 
         // Drag resizing - notify the PanelView without saving
@@ -598,10 +607,12 @@
         },
 
         // Turn coordinates into css object with rotation transform
-        _viewport_css: function(img_x, img_y, img_w, img_h, frame_w, frame_h) {
+        _viewport_css: function(img_x, img_y, img_w, img_h, frame_w, frame_h, rotation) {
             var transform_x = 100 * (frame_w/2 - img_x) / img_w,
-                transform_y = 100 * (frame_h/2 - img_y) / img_h,
+                transform_y = 100 * (frame_h/2 - img_y) / img_h;
+            if (rotation == undefined) {
                 rotation = this.get('rotation') || 0;
+            }
 
             var css = {'left':img_x,
                        'top':img_y,
@@ -901,6 +912,4 @@
                 });
             }.bind(this));
         }
-
-        // localStorage: new Backbone.LocalStorage("figureShop-backbone")
     });

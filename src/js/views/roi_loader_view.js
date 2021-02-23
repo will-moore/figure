@@ -7,7 +7,10 @@ var RoiLoaderView = Backbone.View.extend({
     shapeTemplate: JST["src/templates/modal_dialogs/roi_modal_shape.html"],
 
     initialize: function(options) {
+        this.render = _.debounce(this.render);
+        this.totalCount = options.totalCount;
         this.panel = options.panel;
+        this.listenTo(this.collection, "add", this.render);
     },
 
     events: {
@@ -163,7 +166,12 @@ var RoiLoaderView = Backbone.View.extend({
         // remove any rois from above with no shapes
         json = json.filter(function(j) {return j});
 
-        var html = this.template({'rois': json});
+        var html = this.template({
+            rois: json,
+            showLoadMore: this.totalCount > this.collection.length,
+            totalCount: this.totalCount,
+            count: this.collection.length,
+        });
         this.$el.html(html);
 
         return this;
