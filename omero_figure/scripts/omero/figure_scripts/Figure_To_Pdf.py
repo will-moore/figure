@@ -337,7 +337,7 @@ class ShapeToPdfExport(ShapeExport):
         g = float(rgb[1])/255
         b = float(rgb[2])/255
         self.canvas.setStrokeColorRGB(r, g, b)
-        stroke_width = shape.get('strokeWidth', 1)
+        stroke_width = float(shape.get('strokeWidth', 1))
         self.canvas.setLineWidth(stroke_width)
 
         p = self.canvas.beginPath()
@@ -354,7 +354,7 @@ class ShapeToPdfExport(ShapeExport):
         y1 = self.page_height - start['y']
         x2 = end['x']
         y2 = self.page_height - end['y']
-        stroke_width = shape.get('strokeWidth', 1)
+        stroke_width = float(shape.get('strokeWidth', 1))
         # Don't draw if both points outside panel
         if (start['inPanel'] is False) and (end['inPanel'] is False):
             return
@@ -422,7 +422,7 @@ class ShapeToPdfExport(ShapeExport):
         if not polygon_in_viewport:
             return
 
-        stroke_width = shape.get('strokeWidth', 1)
+        stroke_width = float(shape.get('strokeWidth', 1))
         r, g, b, a = self.get_rgba(shape['strokeColor'])
         self.canvas.setStrokeColorRGB(r, g, b, alpha=a)
         self.canvas.setLineWidth(stroke_width)
@@ -453,7 +453,7 @@ class ShapeToPdfExport(ShapeExport):
         self.draw_polygon(shape, False)
 
     def draw_ellipse(self, shape):
-        stroke_width = shape.get('strokeWidth', 1)
+        stroke_width = float(shape.get('strokeWidth', 1))
         c = self.panel_to_page_coords(shape['x'], shape['y'])
 
         # Don't draw if centre outside panel
@@ -584,9 +584,9 @@ class ShapeToPilExport(ShapeExport):
         y1 = start['y']
         x2 = end['x']
         y2 = end['y']
-        head_size = ((shape.get('strokeWidth', 1) * 4) + 5)
+        head_size = ((float(shape.get('strokeWidth', 1)) * 4) + 5)
         head_size = scale_to_export_dpi(head_size)
-        stroke_width = scale_to_export_dpi(shape.get('strokeWidth', 2))
+        stroke_width = scale_to_export_dpi(float(shape.get('strokeWidth', 2)))
         rgb = ShapeToPdfExport.get_rgb(shape['strokeColor'])
 
         # Do some trigonometry to get the line angle can calculate arrow points
@@ -638,7 +638,7 @@ class ShapeToPilExport(ShapeExport):
         p.append(p[0])
         points = p
 
-        stroke_width = scale_to_export_dpi(shape.get('strokeWidth', 2))
+        stroke_width = scale_to_export_dpi(float(shape.get('strokeWidth', 2)))
         buffer = int(ceil(stroke_width) * 1.5)
 
         # if fill, draw filled polygon without outline, then add line later
@@ -694,7 +694,7 @@ class ShapeToPilExport(ShapeExport):
         if closed:
             points.append(points[0])
 
-        stroke_width = scale_to_export_dpi(shape.get('strokeWidth', 2))
+        stroke_width = scale_to_export_dpi(float(shape.get('strokeWidth', 2)))
         buffer = int(ceil(stroke_width))
 
         # if fill, draw filled polygon without outline, then add line later
@@ -744,7 +744,7 @@ class ShapeToPilExport(ShapeExport):
         y1 = start['y']
         x2 = end['x']
         y2 = end['y']
-        stroke_width = scale_to_export_dpi(shape.get('strokeWidth', 2))
+        stroke_width = scale_to_export_dpi(float(shape.get('strokeWidth', 2)))
         rgba = ShapeToPdfExport.get_rgba_int(shape['strokeColor'])
         self.draw.line(
             [(x1, y1), (x2, y2)], fill=rgba, width=int(stroke_width))
@@ -752,7 +752,7 @@ class ShapeToPilExport(ShapeExport):
 
     def draw_ellipse(self, shape):
 
-        w = int(scale_to_export_dpi(shape.get('strokeWidth', 2)))
+        w = int(scale_to_export_dpi(float(shape.get('strokeWidth', 2))))
         ctr = self.get_panel_coords(shape['x'], shape['y'])
         cx = ctr['x']
         cy = ctr['y']
@@ -844,7 +844,7 @@ class FigureExport(object):
                     page_coords_width = float(p.get('width'))
                     stroke_width_scale = page_coords_width/image_pixels_width
                     for shape in p['shapes']:
-                        stroke_width = shape.get('strokeWidth', 1)
+                        stroke_width = float(shape.get('strokeWidth', 1))
                         stroke_width = stroke_width * stroke_width_scale
                         # Set stroke-width to 0.25, 0.5, 0.75, 1 or greater
                         if stroke_width > 0.875:
@@ -1257,7 +1257,7 @@ class FigureExport(object):
         """
         Add the scalebar to the page.
         Here we calculate the position of scalebar but delegate
-        to self.draw_line() and self.draw_text() to actually place
+        to self.draw_scalebar_line() and self.draw_text() to actually place
         the scalebar and label on PDF/TIFF
         """
         x = panel['x']
@@ -1332,7 +1332,7 @@ class FigureExport(object):
         else:
             lx_end = lx - canvas_length
 
-        self.draw_line(lx, ly, lx_end, ly, 3, (red, green, blue))
+        self.draw_scalebar_line(lx, ly, lx_end, ly, 3, (red, green, blue))
 
         if 'show_label' in sb and sb['show_label']:
             symbol = u"\u00B5m"
@@ -1903,7 +1903,7 @@ class FigureExport(object):
         if align == 'vertical':
             c.rotate(-90)
 
-    def draw_line(self, x, y, x2, y2, width, rgb):
+    def draw_scalebar_line(self, x, y, x2, y2, width, rgb):
         """ Adds line to PDF. Overwritten for TIFF below """
         red, green, blue = rgb
         red = float(red)/255
@@ -2059,7 +2059,7 @@ class TiffExport(FigureExport):
         box = (x, y, x + width, y + height)
         self.tiff_figure.paste(pil_img, box)
 
-    def draw_line(self, x, y, x2, y2, width, rgb):
+    def draw_scalebar_line(self, x, y, x2, y2, width, rgb):
         """ Draw line on the current figure page """
         draw = ImageDraw.Draw(self.tiff_figure)
 
