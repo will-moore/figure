@@ -4,12 +4,12 @@
             <tr><td>
                 <div class="col-sm-3">Compare:</div>
                 <div class="col-sm-3">
-                    <img class="small-thumb" title="<%= selImg.name %>"
+                    <img class="small-thumb" title="<%- selImg.name %>"
                         src="<%= selThumbSrc %>" />
                 </div>
                 <div class="col-sm-3">
                     <% if(newImg.imageId) { %>
-                        <img class="small-thumb" title="<%= newImg.name %>"
+                        <img class="small-thumb" title="<%- newImg.name %>"
                             src="<%= newThumbSrc %>" />
                     <% } else { %>
                         <div style="width:40px; height:40px; background-color:#ddd"></div>
@@ -40,12 +40,12 @@
                 <div class="col-sm-3"><small><strong>Channels</strong>:</small></div>
                 <div class="col-sm-3"><small>
                     <% _.each(selImg.channels, function(ch, i) { %>
-                        <%= ch.label %><% if(i < selImg.channels.length-1){print(',')} %>
+                        <%- ch.label %><% if(i < selImg.channels.length-1){print(',')} %>
                     <% }); %>
                 </small></div>
                 <div class="col-sm-3"><small>
                     <% if(newImg.channels){ _.each(newImg.channels, function(ch, i) { %>
-                        <%= ch.label %><% if(i < newImg.channels.length-1){print(',')} %>
+                        <%- ch.label %><% if(i < newImg.channels.length-1){print(',')} %>
                     <% }) } else { print("-") } %>
                 </small></div>
                 <div class="col-sm-3"><small><%= comp.channels || "-" %></small></div>

@@ -1,6 +1,6 @@
 
 //
-// Copyright (C) 2014-2020 University of Dundee & Open Microscopy Environment.
+// Copyright (C) 2014-2021 University of Dundee & Open Microscopy Environment.
 // All rights reserved.
 //
 // This program is free software: you can redistribute it and/or modify
@@ -38,12 +38,12 @@ var FigureFile = Backbone.Model.extend({
 
     isVisible: function(filter) {
         if (filter.owner) {
-            if (this.get('ownerFullName') !== filter.owner) {
+            if (this.get('owner').id !== filter.owner) {
                 return false;
             }
         }
         if (filter.group) {
-            if (this.get('group').name !== filter.group) {
+            if (this.get('group').id !== filter.group) {
                 return false;
             }
         }
@@ -109,7 +109,7 @@ var FileListView = Backbone.View.extend({
     initialize:function (options) {
         this.$tbody = $('tbody', this.$el);
         this.$fileFilter = $('#file-filter');
-        this.owner = USER_FULL_NAME;
+        this.owner = USER_ID;
         if (window.IS_PUBLIC_USER) {
             delete this.owner;
         }
@@ -194,8 +194,8 @@ var FileListView = Backbone.View.extend({
 
     pick_owner: function(event) {
         event.preventDefault()
-        var owner = $(event.target).text();
-        if (owner != " -- Show All -- ") {
+        var owner = $(event.target).data('id');
+        if (owner != -1) {
             this.owner = owner;
         } else {
             delete this.owner;
@@ -205,8 +205,8 @@ var FileListView = Backbone.View.extend({
 
     pick_group: function (event) {
         event.preventDefault()
-        var group = $(event.target).text();
-        if (group != " -- Show All -- ") {
+        var group = $(event.target).data('id');
+        if (group != -1) {
             this.group = group;
         } else {
             delete this.group;
@@ -219,10 +219,10 @@ var FileListView = Backbone.View.extend({
             filter = {},
             filterVal = this.$fileFilter.val(),
             currentFileId = this.figureModel.get('fileId');
-        if (this.owner && this.owner.length > 0) {
+        if (this.owner && this.owner != -1) {
             filter.owner = this.owner;
         }
-        if (this.group && this.group.length > 0) {
+        if (this.group && this.group != -1) {
             filter.group = this.group;
         }
         if (filterVal.length > 0) {
@@ -243,30 +243,38 @@ var FileListView = Backbone.View.extend({
                 self.$tbody.prepend(e);
             }
         });
-        var owners = this.model.pluck("ownerFullName");
-        owners = _.uniq(owners, false);
+        var owners = this.model.pluck("owner");
+        var ownersByName = {};
+        owners.forEach(function(o){
+            let name = o.firstName + " " + o.lastName;
+            ownersByName[name] = o.id;
+        });
+        var ownersNames = Object.keys(ownersByName);
         // Sort by last name
-        owners.sort(function compare(a, b) {
+        ownersNames.sort(function compare(a, b) {
             var aNames = a.split(" "),
                 aN = aNames[aNames.length - 1],
                 bNames = b.split(" "),
                 bN = bNames[bNames.length - 1];
             return aN > bN;
         });
-        var ownersHtml = "<li><a class='pick-owner' href='#'> -- Show All -- </a></li>";
+        var ownersHtml = "<li><a class='pick-owner' href='#' data-id='-1'> -- Show All -- </a></li>";
             ownersHtml += "<li class='divider'></li>";
-        _.each(owners, function(owner) {
-            ownersHtml += "<li><a class='pick-owner' href='#'>" + owner + "</a></li>";
+        _.each(ownersNames, function(name) {
+            ownersHtml += "<li><a class='pick-owner' data-id='" + ownersByName[name] + "' href='#'>" + _.escape(name) + "</a></li>";
         });
         $("#owner-menu").html(ownersHtml);
 
         // render groups chooser
         var groups = this.model.pluck("group");
-        var groupNames = groups.map(function(g){return g.name});
-        groupNames = _.uniq(groupNames, false);
+        var groupsByName = {};
+        groups.forEach(function (g) {
+            groupsByName[g.name] = g.id;
+        })
+        var groupNames = Object.keys(groupsByName);
         groupNames.sort();
-        var groupsHtml = "<li><a class='pick-group' href='#'> -- Show All -- </a></li><li class='divider'></li>";
-        groupsHtml += groupNames.map(function (g) { return "<li><a class='pick-group' href='#'>" + g + "</a></li>"}).join('\n');
+        var groupsHtml = "<li><a class='pick-group' href='#' data-id='-1'> -- Show All -- </a></li><li class='divider'></li>";
+        groupsHtml += groupNames.map(function (name) { return "<li><a class='pick-group' data-id='" + groupsByName[name] + "' href='#'>" + _.escape(name) + "</a></li>"}).join('\n');
         $("#group-menu").html(groupsHtml);
         return this;
     }
@@ -316,10 +324,6 @@ var FileListItemView = Backbone.View.extend({
                     json.imageId = d.imageId;
                     // we cache this so we don't have to parse() on each render()
                     this.model.set('imageId', d.imageId);
-                }
-                if (d.name) {
-                    json.name = _.escape(d.name);
-                    this.model.set('name', json.name);
                 }
             } catch (err) {
                 console.log('failed to parse json', json.description);

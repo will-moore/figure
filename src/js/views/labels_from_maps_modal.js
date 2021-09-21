@@ -120,7 +120,7 @@ var LabelFromMapsModal = Backbone.View.extend({
             label = ""
         }
 
-        $("#exampleLabelFromMap").html(label);
+        $("#exampleLabelFromMap").html(_.escape(label));
     },
 
     /**
@@ -154,7 +154,7 @@ var LabelFromMapsModal = Backbone.View.extend({
         });
 
         var html = keyList.map(function(key) {
-            return "<option value='" + key + "'>" + key + " (" + keyCounts[key] + ")</option>";
+            return "<option value='" + _.escape(key) + "'>" + _.escape(key) + " (" + keyCounts[key] + ")</option>";
         }).join("");
         if (keyList.length === 0) {
             html = "<option>No Key-Value Pairs found</option>";

@@ -80,14 +80,14 @@ var ChgrpModalView = Backbone.View.extend({
         var url = BASE_WEBFIGURE_URL + 'chgrp/';
         this.enableSubmit(false);
         setTimeout(function(){
-            $('#chgrpModal .modal-body').append("<p>Moving to Group: " + group_name + "...</p>");
+            $('#chgrpModal .modal-body').append("<p>Moving to Group: " + _.escape(group_name) + "...</p>");
         }, 1000);
         $.post(url, { group_id: group_id, ann_id: fileId})
             .done(function (data) {
                 $("#chgrpModal").modal('hide');
                 if (data.success) {
                     this.model.set({groupId: group_id});
-                    figureConfirmDialog("Success", "Figure moved to Group: " + group_name, ["OK"]);
+                    figureConfirmDialog("Success", "Figure moved to Group: " + _.escape(group_name), ["OK"]);
                 } else {
                     var errorMsg = data.error || "No error message available";
                     figureConfirmDialog("Move Failed", errorMsg, ["OK"]);
@@ -100,7 +100,7 @@ var ChgrpModalView = Backbone.View.extend({
         var groupId = this.model.get('groupId');
         var currentGroup = this.omeroGroups.filter(group => group.id === groupId)[0];
         if (currentGroup) {
-            html += '<p>This figure is currently in Group: <strong>' + currentGroup.name + '</strong>.</p>';
+            html += '<p>This figure is currently in Group: <strong>' + _.escape(currentGroup.name) + '</strong>.</p>';
         }
 
         var groupCount = Object.keys(this.imagesByGroup).length;
@@ -109,7 +109,7 @@ var ChgrpModalView = Backbone.View.extend({
             var imgIds = this.imagesByGroup[groupId].map(i => i.id);
             var groupName = this.imagesByGroup[groupId][0].group.name;
             return `
-                <b>${groupName}</b>
+                <b>${_.escape(groupName)}</b>
                 (<a target="_blank" href="${WEBINDEX_URL}?show=image-${imgIds.join('|image-')}">${imgIds.length} image${imgIds.length == 1 ? '' : 's'}</a>)`
             }
         ).join(", ") + '.</p>';
@@ -123,7 +123,7 @@ var ChgrpModalView = Backbone.View.extend({
             html += "<p>Move to Group...</p>";
             html += targetGroups.map(group => `<div class="radio">
                 <label><input type="radio" name="target_group" value="${group.id}">
-                    ${group.name}
+                    ${_.escape(group.name)}
                 </label></div>`)
                 .join("\n");
         }

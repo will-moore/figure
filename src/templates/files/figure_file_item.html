@@ -6,7 +6,7 @@
         </td>
         <td title="This figure is currently open">
             <div style="width:400px; word-wrap:break-word;">
-                <%= name %>
+                <%- name %>
             </div>
         </td>
     <% } else { %>
@@ -17,7 +17,7 @@
         </td>
         <td>
             <div style="width:400px; word-wrap:break-word;">
-                <a href="<%= url %>"><%= name %></a>
+                <a href="<%= url %>"><%- name %></a>
             </div>
         </td>
     <% } %>
@@ -25,8 +25,8 @@
         <%= formatDate(creationDate) %>
     </td>
     <td>
-        <%= ownerFullName %>
+        <%- ownerFullName %>
     </td>
     <td>
-        <%= group.name %>
+        <%- group.name %>
     </td>
