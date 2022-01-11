@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/ome/omero-figure.git"
+    "url": "https://github.com/ome/omero-figure.git"
   },
   "keywords": [
     "backbone",
