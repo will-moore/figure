@@ -282,6 +282,7 @@ var ChannelSliderView = Backbone.View.extend({
                     range: true,
                     min: min,
                     max: max,
+                    step: 0.01,
                     values: [startAvg, endAvg],
                     slide: function(event, ui) {
                         $('.ch_start input', $div).val(ui.values[0]);
