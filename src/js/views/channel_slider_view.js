@@ -141,7 +141,7 @@ var ChannelSliderView = Backbone.View.extend({
         var idx = event.target.getAttribute('data-idx'),
             startEnd = event.target.getAttribute('data-window');  // 'start' or 'end'
         idx = parseInt(idx, 10);
-        var value = parseInt(event.target.value, 10);
+        var value = parseFloat(event.target.value, 10);
         if (isNaN(value)) return;
         // Make sure 'start' < 'end' value
         if (event.target.getAttribute('max') && value > event.target.getAttribute('max')){
@@ -236,8 +236,8 @@ var ChannelSliderView = Backbone.View.extend({
                 var actives = chData.map(getActive(chIdx));
                 var labels = chData.map(getLabel(chIdx));
                 // Reduce lists into summary for this channel
-                var startAvg = parseInt(starts.reduce(addFn, 0) / starts.length, 10);
-                var endAvg = parseInt(ends.reduce(addFn, 0) / ends.length, 10);
+                var startAvg = starts.reduce(addFn, 0) / starts.length;
+                var endAvg = ends.reduce(addFn, 0) / ends.length;
                 var startsNotEqual = starts.reduce(allEqualFn, starts[0]) === undefined;
                 var endsNotEqual = ends.reduce(allEqualFn, ends[0]) === undefined;
                 var min = mins.reduce(reduceFn(Math.min));
