@@ -1,4 +1,7 @@
 
+const SLIDER_INCR_CUTOFF = 100;
+// If the max value of a slider is below this, use smaller slider increments
+
 var ChannelSliderView = Backbone.View.extend({
 
     template: JST["src/templates/channel_slider_template.html"],
@@ -242,6 +245,14 @@ var ChannelSliderView = Backbone.View.extend({
                 var endsNotEqual = ends.reduce(allEqualFn, ends[0]) === undefined;
                 var min = mins.reduce(reduceFn(Math.min));
                 var max = maxs.reduce(reduceFn(Math.max));
+                if (max > SLIDER_INCR_CUTOFF) {
+                    // If we have a large range, use integers, otherwise format to 2dp
+                    startAvg = parseInt(startAvg);
+                    endAvg = parseInt(endAvg);
+                } else {
+                    startAvg = startAvg.toFixed(2);
+                    endAvg = endAvg.toFixed(2);
+                }
                 var color = colors.reduce(allEqualFn, colors[0]) ? colors[0] : 'ccc';
                 // allEqualFn for booleans will return undefined if not or equal
                 var label = labels.reduce(allEqualFn, labels[0]) ? labels[0] : ' ';
@@ -282,11 +293,13 @@ var ChannelSliderView = Backbone.View.extend({
                     range: true,
                     min: min,
                     max: max,
-                    step: 0.01,
+                    step: (max > SLIDER_INCR_CUTOFF) ? 1 : 0.01,
                     values: [startAvg, endAvg],
                     slide: function(event, ui) {
-                        $('.ch_start input', $div).val(ui.values[0]);
-                        $('.ch_end input', $div).val(ui.values[1]);
+                        let chStart = (max > SLIDER_INCR_CUTOFF) ? ui.values[0] : ui.values[0].toFixed(2);
+                        let chEnd = (max > SLIDER_INCR_CUTOFF) ? ui.values[1] : ui.values[1].toFixed(2);
+                        $('.ch_start input', $div).val(chStart);
+                        $('.ch_end input', $div).val(chEnd);
                     },
                     stop: function(event, ui) {
                         self.models.forEach(function(m) {
