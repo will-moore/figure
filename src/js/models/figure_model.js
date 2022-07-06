@@ -567,7 +567,7 @@
             });
         },
 
-        align_grid: function() {
+        align_grid: function(gridGap) {
             var sel = this.getSelected(),
                 top_left = this.get_top_left_panel(sel),
                 top_x = top_left.get('x'),
@@ -594,8 +594,11 @@
                 }
             }
 
-            var spacer = top_left.get('width')/20,
-                new_x = top_x,
+            var spacer = top_left.get('width')/20;
+            if (!isNaN(parseFloat(gridGap))) {
+                spacer = parseFloat(gridGap);
+            }
+            var new_x = top_x,
                 new_y = top_y,
                 max_h = 0;
             for (var r=0; r<grid.length; r++) {
