@@ -371,12 +371,6 @@
             };
 
             selected.forEach(function(m) {
-                if (label_text === "[image-name]") {
-                    var pathnames = m.get('name').split('/');
-                    label.text = pathnames[pathnames.length-1];
-                } else if (label_text === "[dataset-name]") {
-                    label.text = m.get('datasetName') ? m.get('datasetName') : "No/Many Datasets";
-                }
                 m.add_labels([label]);
             });
             return false;

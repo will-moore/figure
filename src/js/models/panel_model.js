@@ -308,6 +308,16 @@
             return (isNegative ? '-' : '') + text;
         },
 
+		get_name_label_text: function(format) {
+            var text = "";
+            if (format === "image") {
+                var pathnames = this.get('name').split('/');
+                text = pathnames[pathnames.length-1];
+            } else if (format === "dataset"){
+                text = this.get('datasetName') ? this.get('datasetName') : "No/Many Datasets";
+            }
+            return text;
+        },
 
         get_label_key: function(label) {
             var key = label.text + '_' + label.size + '_' + label.color + '_' + label.position;

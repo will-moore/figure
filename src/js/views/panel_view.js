@@ -198,6 +198,11 @@
                         var label_value = ""
                         if (expr[0]==="time")
                             label_value = self.model.get_time_label_text(expr[1]);
+						else if (expr[0]==="name"){
+                            label_value = self.model.get_name_label_text(expr[1]);
+							//Escape the underscore for markdown
+							label_value = label_value.replaceAll("_", "\\_");
+						}
 
                         //If label_value hasn't been created (invalid expr[0])
                         //  or is empty (invalid expr[1]), the expr is kept unmodified
