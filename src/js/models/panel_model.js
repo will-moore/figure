@@ -96,6 +96,7 @@
                 'datasetName': data.datasetName,
                 'pixel_size_x': data.pixel_size_x,
                 'pixel_size_y': data.pixel_size_y,
+				'pixel_size_z': data.pixel_size_z,
                 'pixel_size_x_symbol': data.pixel_size_x_symbol,
                 'pixel_size_x_unit': data.pixel_size_x_unit,
                 'deltaT': data.deltaT,
@@ -332,6 +333,17 @@
                 text = ""+parseInt(viewport['height']);
             } else if (format === "rotation"){
                 text = ""+parseInt(viewport['rotation']);
+            }
+            return text;
+        },
+		
+		get_depth_label_text: function(format) {
+            var theZ = this.get('theZ');
+            var text = "";
+            if (format === "index") {
+                text = "" + (theZ + 1);
+            } else if (format === "unit"){
+                text = ""+ (theZ * this.get('pixel_size_z')).toPrecision(3) +" "+ this.get('pixel_size_x_symbol')
             }
             return text;
         },
