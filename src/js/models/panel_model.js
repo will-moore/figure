@@ -323,15 +323,15 @@
 			viewport = this.getViewportAsRect();
             var text = "";
             if (format === "x") {
-                text = ""+Math.round(viewport['x']);
+                text = ""+parseInt(viewport['x']);
             } else if (format === "y"){
-                text = ""+Math.round(viewport['y']);
+                text = ""+parseInt(viewport['y']);
             } else if (format === "width"){
-                text = ""+Math.round(viewport['width']);
+                text = ""+parseInt(viewport['width']);
             } else if (format === "height"){
-                text = ""+Math.round(viewport['height']);
+                text = ""+parseInt(viewport['height']);
             } else if (format === "rotation"){
-                text = ""+Math.round(viewport['rotation']);
+                text = ""+parseInt(viewport['rotation']);
             }
             return text;
         },

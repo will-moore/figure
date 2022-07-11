@@ -1136,6 +1136,8 @@ class FigureExport(object):
         y = panel['y']
         width = panel['width']
         height = panel['height']
+        
+        viewport_region = self.get_crop_region(panel)
 
         # Handle page offsets
         x = x - page['x']
@@ -1174,6 +1176,19 @@ class FigureExport(object):
                     elif expr[1] == "dataset":
                         label_value = panel['datasetName'] if panel['datasetName'] else "No/Many Datasets"
                     label_value = label_value.replace("_", "\\_") #Escaping for markdown
+                    
+                elif expr[0]=="roi":
+                    if expr[1] == "x":
+                        label_value = viewport_region["x"]
+                    elif expr[1] == "y":
+                        label_value = viewport_region["y"]
+                    elif expr[1] == "width":
+                        label_value = viewport_region["width"]
+                    elif expr[1] == "height":
+                        label_value = viewport_region["height"]
+                    elif expr[1] == "rotation":
+                        label_value = panel["rotation"]
+                    label_value = str(int(label_value))
 
                 new_text.append(label_value if label_value else item.group())
                 last_idx += item.end()
