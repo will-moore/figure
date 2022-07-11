@@ -30,7 +30,7 @@ from math import atan2, atan, sin, cos, sqrt, radians, floor, ceil
 from copy import deepcopy
 import re
 
-from omero.model import ImageAnnotationLinkI, ImageI, LengthI
+from p.model import ImageAnnotationLinkI, ImageI, LengthI
 import omero.scripts as scripts
 from omero.gateway import BlitzGateway
 from omero.rtypes import rstring, robject
@@ -1158,6 +1158,7 @@ class FigureExport(object):
                 new_text.append(l['text'][last_idx:item.start()])
                 expr = item.group()[1:-1].split("-")
                 label_value = ""
+                
                 if expr[0]=="time":
                     the_t = panel['theT']
                     timestamps = panel.get('deltaT')
@@ -1166,6 +1167,14 @@ class FigureExport(object):
                     elif timestamps and panel['theT'] < len(timestamps):
                         d_t = panel['deltaT'][the_t]
                         label_value = self.get_time_label_text(d_t, expr[1])
+                        
+                elif expr[0]=="name":
+                    if expr[1] == "image":
+                        label_value = panel['name'].split('/')[-1]
+                    elif expr[1] == "dataset":
+                        label_value = panel['datasetName'] if panel['datasetName'] else "No/Many Datasets"
+                    label_value = label_value.replace("_", "\\_") #Escaping for markdown
+
                 new_text.append(label_value if label_value else item.group())
                 last_idx += item.end()
             l['text'] = "".join(new_text)
