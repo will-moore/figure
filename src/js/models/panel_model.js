@@ -318,6 +318,23 @@
             }
             return text;
         },
+		
+		get_roi_label_text: function(format) {
+			viewport = this.getViewportAsRect();
+            var text = "";
+            if (format === "x") {
+                text = ""+Math.round(viewport['x']);
+            } else if (format === "y"){
+                text = ""+Math.round(viewport['y']);
+            } else if (format === "width"){
+                text = ""+Math.round(viewport['width']);
+            } else if (format === "height"){
+                text = ""+Math.round(viewport['height']);
+            } else if (format === "rotation"){
+                text = ""+Math.round(viewport['rotation']);
+            }
+            return text;
+        },
 
         get_label_key: function(label) {
             var key = label.text + '_' + label.size + '_' + label.color + '_' + label.position;

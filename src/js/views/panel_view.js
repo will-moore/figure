@@ -21,7 +21,7 @@
             this.listenTo(this.model,
                 'change:zoom change:dx change:dy change:width change:height change:channels change:theZ change:theT change:z_start change:z_end change:z_projection change:min_export_dpi',
                 this.render_image);
-            this.listenTo(this.model, 'change:labels change:theT change:deltaT', this.render_labels);
+            this.listenTo(this.model, 'change:zoom change:dx change:dy change:rotation change:labels change:theT change:deltaT', this.render_labels);
             this.listenTo(this.model, 'change:shapes', this.render_shapes);
 
             // During drag or resize, model isn't updated, but we trigger 'drag'
@@ -202,6 +202,8 @@
                             label_value = self.model.get_name_label_text(expr[1]);
 							//Escape the underscore for markdown
 							label_value = label_value.replaceAll("_", "\\_");
+						} else if (expr[0]==="roi"){
+                            label_value = self.model.get_roi_label_text(expr[1]);
 						}
 
                         //If label_value hasn't been created (invalid expr[0])
