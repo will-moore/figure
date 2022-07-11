@@ -1166,8 +1166,8 @@ class FigureExport(object):
                     timestamps = panel.get('deltaT')
                     if expr[1] == "index":
                         label_value = str(the_t + 1)
-                    elif timestamps and panel['theT'] < len(timestamps):
-                        d_t = panel['deltaT'][the_t]
+                    elif timestamps and the_t < len(timestamps):
+                        d_t = timestamps[the_t]
                         label_value = self.get_time_label_text(d_t, expr[1])
                         
                 elif expr[0]=="name":
@@ -1189,6 +1189,14 @@ class FigureExport(object):
                     elif expr[1] == "rotation":
                         label_value = panel["rotation"]
                     label_value = str(int(label_value))
+                    
+                elif expr[0]=="depth":
+                    the_z = panel['theZ']
+                    size_z = panel.get('sizeZ')
+                    if expr[1] == "index":
+                        label_value = str(the_z + 1)
+                    elif size_z and the_z < size_z:
+                        label_value = str(round(the_z*panel.get('pixel_size_z'), 2)) + " " + panel.get('pixel_size_x_symbol')
 
                 new_text.append(label_value if label_value else item.group())
                 last_idx += item.end()
