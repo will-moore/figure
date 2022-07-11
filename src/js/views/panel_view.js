@@ -188,12 +188,28 @@
                         ljson.color = '000000';
                     }
                 }
-                if (typeof ljson.text == 'undefined' && ljson.time) {
-                    ljson.text = self.model.get_time_label_text(ljson.time);
-                } else {
-                    // Markdown also escapes all labels so they are safe
-                    ljson.text = markdown.toHTML(ljson.text);
+                const matches = [...ljson.text.matchAll(/\[.+?\]/g)]; // Non greedy regex capturing expressions in []
+                if (matches.length>0){ 
+                    var new_text = "";
+                    var last_idx = 0;
+                    for (const match of matches) {// Loops on the match to replace in the ljson.text the expression by their values
+                        var new_text = new_text + ljson.text.slice(last_idx, match.index);
+                        expr = match[0].slice(1,-1).split("-");
+                        var label_value = ""
+                        if (expr[0]==="time")
+                            label_value = self.model.get_time_label_text(expr[1]);
+
+                        //If label_value hasn't been created (invalid expr[0])
+                        //  or is empty (invalid expr[1]), the expr is kept unmodified
+                        new_text = new_text + (label_value?label_value:match[0]); 
+                        last_idx = match.index + match[0].length;
+                    }
+                    ljson.text = new_text + ljson.text.slice(last_idx);
                 }
+
+                // Markdown also escapes all labels so they are safe
+                ljson.text = markdown.toHTML(ljson.text);
+
                 positions[l.position].push(ljson);
             });
 
