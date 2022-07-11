@@ -28,6 +28,7 @@ from os import path
 import zipfile
 from math import atan2, atan, sin, cos, sqrt, radians, floor, ceil
 from copy import deepcopy
+import re
 
 from omero.model import ImageAnnotationLinkI, ImageI, LengthI
 import omero.scripts as scripts
@@ -1148,17 +1149,26 @@ class FigureExport(object):
                      'topleft': [], 'topright': [],
                      'bottomleft': [], 'bottomright': []}
 
+        parse_re = re.compile("\[.+?\]")
         for l in labels:
-            if 'text' not in l:
-                the_t = panel['theT']
-                timestamps = panel.get('deltaT')
-                if l.get('time') == "index":
-                    l['text'] = str(the_t + 1)
-                elif timestamps and panel['theT'] < len(timestamps):
-                    d_t = panel['deltaT'][the_t]
-                    l['text'] = self.get_time_label_text(d_t, l['time'])
-                else:
-                    continue
+            # Substitution of special label by their values
+            new_text = []
+            last_idx = 0
+            for item in parse_re.finditer(l['text']):
+                new_text.append(l['text'][last_idx:item.start()])
+                expr = item.group()[1:-1].split("-")
+                label_value = ""
+                if expr[0]=="time":
+                    the_t = panel['theT']
+                    timestamps = panel.get('deltaT')
+                    if expr[1] == "index":
+                        label_value = str(the_t + 1)
+                    elif timestamps and panel['theT'] < len(timestamps):
+                        d_t = panel['deltaT'][the_t]
+                        label_value = self.get_time_label_text(d_t, expr[1])
+                new_text.append(label_value if label_value else item.group())
+                last_idx += item.end()
+            l['text'] = "".join(new_text)
 
             pos = l['position']
             l['size'] = int(l['size'])   # make sure 'size' is number
