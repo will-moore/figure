@@ -30,7 +30,7 @@ from math import atan2, atan, sin, cos, sqrt, radians, floor, ceil
 from copy import deepcopy
 import re
 
-from p.model import ImageAnnotationLinkI, ImageI, LengthI
+from omero.model import ImageAnnotationLinkI, ImageI, LengthI
 import omero.scripts as scripts
 from omero.gateway import BlitzGateway
 from omero.rtypes import rstring, robject
