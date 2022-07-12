@@ -1136,7 +1136,7 @@ class FigureExport(object):
         y = panel['y']
         width = panel['width']
         height = panel['height']
-        
+
         viewport_region = self.get_crop_region(panel)
 
         # Handle page offsets
@@ -1151,7 +1151,7 @@ class FigureExport(object):
                      'topleft': [], 'topright': [],
                      'bottomleft': [], 'bottomright': []}
 
-        parse_re = re.compile("\[.+?\]")
+        parse_re = re.compile(r"\[.+?\]")
         for l in labels:
             # Substitution of special label by their values
             new_text = []
@@ -1160,8 +1160,8 @@ class FigureExport(object):
                 new_text.append(l['text'][last_idx:item.start()])
                 expr = item.group()[1:-1].split("-")
                 label_value = ""
-                
-                if expr[0]=="time":
+
+                if expr[0] == "time":
                     the_t = panel['theT']
                     timestamps = panel.get('deltaT')
                     if expr[1] == "index":
@@ -1169,15 +1169,19 @@ class FigureExport(object):
                     elif timestamps and the_t < len(timestamps):
                         d_t = timestamps[the_t]
                         label_value = self.get_time_label_text(d_t, expr[1])
-                        
-                elif expr[0]=="name":
+
+                elif expr[0] == "name":
                     if expr[1] == "image":
                         label_value = panel['name'].split('/')[-1]
                     elif expr[1] == "dataset":
-                        label_value = panel['datasetName'] if panel['datasetName'] else "No/Many Datasets"
-                    label_value = label_value.replace("_", "\\_") #Escaping for markdown
-                    
-                elif expr[0]=="roi":
+                        if panel['datasetName']:
+                            label_value = panel['datasetName']
+                        else:
+                            label_value = "No/Many Datasets"
+                    # Escaping "_" for markdown
+                    label_value = label_value.replace("_", "\\_")
+
+                elif expr[0] == "roi":
                     if expr[1] == "x":
                         label_value = viewport_region["x"]
                     elif expr[1] == "y":
@@ -1189,19 +1193,22 @@ class FigureExport(object):
                     elif expr[1] == "rotation":
                         label_value = panel["rotation"]
                     label_value = str(int(label_value))
-                    
-                elif expr[0]=="depth":
+
+                elif expr[0] == "depth":
                     the_z = panel['theZ']
                     size_z = panel.get('sizeZ')
                     if expr[1] == "index":
                         label_value = str(the_z + 1)
                     elif size_z and the_z < size_z:
-                        label_value = str(round(the_z*panel.get('pixel_size_z'), 2)) + " " + panel.get('pixel_size_x_symbol')
+                        z_pos = the_z*panel.get('pixel_size_z')
+                        label_value = (str(round(z_pos, 2))
+                                       + " "
+                                       + panel.get('pixel_size_x_symbol'))
 
                 new_text.append(label_value if label_value else item.group())
                 last_idx += item.end()
-            l['text'] = "".join(new_text)
 
+            l['text'] = "".join(new_text)
             pos = l['position']
             l['size'] = int(l['size'])   # make sure 'size' is number
             # If page is black and label is black, make label white
