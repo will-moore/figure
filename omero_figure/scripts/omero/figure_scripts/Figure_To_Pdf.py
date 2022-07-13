@@ -1195,12 +1195,15 @@ class FigureExport(object):
                     label_value = str(int(label_value))
 
                 elif expr[0] == "depth":
-                    the_z = panel['theZ']
+                    the_z = panel['theZ'] if panel['theZ'] else 0
                     size_z = panel.get('sizeZ')
+                    pixel_size_z = panel.get('pixel_size_z')
+                    if pixel_size_z is None:
+                        pixel_size_z = 0
                     if expr[1] == "index":
                         label_value = str(the_z + 1)
                     elif size_z and the_z < size_z:
-                        z_pos = the_z*panel.get('pixel_size_z')
+                        z_pos = the_z * pixel_size_z
                         label_value = (str(round(z_pos, 2))
                                        + " "
                                        + panel.get('pixel_size_x_symbol'))
