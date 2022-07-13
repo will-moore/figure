@@ -1208,8 +1208,16 @@ class FigureExport(object):
                                        + " "
                                        + panel.get('pixel_size_x_symbol'))
 
+                elif expr[0] == "channels":
+                    label_value = []
+                    for channel in panel["channels"]:
+                        if channel["active"]:
+                            label_value.append(channel["label"])
+                    label_value = " ".join(label_value)
+
                 new_text.append(label_value if label_value else item.group())
                 last_idx += item.end()
+
             new_text.append(l['text'][last_idx:])
             l['text'] = "".join(new_text)
             pos = l['position']

@@ -265,6 +265,17 @@
             this.add_labels(newLabels);
         },
 
+        get_channels_label_text: function() {
+            var text = "";
+            _.each(this.get('channels'), function(c){
+                if (c.active) {
+                    if (text==="") text = c.label
+                    else text = text + " " + c.label
+                }
+            });
+            return text?text:" ";
+        },
+
         getDeltaT: function() {
             var theT = this.get('theT');
             return this.get('deltaT')[theT] || 0;
