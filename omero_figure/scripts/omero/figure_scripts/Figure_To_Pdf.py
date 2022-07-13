@@ -1110,6 +1110,8 @@ class FigureExport(object):
             m = (delta_t % 3600) // 60
             s = round(delta_t % 60)
             text = "%s:%02d:%02d" % (h, m, s)
+        else: # Format unknown
+            return ""
         if text in ["0 s", "0:00", "0 mins", "0:00:00"]:
             is_negative = False
         return ('-' if is_negative else '') + text
@@ -1166,8 +1168,11 @@ class FigureExport(object):
                     timestamps = panel.get('deltaT')
                     if expr[1] == "index":
                         label_value = str(the_t + 1)
-                    elif timestamps and the_t < len(timestamps):
-                        d_t = timestamps[the_t]
+                    else:
+                        if timestamps and the_t < len(timestamps):
+                            d_t = timestamps[the_t]
+                        else:
+                            d_t = 0
                         label_value = self.get_time_label_text(d_t, expr[1])
 
                 elif expr[0] == "name":

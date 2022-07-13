@@ -313,6 +313,8 @@
                 m = pad(parseInt((deltaT % 3600) / 60));
                 s = pad(Math.round(deltaT % 60));
                 text = h + ":" + m + ":" + s;
+            } else { // Format unknown
+                return ""
             }
             if (["0 s", "0:00", "0 mins", "0:00:00"].indexOf(text) > -1) {
                 isNegative = false;
