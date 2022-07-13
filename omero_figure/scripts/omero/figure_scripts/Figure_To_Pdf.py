@@ -1110,7 +1110,7 @@ class FigureExport(object):
             m = (delta_t % 3600) // 60
             s = round(delta_t % 60)
             text = "%s:%02d:%02d" % (h, m, s)
-        else: # Format unknown
+        else:  # Format unknown
             return ""
         if text in ["0 s", "0:00", "0 mins", "0:00:00"]:
             is_negative = False
