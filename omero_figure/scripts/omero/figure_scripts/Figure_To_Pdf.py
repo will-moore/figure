@@ -1093,22 +1093,18 @@ class FigureExport(object):
         is_negative = delta_t < 0
         delta_t = abs(delta_t)
         text = "%d s" % int(round(delta_t))
-        if format == "milliseconds":
+        h = int(delta_t // 3600)
+        m = (delta_t % 3600) // 60
+        s = round(delta_t % 60)
+        if format in ["milliseconds", "ms"]:
             text = "%s ms" % int(round(delta_t * 1000))
-        elif format == "mins":
+        elif format in ["mins", "minutes", "m"]:
             text = "%s mins" % int(round(delta_t / 60))
-        elif format == "mins:secs":
-            m = int(delta_t // 60)
-            s = round(delta_t % 60)
+        elif format in ["mins:secs", "m:s"]:
             text = "%s:%02d" % (m, s)
-        elif format == "hrs:mins":
-            h = int(delta_t // 3600)
-            m = int(round((delta_t % 3600) / 60))
+        elif format in ["hrs:mins", "h:m"]:
             text = "%s:%02d" % (h, m)
-        elif format == "hrs:mins:secs":
-            h = int(delta_t // 3600)
-            m = (delta_t % 3600) // 60
-            s = round(delta_t % 60)
+        elif format in ["hrs:mins:secs", "h:m:s"]:
             text = "%s:%02d:%02d" % (h, m, s)
         else:  # Format unknown
             return ""
@@ -1160,13 +1156,14 @@ class FigureExport(object):
             last_idx = 0
             for item in parse_re.finditer(l['text']):
                 new_text.append(l['text'][last_idx:item.start()])
-                expr = item.group()[1:-1].split("-")
+                expr = item.group()[1:-1].split(".")
                 label_value = ""
 
-                if expr[0] == "time":
+                if expr[0] in ["time", "t"]:
                     the_t = panel['theT']
                     timestamps = panel.get('deltaT')
-                    if expr[1] == "index":
+                    # default to index
+                    if len(expr) == 1 or expr[1] == "index":
                         label_value = str(the_t + 1)
                     else:
                         if timestamps and the_t < len(timestamps):
@@ -1175,45 +1172,75 @@ class FigureExport(object):
                             d_t = 0
                         label_value = self.get_time_label_text(d_t, expr[1])
 
-                elif expr[0] == "name":
-                    if expr[1] == "image":
+                elif expr[0] == "image":
+                    format = expr[1] if len(expr) > 1 else "name"
+                    if format == "name":
                         label_value = panel['name'].split('/')[-1]
-                    elif expr[1] == "dataset":
+                    elif format == "id":
+                        label_value = str(panel['imageId'])
+                    # Escaping "_" for markdown
+                    label_value = label_value.replace("_", "\\_")
+
+                elif expr[0] == "dataset":
+                    format = expr[1] if len(expr) > 1 else "name"
+                    if format == "name":
                         if panel['datasetName']:
                             label_value = panel['datasetName']
                         else:
                             label_value = "No/Many Datasets"
+                    elif format == "id":
+                        if panel['datasetId']:
+                            label_value = panel['datasetName']
+                        else:
+                            label_value = "null"
                     # Escaping "_" for markdown
                     label_value = label_value.replace("_", "\\_")
 
-                elif expr[0] == "roi":
-                    if expr[1] == "x":
-                        label_value = viewport_region["x"]
-                    elif expr[1] == "y":
-                        label_value = viewport_region["y"]
-                    elif expr[1] == "width":
-                        label_value = viewport_region["width"]
-                    elif expr[1] == "height":
-                        label_value = viewport_region["height"]
-                    elif expr[1] == "rotation":
-                        label_value = panel["rotation"]
-                    label_value = str(int(label_value))
+                elif expr[0] in ['x', 'y', 'z', 'width', 'height',
+                                 'w', 'h', 'rotation', 'rot']:
+                    format = expr[1] if len(expr) > 1 else "pixel"
+                    if format == "px":
+                        format = "pixel"
+                    prop = expr[0]
+                    if prop == "w":
+                        prop = "width"
+                    elif prop == "h":
+                        prop = "height"
+                    elif prop == "rot":
+                        prop = "rotation"
 
-                elif expr[0] == "depth":
-                    the_z = panel['theZ'] if panel['theZ'] else 0
-                    size_z = panel.get('sizeZ')
-                    pixel_size_z = panel.get('pixel_size_z')
-                    if pixel_size_z is None:
-                        pixel_size_z = 0
-                    if expr[1] == "index":
-                        label_value = str(the_z + 1)
-                    elif size_z and the_z < size_z:
-                        z_pos = the_z * pixel_size_z
-                        label_value = (str(round(z_pos, 2))
-                                       + " "
-                                       + panel.get('pixel_size_x_symbol'))
+                    if prop == "z":
+                        the_z = panel['theZ'] if panel['theZ'] else 0
+                        size_z = panel.get('sizeZ')
+                        pixel_size_z = panel.get('pixel_size_z')
+                        if pixel_size_z is None:
+                            pixel_size_z = 0
+                        if format == "pixel":
+                            label_value = str(the_z + 1)
+                        elif format == "unit" and size_z and the_z < size_z:
+                            z_pos = the_z * pixel_size_z
+                            label_value = (str(round(z_pos, 2))
+                                           + " "
+                                           + panel.get('pixel_size_z_symbol'))
 
-                elif expr[0] == "channels":
+                    elif prop == "rotation":
+                        label_value = (str(int(panel["rotation"]))
+                                       + panel['rotation_symbol'])
+
+                    else:
+                        value = viewport_region[prop]
+                        if format == "pixel":
+                            label_value = str(int(value))
+                        elif format == "unit":
+                            if prop in ['x', 'width']:
+                                scale = panel['pixel_size_x']
+                            else:
+                                scale = panel['pixel_size_y']
+                            rounded = str(round((value * scale), 3))
+                            label_value = ("" + rounded +
+                                           " " + panel['pixel_size_x_symbol'])
+
+                elif expr[0] in ["channels", "c"]:
                     label_value = []
                     for channel in panel["channels"]:
                         if channel["active"]:
