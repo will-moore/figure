@@ -350,12 +350,26 @@
 
             var text = "";
             if (property === "z") {
-                var theZ = this.get('theZ');
-                if (format === "pixel") {
-                    text = "" + (theZ + 1);
-                } else if (format === "unit"){
-                    text = ""+ (theZ * this.get('pixel_size_z')).toPrecision(3) +" "+ this.get('pixel_size_z_symbol')
+                if (this.get('z_projection')) {
+                    start = this.get('z_start');
+                    end = this.get('z_end');
+                    if (format === "pixel") {
+                        text = "" + (start+1) + "-" + (end+1);
+                    } else if (format === "unit"){
+                        start = (start * this.get('pixel_size_z')).toPrecision(3)
+                        end = (end * this.get('pixel_size_z')).toPrecision(3)
+                        text = ""+ start + "-" + end +" "+ this.get('pixel_size_z_symbol')
+                    }
                 }
+                else {
+                    var theZ = this.get('theZ');
+                    if (format === "pixel") {
+                        text = "" + (theZ + 1);
+                    } else if (format === "unit"){
+                        text = ""+ (theZ * this.get('pixel_size_z')).toPrecision(3) +" "+ this.get('pixel_size_z_symbol')
+                    }
+                }
+
                 return text
             }
             viewport = this.getViewportAsRect();
