@@ -94,11 +94,14 @@
                 'orig_width': data.orig_width,
                 'orig_height': data.orig_height,
                 'datasetName': data.datasetName,
+                'datasetId': data.datasetId,
                 'pixel_size_x': data.pixel_size_x,
                 'pixel_size_y': data.pixel_size_y,
-				'pixel_size_z': data.pixel_size_z,
+                'pixel_size_z': data.pixel_size_z,
                 'pixel_size_x_symbol': data.pixel_size_x_symbol,
+                'pixel_size_z_symbol': data.pixel_size_z_symbol,
                 'pixel_size_x_unit': data.pixel_size_x_unit,
+                'pixel_size_z_unit': data.pixel_size_z_unit,
                 'deltaT': data.deltaT,
             };
 
@@ -291,27 +294,23 @@
                 isNegative = (deltaT < 0),
                 text = "", h, m, s;
             deltaT = Math.abs(deltaT);
+            h = parseInt(deltaT / 3600);
+            m = parseInt(deltaT / 60);
+            s = pad(Math.round(deltaT % 60));
             if (format === "index") {
                 isNegative = false;
                 text = "" + (theT + 1);
-            } else if (format === "milliseconds") {
+            } else if (['milliseconds', 'ms'].includes(format)) {
                 text = Math.round(deltaT*1000) + " ms";
-            } else if (format === "secs") {
+            } else if (['seconds', 'secs', 's'].includes(format)) {
                 text = Math.round(deltaT) + " s";
-            } else if (format === "mins:secs") {
-                m = parseInt(deltaT / 60);
-                s = pad(Math.round(deltaT % 60));
-                text = m + ":" + s;
-            } else if (format === "mins") {
+            } else if (['minutes', 'mins', 'm'].includes(format)) {
                 text = Math.round(deltaT / 60) + " mins";
-            } else if (format === "hrs:mins") {
-                h = parseInt(deltaT / 3600);
-                m = pad(Math.round((deltaT % 3600) / 60));
+            } else if (["mins:secs", "m:s"].includes(format)) {
+                text = m + ":" + s;
+            } else if (["hrs:mins", "h:m"].includes(format)) {
                 text = h + ":" + m;
-            } else if (format === "hrs:mins:secs") {
-                h = parseInt(deltaT / 3600);
-                m = pad(parseInt((deltaT % 3600) / 60));
-                s = pad(Math.round(deltaT % 60));
+            } else if (["hrs:mins:secs", "h:m:s"].includes(format)) {
                 text = h + ":" + m + ":" + s;
             } else { // Format unknown
                 return ""
@@ -322,43 +321,53 @@
             return (isNegative ? '-' : '') + text;
         },
 
-		get_name_label_text: function(format) {
+        get_name_label_text: function(property, format) {
             var text = "";
-            if (format === "image") {
-                var pathnames = this.get('name').split('/');
-                text = pathnames[pathnames.length-1];
-            } else if (format === "dataset"){
-                text = this.get('datasetName') ? this.get('datasetName') : "No/Many Datasets";
+            if (property === "image") {
+                if (format === "id") {
+                    text = ""+this.get('imageId');
+                } else if (format === "name") {
+                    var pathnames = this.get('name').split('/');
+                    text = pathnames[pathnames.length-1];
+                }
+            } else if (property === "dataset"){
+                if (format === "id") {
+                    text = ""+this.get('datasetId');
+                } else if (format === "name") {
+                    text = this.get('datasetName') ? this.get('datasetName') : "No/Many Datasets";
+                }
             }
             return text;
         },
-		
-		get_roi_label_text: function(format) {
-			viewport = this.getViewportAsRect();
+
+        get_view_label_text: function(property, format) {
+            if (format === "px") format = "pixel";
+
+            if (property === "w") property = "width";
+            else if (property === "h") property = "height";
+            else if (property === "rot") property = "rotation";
+
             var text = "";
-            if (format === "x") {
-                text = ""+parseInt(viewport['x']);
-            } else if (format === "y"){
-                text = ""+parseInt(viewport['y']);
-            } else if (format === "width"){
-                text = ""+parseInt(viewport['width']);
-            } else if (format === "height"){
-                text = ""+parseInt(viewport['height']);
-            } else if (format === "rotation"){
-                text = ""+parseInt(viewport['rotation']);
+            if (property === "z") {
+                var theZ = this.get('theZ');
+                if (format === "pixel") {
+                    text = "" + (theZ + 1);
+                } else if (format === "unit"){
+                    text = ""+ (theZ * this.get('pixel_size_z')).toPrecision(3) +" "+ this.get('pixel_size_z_symbol')
+                }
+                return text
             }
-            return text;
-        },
-		
-		get_depth_label_text: function(format) {
-            var theZ = this.get('theZ');
-            var text = "";
-            if (format === "index") {
-                text = "" + (theZ + 1);
-            } else if (format === "unit"){
-                text = ""+ (theZ * this.get('pixel_size_z')).toPrecision(3) +" "+ this.get('pixel_size_x_symbol')
+            viewport = this.getViewportAsRect();
+            value = parseInt(viewport[property]);
+            if (property === "rotation") {
+                return ""+value+"°";
+            } else if (format === "pixel") {
+                return ""+value;
+            } else if (format === "unit") {
+                scale = ['x', 'width'].includes(property) ? this.get('pixel_size_x') : this.get('pixel_size_y')
+                text = ""+ (value * scale).toPrecision(3) +" "+ this.get('pixel_size_x_symbol')
             }
-            return text;
+            return text
         },
 
         get_label_key: function(label) {

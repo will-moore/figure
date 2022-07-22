@@ -196,21 +196,19 @@
                     var last_idx = 0;
                     for (const match of matches) {// Loops on the match to replace in the ljson.text the expression by their values
                         var new_text = new_text + ljson.text.slice(last_idx, match.index);
-                        expr = match[0].slice(1,-1).split("-");
+                        expr = match[0].slice(1,-1).split(".");
                         var label_value = ""
-                        if (expr[0]==="time") {
-                            label_value = self.model.get_time_label_text(expr[1]);
-						} else if (expr[0]==="name"){
-                            label_value = self.model.get_name_label_text(expr[1]);
-							//Escape the underscore for markdown
-							label_value = label_value.replaceAll("_", "\\_");
-						} else if (expr[0]==="roi"){
-                            label_value = self.model.get_roi_label_text(expr[1]);
-						} else if (expr[0]==="depth") {
-                            label_value = self.model.get_depth_label_text(expr[1]);
-						} else if (expr[0]==="channels") {
+                        if (['time', 't'].includes(expr[0])) {
+                            label_value = self.model.get_time_label_text(expr[1] ? expr[1] : "index");
+                        } else if (['image', 'dataset'].includes(expr[0])){
+                            label_value = self.model.get_name_label_text(expr[0], expr[1] ? expr[1] : "name");
+                            //Escape the underscore for markdown
+                            label_value = label_value.replaceAll("_", "\\_");
+                        } else if (['x', 'y', 'z', 'width', 'height', 'w', 'h', 'rotation', 'rot'].includes(expr[0])){
+                            label_value = self.model.get_view_label_text(expr[0], expr[1] ? expr[1] : "pixel");
+                        } else if (['channels', 'c'].includes(expr[0])) {
                             label_value = self.model.get_channels_label_text();
-						}
+                        }
 
                         //If label_value hasn't been created (invalid expr[0])
                         //  or is empty (invalid expr[1]), the expr is kept unmodified

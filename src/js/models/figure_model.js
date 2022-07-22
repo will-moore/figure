@@ -221,10 +221,10 @@
                     });
                 }
             }
-			
-			if (v < 6) {
-				//Need to update version so that it includes  'pixel_size_z': data.pixel_size.z,
-			}
+
+            if (v < 6) {
+            //Need to update version so that it includes  'pixel_size_z': data.pixel_size.z,
+            }
 
             return json;
         },
@@ -461,9 +461,11 @@
                         'datasetId': data.meta.datasetId,
                         'pixel_size_x': data.pixel_size.valueX,
                         'pixel_size_y': data.pixel_size.valueY,
-						'pixel_size_z': data.pixel_size.z,
+                        'pixel_size_z': data.pixel_size.valueZ,
                         'pixel_size_x_symbol': data.pixel_size.symbolX,
+                        'pixel_size_z_symbol': data.pixel_size.symbolZ,
                         'pixel_size_x_unit': data.pixel_size.unitX,
+                        'pixel_size_z_unit': data.pixel_size.unitZ,
                         'deltaT': data.deltaT,
                     };
                     if (baseUrl) {

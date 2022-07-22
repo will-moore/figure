@@ -337,7 +337,7 @@
 
             var selected = this.model.getSelected();
 
-            if (label_text == '[channels]') {
+            if (label_text == '[channels labels]') {
                 selected.forEach(function(m) {
                     m.create_labels_from_channels({position:position, size:font_size});
                 });
