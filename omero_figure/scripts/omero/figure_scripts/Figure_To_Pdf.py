@@ -1210,18 +1210,32 @@ class FigureExport(object):
                         prop = "rotation"
 
                     if prop == "z":
-                        the_z = panel['theZ'] if panel['theZ'] else 0
                         size_z = panel.get('sizeZ')
                         pixel_size_z = panel.get('pixel_size_z')
+                        z_symbol = panel.get('pixel_size_z_symbol')
                         if pixel_size_z is None:
                             pixel_size_z = 0
-                        if format == "pixel":
-                            label_value = str(the_z + 1)
-                        elif format == "unit" and size_z and the_z < size_z:
-                            z_pos = the_z * pixel_size_z
-                            label_value = (str(round(z_pos, 2))
-                                           + " "
-                                           + panel.get('pixel_size_z_symbol'))
+
+                        if ("z_projection" in panel.keys()
+                           and panel["z_projection"]):
+                            z_start, z_end = panel["z_start"], panel["z_end"]
+                            if format == "pixel":
+                                label_value = (str(z_start + 1) + "-"
+                                               + str(z_end + 1))
+                            elif format == "unit" and size_z:
+                                z_start = str(round(z_start * pixel_size_z, 2))
+                                z_end = str(round(z_end * pixel_size_z, 2))
+                                label_value = (z_start + "-" + z_end
+                                               + z_symbol)
+                        else:
+                            the_z = panel['theZ'] if panel['theZ'] else 0
+                            if format == "pixel":
+                                label_value = str(the_z + 1)
+                            elif (format == "unit" and size_z
+                                  and the_z < size_z):
+                                z_pos = the_z * pixel_size_z
+                                label_value = (str(round(z_pos, 2))
+                                               + " " + z_symbol)
 
                     elif prop == "rotation":
                         label_value = (str(int(panel["rotation"]))
