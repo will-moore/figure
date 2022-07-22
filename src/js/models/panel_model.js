@@ -354,11 +354,12 @@
                     start = this.get('z_start');
                     end = this.get('z_end');
                     if (format === "pixel") {
-                        text = "" + (start+1) + "-" + (end+1);
+                        text = "" + (start+1) + " - " + (end+1);
                     } else if (format === "unit"){
                         start = (start * this.get('pixel_size_z')).toPrecision(3)
                         end = (end * this.get('pixel_size_z')).toPrecision(3)
-                        text = ""+ start + "-" + end +" "+ this.get('pixel_size_z_symbol')
+                        text = ""+ start +" "+ this.get('pixel_size_z_symbol')
+                               + " - " + end +" "+ this.get('pixel_size_z_symbol')
                     }
                 }
                 else {

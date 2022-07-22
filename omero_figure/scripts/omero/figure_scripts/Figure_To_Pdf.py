@@ -1225,8 +1225,8 @@ class FigureExport(object):
                             elif format == "unit" and size_z:
                                 z_start = str(round(z_start * pixel_size_z, 2))
                                 z_end = str(round(z_end * pixel_size_z, 2))
-                                label_value = (z_start + "-" + z_end
-                                               + z_symbol)
+                                label_value = (z_start + " " + z_symbol + " - "
+                                               + z_end + " " + z_symbol)
                         else:
                             the_z = panel['theZ'] if panel['theZ'] else 0
                             if format == "pixel":
