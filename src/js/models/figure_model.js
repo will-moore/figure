@@ -224,6 +224,7 @@
 
             if (v < 6) {
                 console.log("Transforming to VERSION 6");
+                // Adding the Z scale to the model
                 var iids = [];
                 _.each(json.panels, function(p) {
                     if (iids.indexOf(p.imageId) == -1) {
@@ -246,6 +247,17 @@
                         });
                     });
                 }
+
+                // Converting the time-labels to V6 syntax, all other special label were converted to text
+                _.each(json.panels, function(p) {
+                    for (var i=0; i<p["labels"].length; i++){
+                        label = p["labels"][i];
+                        if (label["time"]) {
+                            label["text"] = "[time."+label["time"]+"]";
+                            delete label.time;
+                        }
+                    }
+                });
             }
 
             return json;
