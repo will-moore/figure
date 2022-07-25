@@ -223,7 +223,29 @@
             }
 
             if (v < 6) {
-            //Need to update version so that it includes  'pixel_size_z': data.pixel_size.z,
+                console.log("Transforming to VERSION 6");
+                var iids = [];
+                _.each(json.panels, function(p) {
+                    if (iids.indexOf(p.imageId) == -1) {
+                        iids.push(p.imageId)
+                    }
+                });
+                if (iids.length > 0) {
+                    zUrl = BASE_WEBFIGURE_URL + 'z_scale/';
+                    zUrl += '?image=' + iids.join('&image=');
+                    $.getJSON(zUrl, function(data) {
+                        // Update all panels
+                        // NB: By the time that this callback runs, the panels will have been created
+                        self.panels.forEach(function(p){
+                            var iid = p.get('imageId');
+                            if (data[iid]) {
+                                p.set('pixel_size_z', data[iid].valueZ);
+                                p.set('pixel_size_z_symbol', data[iid].symbolZ);
+                                p.set('pixel_size_z_unit', data[iid].unitZ);
+                            }
+                        });
+                    });
+                }
             }
 
             return json;
