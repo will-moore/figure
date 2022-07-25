@@ -348,6 +348,15 @@
             else if (property === "h") property = "height";
             else if (property === "rot") property = "rotation";
 
+            
+            x_symbol = this.get('pixel_size_x_symbol');
+            z_symbol = this.get('pixel_size_z_symbol');
+            z_symbol = z_symbol?z_symbol:x_symbol // Using x symbol when z not defined
+            x_size = this.get('pixel_size_x');
+            y_size = this.get('pixel_size_y');
+            z_size = this.get('pixel_size_z');
+            z_size = z_size?z_size:0
+
             var text = "";
             if (property === "z") {
                 if (this.get('z_projection')) {
@@ -356,10 +365,10 @@
                     if (format === "pixel") {
                         text = "" + (start+1) + " - " + (end+1);
                     } else if (format === "unit"){
-                        start = (start * this.get('pixel_size_z')).toPrecision(3)
-                        end = (end * this.get('pixel_size_z')).toPrecision(3)
-                        text = ""+ start +" "+ this.get('pixel_size_z_symbol')
-                               + " - " + end +" "+ this.get('pixel_size_z_symbol')
+                        start = (start * z_size).toPrecision(3)
+                        end = (end * z_size).toPrecision(3)
+                        text = ""+ start +" "+ z_symbol
+                               + " - " + end +" "+ z_symbol
                     }
                 }
                 else {
@@ -367,10 +376,9 @@
                     if (format === "pixel") {
                         text = "" + (theZ + 1);
                     } else if (format === "unit"){
-                        text = ""+ (theZ * this.get('pixel_size_z')).toPrecision(3) +" "+ this.get('pixel_size_z_symbol')
+                        text = ""+ (theZ * z_size).toPrecision(3) +" "+ z_symbol
                     }
                 }
-
                 return text
             }
             viewport = this.getViewportAsRect();
@@ -380,8 +388,8 @@
             } else if (format === "pixel") {
                 return ""+value;
             } else if (format === "unit") {
-                scale = ['x', 'width'].includes(property) ? this.get('pixel_size_x') : this.get('pixel_size_y')
-                text = ""+ (value * scale).toPrecision(3) +" "+ this.get('pixel_size_x_symbol')
+                scale = ['x', 'width'].includes(property) ? x_size : y_size
+                text = ""+ (value * scale).toPrecision(3) +" "+ x_symbol
             }
             return text
         },
