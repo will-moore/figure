@@ -295,9 +295,6 @@
                 isNegative = (deltaT < 0),
                 text = "", h, m, s;
             deltaT = Math.abs(deltaT);
-            h = parseInt(deltaT / 3600);
-            m = parseInt(deltaT / 60);
-            s = pad(Math.round(deltaT % 60));
             if (format === "index") {
                 isNegative = false;
                 text = "" + (theT + 1);
@@ -308,10 +305,17 @@
             } else if (['minutes', 'mins', 'm'].includes(format)) {
                 text = Math.round(deltaT / 60) + " mins";
             } else if (["mins:secs", "m:s"].includes(format)) {
+                m = parseInt(deltaT / 60);
+                s = pad(Math.round(deltaT % 60));
                 text = m + ":" + s;
             } else if (["hrs:mins", "h:m"].includes(format)) {
+                h = parseInt(deltaT / 3600);
+                m = pad(Math.round((deltaT % 3600) / 60));
                 text = h + ":" + m;
             } else if (["hrs:mins:secs", "h:m:s"].includes(format)) {
+                h = parseInt(deltaT / 3600);
+                m = pad(parseInt((deltaT % 3600) / 60));
+                s = pad(Math.round(deltaT % 60));
                 text = h + ":" + m + ":" + s;
             } else { // Format unknown
                 return ""
