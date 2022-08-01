@@ -369,8 +369,8 @@
                     if (format === "pixel") {
                         text = "" + (start+1) + " - " + (end+1);
                     } else if (format === "unit"){
-                        start = (start * z_size).toPrecision(3)
-                        end = (end * z_size).toPrecision(3)
+                        start = (start * z_size).toFixed(2)
+                        end = (end * z_size).toFixed(2)
                         text = ""+ start +" "+ z_symbol
                                + " - " + end +" "+ z_symbol
                     }
@@ -380,20 +380,20 @@
                     if (format === "pixel") {
                         text = "" + (theZ + 1);
                     } else if (format === "unit"){
-                        text = ""+ (theZ * z_size).toPrecision(3) +" "+ z_symbol
+                        text = ""+ (theZ * z_size).toFixed(2) +" "+ z_symbol
                     }
                 }
                 return text
             }
             viewport = this.getViewportAsRect();
-            value = parseInt(viewport[property]);
+            value = viewport[property];
             if (property === "rotation") {
-                return ""+value+"°";
+                return ""+parseInt(value)+"°";
             } else if (format === "pixel") {
-                return ""+value;
+                return ""+parseInt(value);
             } else if (format === "unit") {
                 scale = ['x', 'width'].includes(property) ? x_size : y_size
-                text = ""+ (value * scale).toPrecision(3) +" "+ x_symbol
+                text = ""+ (value * scale).toFixed(2) +" "+ x_symbol
             }
             return text
         },

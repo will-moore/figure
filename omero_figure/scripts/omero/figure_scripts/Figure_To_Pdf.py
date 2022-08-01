@@ -1093,18 +1093,24 @@ class FigureExport(object):
         is_negative = delta_t < 0
         delta_t = abs(delta_t)
         text = "%d s" % int(round(delta_t))
-        h = int(delta_t // 3600)
-        m = (delta_t % 3600) // 60
-        s = round(delta_t % 60)
         if format in ["milliseconds", "ms"]:
             text = "%s ms" % int(round(delta_t * 1000))
+        elif format in ["secs", "seconds", "s"]:
+            text = "%d s" % int(round(delta_t))
         elif format in ["mins", "minutes", "m"]:
             text = "%s mins" % int(round(delta_t / 60))
         elif format in ["mins:secs", "m:s"]:
+            m = int(delta_t // 60)
+            s = round(delta_t % 60)
             text = "%s:%02d" % (m, s)
         elif format in ["hrs:mins", "h:m"]:
+            h = int(delta_t // 3600)
+            m = int(round((delta_t % 3600) / 60))
             text = "%s:%02d" % (h, m)
         elif format in ["hrs:mins:secs", "h:m:s"]:
+            h = int(delta_t // 3600)
+            m = (delta_t % 3600) // 60
+            s = round(delta_t % 60)
             text = "%s:%02d:%02d" % (h, m, s)
         else:  # Format unknown
             return ""
@@ -1223,8 +1229,8 @@ class FigureExport(object):
                                 label_value = (str(z_start + 1) + "-"
                                                + str(z_end + 1))
                             elif format == "unit" and size_z:
-                                z_start = str(round(z_start * pixel_size_z, 2))
-                                z_end = str(round(z_end * pixel_size_z, 2))
+                                z_start = f"{(z_start * pixel_size_z):.2f}"
+                                z_end = f"{(z_end * pixel_size_z):.2f}"
                                 label_value = (z_start + " " + z_symbol + " - "
                                                + z_end + " " + z_symbol)
                         else:
@@ -1233,9 +1239,8 @@ class FigureExport(object):
                                 label_value = str(the_z + 1)
                             elif (format == "unit" and size_z
                                   and the_z < size_z):
-                                z_pos = the_z * pixel_size_z
-                                label_value = (str(round(z_pos, 2))
-                                               + " " + z_symbol)
+                                z_pos = f"{(the_z * pixel_size_z):.2f}"
+                                label_value = (z_pos + " " + z_symbol)
 
                     elif prop == "rotation":
                         label_value = (str(int(panel["rotation"]))
@@ -1248,9 +1253,9 @@ class FigureExport(object):
                         elif format == "unit":
                             if prop in ['x', 'width']:
                                 scale = panel['pixel_size_x']
-                            else:
+                            elif prop in ['y', 'height']:
                                 scale = panel['pixel_size_y']
-                            rounded = str(round((value * scale), 3))
+                            rounded = f"{(value * scale):.2f}"
                             label_value = ("" + rounded +
                                            " " + panel['pixel_size_x_symbol'])
 

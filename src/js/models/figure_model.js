@@ -221,7 +221,7 @@
                     });
                 }
             }
-
+            
             if (v < 6) {
                 console.log("Transforming to VERSION 6");
                 // Adding the Z scale to the model
