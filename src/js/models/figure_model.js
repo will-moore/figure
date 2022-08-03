@@ -1,4 +1,10 @@
     
+    import Backbone from "backbone";
+    import _ from 'underscore';
+    import $ from "jquery";
+
+    import {PanelList, Panel} from "./panel_model";
+
     // Version of the json file we're saving.
     // This only needs to increment when we make breaking changes (not linked to release versions.)
     var VERSION = 5;
@@ -838,3 +844,5 @@
 
     });
 
+
+export default FigureModel

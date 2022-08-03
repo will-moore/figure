@@ -5,6 +5,11 @@ import "../scss/styles.scss";
 import * as bootstrap from "bootstrap";
 
 import Backbone from "backbone";
+import $ from "jquery";
+
+import FigureModel from "./models/figure_model";
+
+const figureModel = new FigureModel();
 
 var FigureRouter = Backbone.Router.extend({
   routes: {
@@ -118,8 +123,8 @@ var FigureRouter = Backbone.Router.extend({
 
 let config = { pushState: true };
 // when deployed from omero-web...
-if (BASE_WEBFIGURE_URL) {
-  config.root = BASE_WEBFIGURE_URL;
+if (APP_ROOT_URL) {
+  config.root = APP_ROOT_URL;
 }
 
 const app = new FigureRouter();

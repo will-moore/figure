@@ -1,11 +1,13 @@
 
+    import Backbone from "backbone";
+
     // Corresponds to css - allows us to calculate size of labels
     var LINE_HEIGHT = 1.43;
 
     // ------------------------ Panel -----------------------------------------
     // Simple place-holder for each Panel. Will have E.g. imageId, rendering options etc
     // Attributes can be added as we need them.
-    var Panel = Backbone.Model.extend({
+    export var Panel = Backbone.Model.extend({
 
         defaults: {
             x: 100,     // coordinates on the 'paper'
@@ -818,7 +820,7 @@
     });
 
     // ------------------------ Panel Collection -------------------------
-    var PanelList = Backbone.Collection.extend({
+    export var PanelList = Backbone.Collection.extend({
         model: Panel,
 
         getSelected: function() {
