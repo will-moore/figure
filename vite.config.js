@@ -10,5 +10,9 @@ export default {
   server: {
     port: 8080,
     hot: true
+  },
+  build: {
+    // Put 'dist' at top level, not inside src/
+    outDir: "../dist"
   }
 }

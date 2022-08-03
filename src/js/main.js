@@ -117,9 +117,10 @@ var FigureRouter = Backbone.Router.extend({
 });
 
 let config = { pushState: true };
-// when deployed from omero-web
-const BASE_WEBFIGURE_URL = "/figure/";
-// config.root = BASE_WEBFIGURE_URL
+// when deployed from omero-web...
+if (BASE_WEBFIGURE_URL) {
+  config.root = BASE_WEBFIGURE_URL;
+}
 
 const app = new FigureRouter();
 Backbone.history.start(config);
