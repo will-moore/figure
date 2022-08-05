@@ -19,6 +19,10 @@ export const figureModel = new FigureModel();
 export const FigureColorPicker = new ColorPickerView();
 export const FigureLutPicker = new LutPickerView();
 
+const RELEASE_VERSION = import.meta.env.VITE_VERSION;
+console.log("RELEASE_VERSION", RELEASE_VERSION)
+document.getElementById("release_version").innerHTML = RELEASE_VERSION;
+
 // Override 'Backbone.sync'...
 Backbone.ajaxSync = Backbone.sync;
 
