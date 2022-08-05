@@ -2,6 +2,7 @@
 import Backbone from "backbone";
 import _ from "underscore";
 import $ from "jquery";
+import Raphael from "raphael";
 
 import FigureModel from "../models/figure_model";
 

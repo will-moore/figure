@@ -8,10 +8,1115 @@
     <script>
       const BASE_WEBFIGURE_URL = "http://localhost:4080/figure/";
       const APP_ROOT_URL = "";
-      console.log("BASE_WEBFIGURE_URL", BASE_WEBFIGURE_URL, "APP_ROOT_URL", APP_ROOT_URL);
+      console.log(
+        "BASE_WEBFIGURE_URL",
+        BASE_WEBFIGURE_URL,
+        "APP_ROOT_URL",
+        APP_ROOT_URL
+      );
     </script>
   </head>
   <body>
+
+    <!-- Welcome splash-screen Modal -->
+    <div
+      class="modal"
+      id="welcomeModal"
+      tabindex="-1"
+      role="dialog"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-hidden="true"
+            >
+              &times;
+            </button>
+            <h4 class="modal-title">Welcome to OMERO.figure</h4>
+          </div>
+          <div class="modal-body" style="padding: 25px 25px 35px 25px">
+            <p>To get started...</p>
+            <div
+              style="
+                margin-left: auto;
+                margin-right: auto;
+                display: block;
+                width: 70%;
+              "
+            >
+              <!-- Two buttons - use different elements in different ways -->
+              <button type="button" class="new_figure btn btn-lg btn-primary">
+                Create New File
+              </button>
+              <button
+                type="button"
+                class="open_figure btn btn-lg btn-primary pull-right"
+              >
+                Open File
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- About OMERO.figure Modal -->
+    <div
+      class="modal"
+      id="aboutModal"
+      tabindex="-1"
+      role="dialog"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header" style="padding: 15px; text-align: center">
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-hidden="true"
+            >
+              &times;
+            </button>
+            <h4 class="modal-title">About OMERO.figure</h4>
+          </div>
+          <div
+            class="modal-body"
+            style="padding: 25px 25px 35px 25px; text-align: center"
+          >
+            <p>
+              <strong>Version</strong>:
+              <script>
+                document.write(RELEASE_VERSION);
+              </script>
+            </p>
+            <p>
+              For more information, visit the
+              <a
+                target="new"
+                href="https://www.openmicroscopy.org/omero/figure/"
+                >OMERO.figure Home Page</a
+              >
+            </p>
+            <p>
+              &copy; 2013-{% now "Y" %} University of Dundee &amp; Open
+              Microscopy Environment<br />
+              OMERO is distributed under the terms of the GNU GPL and
+              OMERO.figure under AGPL.<br />
+              See:
+              <a target="new" href="http://www.openmicroscopy.org"
+                >openmicroscopy.org</a
+              >
+            </p>
+          </div>
+          <div class="modal-footer" style="margin-top: 0">
+            <button type="button" class="btn btn-default" data-dismiss="modal">
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- ROI editing modal dialog -->
+    <div
+      class="modal"
+      id="roiModal"
+      data-backdrop="static"
+      tabindex="-1"
+      role="dialog"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog" style="width: 920px">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title" style="float: left; padding-right: 20px">
+              Edit ROIs
+            </h4>
+            <p style="margin: 4px 0 0 0">
+              Draw & edit ROIs and load ROIs from OMERO
+            </p>
+          </div>
+          <form class="roiModalForm" role="form">
+            <div class="modal-body">
+              <div class="col-xs-8">
+                <div
+                  id="roi_toolbar"
+                  class="roi_toolbar btn-toolbar"
+                  role="toolbar"
+                  aria-label="..."
+                ></div>
+                <div id="roiViewer" class="roiViewer">
+                  <!-- Show / add ROIs on image -->
+                  <!-- <div id="roi_image" style="position: absolute"> -->
+                  <img class="roi_image" style="position: absolute" />
+                  <!-- </div> -->
+                  <div
+                    id="roi_paper"
+                    class="roi_paper"
+                    style="
+                      position: absolute;
+                      top: 0;
+                      left: 0;
+                      overflow: hidden;
+                    "
+                  >
+                    <!-- svg is added here by Raphael.js -->
+                  </div>
+
+                  <div
+                    id="roi_zt_buttons"
+                    style="position: absolute; top: 5px; left: 5px"
+                  ></div>
+                </div>
+              </div>
+              <div id="roiModalSidebar" class="col-xs-4" style="padding: 0">
+                <span
+                  id="roiPageControls"
+                  style="color: #999; line-height: 30px"
+                >
+                </span>
+                <div style="clear: both; padding: 5px"></div>
+                <div style="padding: 0; height: 550px; overflow-y: auto">
+                  <div id="roiModalRoiList">
+                    <table
+                      style="width: 100%"
+                      class="table table-hover table-condensed"
+                    ></table>
+                  </div>
+                  <p id="roiModalTip" style="position: absolute; top: 0"></p>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer" style="margin-top: 0">
+              <button
+                type="button"
+                class="btn btn-default"
+                data-dismiss="modal"
+              >
+                Cancel
+              </button>
+              <button type="submit" class="btn btn-primary">OK</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <!-- Confirm modal for custom messages -->
+    <div
+      class="modal"
+      id="confirmModal"
+      data-backdrop="static"
+      tabindex="-1"
+      role="dialog"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">Save Changes to Figure?</h4>
+          </div>
+          <div class="modal-body" style="padding: 25px 25px 35px 25px">
+            <p>Your changes will be lost if you don't save them</p>
+          </div>
+          <div class="modal-footer" style="margin-top: 0">
+            <button type="button" class="btn btn-default" data-dismiss="modal">
+              Don't Save
+            </button>
+            <button type="submit" class="btn btn-primary" data-dismiss="modal">
+              Save
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Paper setup Modal -->
+    <div
+      class="modal"
+      id="paperSetupModal"
+      tabindex="-1"
+      role="dialog"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-hidden="true"
+            >
+              &times;
+            </button>
+            <h4 class="modal-title">Paper Setup</h4>
+          </div>
+          <form class="paperSetupForm" role="form">
+            <div class="modal-body">
+              <!-- Content added from paper_setup_modal_template -->
+            </div>
+            <div class="modal-footer" style="margin-top: 0">
+              <button
+                type="button"
+                class="btn btn-default"
+                data-dismiss="modal"
+              >
+                Cancel
+              </button>
+              <button type="submit" class="btn btn-primary">OK</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <!-- chgrp Modal -->
+    <div
+      class="modal"
+      id="chgrpModal"
+      tabindex="-1"
+      role="dialog"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-hidden="true"
+            >
+              &times;
+            </button>
+            <h4 class="modal-title">Move Figure to Group</h4>
+          </div>
+          <form class="chgrpForm" role="form">
+            <div class="modal-body">
+              <!-- Content added -->
+            </div>
+            <div class="modal-footer" style="margin-top: 0">
+              <button
+                type="button"
+                class="btn btn-default"
+                data-dismiss="modal"
+              >
+                Cancel
+              </button>
+              <button type="submit" class="btn btn-primary">OK</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <!-- dpi modal -->
+    <div
+      class="modal"
+      id="dpiModal"
+      tabindex="-1"
+      role="dialog"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-hidden="true"
+            >
+              &times;
+            </button>
+            <h4 class="modal-title">Resample Panels</h4>
+          </div>
+          <form class="dpiModalForm form-horizontal" role="form">
+            <div class="modal-body">
+              <p>
+                Set a resolution range for selected panels. When exported as
+                <strong>PDF</strong>, panel images outside this dpi range will
+                be resampled as necessary.
+              </p>
+              <div
+                class="form-group"
+                style="margin-top: 15px; margin-bottom: 0px"
+              >
+                <label class="col-sm-4 control-label">
+                  Minimum (optional)
+                </label>
+                <div class="col-sm-8 input-group">
+                  <input
+                    type="number"
+                    class="form-control min_export_dpi"
+                    placeholder="min"
+                  />
+                  <div class="input-group-addon">dpi</div>
+                </div>
+              </div>
+              <div
+                class="form-group"
+                style="margin-top: 15px; margin-bottom: 0px"
+              >
+                <label class="col-sm-4 control-label">
+                  Maximum (required)
+                </label>
+                <div class="col-sm-8 input-group">
+                  <input
+                    type="number"
+                    class="form-control max_export_dpi"
+                    placeholder="max"
+                  />
+                  <div class="input-group-addon">dpi</div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer" style="margin-top: 0">
+              <button
+                type="button"
+                class="btn btn-default"
+                data-dismiss="modal"
+              >
+                Cancel
+              </button>
+              <button type="submit" class="btn btn-primary">OK</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <!-- Crop Modal -->
+    <div
+      class="modal"
+      id="cropModal"
+      tabindex="-1"
+      role="dialog"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog" style="width: 900px">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-hidden="true"
+            >
+              &times;
+            </button>
+            <h4 class="modal-title">Crop to Region</h4>
+          </div>
+          <form class="cropModalForm" role="form">
+            <div
+              class="modal-body"
+              style="height: 500px; max-height: 500px; padding-bottom: 0"
+            >
+              <div class="col-xs-4" style="height: 485px; overflow: auto">
+                <p>
+                  Click and drag on the image to choose a crop region or pick an
+                  ROI from the list below.
+                </p>
+                <h4>ROIs:</h4>
+                <table class="roiPicker roisFromFigure table table-condensed">
+                  <thead>
+                    <td>
+                      <strong
+                        title="Crop to rectangles on this image in the figure"
+                        >from Figure</strong
+                      >
+                    </td>
+                    <td></td>
+                    <td></td>
+                  </thead>
+                  <tbody>
+                    <!-- ROIs loaded here... -->
+                  </tbody>
+                </table>
+                <table
+                  class="roiPicker roisFromClipboard table table-condensed"
+                >
+                  <thead>
+                    <td>
+                      <strong title="Crop to rectangles copied to clipboard"
+                        >from Clipboard</strong
+                      >
+                    </td>
+                    <td></td>
+                    <td></td>
+                  </thead>
+                  <tbody>
+                    <!-- ROIs loaded here... -->
+                  </tbody>
+                </table>
+                <table class="roiPicker roisFromOMERO table table-condensed">
+                  <thead>
+                    <td>
+                      <strong
+                        title="Crop to rectangles saved on this image on the OMERO server"
+                        >from OMERO</strong
+                      >
+                    </td>
+                    <td>Z-index</td>
+                    <td>T-index</td>
+                  </thead>
+                  <tbody>
+                    <!-- ROIs loaded here... -->
+                  </tbody>
+                </table>
+                <button
+                  style="float: right"
+                  class="btn btn-sm btn-default loadRoiRects"
+                >
+                  Load More...
+                </button>
+                <!-- Additional message/status -->
+                <p style="color: #999; margin: 10px" id="cropRoiMessage"></p>
+              </div>
+              <div class="col-xs-8">
+                <div id="cropViewer">
+                  <!-- Show / add ROIs on image -->
+                  <div
+                    id="crop_paper"
+                    style="
+                      position: absolute;
+                      top: 0;
+                      left: 0;
+                      right: 10px;
+                      bottom: 10px;
+                      overflow: hidden;
+                    "
+                  >
+                    <!-- svg is added here by Raphael.js -->
+                  </div>
+                  <img
+                    class="crop_image"
+                    style="position: absolute; top: 0; left: 0"
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer" style="margin-top: 0">
+              <button
+                type="button"
+                class="btn btn-default"
+                data-dismiss="modal"
+              >
+                Cancel
+              </button>
+              <button type="submit" class="btn btn-primary" disabled="disabled">
+                OK
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <!-- SetId Modal - behaviour handled by SetIdModalView -->
+    <div
+      class="modal"
+      id="setIdModal"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="setIdLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-hidden="true"
+            >
+              &times;
+            </button>
+            <h4 class="modal-title" id="setIdLabel">Edit Image ID</h4>
+          </div>
+          <div class="modal-body">
+            <p>Choose a new Image ID for the selected panels</p>
+            <form
+              class="setIdForm form-inline"
+              role="form"
+              style="margin-top: 10px; margin-bottom: 10px"
+            >
+              <div class="form-group">
+                <input
+                  type="text"
+                  class="form-control imgId"
+                  placeholder="Image ID"
+                />
+              </div>
+              <button
+                type="submit"
+                class="btn btn-primary preview"
+                disabled="disabled"
+              >
+                Preview
+              </button>
+            </form>
+            <div class="previewIdChange"></div>
+          </div>
+          <div class="modal-footer" style="margin-top: 0">
+            <button type="button" class="btn btn-default" data-dismiss="modal">
+              Close
+            </button>
+            <button
+              type="submit"
+              class="btn btn-primary doSetId"
+              data-dismiss="modal"
+              disabled="disabled"
+            >
+              Update
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Color-picker Modal -->
+    <div
+      class="modal"
+      id="colorpickerModal"
+      tabindex="-1"
+      role="dialog"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-hidden="true"
+            >
+              &times;
+            </button>
+            <h4 class="modal-title">Color Picker</h4>
+          </div>
+          <form class="colorpickerForm" role="form">
+            <div class="modal-body">
+              <div
+                id="demo_cont"
+                class="demo demo-auto inl-bl"
+                data-container="#demo_cont"
+                data-color="#ff0000"
+                data-inline="true"
+              >
+                <div style="position: absolute; left: 280px; top: 200px">
+                  <input
+                    name="color"
+                    style="width: 100px"
+                    value="test"
+                    class="form-control"
+                  />
+                </div>
+              </div>
+              <div class="rgb-group form-horizontal">
+                <div class="form-group">
+                  <label class="col-sm-4 control-label">Red</label>
+                  <div class="col-sm-8">
+                    <input
+                      type="number"
+                      name="red"
+                      class="form-control"
+                      placeholder="255"
+                    />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-sm-4 control-label">Green</label>
+                  <div class="col-sm-8">
+                    <input
+                      type="number"
+                      name="green"
+                      class="form-control"
+                      placeholder="255"
+                    />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-sm-4 control-label">Blue</label>
+                  <div class="col-sm-8">
+                    <input
+                      type="number"
+                      name="blue"
+                      class="form-control"
+                      placeholder="255"
+                    />
+                  </div>
+                </div>
+              </div>
+              <ul class="list-group oldNewColors">
+                <li class="list-group-item"></li>
+                <li class="list-group-item" style="border-top-width: 0"></li>
+              </ul>
+
+              <div
+                id="pickedColors"
+                class="btn-toolbar pickedColors"
+                role="toolbar"
+              >
+                <!-- picked colors added here by render() -->
+              </div>
+            </div>
+            <div class="modal-footer" style="margin-top: 0">
+              <button
+                type="button"
+                class="btn btn-default"
+                data-dismiss="modal"
+              >
+                Cancel
+              </button>
+              <button type="submit" class="btn btn-primary">OK</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <!-- LUT-picker Modal -->
+    <div
+      class="modal"
+      id="lutpickerModal"
+      tabindex="-1"
+      role="dialog"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-hidden="true"
+            >
+              &times;
+            </button>
+            <h4 class="modal-title">Lookup Table Chooser</h4>
+          </div>
+          <div class="modal-body" style="height: 500px">
+            <p>Loading Lookup Tables...</p>
+          </div>
+          <div class="lutPreview lutBg">&nbsp</div>
+          <div class="modal-footer" style="margin-top: 0">
+            <button type="button" class="btn btn-default" data-dismiss="modal">
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-primary" disabled="disabled">
+              OK
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Add-Images Modal - behaviour handled by AddImagesModalView -->
+    <div
+      class="modal"
+      id="addImagesModal"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="addImagesLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-hidden="true"
+            >
+              &times;
+            </button>
+            <h4 class="modal-title" id="addImagesLabel">Add Images</h4>
+          </div>
+          <form class="addImagesForm" role="form">
+            <div class="modal-body">
+              <p>
+                Add images to the figure by entering their IDs, separated by
+                commas.<br />
+                Hint: You can also select images in the webclient, click the
+                link in right panel, copy the URL and paste it here:
+              </p>
+              <div
+                class="form-group"
+                style="margin-top: 15px; margin-bottom: 0px"
+              >
+                <input
+                  type="text"
+                  class="form-control imgIds"
+                  placeholder="Image IDs or URL"
+                />
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-default"
+                data-dismiss="modal"
+              >
+                Close
+              </button>
+              <button
+                type="submit"
+                class="btn btn-primary"
+                data-dismiss="modal"
+                disabled="disabled"
+              >
+                Add Images
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <!-- /.modal -->
+
+    <!-- Export json Modal -->
+    <div
+      class="modal"
+      id="exportJsonModal"
+      tabindex="-1"
+      role="dialog"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog" style="width: 800px">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-hidden="true"
+            >
+              &times;
+            </button>
+            <h4 class="modal-title" id="addImagesLabel">Export as JSON</h4>
+          </div>
+          <form class="addImagesForm" role="form">
+            <div class="modal-body">
+              <p>
+                The current Figure is entirely defined by the JSON data below.
+              </p>
+              <div
+                class="form-group"
+                style="margin-top: 15px; margin-bottom: 0px"
+              >
+                <textarea class="form-control" rows="15"></textarea>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-default"
+                data-dismiss="modal"
+              >
+                Close
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <!-- Import json Modal -->
+    <div
+      class="modal"
+      id="importJsonModal"
+      tabindex="-1"
+      role="dialog"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog" style="width: 800px">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-hidden="true"
+            >
+              &times;
+            </button>
+            <h4 class="modal-title" id="addImagesLabel">Import from JSON</h4>
+          </div>
+          <form class="importJsonForm" role="form">
+            <div class="modal-body">
+              <p>Paste the JSON data for the Figure into the text box below.</p>
+              <div
+                class="form-group"
+                style="margin-top: 15px; margin-bottom: 0px"
+              >
+                <textarea class="form-control" rows="15"></textarea>
+              </div>
+            </div>
+            <div class="modal-footer" style="margin-top: 0">
+              <button
+                type="button"
+                class="btn btn-default"
+                data-dismiss="modal"
+              >
+                Cancel
+              </button>
+              <button type="submit" class="btn btn-primary">OK</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <!-- Markdown Info Modal -->
+    <div
+      class="modal"
+      id="markdownInfoModal"
+      tabindex="-1"
+      role="dialog"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog" style="width: 800px">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-hidden="true"
+            >
+              &times;
+            </button>
+            <h4 class="modal-title">Markdown Formatting</h4>
+          </div>
+          <div class="modal-body">
+            <p>
+              You can use "Markdown" syntax to add formatting to plain text. For
+              example, **this text will be bold** and this *word* will be
+              italic. NB: Links are not supported for panel labels.
+            </p>
+
+            <table class="table">
+              <tr>
+                <td></td>
+                <th>This text will be formatted to...</th>
+                <th>...this text</th>
+              </tr>
+              <tr>
+                <th>BOLD</th>
+                <td>Use 2 stars for **bold**.</td>
+                <td>Use 2 stars for <strong>bold</strong>.</td>
+              </tr>
+              <tr>
+                <th>ITALIC</th>
+                <td>Use 1 star for *italic*.</td>
+                <td>Use 1 star for <i>italic</i>.</td>
+              </tr>
+              <tr>
+                <th>LINKS</th>
+                <td>Add links with [Link text](http://link_url.com)</td>
+                <td>Add links with <a href="#">Link text</a></td>
+              </tr>
+              <!--  <tr><td>You need to use 2 line breaks between paragraphs</td><td></td></tr> -->
+            </table>
+            <p>
+              The figure legend will be included in the PDF info page when the
+              figure is exported.
+            </p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- File Open Modal -->
+    <div
+      class="modal"
+      id="openFigureModal"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="addImagesLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog" style="width: 850px">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-hidden="true"
+            >
+              &times;
+            </button>
+            <h4 class="modal-title">Open</h4>
+          </div>
+
+          <div class="modal-body" style="height: 450px">
+            <table class="table table-condensed">
+              <thead>
+                <tr>
+                  <th style="width: 7%"></th>
+                  <th style="width: 47%">
+                    <form class="form-inline" role="form">
+                      <div class="form-group">
+                        <label class="col-sm-2 control-label">Name</label>
+                      </div>
+                      <button
+                        type="button"
+                        class="btn btn-link btn-sm sort-name muted table-sort-btn"
+                      >
+                        <span class="glyphicon glyphicon-chevron-up"></span>
+                      </button>
+                      <button
+                        type="button"
+                        class="btn btn-link btn-sm sort-name-reverse muted table-sort-btn"
+                      >
+                        <span class="glyphicon glyphicon-chevron-down"></span>
+                      </button>
+                      <div class="form-group" style="width: 60%">
+                        <input
+                          class="form-control"
+                          id="file-filter"
+                          placeholder="Filter"
+                        />
+                      </div>
+                    </form>
+                  </th>
+                  <th style="width: 22%">
+                    Created
+                    <button
+                      type="button"
+                      class="btn btn-link btn-sm sort-created sort table-sort-btn"
+                    >
+                      <span class="glyphicon glyphicon-chevron-up"></span>
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-link btn-sm sort-created-reverse muted table-sort-btn"
+                    >
+                      <span class="glyphicon glyphicon-chevron-down"></span>
+                    </button>
+                  </th>
+                  <th style="width: 12%">
+                    <div class="btn-group" title="Filter files by owner">
+                      <button
+                        type="button"
+                        class="btn btn-default dropdown-toggle"
+                        data-toggle="dropdown"
+                      >
+                        <b>Owner</b> <span class="caret"></span>
+                      </button>
+                      <ul
+                        id="owner-menu"
+                        class="dropdown-menu pull-right"
+                        role="menu"
+                      >
+                        <!-- owners added here -->
+                      </ul>
+                    </div>
+                  </th>
+                  <th style="width: 12%">
+                    <div class="btn-group" title="Filter files by group">
+                      <button
+                        type="button"
+                        class="btn btn-default dropdown-toggle"
+                        data-toggle="dropdown"
+                      >
+                        <b>Group</b> <span class="caret"></span>
+                      </button>
+                      <ul
+                        id="group-menu"
+                        class="dropdown-menu pull-right"
+                        role="menu"
+                      >
+                        <!-- groups added here -->
+                      </ul>
+                    </div>
+                  </th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div class="modal-footer" style="margin-top: 0px">
+            <button
+              title="Refresh file list"
+              type="button"
+              class="btn btn-default pull-left refresh-files"
+            >
+              Refresh
+            </button>
+            <button type="button" class="btn btn-default" data-dismiss="modal">
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Labels from Map Annotations Modal -->
+    <div
+      class="modal"
+      id="labelsFromMapAnns"
+      tabindex="-1"
+      role="dialog"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog" style="width: 400px">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-hidden="true"
+            >
+              &times;
+            </button>
+            <h4 class="modal-title" id="addImagesLabel">
+              Labels from Key-Value Pairs
+            </h4>
+          </div>
+          <form class="labelsFromMapAnnsForm" role="form">
+            <div class="modal-body">
+              <p>
+                Choose Key
+                <small class="text-muted">(shows numbers of images)</small>:
+              </p>
+              <select></select>
+              <div class="checkbox">
+                <label>
+                  Include Key in Label
+                  <input name="includeKey" type="checkbox" checked />
+                </label>
+              </div>
+              <hr />
+              <h5>Example Label</h5>
+              <div
+                id="exampleLabelFromMap"
+                class="well"
+                style="background-color: transparent; margin: 0"
+              ></div>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-default"
+                data-dismiss="modal"
+              >
+                Close
+              </button>
+              <button type="submit" class="btn btn-primary">OK</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- -- END OF MODAL DIALOGS -- -->
+
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
       <div class="container-fluid">
         <a class="navbar-brand text-white" href="#">OMERO</a>
@@ -134,12 +1239,16 @@
               <ul class="dropdown-menu">
                 <li class="about_figure">
                   <a class="dropdown-item" href="#">About OMERO.figure</a>
-              </li>
-              <li>
-                  <a class="dropdown-item" href="https://www.openmicroscopy.org/omero/figure/" target="new">
-                      Home Page
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="https://www.openmicroscopy.org/omero/figure/"
+                    target="new"
+                  >
+                    Home Page
                   </a>
-              </li>
+                </li>
               </ul>
             </li>
           </ul>
