@@ -1,7 +1,12 @@
 
 // Events, show/hide and rendering for various Modal dialogs.
+import Backbone from "backbone";
+import _ from "underscore";
+import $ from "jquery";
 
-    var DpiModalView = Backbone.View.extend({
+import FigureModel from "../models/figure_model";
+
+    export const DpiModalView = Backbone.View.extend({
 
         el: $("#dpiModal"),
 
@@ -58,11 +63,11 @@
         }
     });
 
-    var PaperSetupModalView = Backbone.View.extend({
+    export const PaperSetupModalView = Backbone.View.extend({
 
         el: $("#paperSetupModal"),
 
-        template: JST["src/templates/modal_dialogs/paper_setup_modal_template.html"],
+        template: _.template("src/templates/modal_dialogs/paper_setup_modal_template.html"),
 
         model:FigureModel,
 
@@ -226,11 +231,11 @@
     });
 
 
-    var SetIdModalView = Backbone.View.extend({
+    export const SetIdModalView = Backbone.View.extend({
 
         el: $("#setIdModal"),
 
-        template: JST["src/templates/modal_dialogs/preview_Id_change_template.html"],
+        template: _.template("src/templates/modal_dialogs/preview_Id_change_template.html"),
 
         model:FigureModel,
 
@@ -414,7 +419,7 @@
     });
 
 
-    var AddImagesModalView = Backbone.View.extend({
+    export const AddImagesModalView = Backbone.View.extend({
 
         el: $("#addImagesModal"),
 

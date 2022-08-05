@@ -1,6 +1,10 @@
 
+import Backbone from "backbone";
+import $ from "jquery";
 
-var ChgrpModalView = Backbone.View.extend({
+import FigureModel from "../models/figure_model";
+
+export const ChgrpModalView = Backbone.View.extend({
 
     el: $("#chgrpModal"),
 

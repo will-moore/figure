@@ -1,10 +1,15 @@
 
+import Backbone from "backbone";
+import _ from "underscore";
+import $ from "jquery";
 
-var RoiModalView = Backbone.View.extend({
+import FigureModel from "../models/figure_model";
 
-        template: JST["src/templates/shapes/shape_toolbar_template.html"],
+export const RoiModalView = Backbone.View.extend({
 
-        roi_zt_buttons_template: JST["src/templates/modal_dialogs/roi_zt_buttons.html"],
+        template: _.template("src/templates/shapes/shape_toolbar_template.html"),
+
+        roi_zt_buttons_template: _.template("src/templates/modal_dialogs/roi_zt_buttons.html"),
 
         el: $("#roiModal"),
 

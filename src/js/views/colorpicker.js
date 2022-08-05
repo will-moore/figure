@@ -17,6 +17,8 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+import Backbone from "backbone";
+import $ from "jquery";
 
 // Should only ever have a singleton on this
 var ColorPickerView = Backbone.View.extend({
@@ -28,73 +30,74 @@ var ColorPickerView = Backbone.View.extend({
 
     initialize:function () {
         
-        var sliders = {
-            saturation: {
-                maxLeft: 200,
-                maxTop: 200,
-                callLeft: 'setSaturation',
-                callTop: 'setBrightness'
-            },
-            hue: {
-                maxLeft: 0,
-                maxTop: 200,
-                callLeft: false,
-                callTop: 'setHue'
-            },
-            alpha: {
-                maxLeft: 0,
-                maxTop: 200,
-                callLeft: false,
-                callTop: 'setAlpha'
-            }
-        };
+        // var sliders = {
+        //     saturation: {
+        //         maxLeft: 200,
+        //         maxTop: 200,
+        //         callLeft: 'setSaturation',
+        //         callTop: 'setBrightness'
+        //     },
+        //     hue: {
+        //         maxLeft: 0,
+        //         maxTop: 200,
+        //         callLeft: false,
+        //         callTop: 'setHue'
+        //     },
+        //     alpha: {
+        //         maxLeft: 0,
+        //         maxTop: 200,
+        //         callLeft: false,
+        //         callTop: 'setAlpha'
+        //     }
+        // };
 
-        var self = this,
-            editingRGB = false;     // flag to prevent update of r,g,b fields
+        // var self = this,
+        //     editingRGB = false;     // flag to prevent update of r,g,b fields
 
         this.$submit_btn = $("#colorpickerModal .modal-footer button[type='submit']");
 
-        var $cp = $('.demo-auto').colorpicker({
-            'sliders': sliders,
-            'color': '00ff00',
-        });
+        // TODO: use <input type="color"/>
+        // var $cp = $('.demo-auto').colorpicker({
+        //     'sliders': sliders,
+        //     'color': '00ff00',
+        // });
 
-        // Access the colorpicker object for use below...
-        var cp = $cp.data('colorpicker');
+        // // Access the colorpicker object for use below...
+        // var cp = $cp.data('colorpicker');
 
 
-        $cp.on('changeColor', function(event){
+        // $cp.on('changeColor', function(event){
 
-            // In edge-case of starting with 'black', clicking on Hue slider,
-            // default is to stay 'black', but we want to pick the color
-            // by setting saturation and brightness.
-            var c = event.color;
-            if ((c.toHex() === "#000000" || c.toHex() === "#ffffff") &&
-                    cp.currentSlider && cp.currentSlider.callTop === "setHue") {
-                cp.color.setSaturation(1);
-                cp.color.setBrightness(0);
-                cp.update(true);
-                cp.element.trigger({
-                    type: 'changeColor',
-                    color: cp.color
-                });
-                // so we don't do this again until next click
-                cp.currentSlider = undefined;
-                return;
-            }
+        //     // In edge-case of starting with 'black', clicking on Hue slider,
+        //     // default is to stay 'black', but we want to pick the color
+        //     // by setting saturation and brightness.
+        //     var c = event.color;
+        //     if ((c.toHex() === "#000000" || c.toHex() === "#ffffff") &&
+        //             cp.currentSlider && cp.currentSlider.callTop === "setHue") {
+        //         cp.color.setSaturation(1);
+        //         cp.color.setBrightness(0);
+        //         cp.update(true);
+        //         cp.element.trigger({
+        //             type: 'changeColor',
+        //             color: cp.color
+        //         });
+        //         // so we don't do this again until next click
+        //         cp.currentSlider = undefined;
+        //         return;
+        //     }
 
-            // enable form submission & show color
-            self.$submit_btn.prop('disabled', false);
-            $('.oldNewColors li:first-child').css('background-color', event.color.toHex());
+        //     // enable form submission & show color
+        //     self.$submit_btn.prop('disabled', false);
+        //     $('.oldNewColors li:first-child').css('background-color', event.color.toHex());
 
-            // update red, green, blue inputs
-            if (!editingRGB) {
-                var rgb = event.color.toRGB();
-                $(".rgb-group input[name='red']").val(rgb.r);
-                $(".rgb-group input[name='green']").val(rgb.g);
-                $(".rgb-group input[name='blue']").val(rgb.b);
-            }
-        });
+        //     // update red, green, blue inputs
+        //     if (!editingRGB) {
+        //         var rgb = event.color.toRGB();
+        //         $(".rgb-group input[name='red']").val(rgb.r);
+        //         $(".rgb-group input[name='green']").val(rgb.g);
+        //         $(".rgb-group input[name='blue']").val(rgb.b);
+        //     }
+        // });
 
         $(".rgb-group input").bind("change keyup", function(){
             var $this = $(this),
@@ -213,3 +216,5 @@ var ColorPickerView = Backbone.View.extend({
         $("#pickedColors").html(html);
     }
 });
+
+export default ColorPickerView

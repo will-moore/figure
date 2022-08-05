@@ -1,10 +1,15 @@
 
+import Backbone from "backbone";
+import _ from "underscore";
+import $ from "jquery";
 
-var CropModalView = Backbone.View.extend({
+import FigureModel from "../models/figure_model";
+
+export const CropModalView = Backbone.View.extend({
 
         el: $("#cropModal"),
 
-        roiTemplate: JST["src/templates/modal_dialogs/crop_modal_roi.html"],
+        roiTemplate: _.template("src/templates/modal_dialogs/crop_modal_roi.html"),
 
         model: FigureModel,
 

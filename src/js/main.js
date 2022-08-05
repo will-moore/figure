@@ -8,8 +8,57 @@ import Backbone from "backbone";
 import $ from "jquery";
 
 import FigureModel from "./models/figure_model";
+import ColorPickerView from "./views/colorpicker";
+import LutPickerView from "./views/lutpicker";
+import FigureView from "./views/figure_view";
 
-const figureModel = new FigureModel();
+export const figureModel = new FigureModel();
+
+// window.figureModel = new FigureModel();
+
+export const FigureColorPicker = new ColorPickerView();
+export const FigureLutPicker = new LutPickerView();
+
+// Override 'Backbone.sync'...
+Backbone.ajaxSync = Backbone.sync;
+
+// TODO: - Use the undo/redo queue instead of sync to trigger figureModel.set("unsaved", true);
+
+// If syncOverride, then instead of actually trying to Save via ajax on model.save(attr, value)
+// We simply set the 'unsaved' flag on the figureModel.
+// This works for FigureModel and also for Panels collection.
+Backbone.getSyncMethod = function (model) {
+  if (
+    model.syncOverride ||
+    (model.collection && model.collection.syncOverride)
+  ) {
+    return function (method, model, options, error) {
+      figureModel.set("unsaved", true);
+    };
+  }
+  return Backbone.ajaxSync;
+};
+
+// Override 'Backbone.sync' to default to localSync,
+// the original 'Backbone.sync' is still available in 'Backbone.ajaxSync'
+Backbone.sync = function (method, model, options, error) {
+  return Backbone.getSyncMethod(model).apply(this, [
+    method,
+    model,
+    options,
+    error,
+  ]);
+};
+
+var view = new FigureView({ model: figureModel }); // uiState: uiState
+var svgView = new SvgView({ model: figureModel });
+new RightPanelView({ model: figureModel });
+
+// Undo Model and View
+var undoManager = new UndoManager({ figureModel: figureModel }),
+  undoView = new UndoView({ model: undoManager });
+// Finally, start listening for changes to panels
+undoManager.listenToCollection(figureModel.panels);
 
 var FigureRouter = Backbone.Router.extend({
   routes: {
@@ -129,7 +178,6 @@ if (APP_ROOT_URL) {
 
 const app = new FigureRouter();
 Backbone.history.start(config);
-
 
 // We want 'a' links (E.g. to open_figure) to use app.navigate
 $(document).on("click", "a", function (ev) {

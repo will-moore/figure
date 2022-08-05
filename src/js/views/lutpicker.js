@@ -17,13 +17,16 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+import Backbone from "backbone";
+import $ from "jquery";
+import _ from 'underscore';
 
 // Should only ever have a singleton on this
 var LutPickerView = Backbone.View.extend({
 
     el: $("#lutpickerModal"),
 
-    template: JST["src/templates/lut_picker.html"],
+    template: _.template("../../src/templates/lut_picker.html"),
 
     LUT_NAMES: ["16_colors.lut",
                 "3-3-2_rgb.lut",
@@ -152,3 +155,5 @@ var LutPickerView = Backbone.View.extend({
         $(".modal-body", this.el).html(html);
     }
 });
+
+export default LutPickerView

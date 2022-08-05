@@ -53,13 +53,21 @@
 
             var load_url = BASE_WEBFIGURE_URL + "load_web_figure/" + fileId + "/",
                 self = this;
+            console.log("loading", load_url);
 
-
-            $.getJSON(load_url, function(data){
-                data.fileId = fileId;
-                self.load_from_JSON(data);
-                self.set('unsaved', false);
-            });
+            let cors_headers = { mode: 'cors', credentials: 'include' };
+            fetch(load_url, cors_headers)
+                .then(rsp => rsp.json())
+                .then(data => {
+                    data.fileId = fileId;
+                    self.load_from_JSON(data);
+                    self.set('unsaved', false);
+                });
+            // $.getJSON(load_url, function(data){
+            //     data.fileId = fileId;
+            //     self.load_from_JSON(data);
+            //     self.set('unsaved', false);
+            // });
         },
 
         load_from_JSON: function(data) {

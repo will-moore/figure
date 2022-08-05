@@ -1,6 +1,16 @@
 
     // -------------------------- Backbone VIEWS -----------------------------------------
+    import Backbone from "backbone";
+    import $ from "jquery";
 
+    import FigureModel from "../models/figure_model";
+
+    import {AddImagesModalView, DpiModalView, PaperSetupModalView, SetIdModalView } from "./modal_views";
+
+    import {CropModalView} from "./crop_modal_view";
+    import {ChgrpModalView} from "./chgrp_modal_view";
+    import {RoiModalView} from "./roi_modal_view";
+    import {LegendView} from "./legend_view";
 
     // var SelectionView = Backbone.View.extend({
     var FigureView = Backbone.View.extend({
@@ -940,3 +950,5 @@
             }
         }
     });
+
+export default FigureView
