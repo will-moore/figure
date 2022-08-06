@@ -654,28 +654,28 @@
             });
 
 
-            $("#vp_zoom_slider").slider({
-                // NB: these values are updated on render()
-                max: 1000,
-                min: 100,
-                value: self.zoom_avg,
-                slide: function(event, ui) {
-                    self.update_img_css(ui.value, 0, 0);
-                },
-                stop: function( event, ui ) {
-                    self.zoom_avg = ui.value;
-                    var to_save = {'zoom': ui.value};
-                    if (ui.value === 100) {
-                        to_save.dx = 0;
-                        to_save.dy = 0;
-                    }
-                    self.models.forEach(function(m){
-                        m.save(to_save);
-                    });
-                    // we don't listenTo zoom change...
-                    self.rerender_image_change();
-                }
-            });
+            // $("#vp_zoom_slider").slider({
+            //     // NB: these values are updated on render()
+            //     max: 1000,
+            //     min: 100,
+            //     value: self.zoom_avg,
+            //     slide: function(event, ui) {
+            //         self.update_img_css(ui.value, 0, 0);
+            //     },
+            //     stop: function( event, ui ) {
+            //         self.zoom_avg = ui.value;
+            //         var to_save = {'zoom': ui.value};
+            //         if (ui.value === 100) {
+            //             to_save.dx = 0;
+            //             to_save.dy = 0;
+            //         }
+            //         self.models.forEach(function(m){
+            //             m.save(to_save);
+            //         });
+            //         // we don't listenTo zoom change...
+            //         self.rerender_image_change();
+            //     }
+            // });
             this.$vp_zoom_value = $("#vp_zoom_value");
 
             // We nest the ZoomView so we can update it on update_img_css
@@ -750,9 +750,9 @@
         // called by the parent View before .remove()
         clear: function() {
             // clean up zoom slider etc
-            $( "#vp_zoom_slider" ).slider( "destroy" );
-            $("#vp_z_slider").slider("destroy");
-            $("#vp_t_slider").slider("destroy");
+            // $( "#vp_zoom_slider" ).slider( "destroy" );
+            // $("#vp_z_slider").slider("destroy");
+            // $("#vp_t_slider").slider("destroy");
             this.$vp_zoom_value.text('');
 
             if (this.zmView) {
@@ -891,7 +891,7 @@
             } else if (!this.models.allEqual('theZ')) {
                 z_label = "-";
             }
-            $("#vp_z_slider").slider({'value': theZ + 1});
+            // $("#vp_z_slider").slider({'value': theZ + 1});
             $("#vp_z_value").text(z_label + "/" + (sizeZ || '-'));
 
             var t_label = theT + 1;
@@ -899,7 +899,7 @@
             if (!this.models.allEqual('theT')) {
                 t_label = "-";
             }
-            $("#vp_t_slider").slider({'value': theT + 1});
+            // $("#vp_t_slider").slider({'value': theT + 1});
             $("#vp_t_value").text(t_label + "/" + (sizeT || '-'));
 
             if ((deltaT === 0 || deltaT) && sizeT > 1) {
@@ -954,45 +954,45 @@
             // Destroy any existing slider...
             try {
                 // ...but will throw if not already a slider
-                $("#vp_z_slider").slider("destroy");
+                // $("#vp_z_slider").slider("destroy");
             } catch (e) {}
 
             if (z_projection) {
-                $("#vp_z_slider").slider({
-                    orientation: "vertical",
-                    range: true,
-                    max: Z_max,
-                    disabled: Z_disabled,
-                    min: 1,             // model is 0-based, UI is 1-based
-                    values: [z_start + 1, z_end + 1],
-                    slide: function(event, ui) {
-                        $("#vp_z_value").text(ui.values[0] + "-" + ui.values[1] + "/" + sizeZ);
-                    },
-                    stop: function( event, ui ) {
-                        self.models.forEach(function(m){
-                            m.save({
-                                'z_start': ui.values[0] - 1,
-                                'z_end': ui.values[1] -1
-                            });
-                        });
-                    }
-                });
+                // $("#vp_z_slider").slider({
+                //     orientation: "vertical",
+                //     range: true,
+                //     max: Z_max,
+                //     disabled: Z_disabled,
+                //     min: 1,             // model is 0-based, UI is 1-based
+                //     values: [z_start + 1, z_end + 1],
+                //     slide: function(event, ui) {
+                //         $("#vp_z_value").text(ui.values[0] + "-" + ui.values[1] + "/" + sizeZ);
+                //     },
+                //     stop: function( event, ui ) {
+                //         self.models.forEach(function(m){
+                //             m.save({
+                //                 'z_start': ui.values[0] - 1,
+                //                 'z_end': ui.values[1] -1
+                //             });
+                //         });
+                //     }
+                // });
             } else {
-                $("#vp_z_slider").slider({
-                    orientation: "vertical",
-                    max: sizeZ,
-                    disabled: Z_disabled,
-                    min: 1,             // model is 0-based, UI is 1-based
-                    value: theZ + 1,
-                    slide: function(event, ui) {
-                        $("#vp_z_value").text(ui.value + "/" + sizeZ);
-                    },
-                    stop: function( event, ui ) {
-                        self.models.forEach(function(m){
-                            m.save('theZ', ui.value - 1);
-                        });
-                    }
-                });
+                // $("#vp_z_slider").slider({
+                //     orientation: "vertical",
+                //     max: sizeZ,
+                //     disabled: Z_disabled,
+                //     min: 1,             // model is 0-based, UI is 1-based
+                //     value: theZ + 1,
+                //     slide: function(event, ui) {
+                //         $("#vp_z_value").text(ui.value + "/" + sizeZ);
+                //     },
+                //     stop: function( event, ui ) {
+                //         self.models.forEach(function(m){
+                //             m.save('theZ', ui.value - 1);
+                //         });
+                //     }
+                // });
             }
 
             // T-slider should be enabled even if we have a mixture of sizeT values.
@@ -1009,28 +1009,28 @@
                 $("#vp_t_slider").slider("destroy");
             } catch (e) {}
 
-            $("#vp_t_slider").slider({
-                max: T_slider_max,
-                disabled: T_disabled,
-                min: 1,             // model is 0-based, UI is 1-based
-                value: t_slider_value + 1,
-                slide: function(event, ui) {
-                    var theT = ui.value;
-                    $("#vp_t_value").text(theT + "/" + (sizeT || '-'));
-                    var dt = self.models.head().get('deltaT')[theT-1];
-                    self.models.forEach(function(m){
-                        if (m.get('deltaT')[theT-1] != dt) {
-                            dt = undefined;
-                        }
-                    });
-                    $("#vp_deltaT").text(self.formatTime(dt));
-                },
-                stop: function( event, ui ) {
-                    self.models.forEach(function(m){
-                        m.save('theT', ui.value - 1);
-                    });
-                }
-            });
+            // $("#vp_t_slider").slider({
+            //     max: T_slider_max,
+            //     disabled: T_disabled,
+            //     min: 1,             // model is 0-based, UI is 1-based
+            //     value: t_slider_value + 1,
+            //     slide: function(event, ui) {
+            //         var theT = ui.value;
+            //         $("#vp_t_value").text(theT + "/" + (sizeT || '-'));
+            //         var dt = self.models.head().get('deltaT')[theT-1];
+            //         self.models.forEach(function(m){
+            //             if (m.get('deltaT')[theT-1] != dt) {
+            //                 dt = undefined;
+            //             }
+            //         });
+            //         $("#vp_deltaT").text(self.formatTime(dt));
+            //     },
+            //     stop: function( event, ui ) {
+            //         self.models.forEach(function(m){
+            //             m.save('theT', ui.value - 1);
+            //         });
+            //     }
+            // });
 
             var json = {};
             json.inner_template = this.inner_template;
@@ -1058,8 +1058,8 @@
             max_zoom = Math.max(this.zoom_avg, max_zoom, 1000);
 
             // Current zoom may be larger due to small crop region
-            $("#vp_zoom_slider").slider({'value': this.zoom_avg,
-                                         'max': max_zoom});
+            // $("#vp_zoom_slider").slider({'value': this.zoom_avg,
+            //                              'max': max_zoom});
 
             return this;
         }
@@ -1228,32 +1228,32 @@
                 self = this;
 
             if ($rc.hasClass('rotation-controls-shown')) {
-                $rc.find('.rotation-slider').slider({
-                    orientation: "vertical",
-                    max: 360,
-                    min: 0,
-                    step: 2,
-                    value: self.rotation,
-                    slide: function(event, ui) {
-                        $(".vp_img").css({'-webkit-transform':'rotate(' + ui.value + 'deg)',
-                                        'transform':'rotate(' + ui.value + 'deg)'});
-                        $(".rotation_value").text(ui.value);
-                    },
-                    stop: function( event, ui ) {
-                        self.rotation = ui.value;
-                        self.models.forEach(function(m){
-                            m.save('rotation', ui.value);
-                        });
-                    }
-                });
+                // $rc.find('.rotation-slider').slider({
+                //     orientation: "vertical",
+                //     max: 360,
+                //     min: 0,
+                //     step: 2,
+                //     value: self.rotation,
+                //     slide: function(event, ui) {
+                //         $(".vp_img").css({'-webkit-transform':'rotate(' + ui.value + 'deg)',
+                //                         'transform':'rotate(' + ui.value + 'deg)'});
+                //         $(".rotation_value").text(ui.value);
+                //     },
+                //     stop: function( event, ui ) {
+                //         self.rotation = ui.value;
+                //         self.models.forEach(function(m){
+                //             m.save('rotation', ui.value);
+                //         });
+                //     }
+                // });
             } else {
-                $rc.find('.rotation-slider').slider("destroy");
+                // $rc.find('.rotation-slider').slider("destroy");
             }
         },
 
         clear: function() {
             try {
-                this.$el.find('.rotation-slider').slider("destroy");
+                // this.$el.find('.rotation-slider').slider("destroy");
             } catch (e) {}
             return this;
         },

@@ -160,7 +160,7 @@ var ChannelSliderView = Backbone.View.extend({
     },
 
     clear: function() {
-        $(".ch_slider").slider("destroy");
+        // $(".ch_slider").slider("destroy");
         $("#channel_sliders").empty();
         return this;
     },
@@ -221,7 +221,7 @@ var ChannelSliderView = Backbone.View.extend({
             if (!allSameCount) {
                 return this;
             }
-            $(".ch_slider").slider("destroy");
+            // $(".ch_slider").slider("destroy");
             this.$el.empty();
 
             chData[0].forEach(function(d, chIdx) {
@@ -278,21 +278,21 @@ var ChannelSliderView = Backbone.View.extend({
                                                 'isDark': this.isDark(color)});
                 var $div = $(sliderHtml).appendTo(this.$el);
 
-                $div.find('.ch_slider').slider({
-                    range: true,
-                    min: min,
-                    max: max,
-                    values: [startAvg, endAvg],
-                    slide: function(event, ui) {
-                        $('.ch_start input', $div).val(ui.values[0]);
-                        $('.ch_end input', $div).val(ui.values[1]);
-                    },
-                    stop: function(event, ui) {
-                        self.models.forEach(function(m) {
-                            m.save_channel_window(chIdx, {'start': ui.values[0], 'end': ui.values[1]});
-                        });
-                    }
-                })
+                // $div.find('.ch_slider').slider({
+                //     range: true,
+                //     min: min,
+                //     max: max,
+                //     values: [startAvg, endAvg],
+                //     slide: function(event, ui) {
+                //         $('.ch_start input', $div).val(ui.values[0]);
+                //         $('.ch_end input', $div).val(ui.values[1]);
+                //     },
+                //     stop: function(event, ui) {
+                //         self.models.forEach(function(m) {
+                //             m.save_channel_window(chIdx, {'start': ui.values[0], 'end': ui.values[1]});
+                //         });
+                //     }
+                // })
                 // Need to add background style to newly created div.ui-slider-range
                 .children('.ui-slider-range').css(style)
                 .addClass(sliderClass);
