@@ -33,6 +33,7 @@
     "backbone": "^1.4.1",
     "bootstrap": "^5.2.0",
     "jquery": "^3.6.0",
+    "mousetrap": "^1.6.5",
     "raphael": "^2.3.0",
     "underscore": "^1.13.4"
   }

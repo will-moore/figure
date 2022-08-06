@@ -1,4 +1,6 @@
 
+import Backbone from "backbone";
+
 var ShapeModel = Backbone.Model.extend({
 
     parse: function(shape) {
@@ -131,3 +133,5 @@ var RoiList = Backbone.Collection.extend({
         return shape;
     }
 });
+
+export default RoiList

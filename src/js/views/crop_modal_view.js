@@ -5,6 +5,7 @@ import $ from "jquery";
 import Raphael from "raphael";
 
 import FigureModel from "../models/figure_model";
+import RectView from "./raphael-rect";
 
 export const CropModalView = Backbone.View.extend({
 

@@ -2,8 +2,12 @@
 import Backbone from "backbone";
 import _ from "underscore";
 import $ from "jquery";
+import Mousetrap from "mousetrap";
 
 import FigureModel from "../models/figure_model";
+import RoiList from "../models/roi_model";
+import ShapeManager from "../shape_editor/shape_manager";
+
 
 export const RoiModalView = Backbone.View.extend({
 

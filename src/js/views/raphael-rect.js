@@ -17,7 +17,9 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-var RectView = Backbone.View.extend({
+import Backbone from "backbone";
+
+const RectView = Backbone.View.extend({
 
     handle_wh: 6,
     default_line_attrs: {'stroke-width':0, 'stroke': '#4b80f9', 'cursor': 'default', 'fill-opacity':0.01, 'fill': '#fff'},
@@ -279,3 +281,5 @@ var RectView = Backbone.View.extend({
         this.model.off('change', this.render, this);
     }
 });
+
+export default RectView
