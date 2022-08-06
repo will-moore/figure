@@ -11,6 +11,7 @@ import FigureModel from "./models/figure_model";
 import ColorPickerView from "./views/colorpicker";
 import LutPickerView from "./views/lutpicker";
 import FigureView from "./views/figure_view";
+import SvgView from "./views/svg_model_view";
 
 export const figureModel = new FigureModel();
 
