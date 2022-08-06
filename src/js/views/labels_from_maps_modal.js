@@ -1,5 +1,11 @@
 
-var LabelFromMapsModal = Backbone.View.extend({
+import Backbone from "backbone";
+import $ from "jquery"
+
+import FigureModel from "../models/figure_model";
+
+
+export var LabelFromMapsModal = Backbone.View.extend({
 
     el: $("#labelsFromMapAnns"),
 

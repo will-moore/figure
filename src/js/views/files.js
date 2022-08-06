@@ -17,7 +17,11 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-var FigureFile = Backbone.Model.extend({
+import Backbone from "backbone";
+import _ from "underscore";
+import $ from "jquery";
+
+export var FigureFile = Backbone.Model.extend({
 
     defaults: {
         disabled: false,
@@ -61,14 +65,11 @@ var FigureFile = Backbone.Model.extend({
 });
 
 
-var FileList = Backbone.Collection.extend({
+export var FigureFileList = Backbone.Collection.extend({
 
     model: FigureFile,
 
     comparator: 'creationDate',
-
-    initialize: function() {
-    },
 
     disable: function(fileId) {
         // enable all first
@@ -102,7 +103,7 @@ var FileList = Backbone.Collection.extend({
 });
 
 
-var FileListView = Backbone.View.extend({
+export var FileListView = Backbone.View.extend({
 
     el: $("#openFigureModal"),
 
@@ -284,7 +285,7 @@ var FileListItemView = Backbone.View.extend({
 
     tagName:"tr",
 
-    template: JST["src/templates/files/figure_file_item.html"],
+    template: _.template("src/templates/files/figure_file_item.html"),
 
     initialize:function () {
         this.model.bind("change", this.render, this);

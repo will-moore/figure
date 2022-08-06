@@ -4,6 +4,7 @@
     import $ from "jquery";
 
     import FigureModel from "../models/figure_model";
+    import {FigureFileList, FileListView} from "./files";
 
     import {AddImagesModalView, DpiModalView, PaperSetupModalView, SetIdModalView } from "./modal_views";
 
@@ -11,6 +12,7 @@
     import {ChgrpModalView} from "./chgrp_modal_view";
     import {RoiModalView} from "./roi_modal_view";
     import {LegendView} from "./legend_view";
+    import {LabelFromMapsModal} from "./labels_from_maps_modal";
 
     // var SelectionView = Backbone.View.extend({
     var FigureView = Backbone.View.extend({
@@ -31,7 +33,7 @@
             new LegendView({model: this.model});
             new LabelFromMapsModal({model: this.model});
 
-            this.figureFiles = new FileList();
+            this.figureFiles = new FigureFileList();
             new FileListView({model:this.figureFiles, figureModel: this.model});
 
             // set up various elements and we need repeatedly
