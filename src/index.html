@@ -1251,16 +1251,158 @@
               </ul>
             </li>
           </ul>
-          <form class="d-flex" role="search">
-            <input
-              class="form-control me-2"
-              type="search"
-              placeholder="Search"
-              aria-label="Search"
-            />
-            <button class="btn btn-outline-success" type="submit">
-              Search
-            </button>
+
+          <form class="d-flex">
+            <div class="btn-group" style="margin-right: 20px">
+              <button
+                type="button"
+                class="btn btn-sm btn-light"
+                data-toggle="modal"
+                data-target="#addImagesModal"
+                title="Add images to figure"
+              >
+                Add Image
+              </button>
+              <button
+                type="button"
+                class="btn btn-sm btn-light delete_panel"
+                title="Delete selected panels"
+              >
+                Delete
+              </button>
+            </div>
+
+            <!-- Align-left and Grid buttons in nav bar -->
+            <div class="btn-group" style="margin-right: 20px">
+              <button
+                type="button"
+                class="aleft btn btn-sm btn-light"
+                title="Align Left"
+              >
+                <i class="bi-align-start" style="font-size: 1.2rem"></i>
+              </button>
+              <button
+                type="button"
+                class="agrid btn btn-sm btn-light delete_panel"
+                title="Align To Grid"
+              >
+                <i class="bi-grid-3x3-gap-fill" style="font-size: 1rem"></i>
+              </button>
+              <button
+                type="button"
+                class="btn btn-sm btn-light dropdown-toggle dropdown-toggle-split"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                <span class="visually-hidden">Toggle Dropdown</span>
+              </button>
+              <ul class="dropdown-menu">
+                <li>
+                  <label
+                    ><input
+                      type="radio"
+                      value="auto"
+                      checked
+                      name="grid_gap"
+                    /><span class="glyphicon glyphicon-ok"> </span> 5% of panel
+                    width</label
+                  >
+                </li>
+                <li>
+                  <label
+                    ><input type="radio" value="0" name="grid_gap" /><span
+                      class="glyphicon glyphicon-ok"
+                    >
+                    </span>
+                    0 px (no gap)</label
+                  >
+                </li>
+                <li>
+                  <label
+                    ><input type="radio" value="1" name="grid_gap" /><span
+                      class="glyphicon glyphicon-ok"
+                    >
+                    </span>
+                    1 px</label
+                  >
+                </li>
+                <li>
+                  <label
+                    ><input type="radio" value="2" name="grid_gap" /><span
+                      class="glyphicon glyphicon-ok"
+                    >
+                    </span>
+                    2 px</label
+                  >
+                </li>
+                <li>
+                  <label
+                    ><input type="radio" value="5" name="grid_gap" /><span
+                      class="glyphicon glyphicon-ok"
+                    >
+                    </span>
+                    5 px</label
+                  >
+                </li>
+                <li>
+                  <label
+                    ><input type="radio" value="10" name="grid_gap" /><span
+                      class="glyphicon glyphicon-ok"
+                    >
+                    </span>
+                    10 px</label
+                  >
+                </li>
+                <li>
+                  <label
+                    ><input type="radio" value="15" name="grid_gap" /><span
+                      class="glyphicon glyphicon-ok"
+                    >
+                    </span>
+                    15 px</label
+                  >
+                </li>
+                <li>
+                  <label
+                    ><input type="radio" value="20" name="grid_gap" /><span
+                      class="glyphicon glyphicon-ok"
+                    >
+                    </span>
+                    20 px</label
+                  >
+                </li>
+                <li>
+                  <label
+                    ><input
+                      type="radio"
+                      id="custom_grid_gap"
+                      value=""
+                      name="grid_gap"
+                    /><span class="glyphicon glyphicon-ok"> </span> custom
+                    <span id="custom_grid_gap_label"></span>
+                  </label>
+                </li>
+              </ul>
+            </div>
+
+
+            <div class="btn-group">
+              <button
+                type="button" disabled
+                class="atop btn btn-sm btn-light"
+                title="Align Top"
+              >
+                <i class="bi-align-start" style="font-size: 1.2rem"></i>
+              </button>
+              <button
+                type="button"
+                class="btn btn-sm btn-light dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"
+                title="Align Sizes"
+              >
+                <i class="bi-arrows-fullscreen" style="font-size: 1rem"></i>
+              </button>
+              <ul class="dropdown-menu"></ul>
+            </div>
           </form>
         </div>
       </div>

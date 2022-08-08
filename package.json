@@ -32,6 +32,7 @@
     "@popperjs/core": "^2.11.5",
     "backbone": "^1.4.1",
     "bootstrap": "^5.2.0",
+    "bootstrap-icons": "^1.9.1",
     "jquery": "^3.6.0",
     "mousetrap": "^1.6.5",
     "raphael": "^2.3.0",

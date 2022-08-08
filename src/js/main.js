@@ -1,5 +1,6 @@
-// Import our custom CSS
+// Import our custom CSS based on bootstrap
 import "../scss/styles.scss";
+import "bootstrap-icons/font/bootstrap-icons.css"
 
 // Import all of Bootstrap's JS
 import * as bootstrap from "bootstrap";
@@ -12,6 +13,7 @@ import ColorPickerView from "./views/colorpicker";
 import LutPickerView from "./views/lutpicker";
 import FigureView from "./views/figure_view";
 import SvgView from "./views/svg_model_view";
+import RightPanelView from "./views/right_panel_view";
 
 export const figureModel = new FigureModel();
 

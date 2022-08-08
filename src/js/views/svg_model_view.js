@@ -5,6 +5,8 @@
     import $ from "jquery";
     import Raphael from "raphael";
 
+    import RectView from "./raphael-rect";
+
     // SvgView uses ProxyRectModel to manage Svg Rects (raphael)
     // This converts between zoomed coordiantes of the html DOM panels
     // and the unzoomed SVG overlay.

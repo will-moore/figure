@@ -3,6 +3,13 @@
     // It listens to selection changes on the FigureModel and updates it's display
     // By creating new Sub-Views
 
+    import Backbone from "backbone";
+    import _ from "underscore";
+    import $ from "jquery";
+
+    import FigureModel from "../models/figure_model";
+
+
     var RightPanelView = Backbone.View.extend({
 
         initialize: function(opts) {
@@ -58,7 +65,7 @@
 
         model: FigureModel,
 
-        roisTemplate: JST["src/templates/rois_form_template.html"],
+        roisTemplate: _.template("src/templates/rois_form_template.html"),
 
         el: $("#labelsTab"),
 
@@ -258,7 +265,7 @@
 
         model: FigureModel,
 
-        template: JST["src/templates/labels_form_inner_template.html"],
+        template: _.template("src/templates/labels_form_inner_template.html"),
 
         el: $("#labelsTab"),
 
@@ -455,8 +462,8 @@
     // Created new for each selection change
     var SelectedPanelsLabelsView = Backbone.View.extend({
 
-        template: JST["src/templates/labels_form_template.html"],
-        inner_template: JST["src/templates/labels_form_inner_template.html"],
+        template: _.template("src/templates/labels_form_template.html"),
+        inner_template: _.template("src/templates/labels_form_inner_template.html"),
 
         initialize: function(opts) {
 
@@ -628,8 +635,8 @@
 
     var ImageViewerView = Backbone.View.extend({
 
-        template: JST["src/templates/viewport_template.html"],
-        inner_template: JST["src/templates/viewport_inner_template.html"],
+        template: _.template("src/templates/viewport_template.html"),
+        inner_template: _.template("src/templates/viewport_inner_template.html"),
 
         className: "imageViewer",
 
@@ -1068,7 +1075,7 @@
 
     var ZoomView = Backbone.View.extend({
 
-        template: JST["src/templates/zoom_crop_template.html"],
+        template: _.template("src/templates/zoom_crop_template.html"),
 
         initialize: function(opts) {
 
@@ -1193,7 +1200,7 @@
     // Options such as Rotation, Z-Projection etc.
     var ImageDisplayOptionsView = Backbone.View.extend({
         tagName: "div",
-        template: JST["src/templates/image_display_options_template.html"],
+        template: _.template("src/templates/image_display_options_template.html"),
 
         initialize: function(opts) {
             // This View may apply to a single PanelModel or a list
@@ -1306,3 +1313,5 @@
             return this;
         }
     });
+
+    export default RightPanelView;

@@ -194,10 +194,10 @@ $(function(){
 
 
     // Header button tooltips
-    $('.btn-sm').tooltip({container: 'body', placement:'bottom', toggle:"tooltip"});
-    $('.figure-title').tooltip({container: 'body', placement:'bottom', toggle:"tooltip"});
+    // $('.btn-sm').tooltip({container: 'body', placement:'bottom', toggle:"tooltip"});
+    // $('.figure-title').tooltip({container: 'body', placement:'bottom', toggle:"tooltip"});
     // Footer button tooltips
-    $('.btn-xs').tooltip({container: 'body', placement:'top', toggle:"tooltip"});
+    // $('.btn-xs').tooltip({container: 'body', placement:'top', toggle:"tooltip"});
 
 
     // If we're on Mac, update dropdown menus for keyboard short cuts:
