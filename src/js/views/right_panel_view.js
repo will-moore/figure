@@ -275,7 +275,7 @@
             // one-off build 'New Label' form, with same template as used for 'Edit Label' forms
             var json = {'l': {'text':'', 'size':12, 'color':'000000'}, 'position':'top', 'edit':false};
             $('.new-label-form', this.$el).html(this.template(json));
-            $('.btn-sm').tooltip({container: 'body', placement:'bottom', toggle:"tooltip"});
+            // $('.btn-sm').tooltip({container: 'body', placement:'bottom', toggle:"tooltip"});
 
             this.render();
         },

@@ -1279,7 +1279,7 @@
                 class="aleft btn btn-sm btn-light"
                 title="Align Left"
               >
-                <i class="bi-align-start" style="font-size: 1.2rem"></i>
+                <i class="bi-text-left" style="font-size: 1.2rem"></i>
               </button>
               <button
                 type="button"
@@ -1385,23 +1385,138 @@
               </ul>
             </div>
 
-
             <div class="btn-group">
               <button
-                type="button" disabled
+                type="button"
+                disabled
                 class="atop btn btn-sm btn-light"
                 title="Align Top"
               >
-                <i class="bi-align-start" style="font-size: 1.2rem"></i>
+                <i class="bi-text-left" style="font-size: 1.2rem"></i>
               </button>
               <button
                 type="button"
-                class="btn btn-sm btn-light dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"
+                class="btn btn-sm btn-light dropdown-toggle"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
                 title="Align Sizes"
               >
                 <i class="bi-arrows-fullscreen" style="font-size: 1rem"></i>
               </button>
-              <ul class="dropdown-menu"></ul>
+              <ul class="dropdown-menu">
+                <li>
+                  <a href="#" class="dropdown-item awidth">
+                    <i class="bi-justify" style="font-size: 1rem"></i>
+                    Align Width</a
+                  >
+                </li>
+                <li>
+                  <a href="#" class="dropdown-item aheight">
+                    <i class="bi-justify" style="font-size: 1rem"></i>
+                    Align Height</a
+                  >
+                </li>
+                <li>
+                  <a href="#" class="dropdown-item asize">
+                    <i class="bi-arrows-fullscreen" style="font-size: 1rem"></i>
+                    Width &amp; Height</a
+                  >
+                </li>
+                <li>
+                  <a href="#" class="dropdown-item amagnification">
+                    <i class="bi-arrows-fullscreen" style="font-size: 1rem"></i>
+                    Align Magnification</a
+                  >
+                </li>
+              </ul>
+            </div>
+
+            <!-- Download and Script export buttons -->
+            <button type="button" class="btn btn-primary btn-sm">
+              Exporting Figure
+              <i class="bi-arrow-repeat" style="font-size: 1rem"></i>
+            </button>
+
+            <a
+              id="pdf_download"
+              href="#"
+              target="_blank"
+              class="btn btn-primary btn-sm"
+              ><i class="bi-download"></i
+            ></a>
+
+            <button type="button" class="btn btn-danger btn-sm">
+              <i class="bi-exclamation-triangle"></i>
+            </button>
+
+            <div class="btn-group">
+              <button type="button" class="btn btn-success">Export PDF</button>
+              <button
+                type="button"
+                class="btn btn-success dropdown-toggle dropdown-toggle-split"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                <span class="visually-hidden">Toggle Dropdown</span>
+              </button>
+              <ul class="dropdown-menu export_options" role="menu">
+                <!-- NB: data-export-option attr used to label export button & handled by js on click -->
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="#"
+                    data-export-option="PDF"
+                    title="Export figure as PDF"
+                  >
+                    <i class="bi-check-lg"></i>
+                    PDF</a
+                  >
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="#"
+                    data-export-option="PDF & images"
+                    title="Export as PDF, in zip with panel images"
+                  >
+                    <i class="bi-check-lg" style="visibility: hidden"></i>
+                    PDF with images</a
+                  >
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="#"
+                    data-export-option="TIFF"
+                    title="Export figure as a TIFF image per page"
+                  >
+                    <i class="bi-check-lg"></i>
+                    TIFF (300 dpi)</a
+                  >
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="#"
+                    data-export-option="TIFF & images"
+                    title="Export as TIFF, in zip with panel images"
+                  >
+                    <i class="bi-check-lg"></i>
+                    TIFF with images</a
+                  >
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="#"
+                    data-export-option="to OMERO"
+                    title="Export each page as an Image in OMERO"
+                  >
+                    <i class="bi-check-lg"></i>
+                    New OMERO Image</a
+                  >
+                </li>
+              </ul>
             </div>
           </form>
         </div>
