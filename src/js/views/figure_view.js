@@ -13,6 +13,7 @@
     import {RoiModalView} from "./roi_modal_view";
     import {LegendView} from "./legend_view";
     import {LabelFromMapsModal} from "./labels_from_maps_modal";
+    import PanelView from "./panel_view";
 
     // var SelectionView = Backbone.View.extend({
     var FigureView = Backbone.View.extend({

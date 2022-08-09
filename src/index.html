@@ -7,15 +7,19 @@
 
     <script>
       // These are updated by views.py when serving this page
-      const BASE_WEBFIGURE_URL = "http://localhost:4080/figure/";
+      const BASE_OMEROWEB_URL = "http://localhost:4080/"
+      const BASE_WEBFIGURE_URL = BASE_OMEROWEB_URL + "figure/";
+      const WEBGATEWAYINDEX = BASE_OMEROWEB_URL + "/webgateway";
       const APP_ROOT_URL = "";
       const USER_ID = 0;
-      console.log(
-        "BASE_WEBFIGURE_URL",
-        BASE_WEBFIGURE_URL,
-        "APP_ROOT_URL",
-        APP_ROOT_URL
-      );
+      const PING_URL = "";
+      const USER_FULL_NAME = "OME";
+      // TODO: const LENGTH_UNITS = {{ lengthUnits|safe }};
+      const IS_PUBLIC_USER = false;
+      // Images larger than this are 'big' tiled images
+      const MAX_PLANE_SIZE = 10188864;
+
+      const LOCAL_STORAGE_RECOVERED_FIGURE = "recoveredFigure" + USER_ID;
     </script>
   </head>
   <body>

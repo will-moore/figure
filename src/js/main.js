@@ -14,6 +14,7 @@ import LutPickerView from "./views/lutpicker";
 import FigureView from "./views/figure_view";
 import SvgView from "./views/svg_model_view";
 import RightPanelView from "./views/right_panel_view";
+import { UndoManager, UndoView } from "./models/undo";
 
 export const figureModel = new FigureModel();
 
@@ -57,9 +58,16 @@ Backbone.sync = function (method, model, options, error) {
   ]);
 };
 
-var view = new FigureView({ model: figureModel }); // uiState: uiState
-var svgView = new SvgView({ model: figureModel });
+new FigureView({ model: figureModel }); // uiState: uiState
+new SvgView({ model: figureModel });
 new RightPanelView({ model: figureModel });
+
+if (PING_URL){
+  // keep-alive ping every minute, so that OMERO session doesn't die
+  setInterval(function () {
+    fetch(PING_URL);
+  }, 60000);
+}
 
 // Undo Model and View
 var undoManager = new UndoManager({ figureModel: figureModel }),

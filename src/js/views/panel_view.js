@@ -1,14 +1,18 @@
 
+    import Backbone from "backbone";
+    import _ from "underscore";
+    import $ from "jquery";
+    
     // -------------------------Panel View -----------------------------------
     // A Panel is a <div>, added to the #paper by the FigureView below.
     var PanelView = Backbone.View.extend({
         tagName: "div",
         className: "imagePanel",
-        template: JST["src/templates/figure_panel_template.html"],
-        label_template: JST["src/templates/labels/label_template.html"],
-        label_vertical_template: JST["src/templates/labels/label_vertical_template.html"],
-        label_table_template: JST["src/templates/labels/label_table_template.html"],
-        scalebar_template: JST["src/templates/scalebar_panel_template.html"],
+        template: _.template("src/templates/figure_panel_template.html"),
+        label_template: _.template("src/templates/labels/label_template.html"),
+        label_vertical_template: _.template("src/templates/labels/label_vertical_template.html"),
+        label_table_template: _.template("src/templates/labels/label_table_template.html"),
+        scalebar_template: _.template("src/templates/scalebar_panel_template.html"),
 
 
         initialize: function(opts) {
@@ -278,3 +282,5 @@
             return this;
         }
     });
+
+    export default PanelView
