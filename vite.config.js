@@ -12,7 +12,7 @@ export default {
     hot: true
   },
   build: {
-    // Put 'dist' at top level, not inside src/
-    outDir: "../dist"
+    // output into Django's static dir
+    outDir: "../omero_figure/static/omero_figure/"
   }
 }
