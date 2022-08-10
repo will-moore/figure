@@ -11,10 +11,13 @@
                 <ul class="dropdown-menu pull-right">
                     <li role="presentation" class="dropdown-header">Create Label(s) From:</li>
                     <li role="presentation" class="divider"></li>
-                    <li><a href="#" data-label="[image-name]">Image Name</a></li>
-                    <li><a href="#" data-label="[dataset-name]">Dataset Name</a></li>
+                    <li><a href="#" data-label="[image.name]">Image Name</a></li>
+                    <li><a href="#" data-label="[dataset.name]">Dataset Name</a></li>
                     <li title="Create labels from active Channels on the selected panel">
-                        <a href="#" data-label="[channels]">Channels</a>
+                        <a href="#" data-label="[channels labels]">Channels (separate labels)</a>
+                    </li>
+                    <li title="Create labels from active Channels on the selected panel">
+                        <a href="#" data-label="[channels]">Channels (single label)</a>
                     </li>
                     <li title="Create labels from Tags on this Image in OMERO">
                         <a href="#" data-label="[tags]">Tags</a>
@@ -23,25 +26,31 @@
                         <a href="#" data-label="[key-values]">Key-Value Pairs</a>
                     </li>
                     <li title="Add a label that shows the current T-index">
-                        <a href="#" data-label="[time-index]">Time (T-index)</a>
+                        <a href="#" data-label="[time.index]">Time (T-index)</a>
                     </li>
                     <li class="add_time_label" title="Label shows time in milliseconds">
-                        <a href="#" data-label="[time-milliseconds]">Time (milliseconds)</a>
+                        <a href="#" data-label="[time.milliseconds]">Time (milliseconds)</a>
                     </li>
                     <li class="add_time_label">
-                        <a href="#" data-label="[time-secs]">Time (seconds)</a>
+                        <a href="#" data-label="[time.secs]">Time (seconds)</a>
                     </li>
                     <li class="add_time_label">
-                        <a href="#" data-label="[time-mins]">Time (mins)</a>
+                        <a href="#" data-label="[time.mins]">Time (mins)</a>
                     </li>
                     <li class="add_time_label" title="Label shows time in mins:secs">
-                        <a href="#" data-label="[time-mins:secs]">Time (mins:secs)</a>
+                        <a href="#" data-label="[time.mins:secs]">Time (mins:secs)</a>
                     </li>
                     <li class="add_time_label">
-                        <a href="#" data-label="[time-hrs:mins:secs]">Time (hrs:mins:secs)</a>
+                        <a href="#" data-label="[time.hrs:mins:secs]">Time (hrs:mins:secs)</a>
                     </li>
                     <li class="add_time_label">
-                        <a href="#" data-label="[time-hrs:mins]">Time (hrs:mins)</a>
+                        <a href="#" data-label="[time.hrs:mins]">Time (hrs:mins)</a>
+                    </li>
+                    <li title="Add a label that shows the viewport X and Y in pixels">
+                        <a href="#" data-label="X: [x.pixel] Y: [y.pixel]">X and Y (pixel or unit)</a>
+                    </li>
+                    <li  title="Add a label that shows the current Z-index">
+                        <a href="#" data-label="Z: [z.pixel]">Z (pixel or unit)</a>
                     </li>
                 </ul>
             </div>

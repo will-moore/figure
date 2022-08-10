@@ -1,7 +1,7 @@
     
     // Version of the json file we're saving.
     // This only needs to increment when we make breaking changes (not linked to release versions.)
-    var VERSION = 5;
+    var VERSION = 6;
 
 
     // ------------------------- Figure Model -----------------------------------
@@ -220,6 +220,44 @@
                         });
                     });
                 }
+            }
+            
+            if (v < 6) {
+                console.log("Transforming to VERSION 6");
+                // Adding the Z scale to the model
+                var iids = [];
+                _.each(json.panels, function(p) {
+                    if (iids.indexOf(p.imageId) == -1) {
+                        iids.push(p.imageId)
+                    }
+                });
+                if (iids.length > 0) {
+                    zUrl = BASE_WEBFIGURE_URL + 'z_scale/';
+                    zUrl += '?image=' + iids.join('&image=');
+                    $.getJSON(zUrl, function(data) {
+                        // Update all panels
+                        // NB: By the time that this callback runs, the panels will have been created
+                        self.panels.forEach(function(p){
+                            var iid = p.get('imageId');
+                            if (data[iid]) {
+                                p.set('pixel_size_z', data[iid].valueZ);
+                                p.set('pixel_size_z_symbol', data[iid].symbolZ);
+                                p.set('pixel_size_z_unit', data[iid].unitZ);
+                            }
+                        });
+                    });
+                }
+
+                // Converting the time-labels to V6 syntax, all other special label were converted to text
+                _.each(json.panels, function(p) {
+                    for (var i=0; i<p["labels"].length; i++){
+                        label = p["labels"][i];
+                        if (label["time"]) {
+                            label["text"] = "[time."+label["time"]+"]";
+                            delete label.time;
+                        }
+                    }
+                });
             }
 
             return json;
@@ -457,8 +495,11 @@
                         'datasetId': data.meta.datasetId,
                         'pixel_size_x': data.pixel_size.valueX,
                         'pixel_size_y': data.pixel_size.valueY,
+                        'pixel_size_z': data.pixel_size.valueZ,
                         'pixel_size_x_symbol': data.pixel_size.symbolX,
+                        'pixel_size_z_symbol': data.pixel_size.symbolZ,
                         'pixel_size_x_unit': data.pixel_size.unitX,
+                        'pixel_size_z_unit': data.pixel_size.unitZ,
                         'deltaT': data.deltaT,
                     };
                     if (baseUrl) {
