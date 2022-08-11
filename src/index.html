@@ -7,7 +7,7 @@
 
     <script>
       // These are updated by views.py when serving this page
-      const BASE_OMEROWEB_URL = "http://localhost:4080/"
+      const BASE_OMEROWEB_URL = "http://localhost:4080/";
       const BASE_WEBFIGURE_URL = BASE_OMEROWEB_URL + "figure/";
       const WEBGATEWAYINDEX = BASE_OMEROWEB_URL + "/webgateway";
       const APP_ROOT_URL = "";
@@ -22,8 +22,11 @@
       const LOCAL_STORAGE_RECOVERED_FIGURE = "recoveredFigure" + USER_ID;
     </script>
 
-  <!-- Use cdn for vite, but this is served from static by Django -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
+    <!-- Use cdn for vite, but this is served from static by Django -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css"
+    />
   </head>
   <body>
     <!-- Welcome splash-screen Modal -->
