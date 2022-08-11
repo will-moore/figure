@@ -25,7 +25,9 @@
             this.listenTo(this.model,
                 'change:zoom change:dx change:dy change:width change:height change:channels change:theZ change:theT change:z_start change:z_end change:z_projection change:min_export_dpi',
                 this.render_image);
-            this.listenTo(this.model, 'change:labels change:theT change:deltaT', this.render_labels);
+            this.listenTo(this.model,
+                'change:channels change:zoom change:dx change:dy change:width change:height change:rotation change:labels change:theT change:deltaT change:theZ change:deltaZ change:z_projection change:z_start change:z_end',
+                this.render_labels);
             this.listenTo(this.model, 'change:shapes', this.render_shapes);
 
             // During drag or resize, model isn't updated, but we trigger 'drag'
@@ -192,12 +194,37 @@
                         ljson.color = '000000';
                     }
                 }
-                if (typeof ljson.text == 'undefined' && ljson.time) {
-                    ljson.text = self.model.get_time_label_text(ljson.time);
-                } else {
-                    // Markdown also escapes all labels so they are safe
-                    ljson.text = markdown.toHTML(ljson.text);
+                const matches = [...ljson.text.matchAll(/\[.+?\]/g)]; // Non greedy regex capturing expressions in []
+                if (matches.length>0){ 
+                    var new_text = "";
+                    var last_idx = 0;
+                    for (const match of matches) {// Loops on the match to replace in the ljson.text the expression by their values
+                        var new_text = new_text + ljson.text.slice(last_idx, match.index);
+                        expr = match[0].slice(1,-1).split(".");
+                        var label_value = ""
+                        if (['time', 't'].includes(expr[0])) {
+                            label_value = self.model.get_time_label_text(expr[1] ? expr[1] : "index");
+                        } else if (['image', 'dataset'].includes(expr[0])){
+                            label_value = self.model.get_name_label_text(expr[0], expr[1] ? expr[1] : "name");
+                            //Escape the underscore for markdown
+                            label_value = label_value.replaceAll("_", "\\_");
+                        } else if (['x', 'y', 'z', 'width', 'height', 'w', 'h', 'rotation', 'rot'].includes(expr[0])){
+                            label_value = self.model.get_view_label_text(expr[0], expr[1] ? expr[1] : "pixel");
+                        } else if (['channels', 'c'].includes(expr[0])) {
+                            label_value = self.model.get_channels_label_text();
+                        }
+
+                        //If label_value hasn't been created (invalid expr[0])
+                        //  or is empty (invalid expr[1]), the expr is kept unmodified
+                        new_text = new_text + (label_value?label_value:match[0]); 
+                        last_idx = match.index + match[0].length;
+                    }
+                    ljson.text = new_text + ljson.text.slice(last_idx);
                 }
+
+                // Markdown also escapes all labels so they are safe
+                ljson.text = markdown.toHTML(ljson.text);
+
                 positions[l.position].push(ljson);
             });
 

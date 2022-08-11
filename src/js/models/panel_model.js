@@ -23,6 +23,7 @@
             selected: false,
             pixel_size_x_symbol: '\xB5m',     // microns by default
             pixel_size_x_unit: 'MICROMETER',
+            rotation_symbol: '\xB0',
             max_export_dpi: 1000,
 
             // 'export_dpi' optional value to resample panel on export
@@ -96,10 +97,14 @@
                 'orig_width': data.orig_width,
                 'orig_height': data.orig_height,
                 'datasetName': data.datasetName,
+                'datasetId': data.datasetId,
                 'pixel_size_x': data.pixel_size_x,
                 'pixel_size_y': data.pixel_size_y,
+                'pixel_size_z': data.pixel_size_z,
                 'pixel_size_x_symbol': data.pixel_size_x_symbol,
+                'pixel_size_z_symbol': data.pixel_size_z_symbol,
                 'pixel_size_x_unit': data.pixel_size_x_unit,
+                'pixel_size_z_unit': data.pixel_size_z_unit,
                 'deltaT': data.deltaT,
             };
 
@@ -266,6 +271,17 @@
             this.add_labels(newLabels);
         },
 
+        get_channels_label_text: function() {
+            var text = "";
+            _.each(this.get('channels'), function(c){
+                if (c.active) {
+                    if (text==="") text = c.label
+                    else text = text + " " + c.label
+                }
+            });
+            return text?text:" ";
+        },
+
         getDeltaT: function() {
             var theT = this.get('theT');
             return this.get('deltaT')[theT] || 0;
@@ -284,25 +300,27 @@
             if (format === "index") {
                 isNegative = false;
                 text = "" + (theT + 1);
-            } else if (format === "milliseconds") {
+            } else if (['milliseconds', 'ms'].includes(format)) {
                 text = Math.round(deltaT*1000) + " ms";
-            } else if (format === "secs") {
+            } else if (['seconds', 'secs', 's'].includes(format)) {
                 text = Math.round(deltaT) + " s";
-            } else if (format === "mins:secs") {
+            } else if (['minutes', 'mins', 'm'].includes(format)) {
+                text = Math.round(deltaT / 60) + " mins";
+            } else if (["mins:secs", "m:s"].includes(format)) {
                 m = parseInt(deltaT / 60);
                 s = pad(Math.round(deltaT % 60));
                 text = m + ":" + s;
-            } else if (format === "mins") {
-                text = Math.round(deltaT / 60) + " mins";
-            } else if (format === "hrs:mins") {
+            } else if (["hrs:mins", "h:m"].includes(format)) {
                 h = parseInt(deltaT / 3600);
                 m = pad(Math.round((deltaT % 3600) / 60));
                 text = h + ":" + m;
-            } else if (format === "hrs:mins:secs") {
+            } else if (["hrs:mins:secs", "h:m:s"].includes(format)) {
                 h = parseInt(deltaT / 3600);
                 m = pad(parseInt((deltaT % 3600) / 60));
                 s = pad(Math.round(deltaT % 60));
                 text = h + ":" + m + ":" + s;
+            } else { // Format unknown
+                return ""
             }
             if (["0 s", "0:00", "0 mins", "0:00:00"].indexOf(text) > -1) {
                 isNegative = false;
@@ -310,18 +328,80 @@
             return (isNegative ? '-' : '') + text;
         },
 
-        create_labels_from_time: function(options) {
+        get_name_label_text: function(property, format) {
+            var text = "";
+            if (property === "image") {
+                if (format === "id") {
+                    text = ""+this.get('imageId');
+                } else if (format === "name") {
+                    var pathnames = this.get('name').split('/');
+                    text = pathnames[pathnames.length-1];
+                }
+            } else if (property === "dataset"){
+                if (format === "id") {
+                    text = ""+this.get('datasetId');
+                } else if (format === "name") {
+                    text = this.get('datasetName') ? this.get('datasetName') : "No/Many Datasets";
+                }
+            }
+            return text;
+        },
+
+        get_view_label_text: function(property, format) {
+            if (format === "px") format = "pixel";
+
+            if (property === "w") property = "width";
+            else if (property === "h") property = "height";
+            else if (property === "rot") property = "rotation";
+
             
-            this.add_labels([{
-                    'time': options.format,
-                    'size': options.size,
-                    'position': options.position,
-                    'color': options.color
-            }]);
+            x_symbol = this.get('pixel_size_x_symbol');
+            z_symbol = this.get('pixel_size_z_symbol');
+            z_symbol = z_symbol?z_symbol:x_symbol // Using x symbol when z not defined
+            x_size = this.get('pixel_size_x');
+            y_size = this.get('pixel_size_y');
+            z_size = this.get('pixel_size_z');
+            z_size = z_size?z_size:0
+
+            var text = "";
+            if (property === "z") {
+                if (this.get('z_projection')) {
+                    start = this.get('z_start');
+                    end = this.get('z_end');
+                    if (format === "pixel") {
+                        text = "" + (start+1) + " - " + (end+1);
+                    } else if (format === "unit"){
+                        start = (start * z_size).toFixed(2)
+                        end = (end * z_size).toFixed(2)
+                        text = ""+ start +" "+ z_symbol
+                               + " - " + end +" "+ z_symbol
+                    }
+                }
+                else {
+                    var theZ = this.get('theZ');
+                    if (format === "pixel") {
+                        text = "" + (theZ + 1);
+                    } else if (format === "unit"){
+                        text = ""+ (theZ * z_size).toFixed(2) +" "+ z_symbol
+                    }
+                }
+                return text
+            }
+            viewport = this.getViewportAsRect();
+            value = viewport[property];
+            if (property === "rotation") {
+                return ""+parseInt(value)+"°";
+            } else if (format === "pixel") {
+                return ""+parseInt(value);
+            } else if (format === "unit") {
+                scale = ['x', 'width'].includes(property) ? x_size : y_size
+                text = ""+ (value * scale).toFixed(2) +" "+ x_symbol
+            }
+            return text
         },
 
         get_label_key: function(label) {
-            var key = (label.text || label.time) + '_' + label.size + '_' + label.color + '_' + label.position;
+            var key = label.text + '_' + label.size + '_' + label.color + '_' + label.position;
             key = _.escape(key);
             return key;
         },

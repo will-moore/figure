@@ -344,21 +344,9 @@
 
             var selected = this.model.getSelected();
 
-            if (label_text == '[channels]') {
+            if (label_text == '[channels labels]') {
                 selected.forEach(function(m) {
                     m.create_labels_from_channels({position:position, size:font_size});
-                });
-                return false;
-            }
-
-            if (label_text.slice(0, 5) == '[time') {
-                var format = label_text.slice(6, -1);   // 'secs', 'hrs:mins' etc
-                selected.forEach(function(m) {
-                    m.create_labels_from_time({format: format,
-                            position:position,
-                            size:font_size,
-                            color: color
-                    });
                 });
                 return false;
             }
@@ -390,12 +378,6 @@
             };
 
             selected.forEach(function(m) {
-                if (label_text === "[image-name]") {
-                    var pathnames = m.get('name').split('/');
-                    label.text = pathnames[pathnames.length-1];
-                } else if (label_text === "[dataset-name]") {
-                    label.text = m.get('datasetName') ? m.get('datasetName') : "No/Many Datasets";
-                }
                 m.add_labels([label]);
             });
             return false;
@@ -520,12 +502,6 @@
             key = _.escape(key);
             var new_label = {text:label_text, size:font_size, position:position, color:color};
 
-            // if we're editing a 'time' label, preserve the 'time' attribute
-            if (label_text.slice(0, 5) == '[time') {
-                new_label.text = undefined;                 // no 'text'
-                new_label.time = label_text.slice(6, -1);   // 'secs', 'hrs:mins' etc
-            }
-
             var newlbls = {};
             newlbls[key] = new_label;
 
@@ -547,10 +523,6 @@
                     var key = m.get_label_key(l),
                         ljson = $.extend(true, {}, l);
                         ljson.key = key;
-                    if (typeof ljson.text == 'undefined' && ljson.time) {
-                        // show time labels as they are in 'new label' form
-                        ljson.text = '[time-' + ljson.time + "]"
-                    }
                     positions[l.position][key] = ljson;
                 });
             });

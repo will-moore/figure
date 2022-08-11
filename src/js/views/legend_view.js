@@ -147,11 +147,14 @@ export const LegendView = Backbone.View.extend({
                 var html = '<textarea class="form-control" rows="9" style="resize:none">'
                             + legendText + '</textarea>';
                 $legend.html(html);
+                // Show above the right-hand panel when editing
+                $(".legend-container").css("z-index", 100);
             } else {
                 // ...only show 'edit' button
                 $edit.show();
                 $save.hide();
                 $cancel.hide();
+                $(".legend-container").css("z-index", 1);
 
                 $panel.removeClass('editing');
                 if (legendText.length === 0) {

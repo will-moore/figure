@@ -1,4 +1,7 @@
 
+const SLIDER_INCR_CUTOFF = 100;
+// If the max value of a slider is below this, use smaller slider increments
+
 var ChannelSliderView = Backbone.View.extend({
 
     template: JST["src/templates/channel_slider_template.html"],
@@ -141,7 +144,7 @@ var ChannelSliderView = Backbone.View.extend({
         var idx = event.target.getAttribute('data-idx'),
             startEnd = event.target.getAttribute('data-window');  // 'start' or 'end'
         idx = parseInt(idx, 10);
-        var value = parseInt(event.target.value, 10);
+        var value = parseFloat(event.target.value, 10);
         if (isNaN(value)) return;
         // Make sure 'start' < 'end' value
         if (event.target.getAttribute('max') && value > event.target.getAttribute('max')){
@@ -236,12 +239,20 @@ var ChannelSliderView = Backbone.View.extend({
                 var actives = chData.map(getActive(chIdx));
                 var labels = chData.map(getLabel(chIdx));
                 // Reduce lists into summary for this channel
-                var startAvg = parseInt(starts.reduce(addFn, 0) / starts.length, 10);
-                var endAvg = parseInt(ends.reduce(addFn, 0) / ends.length, 10);
+                var startAvg = starts.reduce(addFn, 0) / starts.length;
+                var endAvg = ends.reduce(addFn, 0) / ends.length;
                 var startsNotEqual = starts.reduce(allEqualFn, starts[0]) === undefined;
                 var endsNotEqual = ends.reduce(allEqualFn, ends[0]) === undefined;
                 var min = mins.reduce(reduceFn(Math.min));
                 var max = maxs.reduce(reduceFn(Math.max));
+                if (max > SLIDER_INCR_CUTOFF) {
+                    // If we have a large range, use integers, otherwise format to 2dp
+                    startAvg = parseInt(startAvg);
+                    endAvg = parseInt(endAvg);
+                } else {
+                    startAvg = startAvg.toFixed(2);
+                    endAvg = endAvg.toFixed(2);
+                }
                 var color = colors.reduce(allEqualFn, colors[0]) ? colors[0] : 'ccc';
                 // allEqualFn for booleans will return undefined if not or equal
                 var label = labels.reduce(allEqualFn, labels[0]) ? labels[0] : ' ';
@@ -282,10 +293,13 @@ var ChannelSliderView = Backbone.View.extend({
                 //     range: true,
                 //     min: min,
                 //     max: max,
+                //     step: (max > SLIDER_INCR_CUTOFF) ? 1 : 0.01,
                 //     values: [startAvg, endAvg],
                 //     slide: function(event, ui) {
-                //         $('.ch_start input', $div).val(ui.values[0]);
-                //         $('.ch_end input', $div).val(ui.values[1]);
+                //         let chStart = (max > SLIDER_INCR_CUTOFF) ? ui.values[0] : ui.values[0].toFixed(2);
+                //         let chEnd = (max > SLIDER_INCR_CUTOFF) ? ui.values[1] : ui.values[1].toFixed(2);
+                //         $('.ch_start input', $div).val(chStart);
+                //         $('.ch_end input', $div).val(chEnd);
                 //     },
                 //     stop: function(event, ui) {
                 //         self.models.forEach(function(m) {
@@ -293,9 +307,9 @@ var ChannelSliderView = Backbone.View.extend({
                 //         });
                 //     }
                 // })
-                // Need to add background style to newly created div.ui-slider-range
-                .children('.ui-slider-range').css(style)
-                .addClass(sliderClass);
+                // // Need to add background style to newly created div.ui-slider-range
+                // .children('.ui-slider-range').css(style)
+                // .addClass(sliderClass);
 
             }.bind(this));
         return this;
