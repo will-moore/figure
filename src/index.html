@@ -892,9 +892,10 @@
             >
               &times;
             </button>
-            <h4 class="modal-title">Markdown Formatting</h4>
+            <h4 class="modal-title">Label Formatting</h4>
           </div>
-          <div class="modal-body">
+          <div class="modal-body" style="max-height: 518px">
+            <h4>Markdown formatting</h4>
             <p>
               You can use "Markdown" syntax to add formatting to plain text. For
               example, **this text will be bold** and this *word* will be
@@ -924,6 +925,56 @@
               </tr>
               <!--  <tr><td>You need to use 2 line breaks between paragraphs</td><td></td></tr> -->
             </table>
+            <h4>Dynamic properties</h4>
+            <p>
+              The drop-down menu in the 'Add Labels' form allows you to create
+              labels based on Image metadata. Labels created with square
+              brackets indicate dynamic properties. The properties within the
+              square brackets will be dynamically updated upon changes.
+              Additional text can be added outside the square brackets and will
+              not be affected when the labels are displayed.<br />
+              The following table shows some examples, including the use of
+              dynamic properties and markdown together.
+            </p>
+            <table class="table">
+              <tr>
+                <td></td>
+                <th>This text will be formatted to...</th>
+                <th>...this text</th>
+              </tr>
+              <tr></tr>
+              <tr>
+                <th>X and Y in pixels</th>
+                <td>X:[x.pixel] - Y:[y.pixel]</td>
+                <td>X:52 - Y:89</td>
+              </tr>
+              <tr>
+                <th>X and Y in units</th>
+                <td>X:[x.unit] - Y:[y.unit]</td>
+                <td>X:0.43 &#181;m - Y:0.23 &#181;m</td>
+              </tr>
+              <tr>
+                <th>Width</th>
+                <td>Width: [width.pixel]</td>
+                <td>Width: 400</td>
+              </tr>
+              <tr>
+                <th>Height (with markdown formatting)</th>
+                <td>*Height*: **[height.pixel]**</td>
+                <td><i>Height</i>: <strong>300</strong></td>
+              </tr>
+              <tr>
+                <th>Image ID</th>
+                <td>Image ID: [image.id]</td>
+                <td>Image ID: 23556</td>
+              </tr>
+              <tr>
+                <th>Dataset ID</th>
+                <td>Dataset ID: [dataset.id]</td>
+                <td>Dataset ID: 1654</td>
+              </tr>
+            </table>
+            <h4>Legend</h4>
             <p>
               The figure legend will be included in the PDF info page when the
               figure is exported.
