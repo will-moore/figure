@@ -1,6 +1,8 @@
 // Import our custom CSS based on bootstrap
 import "../scss/styles.scss";
 
+import "../css/figure.css";
+
 // Import all of Bootstrap's JS
 import * as bootstrap from "bootstrap";
 

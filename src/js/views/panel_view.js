@@ -2,17 +2,23 @@
     import Backbone from "backbone";
     import _ from "underscore";
     import $ from "jquery";
+
+    import figure_panel_template from '../../templates/figure_panel.template.html?raw';
+    import label_template from '../../templates/labels/label.template.html?raw';
+    import label_vertical_template from '../../templates/labels/label_vertical.template.html?raw';
+    import label_table_template from '../../templates/labels/label_table.template.html?raw';
+    import scalebar_panel_template from '../../templates/scalebar_panel.template.html?raw';
     
     // -------------------------Panel View -----------------------------------
     // A Panel is a <div>, added to the #paper by the FigureView below.
     var PanelView = Backbone.View.extend({
         tagName: "div",
         className: "imagePanel",
-        template: _.template("src/templates/figure_panel_template.html"),
-        label_template: _.template("src/templates/labels/label_template.html"),
-        label_vertical_template: _.template("src/templates/labels/label_vertical_template.html"),
-        label_table_template: _.template("src/templates/labels/label_table_template.html"),
-        scalebar_template: _.template("src/templates/scalebar_panel_template.html"),
+        template: _.template(figure_panel_template),
+        label_template: _.template(label_template),
+        label_vertical_template: _.template(label_vertical_template),
+        label_table_template: _.template(label_table_template),
+        scalebar_template: _.template(scalebar_panel_template),
 
 
         initialize: function(opts) {
