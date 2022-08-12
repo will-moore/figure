@@ -1,10 +1,20 @@
 
+import Backbone from "backbone";
+import _ from "underscore";
+import $ from "jquery";
+
+import LutPickerView from "./lutpicker";
+const FigureLutPicker = new LutPickerView();
+
+import channel_slider_template from '../../templates/channel_slider.template.html?raw';
+
+
 const SLIDER_INCR_CUTOFF = 100;
 // If the max value of a slider is below this, use smaller slider increments
 
 var ChannelSliderView = Backbone.View.extend({
 
-    template: JST["src/templates/channel_slider_template.html"],
+    template: _.template(channel_slider_template),
 
     initialize: function(opts) {
         // This View may apply to a single PanelModel or a list
@@ -315,3 +325,5 @@ var ChannelSliderView = Backbone.View.extend({
         return this;
     }
 });
+
+export default ChannelSliderView

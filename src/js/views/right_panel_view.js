@@ -8,6 +8,9 @@
     import $ from "jquery";
 
     import FigureModel from "../models/figure_model";
+    import InfoPanelView from "./info_panel_view";
+    import ChannelSliderView from "./channel_slider_view";
+    import ScalebarFormView from "./scalebar_form_view";
 
 
     var RightPanelView = Backbone.View.extend({
@@ -1274,7 +1277,7 @@
                 var anyBig = this.models.any(function(m){return m.is_big_image()});
                 // if all panels have sizeZ == 1, don't allow z_projection
                 // Don't currently support Z_projection on Big images.
-                z_projection_disabled = ((sum_sizeZ === this.models.length) || anyBig);
+                const z_projection_disabled = ((sum_sizeZ === this.models.length) || anyBig);
 
                 html = this.template({
                     'z_projection_disabled': z_projection_disabled,

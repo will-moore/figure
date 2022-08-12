@@ -1,8 +1,15 @@
 
+import Backbone from "backbone";
+import _ from "underscore";
+import $ from "jquery";
+
+import scalebar_form_template from '../../templates/scalebar_form.template.html?raw';
+
+
 // Created new for each selection change
 var ScalebarFormView = Backbone.View.extend({
 
-    template: JST["src/templates/scalebar_form_template.html"],
+    template: _.template(scalebar_form_template),
 
     initialize: function(opts) {
 
@@ -118,12 +125,12 @@ var ScalebarFormView = Backbone.View.extend({
         // Turn dict into list of units we can sort by size
         var scalebarUnits = ["PICOMETER", "ANGSTROM", "NANOMETER", "MICROMETER",
             "MILLIMETER", "CENTIMETER", "METER", "KILOMETER", "MEGAMETER"]
-        var unit_symbols = Object.keys(window.LENGTH_UNITS)
+        var unit_symbols = Object.keys(LENGTH_UNITS)
             .filter(function(unit){
                 return (scalebarUnits.indexOf(unit) > -1);
             })
             .map(function(unit){
-                return $.extend({unit: unit}, window.LENGTH_UNITS[unit]);
+                return $.extend({unit: unit}, LENGTH_UNITS[unit]);
             });
         unit_symbols.sort(function(a, b){
             return a.microns > b.microns ? 1 : -1;
@@ -198,3 +205,5 @@ var ScalebarFormView = Backbone.View.extend({
         return this;
     }
 });
+
+export default ScalebarFormView

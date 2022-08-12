@@ -17,6 +17,9 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+import $ from "jquery";
+
+
 // http://www.sitepoint.com/javascript-json-serialization/
 JSON.stringify = JSON.stringify || function (obj) {
     var t = typeof (obj);
@@ -126,7 +129,7 @@ if (OME === undefined) {
     var OME = {};
 }
 
-OPEN_WITH = [];
+export let OPEN_WITH = [];
 
 OME.setOpenWithEnabledHandler = function(id, fn) {
     // look for id in OPEN_WITH
@@ -185,7 +188,8 @@ var rotatePoint = function (x, y, cx, cy, rotation) {
 $(function(){
 
 
-    $(".draggable-dialog").draggable();
+    // TODO: find replacement for jquery-ui
+    // $(".draggable-dialog").draggable();
 
     $('#previewInfoTabs a').click(function (e) {
         e.preventDefault();

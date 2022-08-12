@@ -206,8 +206,8 @@
                 max_y = Math.max(max_y, y+h);
             });
 
-            min_x = selected.getMin('x');
-            min_y = selected.getMin('y');
+            const min_x = selected.getMin('x');
+            const min_y = selected.getMin('y');
 
 
 
