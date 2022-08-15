@@ -651,11 +651,11 @@
         overflow-y: auto;
     }
     .non-modal-dialog {
-        position:relative;
         left:auto;
         margin-right:20px;
         padding-top:0;
         top:55px;
+        right: 20px;
         width:375px;
         z-index:50;
     }

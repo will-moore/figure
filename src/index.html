@@ -1608,6 +1608,115 @@
       </div>
     </main>
 
+
+    <!-- Hacked Bootstrap's modal dialog to be non-modal non-modal-dialog -->
+    <div class="modal non-modal-dialog" style="display: block; left:auto">
+      <div class="modal-content">
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="info-tab" data-bs-toggle="tab" data-bs-target="#info-tab-pane" type="button" role="tab" aria-controls="info-tab-pane" aria-selected="true">Info</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="preview-tab" data-bs-toggle="tab" data-bs-target="#preview-tab-pane" type="button" role="tab" aria-controls="preview-tab-pane" aria-selected="false">Preview</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact-tab-pane" type="button" role="tab" aria-controls="contact-tab-pane" aria-selected="false">Labels</button>
+          </li>
+        </ul>
+        <div class="tab-content" id="myTabContent">
+          <div class="tab-pane fade" id="info-tab-pane" role="tabpanel" aria-labelledby="info-tab" tabindex="0">
+            Info
+          </div>
+
+          <div class="tab-pane fade show active" id="preview-tab-pane" role="tabpanel" aria-labelledby="preview-tab" tabindex="0">
+            <div class="col-sm-2 no-padding" id="channelToggle"></div>
+            <div class="col-sm-10 no-padding" id="viewportContainer">
+              <div id="vp_z_slider" class="pull-left">
+                <button
+                  type="button"
+                  class="btn btn-link btn-sm z-decrement"
+                  title="Decrease Z-index"
+                >
+                  <span class="glyphicon glyphicon-chevron-down"></span>
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-link btn-sm z-increment"
+                  title="Increase Z-index"
+                >
+                  <span class="glyphicon glyphicon-chevron-up"></span>
+                </button>
+              </div>
+              <div id="vp_t_slider">
+                <button
+                  type="button"
+                  class="btn btn-link btn-sm time-decrement"
+                  title="Decrease T-index"
+                >
+                  <span class="glyphicon glyphicon-chevron-left"></span>
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-link btn-sm time-increment"
+                  title="Increase T-index"
+                >
+                  <span class="glyphicon glyphicon-chevron-right"></span>
+                </button>
+              </div>
+            </div>
+            <div class="clearfix" style="padding-bottom: 13px"></div>
+            <div id="channel_sliders"></div>
+            <div class="clearfix"></div>
+            <div class="tab-footer">
+              <div class="col-sm-2 no-padding">
+                <h5>Zoom</h5>
+              </div>
+              <div class="col-sm-8 no-padding">
+                <div id="vp_zoom_slider"></div>
+              </div>
+              <div
+                id="vp_zoom_value"
+                class="col-sm-2"
+                style="padding: 8px 0 0; text-align: right"
+              ></div>
+              <div class="clearfix"></div>
+              <div id="reset-zoom-view">
+                 <!-- button added by ZoomView render() -->
+              </div>
+            </div>
+          </div>
+
+          <!-- events for this pane handled by LabelsPanelView -->
+          <div class="tab-pane fade" id="contact-tab-pane" role="tabpanel" aria-labelledby="contact-tab" tabindex="0">
+            <div id="edit_rois_form"></div>
+
+            <div class="clearfix"></div>
+            <hr />
+
+            <h5>Scalebar</h5>
+            <div id="scalebar_form"></div>
+
+            <hr />
+
+            <h5 style="float: left">Add Labels</h5>
+
+            <button
+              type="button"
+              class="btn btn-link markdown-info"
+              title="Show label formatting options..."
+            >
+              Tips
+            </button>
+            <div class="clearfix"></div>
+            <form class="new-label-form form-inline" role="form"></form>
+
+            <h5>Edit Labels</h5>
+            <div id="selected_panels_labels"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script type="module" src="./js/main.js"></script>
   </body>
 </html>

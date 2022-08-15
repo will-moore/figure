@@ -43,7 +43,7 @@
             if (selected.length > 0) {
                 this.ipv = new InfoPanelView({models: selected, figureModel: this.model});
                 this.ipv.render();
-                $("#infoTab").append(this.ipv.el);
+                $("#info-tab-pane").append(this.ipv.el);
             }
 
             if (this.ctv) {
