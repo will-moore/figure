@@ -12,6 +12,14 @@
     import ChannelSliderView from "./channel_slider_view";
     import ScalebarFormView from "./scalebar_form_view";
 
+    import image_display_options_template from '../../templates/image_display_options.template.html?raw';
+    import rois_form_template from '../../templates/rois_form.template.html?raw';
+    import labels_form_inner_template from '../../templates/labels_form_inner.template.html?raw';
+    import labels_form_template from '../../templates/labels_form.template.html?raw';
+    import viewport_template from '../../templates/viewport.template.html?raw';
+    import viewport_inner_template from '../../templates/viewport_inner.template.html?raw';
+    import zoom_crop_template from '../../templates/zoom_crop.template.html?raw';
+
 
     var RightPanelView = Backbone.View.extend({
 
@@ -68,7 +76,7 @@
 
         model: FigureModel,
 
-        roisTemplate: _.template("src/templates/rois_form_template.html"),
+        roisTemplate: _.template(rois_form_template),
 
         el: $("#labelsTab"),
 
@@ -268,7 +276,7 @@
 
         model: FigureModel,
 
-        template: _.template("src/templates/labels_form_inner_template.html"),
+        template: _.template(labels_form_inner_template),
 
         el: $("#labelsTab"),
 
@@ -447,8 +455,8 @@
     // Created new for each selection change
     var SelectedPanelsLabelsView = Backbone.View.extend({
 
-        template: _.template("src/templates/labels_form_template.html"),
-        inner_template: _.template("src/templates/labels_form_inner_template.html"),
+        template: _.template(labels_form_template),
+        inner_template: _.template(labels_form_inner_template),
 
         initialize: function(opts) {
 
@@ -610,8 +618,8 @@
 
     var ImageViewerView = Backbone.View.extend({
 
-        template: _.template("src/templates/viewport_template.html"),
-        inner_template: _.template("src/templates/viewport_inner_template.html"),
+        template: _.template(viewport_template),
+        inner_template: _.template(viewport_inner_template),
 
         className: "imageViewer",
 
@@ -1050,7 +1058,7 @@
 
     var ZoomView = Backbone.View.extend({
 
-        template: _.template("src/templates/zoom_crop_template.html"),
+        template: _.template(zoom_crop_template),
 
         initialize: function(opts) {
 
@@ -1175,7 +1183,7 @@
     // Options such as Rotation, Z-Projection etc.
     var ImageDisplayOptionsView = Backbone.View.extend({
         tagName: "div",
-        template: _.template("src/templates/image_display_options_template.html"),
+        template: _.template(image_display_options_template),
 
         initialize: function(opts) {
             // This View may apply to a single PanelModel or a list

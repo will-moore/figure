@@ -246,7 +246,7 @@
                     }
                 });
                 if (iids.length > 0) {
-                    zUrl = BASE_WEBFIGURE_URL + 'z_scale/';
+                    let zUrl = BASE_WEBFIGURE_URL + 'z_scale/';
                     zUrl += '?image=' + iids.join('&image=');
                     $.getJSON(zUrl, function(data) {
                         // Update all panels
@@ -265,7 +265,7 @@
                 // Converting the time-labels to V6 syntax, all other special label were converted to text
                 _.each(json.panels, function(p) {
                     for (var i=0; i<p["labels"].length; i++){
-                        label = p["labels"][i];
+                        const label = p["labels"][i];
                         if (label["time"]) {
                             label["text"] = "[time."+label["time"]+"]";
                             delete label.time;
