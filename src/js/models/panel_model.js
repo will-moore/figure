@@ -285,7 +285,7 @@
             return this.get('deltaT')[theT] || 0;
         },
 
-        get_time_label_text: function(format) {
+        get_time_label_text: function(format, shift) {
             var pad = function(digit) {
                 var d = digit + "";
                 return d.length === 1 ? ("0"+d) : d;
@@ -294,7 +294,12 @@
                 deltaT = this.get('deltaT')[theT] || 0,
                 isNegative = (deltaT < 0),
                 text = "", h, m, s;
+
             deltaT = Math.abs(deltaT);
+            if (shift){
+                deltaT = deltaT - this.get('deltaT')[parseInt(shift)-1];
+            }
+
             if (format === "index") {
                 isNegative = false;
                 text = "" + (theT + 1);

@@ -199,7 +199,8 @@
                         expr = match[0].slice(1,-1).split(".");
                         var label_value = ""
                         if (['time', 't'].includes(expr[0])) {
-                            label_value = self.model.get_time_label_text(expr[1] ? expr[1] : "index");
+                            value = (expr[1] ? expr[1] : "index").split("-");
+                            label_value = self.model.get_time_label_text(value[0], value[1]);
                         } else if (['image', 'dataset'].includes(expr[0])){
                             label_value = self.model.get_name_label_text(expr[0], expr[1] ? expr[1] : "name");
                             //Escape the underscore for markdown
