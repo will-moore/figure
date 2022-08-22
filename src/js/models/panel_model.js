@@ -285,7 +285,7 @@
             return this.get('deltaT')[theT] || 0;
         },
 
-        get_time_label_text: function(format, shift) {
+        get_time_label_text: function(format, offset_idx) {
             var pad = function(digit) {
                 var d = digit + "";
                 return d.length === 1 ? ("0"+d) : d;
@@ -297,7 +297,7 @@
 
             deltaT = Math.abs(deltaT);
             if (shift){
-                deltaT = deltaT - this.get('deltaT')[parseInt(shift)-1];
+                deltaT = deltaT - this.get('deltaT')[parseInt(offset_idx)-1];
             }
 
             if (format === "index") {
