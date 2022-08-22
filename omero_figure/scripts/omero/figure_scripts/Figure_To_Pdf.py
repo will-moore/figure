@@ -1174,6 +1174,15 @@ class FigureExport(object):
                     else:
                         if timestamps and the_t < len(timestamps):
                             d_t = timestamps[the_t]
+                            tmp = expr[1].split("-")
+                            expr[1] = tmp[0]
+                            if len(tmp) > 1:
+                                try:
+                                    idx_ref = int(tmp[1])
+                                    if 1 <= idx_ref <= len(timestamps):
+                                        d_t -= timestamps[idx_ref-1]
+                                except ValueError:
+                                    continue
                         else:
                             d_t = 0
                         label_value = self.get_time_label_text(d_t, expr[1])
