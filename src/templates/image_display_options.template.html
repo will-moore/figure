@@ -1,7 +1,8 @@
 
-    <div class="btn-group image-display-options rotation-controls">
-        <button type="button" class="btn btn-default btn-sm show-rotation" title="Rotate image">
+    <div class="image-display-options rotation-controls">
+        <button type="button" class="btn btn-outline-secondary btn-sm show-rotation" title="Rotate image">
             <span class="glyphicon glyphicon-repeat"></span>
+            <i class="bi-arrow-clockwise" style="font-size: 1rem"></i>
             <span class="rotation_value"><%= rotation %></span> &deg;
         </button>
 
@@ -11,10 +12,10 @@
 
     <div class="btn-group image-display-options"
          title="Maximum intensity Z-projection (choose range with 2 handles on Z-slider)">
-        <button type="button" class="btn btn-default btn-sm z-projection
+        <button type="button" class="btn btn-outline-secondary btn-sm z-projection
                 <% if(z_projection) { %>zp-btn-down<% } else if (typeof z_projection == 'boolean') { %><% } else { %>ch-btn-flat<% }%>"
                 <% if (z_projection_disabled) { %>disabled="disabled"<% } %>
                 >
-            <span class="glyphicon"></span>
+            <img src="<%= projectionIconUrl %>" />
         </button>
     </div>

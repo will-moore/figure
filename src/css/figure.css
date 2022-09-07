@@ -493,6 +493,9 @@
         border: 4px solid #fff;
         cursor: pointer;
     }
+    #viewportContainer {
+        position: relative;
+    }
     #vp_z_slider, #vp_t_slider {
         background: none repeat scroll 0 0 #BBBBBB;
     }
@@ -524,11 +527,11 @@
         background: #666;
     }
     .show-rotation {
-        padding: 5px 2px;
+        padding: 2px;
         min-width: 45px;
     }
     .z-projection {
-        padding: 3px 5px 1px;
+        padding: 1px 5px 5px;
     }
     .z-projection span{
         background-image: url("../images/projection20.png");
@@ -635,6 +638,11 @@
         z-index: 100;
     }
     /* Over-riding Bootstrap Styles */
+    /* This helps with migration from bootstrap 3 to 5 */
+    .row {
+        margin-left: 0;
+        margin-right: 0;
+    }
     .alert {
         margin-bottom: 10px;
         padding: 5px;

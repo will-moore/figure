@@ -20,6 +20,8 @@
     import viewport_inner_template from '../../templates/viewport_inner.template.html?raw';
     import zoom_crop_template from '../../templates/zoom_crop.template.html?raw';
 
+    import projectionIconUrl from '../../images/projection20.png';
+
 
     var RightPanelView = Backbone.View.extend({
 
@@ -1288,6 +1290,7 @@
                 const z_projection_disabled = ((sum_sizeZ === this.models.length) || anyBig);
 
                 html = this.template({
+                    projectionIconUrl,
                     'z_projection_disabled': z_projection_disabled,
                     'rotation': rotation,
                     'z_projection': z_projection});
