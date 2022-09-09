@@ -859,7 +859,7 @@
 
     var AlignmentToolbarView = Backbone.View.extend({
 
-        el: $("#alignment-toolbar"),
+        el: $("#alignment-toolbars"),
 
         model:FigureModel,
 
@@ -872,11 +872,13 @@
             "click .aheight": "align_height",
             "click .asize": "align_size",
             "click .amagnification": "align_magnification",
+
+            "click #custom_grid_gap": "custom_grid_gap",
         },
 
         initialize: function() {
             this.listenTo(this.model, 'change:selection', this.render);
-            this.$buttons = $("button", this.$el);
+            this.$buttons = $(".alignment-buttons button", this.$el);
         },
 
         align_left: function(event) {
@@ -886,7 +888,8 @@
 
         align_grid: function(event) {
             event.preventDefault();
-            this.model.align_grid();
+            let gridGap = document.querySelector('input[name="grid_gap"]:checked').value;
+            this.model.align_grid(gridGap);
         },
 
         align_width: function(event) {
@@ -912,6 +915,21 @@
         align_top: function(event) {
             event.preventDefault();
             this.model.align_top();
+        },
+
+        custom_grid_gap: function() {
+            let current = $("#custom_grid_gap").attr("value");
+            // simple propmt to ask user for custom grid gap
+            let gridGap = prompt("Enter grid gap in pixels:", current);
+            gridGap = parseFloat(gridGap);
+            if (isNaN(gridGap)) {
+                alert("Please enter a valid number (of pixels)")
+                return;
+            }
+            // this value will get picked up as radio grid_gap value
+            $("#custom_grid_gap").attr("value", gridGap);
+            // Show the value in the drop-down menu
+            $("#custom_grid_gap_label").text("(" + gridGap + " px)");
         },
 
         render: function() {
