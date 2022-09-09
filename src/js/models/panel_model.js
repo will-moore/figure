@@ -285,47 +285,49 @@
             return this.get('deltaT')[theT] || 0;
         },
 
-        get_time_label_text: function(format, offset_idx) {
+        get_time_label_text: function(format, offset_idx, dec_prec) {
             var pad = function(digit) {
                 var d = digit + "";
                 return d.length === 1 ? ("0"+d) : d;
             };
             var theT = this.get('theT'),
                 deltaT = this.get('deltaT')[theT] || 0,
-                isNegative = (deltaT < 0),
                 text = "", h, m, s;
 
-            deltaT = Math.abs(deltaT);
             if (offset_idx){
                 deltaT = deltaT - this.get('deltaT')[parseInt(offset_idx)-1] || 0;
             }
+            var isNegative = (deltaT < 0);
+            deltaT = Math.abs(deltaT);
 
+            var padlen = dec_prec>0 ? dec_places+3 : 2;
             if (format === "index") {
                 isNegative = false;
                 text = "" + (theT + 1);
             } else if (['milliseconds', 'ms'].includes(format)) {
-                text = Math.round(deltaT*1000) + " ms";
+                text = (deltaT*1000).toFixed(dec_prec) + " ms";
             } else if (['seconds', 'secs', 's'].includes(format)) {
-                text = Math.round(deltaT) + " s";
+                text = deltaT.toFixed(dec_prec) + " s";
             } else if (['minutes', 'mins', 'm'].includes(format)) {
-                text = Math.round(deltaT / 60) + " mins";
+                text = (deltaT / 60).toFixed(dec_prec) + " mins";
             } else if (["mins:secs", "m:s"].includes(format)) {
                 m = parseInt(deltaT / 60);
-                s = pad(Math.round(deltaT % 60));
+                s = ((deltaT % 60).toFixed(dec_prec)).padStart(padlen, "0");
                 text = m + ":" + s;
             } else if (["hrs:mins", "h:m"].includes(format)) {
                 h = parseInt(deltaT / 3600);
-                m = pad(Math.round((deltaT % 3600) / 60));
+                m = (((deltaT % 3600) / 60).toFixed(dec_prec)).padStart(padlen, "0");
                 text = h + ":" + m;
             } else if (["hrs:mins:secs", "h:m:s"].includes(format)) {
                 h = parseInt(deltaT / 3600);
                 m = pad(parseInt((deltaT % 3600) / 60));
-                s = pad(Math.round(deltaT % 60));
+                s = ((deltaT % 60).toFixed(dec_prec)).padStart(padlen, "0");
                 text = h + ":" + m + ":" + s;
             } else { // Format unknown
                 return ""
             }
-            if (["0 s", "0:00", "0 mins", "0:00:00"].indexOf(text) > -1) {
+            var dec_str = dec_prec>0 ? "."+"0".repeat(dec_prec) : "";
+            if (["0"+dec_str+" s", "0"+dec_str+" mins", "0:00"+dec_str, "0:00:00"+dec_str].indexOf(text) > -1) {
                 isNegative = false;
             }
             return (isNegative ? '-' : '') + text;
@@ -350,7 +352,7 @@
             return text;
         },
 
-        get_view_label_text: function(property, format) {
+        get_view_label_text: function(property, format, dec_prec) {
             if (format === "px") format = "pixel";
 
             if (property === "w") property = "width";
@@ -366,6 +368,9 @@
             z_size = this.get('pixel_size_z');
             z_size = z_size?z_size:0
 
+            dec_prec = parseInt(dec_prec)
+            dec_prec = dec_prec?dec_prec:2
+
             var text = "";
             if (property === "z") {
                 if (this.get('z_projection')) {
@@ -374,8 +379,8 @@
                     if (format === "pixel") {
                         text = "" + (start+1) + " - " + (end+1);
                     } else if (format === "unit"){
-                        start = (start * z_size).toFixed(2)
-                        end = (end * z_size).toFixed(2)
+                        start = (start * z_size).toFixed(dec_prec)
+                        end = (end * z_size).toFixed(dec_prec)
                         text = ""+ start +" "+ z_symbol
                                + " - " + end +" "+ z_symbol
                     }
@@ -385,7 +390,7 @@
                     if (format === "pixel") {
                         text = "" + (theZ + 1);
                     } else if (format === "unit"){
-                        text = ""+ (theZ * z_size).toFixed(2) +" "+ z_symbol
+                        text = ""+ (theZ * z_size).toFixed(dec_prec) +" "+ z_symbol
                     }
                 }
                 return text
@@ -398,7 +403,7 @@
                 return ""+parseInt(value);
             } else if (format === "unit") {
                 scale = ['x', 'width'].includes(property) ? x_size : y_size
-                text = ""+ (value * scale).toFixed(2) +" "+ x_symbol
+                text = ""+ (value * scale).toFixed(dec_prec) +" "+ x_symbol
             }
             return text
         },

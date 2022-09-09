@@ -199,14 +199,17 @@
                         expr = match[0].slice(1,-1).split(".");
                         var label_value = ""
                         if (['time', 't'].includes(expr[0])) {
-                            value = (expr[1] ? expr[1] : "index").split("-");
-                            label_value = self.model.get_time_label_text(value[0], value[1]);
+                            tmp = expr[expr.length-1].split("-");
+                            expr[expr.length-1] = tmp[0];
+                            dec_prec = (expr[2] ? parseInt(expr[2]) : 0); // decimal places matters only when the format isn't default
+                            label_value = self.model.get_time_label_text(expr[1] ? expr[1] : "index", tmp[1], dec_prec);
                         } else if (['image', 'dataset'].includes(expr[0])){
                             label_value = self.model.get_name_label_text(expr[0], expr[1] ? expr[1] : "name");
                             //Escape the underscore for markdown
                             label_value = label_value.replaceAll("_", "\\_");
                         } else if (['x', 'y', 'z', 'width', 'height', 'w', 'h', 'rotation', 'rot'].includes(expr[0])){
-                            label_value = self.model.get_view_label_text(expr[0], expr[1] ? expr[1] : "pixel");
+                            dec_prec = (expr[2] ? parseInt(expr[2]) : 2); // decimal places matters only when the format isn't default
+                            label_value = self.model.get_view_label_text(expr[0], expr[1] ? expr[1] : "pixel", dec_prec);
                         } else if (['channels', 'c'].includes(expr[0])) {
                             label_value = self.model.get_channels_label_text();
                         }

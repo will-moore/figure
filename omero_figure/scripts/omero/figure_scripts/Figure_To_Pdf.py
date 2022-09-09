@@ -1087,34 +1087,36 @@ class FigureExport(object):
 
         return {'x': cropx, 'y': cropy, 'width': tile_w, 'height': tile_h}
 
-    def get_time_label_text(self, delta_t, format):
+    def get_time_label_text(self, delta_t, format, dec_prec):
         """ Gets the text for 'live' time-stamp labels """
         # format of "secs" by default
         is_negative = delta_t < 0
         delta_t = abs(delta_t)
-        text = "%d s" % int(round(delta_t))
+        npad = 2 + dec_prec + (dec_prec > 0)
         if format in ["milliseconds", "ms"]:
-            text = "%s ms" % int(round(delta_t * 1000))
+            text = "%.*f ms" % (dec_prec, delta_t * 1000)
         elif format in ["secs", "seconds", "s"]:
-            text = "%d s" % int(round(delta_t))
+            text = "%.*f s" % (dec_prec, delta_t)
         elif format in ["mins", "minutes", "m"]:
-            text = "%s mins" % int(round(delta_t / 60))
+            text = "%.*f mins" % (dec_prec, delta_t / 60)
         elif format in ["mins:secs", "m:s"]:
             m = int(delta_t // 60)
-            s = round(delta_t % 60)
-            text = "%s:%02d" % (m, s)
+            s = delta_t % 60
+            text = "%s:%0*.*f" % (m, npad, dec_prec, s)
         elif format in ["hrs:mins", "h:m"]:
             h = int(delta_t // 3600)
-            m = int(round((delta_t % 3600) / 60))
-            text = "%s:%02d" % (h, m)
+            m = (delta_t % 3600) / 60
+            text = "%s:%0*.*f" % (h, npad, dec_prec, m)
         elif format in ["hrs:mins:secs", "h:m:s"]:
             h = int(delta_t // 3600)
             m = (delta_t % 3600) // 60
-            s = round(delta_t % 60)
-            text = "%s:%02d:%02d" % (h, m, s)
+            s = delta_t % 60
+            text = "%s:%02d:%0*.*f" % (h, m, npad, dec_prec, s)
         else:  # Format unknown
             return ""
-        if text in ["0 s", "0:00", "0 mins", "0:00:00"]:
+        dec_str = "" if dec_prec == 0 else "." + "0" * dec_prec
+        if text in ["0"+dec_str+" s", "0:00"+dec_str,
+                    "0"+dec_str+" mins", "0:00:00"+dec_str]:
             is_negative = False
         return ('-' if is_negative else '') + text
 
@@ -1172,20 +1174,32 @@ class FigureExport(object):
                     if len(expr) == 1 or expr[1] == "index":
                         label_value = str(the_t + 1)
                     else:
+                        tmp = expr[-1].split("-")
+                        expr[-1] = tmp[0]
                         if timestamps and the_t < len(timestamps):
                             d_t = timestamps[the_t]
-                            tmp = expr[1].split("-")
-                            expr[1] = tmp[0]
                             if len(tmp) > 1:
                                 try:
                                     idx_ref = int(tmp[1])
                                     if 1 <= idx_ref <= len(timestamps):
                                         d_t -= timestamps[idx_ref-1]
+                                    else:
+                                        d_t = 0
                                 except ValueError:
-                                    continue
+                                    d_t = 0
                         else:
                             d_t = 0
-                        label_value = self.get_time_label_text(d_t, expr[1])
+
+                        dec_prec = 0
+                        if len(expr) > 2:
+                            try:
+                                dec_prec = int(expr[2])
+                            except ValueError:
+                                dec_prec = 0
+
+                        label_value = self.get_time_label_text(d_t,
+                                                               expr[1],
+                                                               dec_prec)
 
                 elif expr[0] == "image":
                     format = expr[1] if len(expr) > 1 else "name"
@@ -1224,6 +1238,11 @@ class FigureExport(object):
                     elif prop == "rot":
                         prop = "rotation"
 
+                    try:
+                        dec_prec = int(expr[2]) if len(expr) > 2 else 2
+                    except ValueError:
+                        dec_prec = 2  # Default is 2
+
                     if prop == "z":
                         size_z = panel.get('sizeZ')
                         pixel_size_z = panel.get('pixel_size_z')
@@ -1238,8 +1257,10 @@ class FigureExport(object):
                                 label_value = (str(z_start + 1) + "-"
                                                + str(z_end + 1))
                             elif format == "unit" and size_z:
-                                z_start = f"{(z_start * pixel_size_z):.2f}"
-                                z_end = f"{(z_end * pixel_size_z):.2f}"
+                                z_start = "%.*f" % (dec_prec,
+                                                    (z_start * pixel_size_z))
+                                z_end = "%.*f" % (dec_prec,
+                                                  (z_end * pixel_size_z))
                                 label_value = (z_start + " " + z_symbol + " - "
                                                + z_end + " " + z_symbol)
                         else:
@@ -1248,7 +1269,8 @@ class FigureExport(object):
                                 label_value = str(the_z + 1)
                             elif (format == "unit" and size_z
                                   and the_z < size_z):
-                                z_pos = f"{(the_z * pixel_size_z):.2f}"
+                                z_pos = "%.*f" % (dec_prec,
+                                                  (the_z * pixel_size_z))
                                 label_value = (z_pos + " " + z_symbol)
 
                     elif prop == "rotation":
@@ -1264,7 +1286,8 @@ class FigureExport(object):
                                 scale = panel['pixel_size_x']
                             elif prop in ['y', 'height']:
                                 scale = panel['pixel_size_y']
-                            rounded = f"{(value * scale):.2f}"
+                            rounded = "%.*f" % (dec_prec,
+                                                (value * scale))
                             label_value = ("" + rounded +
                                            " " + panel['pixel_size_x_symbol'])
 
