@@ -296,8 +296,8 @@
                 text = "", h, m, s;
 
             deltaT = Math.abs(deltaT);
-            if (shift){
-                deltaT = deltaT - this.get('deltaT')[parseInt(offset_idx)-1];
+            if (offset_idx){
+                deltaT = deltaT - this.get('deltaT')[parseInt(offset_idx)-1] || 0;
             }
 
             if (format === "index") {
