@@ -1,5 +1,5 @@
 
- <div class="clearfix" style="position: relative; padding-bottom: 4px">
+ <div class="clearfix channel_slider_<%=idx%>" style="position: relative; padding-bottom: 4px">
 
 
     <div class="btn-group">
@@ -62,7 +62,13 @@
         <% } %>
         data-idx="<%=idx%>" value="<%= startAvg %>" max="<%= endAvg %>">
     </span>
-    <div class="ch_slider" style="background-color:#ddd; background-color:#<%=color%>" aria-disabled="false">
+    <div class="ch_slider">
+        <input class="ch_start_slider" data-idx="<%=idx%>"
+            min="<%= min %>" max="<%= max %>" step="<%= step %>"
+            type="range" value="<%= startAvg %>" style="background-color:#<%=color%>"/>
+        <input class="ch_end_slider" data-idx="<%=idx%>"
+            min="<%= min %>" max="<%= max %>" step="<%= step %>"
+            type="range" value="<%= endAvg %>" style="background-color: rbga(1,1,1,0)"/>
     </div>
     <span class="ch_end">
         <input type="number" data-window="end"

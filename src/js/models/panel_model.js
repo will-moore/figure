@@ -1,6 +1,7 @@
 
     import Backbone from "backbone";
     import _ from "underscore";
+    import $ from "jquery";
 
     // Corresponds to css - allows us to calculate size of labels
     var LINE_HEIGHT = 1.43;

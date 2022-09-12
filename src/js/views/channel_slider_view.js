@@ -30,6 +30,8 @@ var ChannelSliderView = Backbone.View.extend({
         "keyup .ch_end": "handle_channel_input",
         "click .channel-btn": "toggle_channel",
         "click .dropdown-menu a": "pick_color",
+        "input .ch_slider input": "channel_slider_slide",
+        "change .ch_slider input": "channel_slider_stop",
     },
 
     pick_color: function(e) {
@@ -172,6 +174,38 @@ var ChannelSliderView = Backbone.View.extend({
         });
     },
 
+    channel_slider_slide: function(event) {
+        // Handle sliding action for start slider and end slider
+        let $target = $(event.target);
+        let value = event.target.value;
+        let max = $target.attr('max');
+        let chIndex = $target.data('idx');
+        value = (max > SLIDER_INCR_CUTOFF) ? value : value.toFixed(2);
+        // simply update the correct text input...
+        if ($target.hasClass("ch_start_slider")){
+            $(`.channel_slider_${chIndex} .ch_start input`).val(value);
+        } else {
+            $(`.channel_slider_${chIndex}  .ch_end input`).val(value);
+        }
+    },
+
+    channel_slider_stop: function(event) {
+        // Handle slide -> stop for start slider and end slider
+        console.log("stop", this, event.target.value);
+        let $target = $(event.target);
+        let chIndex = $target.data('idx');
+        let toUpdate = {};
+        // Save change to 'start' or 'end' value;
+        if ($target.hasClass("ch_start_slider")) {
+            toUpdate.start = event.target.value;
+        } else {
+            toUpdate.end = event.target.value;
+        }
+        this.models.forEach(function(m) {
+            m.save_channel_window(chIndex, toUpdate);
+        });
+    },
+
     clear: function() {
         // $(".ch_slider").slider("destroy");
         $("#channel_sliders").empty();
@@ -292,6 +326,9 @@ var ChannelSliderView = Backbone.View.extend({
                                                 'startsNotEqual': startsNotEqual,
                                                 'endAvg': endAvg,
                                                 'endsNotEqual': endsNotEqual,
+                                                'min': min,
+                                                'max': max,
+                                                'step': (max > SLIDER_INCR_CUTOFF) ? 1 : 0.01,
                                                 'active': active,
                                                 'lutBgPos': lutBgPos,
                                                 'reverse': reverse,
