@@ -1188,8 +1188,6 @@ class FigureExport(object):
                     timestamps = panel.get('deltaT')
                     # default to index
                     if len(expr) == 1 or expr[1] == "index":
-                        if ref_idx is not None:
-                            the_t -= ref_idx
                         label_value = str(the_t + 1)
                     else:
                         d_t = 0
@@ -1299,7 +1297,7 @@ class FigureExport(object):
                     label_value = " ".join(label_value)
 
                 new_text.append(label_value if label_value else item.group())
-                last_idx += item.end()
+                last_idx = item.end()
 
             new_text.append(l['text'][last_idx:])
             l['text'] = "".join(new_text)
