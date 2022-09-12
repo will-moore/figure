@@ -1167,35 +1167,37 @@ class FigureExport(object):
                 expr = item.group()[1:-1].split(".")
                 label_value = ""
 
+                tmp = expr[-1].split("-")
+                expr[-1] = tmp[0]
+                ref_idx = None
+                if len(tmp) > 1:
+                    try:
+                        ref_idx = int(tmp[1])
+                    except ValueError:
+                        pass
+
+                dec_prec = 0
+                if len(expr) > 2:
+                    try:
+                        dec_prec = int(expr[2])
+                    except ValueError:
+                        pass
+
                 if expr[0] in ["time", "t"]:
                     the_t = panel['theT']
                     timestamps = panel.get('deltaT')
                     # default to index
                     if len(expr) == 1 or expr[1] == "index":
+                        if ref_idx is not None:
+                            the_t -= ref_idx
                         label_value = str(the_t + 1)
                     else:
-                        tmp = expr[-1].split("-")
-                        expr[-1] = tmp[0]
+                        d_t = 0
                         if timestamps and the_t < len(timestamps):
                             d_t = timestamps[the_t]
-                            if len(tmp) > 1:
-                                try:
-                                    idx_ref = int(tmp[1])
-                                    if 1 <= idx_ref <= len(timestamps):
-                                        d_t -= timestamps[idx_ref-1]
-                                    else:
-                                        d_t = 0
-                                except ValueError:
-                                    d_t = 0
-                        else:
-                            d_t = 0
-
-                        dec_prec = 0
-                        if len(expr) > 2:
-                            try:
-                                dec_prec = int(expr[2])
-                            except ValueError:
-                                dec_prec = 0
+                            if ref_idx is not None:
+                                if 1 <= ref_idx <= len(timestamps):
+                                    d_t -= timestamps[ref_idx-1]
 
                         label_value = self.get_time_label_text(d_t,
                                                                expr[1],
@@ -1238,10 +1240,8 @@ class FigureExport(object):
                     elif prop == "rot":
                         prop = "rotation"
 
-                    try:
-                        dec_prec = int(expr[2]) if len(expr) > 2 else 2
-                    except ValueError:
-                        dec_prec = 2  # Default is 2
+                    # Set the default precision value (2) if not given
+                    dec_prec = dec_prec if len(expr) > 2 else 2
 
                     if prop == "z":
                         size_z = panel.get('sizeZ')

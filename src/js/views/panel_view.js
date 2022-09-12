@@ -198,11 +198,13 @@
                         var new_text = new_text + ljson.text.slice(last_idx, match.index);
                         expr = match[0].slice(1,-1).split(".");
                         var label_value = ""
+
+                        ref_idx = expr[expr.length-1].split("-");
+                        expr[expr.length-1] = ref_idx[0];
+
                         if (['time', 't'].includes(expr[0])) {
-                            tmp = expr[expr.length-1].split("-");
-                            expr[expr.length-1] = tmp[0];
                             dec_prec = (expr[2] ? parseInt(expr[2]) : 0); // decimal places matters only when the format isn't default
-                            label_value = self.model.get_time_label_text(expr[1] ? expr[1] : "index", tmp[1], dec_prec);
+                            label_value = self.model.get_time_label_text(expr[1] ? expr[1] : "index", ref_idx[1], dec_prec);
                         } else if (['image', 'dataset'].includes(expr[0])){
                             label_value = self.model.get_name_label_text(expr[0], expr[1] ? expr[1] : "name");
                             //Escape the underscore for markdown

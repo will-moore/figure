@@ -285,7 +285,7 @@
             return this.get('deltaT')[theT] || 0;
         },
 
-        get_time_label_text: function(format, offset_idx, dec_prec) {
+        get_time_label_text: function(format, ref_idx, dec_prec) {
             var pad = function(digit) {
                 var d = digit + "";
                 return d.length === 1 ? ("0"+d) : d;
@@ -294,13 +294,13 @@
                 deltaT = this.get('deltaT')[theT] || 0,
                 text = "", h, m, s;
 
-            if (offset_idx){
-                deltaT = deltaT - this.get('deltaT')[parseInt(offset_idx)-1] || 0;
+            if (ref_idx){
+                deltaT = deltaT - this.get('deltaT')[parseInt(ref_idx)-1] || 0;
             }
             var isNegative = (deltaT < 0);
             deltaT = Math.abs(deltaT);
 
-            var padlen = dec_prec>0 ? dec_places+3 : 2;
+            var padlen = dec_prec>0 ? dec_prec+3 : 2;
             if (format === "index") {
                 isNegative = false;
                 text = "" + (theT + 1);
