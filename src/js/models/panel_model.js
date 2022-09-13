@@ -295,7 +295,8 @@
                 text = "", h, m, s;
 
             if (ref_idx){
-                deltaT = deltaT - this.get('deltaT')[parseInt(ref_idx)-1] || 0;
+                shift = this.get('deltaT')[parseInt(ref_idx)-1];
+                deltaT = shift==null?deltaT:deltaT-shift;
             }
             var isNegative = (deltaT < 0);
             deltaT = Math.abs(deltaT);
