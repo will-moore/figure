@@ -370,7 +370,7 @@
             z_size = z_size?z_size:0
 
             dec_prec = parseInt(dec_prec)
-            dec_prec = dec_prec?dec_prec:2
+            dec_prec = dec_prec==null?2:dec_prec; // 2 is the default precision
 
             var text = "";
             if (property === "z") {
