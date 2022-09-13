@@ -1267,7 +1267,7 @@ class FigureExport(object):
                     label_value = " ".join(label_value)
 
                 new_text.append(label_value if label_value else item.group())
-                last_idx += item.end()
+                last_idx = item.end()
 
             new_text.append(l['text'][last_idx:])
             l['text'] = "".join(new_text)
