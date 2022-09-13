@@ -1176,7 +1176,7 @@ class FigureExport(object):
                     except ValueError:
                         pass
 
-                dec_prec = 0
+                dec_prec = None
                 if len(expr) > 2:
                     try:
                         dec_prec = int(expr[2])
@@ -1196,6 +1196,9 @@ class FigureExport(object):
                             if ref_idx is not None:
                                 if 1 <= ref_idx <= len(timestamps):
                                     d_t -= timestamps[ref_idx-1]
+
+                        # Set the default precision value (0) if not given
+                        dec_prec = 0 if dec_prec is None else dec_prec
 
                         label_value = self.get_time_label_text(d_t,
                                                                expr[1],
@@ -1239,7 +1242,7 @@ class FigureExport(object):
                         prop = "rotation"
 
                     # Set the default precision value (2) if not given
-                    dec_prec = dec_prec if len(expr) > 2 else 2
+                    dec_prec = 2 if dec_prec is None else dec_prec
 
                     if prop == "z":
                         size_z = panel.get('sizeZ')
