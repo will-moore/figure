@@ -1285,9 +1285,11 @@ class FigureExport(object):
                             label_value = str(int(value))
                         elif format == "unit":
                             if prop in ['x', 'width']:
-                                scale = panel['pixel_size_x']
+                                scale = panel.get('pixel_size_x')
                             elif prop in ['y', 'height']:
-                                scale = panel['pixel_size_y']
+                                scale = panel.get('pixel_size_y')
+                            if scale is None:
+                                scale = 0
                             rounded = "%.*f" % (dec_prec,
                                                 (value * scale))
                             label_value = ("" + rounded +

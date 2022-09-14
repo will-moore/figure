@@ -368,6 +368,8 @@
             y_size = this.get('pixel_size_y');
             z_size = this.get('pixel_size_z');
             z_size = z_size?z_size:0
+            x_size = x_size?x_size:0
+            y_size = y_size?y_size:0
 
             dec_prec = parseInt(dec_prec)
             dec_prec = dec_prec==null?2:dec_prec; // 2 is the default precision
