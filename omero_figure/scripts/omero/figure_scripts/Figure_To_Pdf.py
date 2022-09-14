@@ -1250,6 +1250,7 @@ class FigureExport(object):
                         z_symbol = panel.get('pixel_size_z_symbol')
                         if pixel_size_z is None:
                             pixel_size_z = 0
+                            z_symbol = "\xB5m"
 
                         if ("z_projection" in panel.keys()
                            and panel["z_projection"]):
