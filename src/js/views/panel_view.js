@@ -218,7 +218,7 @@
 
                         //If label_value hasn't been created (invalid expr[0])
                         //  or is empty (invalid expr[1]), the expr is kept unmodified
-                        new_text = new_text + (label_value?label_value:match[0]); 
+                        new_text = new_text + (label_value ? label_value : match[0]);
                         last_idx = match.index + match[0].length;
                     }
                     ljson.text = new_text + ljson.text.slice(last_idx);

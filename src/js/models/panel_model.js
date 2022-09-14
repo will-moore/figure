@@ -277,7 +277,7 @@
                     else text = text + " " + c.label
                 }
             });
-            return text?text:" ";
+            return text ? text : " ";
         },
 
         getDeltaT: function() {
@@ -296,7 +296,7 @@
 
             if (ref_idx){
                 shift = this.get('deltaT')[parseInt(ref_idx)-1];
-                deltaT = shift==null?deltaT:deltaT-shift;
+                deltaT = shift==null ? deltaT : deltaT-shift;
             }
             var isNegative = (deltaT < 0);
             deltaT = Math.abs(deltaT);
@@ -363,16 +363,16 @@
             
             x_symbol = this.get('pixel_size_x_symbol');
             z_symbol = this.get('pixel_size_z_symbol');
-            z_symbol = z_symbol?z_symbol:x_symbol // Using x symbol when z not defined
+            z_symbol = z_symbol ? z_symbol : x_symbol // Using x symbol when z not defined
             x_size = this.get('pixel_size_x');
             y_size = this.get('pixel_size_y');
             z_size = this.get('pixel_size_z');
-            z_size = z_size?z_size:0
-            x_size = x_size?x_size:0
-            y_size = y_size?y_size:0
+            z_size = z_size ? z_size : 0
+            x_size = x_size ? x_size : 0
+            y_size = y_size ? y_size : 0
 
             dec_prec = parseInt(dec_prec)
-            dec_prec = dec_prec==null?2:dec_prec; // 2 is the default precision
+            dec_prec = dec_prec==null ? 2 : dec_prec; // 2 is the default precision
 
             var text = "";
             if (property === "z") {
