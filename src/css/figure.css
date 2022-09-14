@@ -455,8 +455,8 @@
     }
     #vp_z_label {
         position:absolute;
-        top: 0;
-        left: 0;
+        top: -5px;
+        left: 1px;
         padding: 0 2px;
     }
     #vp_z_value {
@@ -496,9 +496,6 @@
     #viewportContainer {
         position: relative;
     }
-    #vp_z_slider, #vp_t_slider {
-        background: none repeat scroll 0 0 #BBBBBB;
-    }
     .tab-pane .ui-slider-handle {
         background: none repeat scroll 0 0 #DDDDDD;
         border: 1px solid #aaa;
@@ -511,11 +508,13 @@
     .tab-pane .ui-slider-horizontal .ui-slider-handle {
         top: -6px;
     }
-    .tab-pane .ui-slider-vertical {
+    #vp_z_slider {
         width: 10px;
         height: 188px;
         margin-right: 10px;
         margin-top: 30px;
+        float: left;
+        position: relative;
     }
     .image-display-options {
         padding: 2px;
@@ -654,8 +653,16 @@
           /*Edge starts the margin from the thumb, not the track as other browsers do*/
         }
       }
-      
-      
+    
+    #vp_z_slider input[type="range"] {
+        transform: rotate(90deg);
+        transform-origin: left;
+        background-color: #bbbbbb;
+        margin: 0;
+        height: 2px;
+        left: 8px;
+        width: 180px;
+    }  
 
     .ch_start, .ch_end {
         position: absolute;
@@ -705,21 +712,23 @@
         display: none;
     }
     /* only show these buttons when container div is slider */
-    .ui-slider .time-increment, .ui-slider .time-decrement,
-    .ui-slider .z-increment, .ui-slider .z-decrement {
+    .time-increment, .time-decrement,
+    .z-increment, .z-decrement {
         display: block;
+        border: solid red 1px;
+        padding: 0;
     }
     .time-increment:hover, .time-decrement:hover,
     .z-increment:hover, .z-decrement:hover {
         border: solid #ddd 1px;
     }
     .z-decrement {
-        left: -8px;
-        bottom: -23px;
+        left: -1px;
+        bottom: -14px;
     }
     .z-increment {
-        left: -8px;
-        top: -22px;
+        left: -1px;
+        top: -20px;
     }
     .time-decrement {
         left: -20px;
