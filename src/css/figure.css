@@ -467,8 +467,8 @@
     }
     #vp_t_label {
         position: absolute;
-        left: 20px;
-        bottom: 0;
+        left: 6px;
+        bottom: -2px;
     }
     #vp_t_value {
         position: absolute;
@@ -654,15 +654,25 @@
         }
       }
     
+    #vp_z_slider input[type="range"], #vp_t_slider input[type="range"] {
+        background-color: #bbbbbb;
+        margin: 0;
+        height: 2px;
+    }
+
     #vp_z_slider input[type="range"] {
-        transform: rotate(90deg);
+        transform: rotate(270deg);
         transform-origin: left;
         background-color: #bbbbbb;
         margin: 0;
         height: 2px;
-        left: 8px;
+        left: 7px;
         width: 180px;
-    }  
+        bottom: 6px;
+    }
+    #vp_z_slider input.z_end {
+        background-color: transparent;
+    }
 
     .ch_start, .ch_end {
         position: absolute;
@@ -699,7 +709,7 @@
     }
     #vp_t_slider {
         position: absolute;
-        bottom: -1px;
+        bottom: 11px;
         left: 40px;
         width: 180px;
     }
@@ -715,7 +725,6 @@
     .time-increment, .time-decrement,
     .z-increment, .z-decrement {
         display: block;
-        border: solid red 1px;
         padding: 0;
     }
     .time-increment:hover, .time-decrement:hover,
@@ -732,11 +741,11 @@
     }
     .time-decrement {
         left: -20px;
-        top: -10px;
+        top: -12px;
     }
     .time-increment {
         right: -20px;
-        top: -10px;
+        top: -12px;
     }
     .rotation-controls-shown {
         background-color: #FAFAFA;

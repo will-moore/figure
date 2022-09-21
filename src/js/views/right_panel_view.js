@@ -876,10 +876,13 @@
             var deltaT = this.models.getDeltaTIfEqual();
 
             var z_label = theZ + 1;
+            $("#vp_z_slider input[type='range']").val(theZ + 1)
             if (z_projection) {
                 var z_start = Math.round(this.models.getAverage('z_start'));
                 var z_end = Math.round(this.models.getAverage('z_end'));
                 z_label = (z_start + 1) + "-" + (z_end + 1);
+                $("#vp_z_slider .z_end").val(z_end + 1);
+                $("#vp_z_slider .z_start").val(z_start + 1);
             } else if (!this.models.allEqual('theZ')) {
                 z_label = "-";
             }
@@ -891,7 +894,7 @@
             if (!this.models.allEqual('theT')) {
                 t_label = "-";
             }
-            // $("#vp_t_slider").slider({'value': theT + 1});
+            $("#vp_t_slider input[type='range']").val(theT + 1)
             $("#vp_t_value").text(t_label + "/" + (sizeT || '-'));
 
             if ((deltaT === 0 || deltaT) && sizeT > 1) {
@@ -919,10 +922,8 @@
                 z_start = Math.round(this.models.getAverage('z_start')),
                 z_end = Math.round(this.models.getAverage('z_end')),
                 theT = this.models.getAverage('theT'),
-                // deltaT = sum_deltaT/this.models.length,
                 sizeZ = this.models.getIfEqual('sizeZ'),
                 sizeT = this.models.getIfEqual('sizeT'),
-                deltaT = this.models.getDeltaTIfEqual(),
                 z_projection = this.models.allTrue('z_projection');
 
             if (wh <= 1) {
@@ -943,48 +944,42 @@
                 Z_max = 1;
             }
 
-            // Destroy any existing slider...
-            try {
-                // ...but will throw if not already a slider
-                // $("#vp_z_slider").slider("destroy");
-            } catch (e) {}
-
+            // setup single Z slider(s)
             if (z_projection) {
-                // $("#vp_z_slider").slider({
-                //     orientation: "vertical",
-                //     range: true,
-                //     max: Z_max,
-                //     disabled: Z_disabled,
-                //     min: 1,             // model is 0-based, UI is 1-based
-                //     values: [z_start + 1, z_end + 1],
-                //     slide: function(event, ui) {
-                //         $("#vp_z_value").text(ui.values[0] + "-" + ui.values[1] + "/" + sizeZ);
-                //     },
-                //     stop: function( event, ui ) {
-                //         self.models.forEach(function(m){
-                //             m.save({
-                //                 'z_start': ui.values[0] - 1,
-                //                 'z_end': ui.values[1] -1
-                //             });
-                //         });
-                //     }
-                // });
+                // show the z_end slider...
+                $("#vp_z_slider .z_end").show().attr({max: Z_max, min: 1}).val(z_end + 1);
+                $("#vp_z_slider .z_start").attr({max: Z_max, min: 1}).val(z_start + 1);
+                // slide and stop events for both sliders
+                $("#vp_z_slider input[type='range']")
+                    .on("input", (event) => {
+                        let start = $("#vp_z_slider .z_start").val();
+                        let end = $("#vp_z_slider .z_end").val();
+                        $("#vp_z_value").text(start + "-" + end + "/" + sizeZ);
+                    })
+                    .on("change", (event) => {
+                        let start = $("#vp_z_slider .z_start").val();
+                        let end = $("#vp_z_slider .z_end").val();
+                        self.models.forEach(function(m){
+                            m.save({
+                                'z_start': start - 1,
+                                'z_end': end -1
+                            });
+                        });
+                    });
             } else {
-                // $("#vp_z_slider").slider({
-                //     orientation: "vertical",
-                //     max: sizeZ,
-                //     disabled: Z_disabled,
-                //     min: 1,             // model is 0-based, UI is 1-based
-                //     value: theZ + 1,
-                //     slide: function(event, ui) {
-                //         $("#vp_z_value").text(ui.value + "/" + sizeZ);
-                //     },
-                //     stop: function( event, ui ) {
-                //         self.models.forEach(function(m){
-                //             m.save('theZ', ui.value - 1);
-                //         });
-                //     }
-                // });
+                // hide the z_end slider (not needed)
+                $("#vp_z_slider .z_end").hide();
+                $("#vp_z_slider input[type='range']")
+                    .attr({max: sizeZ, min: 1})
+                    .val(theZ + 1)
+                    .on("input", (event) => {
+                        $("#vp_z_value").text(event.target.value + "/" + sizeZ);
+                    })
+                    .on("change", (event) => {
+                        self.models.forEach(function(m){
+                            m.save('theZ', event.target.value - 1);
+                        });
+                    });
             }
 
             // T-slider should be enabled even if we have a mixture of sizeT values.
@@ -1001,28 +996,26 @@
                 $("#vp_t_slider").slider("destroy");
             } catch (e) {}
 
-            // $("#vp_t_slider").slider({
-            //     max: T_slider_max,
-            //     disabled: T_disabled,
-            //     min: 1,             // model is 0-based, UI is 1-based
-            //     value: t_slider_value + 1,
-            //     slide: function(event, ui) {
-            //         var theT = ui.value;
-            //         $("#vp_t_value").text(theT + "/" + (sizeT || '-'));
-            //         var dt = self.models.head().get('deltaT')[theT-1];
-            //         self.models.forEach(function(m){
-            //             if (m.get('deltaT')[theT-1] != dt) {
-            //                 dt = undefined;
-            //             }
-            //         });
-            //         $("#vp_deltaT").text(self.formatTime(dt));
-            //     },
-            //     stop: function( event, ui ) {
-            //         self.models.forEach(function(m){
-            //             m.save('theT', ui.value - 1);
-            //         });
-            //     }
-            // });
+            // setup T slider
+            $("#vp_t_slider input[type='range']")
+                .attr({max: T_slider_max, min: 1})
+                .val(t_slider_value + 1)
+                .on("input", (event) => {
+                    var theT = event.target.value;
+                    $("#vp_t_value").text(theT + "/" + (sizeT || '-'));
+                    var dt = self.models.head().get('deltaT')[theT-1];
+                    self.models.forEach(function(m){
+                        if (m.get('deltaT')[theT-1] != dt) {
+                            dt = undefined;
+                        }
+                    });
+                    $("#vp_deltaT").text(self.formatTime(dt));
+                })
+                .on("change", (event) => {
+                    self.models.forEach(function(m){
+                        m.save('theT', event.target.value - 1);
+                    });
+                });
 
             var json = {};
             json.inner_template = this.inner_template;
