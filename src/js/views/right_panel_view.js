@@ -743,8 +743,8 @@
         clear: function() {
             // clean up zoom slider etc
             // $( "#vp_zoom_slider" ).slider( "destroy" );
-            // $("#vp_z_slider").slider("destroy");
-            // $("#vp_t_slider").slider("destroy");
+            $("#vp_z_slider").hide();
+            $("#vp_t_slider").hide();
             this.$vp_zoom_value.text('');
 
             if (this.zmView) {
@@ -942,14 +942,18 @@
             if (!sizeZ || sizeZ === 1) {    // undefined or 1
                 Z_disabled = true;
                 Z_max = 1;
+                $("#vp_z_slider").hide();
+            } else {
+                $("#vp_z_slider").show();
             }
 
             // setup single Z slider(s)
             if (z_projection) {
                 // show the z_end slider...
                 $("#vp_z_slider .z_end").show().attr({max: Z_max, min: 1}).val(z_end + 1);
-                $("#vp_z_slider .z_start").attr({max: Z_max, min: 1}).val(z_start + 1);
+                $("#vp_z_slider .z_start").show().attr({max: Z_max, min: 1}).val(z_start + 1);
                 // slide and stop events for both sliders
+                if (!Z_disabled) {
                 $("#vp_z_slider input[type='range']")
                     .on("input", (event) => {
                         let start = $("#vp_z_slider .z_start").val();
@@ -966,10 +970,12 @@
                             });
                         });
                     });
+                }
             } else {
                 // hide the z_end slider (not needed)
                 $("#vp_z_slider .z_end").hide();
-                $("#vp_z_slider input[type='range']")
+                $("#vp_z_slider .z_start")
+                    .show()
                     .attr({max: sizeZ, min: 1})
                     .val(theZ + 1)
                     .on("input", (event) => {
@@ -989,15 +995,15 @@
                 T_slider_max = self.models.getMin('sizeT');
             if (T_slider_max === 1) {
                 T_disabled = true;
+                $("#vp_t_slider").hide();
+            } else {
+                $("#vp_t_slider").show();
             }
             var t_slider_value = Math.min(theT, T_slider_max);
-            // in case it's already been initialised:
-            try {
-                $("#vp_t_slider").slider("destroy");
-            } catch (e) {}
 
             // setup T slider
             $("#vp_t_slider input[type='range']")
+                .show()
                 .attr({max: T_slider_max, min: 1})
                 .val(t_slider_value + 1)
                 .on("input", (event) => {
