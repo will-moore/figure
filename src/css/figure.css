@@ -253,6 +253,7 @@
         top: 0;
         right: 0;
         bottom: 0;
+        background-size: 100% 100%;
     }
 
     .zp-btn-down {
@@ -921,6 +922,10 @@
         padding-left: 6px;
         padding-right: 6px;
         overflow: hidden;
+        white-space: nowrap;
+        max-width: 60px;
+        height: 36px;
+        border-width: 0;
     }
 
     .font-white {
