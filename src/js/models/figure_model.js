@@ -459,6 +459,9 @@
             // Get the json data for the image...
             $.ajax({
                 url: imgDataUrl,
+                xhrFields: {
+                    withCredentials: true, mode: 'cors'
+                },
                 jsonp: callback, // 'callback'
                 dataType: dataType,
                 // work with the response

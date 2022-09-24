@@ -19,7 +19,15 @@
 
     body {
         padding: 0;
+        --bs-body-font-size: 14px;
     }
+
+    /* override bootstrap variables */
+    body .modal {
+        /* Make modal dialogs a bit wider */
+        --bs-modal-width: 650px;
+    }
+
     header {
         background: gray;
         height: 30px;

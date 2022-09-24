@@ -2,6 +2,7 @@
     // -------------------------- Backbone VIEWS -----------------------------------------
     import Backbone from "backbone";
     import $ from "jquery";
+    import * as bootstrap from 'bootstrap'
 
     import FigureModel from "../models/figure_model";
     import {FigureFileList, FileListView} from "./files";
@@ -48,6 +49,8 @@
             this.$saveOption = $("li.save_figure");
             this.$saveAsOption = $("li.save_as");
             this.$deleteOption = $("li.delete_figure");
+
+            this.aboutModal = new bootstrap.Modal('#aboutModal');
 
             var self = this;
 
@@ -168,7 +171,8 @@
 
         show_about_dialog: function(event) {
             event.preventDefault();
-            $("#aboutModal").modal();
+            console.log("show....")
+            this.aboutModal.show();
         },
 
         // Editing name workflow...
