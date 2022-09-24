@@ -20,6 +20,7 @@
 import Backbone from "backbone";
 import $ from "jquery";
 import _ from 'underscore';
+import * as bootstrap from "bootstrap"
 
 // Should only ever have a singleton on this
 var LutPickerView = Backbone.View.extend({
@@ -69,6 +70,7 @@ var LutPickerView = Backbone.View.extend({
                 "yellow_hot.lut"],
 
     initialize:function () {
+        this.lutModal = new bootstrap.Modal('#lutpickerModal');
     },
 
     
@@ -120,7 +122,7 @@ var LutPickerView = Backbone.View.extend({
 
     show: function(options) {
 
-        $("#lutpickerModal").modal('show');
+        this.lutModal.show();
 
         // save callback to use on submit
         if (options.success) {
