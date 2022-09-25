@@ -22,12 +22,14 @@ import $ from "jquery";
 import _ from 'underscore';
 import * as bootstrap from "bootstrap"
 
+import lut_picker_template from '../../templates/lut_picker.template.html?raw';
+
 // Should only ever have a singleton on this
 var LutPickerView = Backbone.View.extend({
 
     el: $("#lutpickerModal"),
 
-    template: _.template("../../src/templates/lut_picker.html"),
+    template: _.template(lut_picker_template),
 
     LUT_NAMES: ["16_colors.lut",
                 "3-3-2_rgb.lut",
@@ -81,7 +83,7 @@ var LutPickerView = Backbone.View.extend({
 
     handleSubmit: function() {
         this.success(this.pickedLut);
-        $("#lutpickerModal").modal('hide');
+        this.lutModal.hide();
     },
 
     pickLut: function(event) {
@@ -98,8 +100,8 @@ var LutPickerView = Backbone.View.extend({
 
     loadLuts: function() {
         var url = WEBGATEWAYINDEX + 'luts/';
-        var promise = $.getJSON(url);
-        return promise;
+        let cors_headers = { mode: 'cors', credentials: 'include' };
+        return fetch(url, cors_headers).then(rsp => rsp.json());
     },
 
     getLutBackgroundPosition: function(lutName) {
@@ -129,13 +131,11 @@ var LutPickerView = Backbone.View.extend({
             this.success = options.success;
         }
 
-        this.loadLuts().done(function(data){
+        this.loadLuts().then((data) => {
+            console.log('data', data);
             this.luts = data.luts;
             this.render();
-        }.bind(this)).fail(function(){
-            // E.g. 404 with Older OMERO (pre 5.3.0)
-            this.render();
-        }.bind(this));
+        });
     },
 
     render:function() {
