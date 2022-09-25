@@ -142,7 +142,7 @@
         // If any modal is visible, we want to ignore keyboard events above
         // All those methods should use this
         modal_visible: function() {
-            return $("div.modal:visible").length > 0;
+            return $("div.modal.show").length > 0;
         },
 
         // choose an export option from the drop-down list
