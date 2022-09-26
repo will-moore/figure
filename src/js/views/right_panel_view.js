@@ -645,29 +645,27 @@
                     self.rerender_image_change);
             });
 
+            $("#vp_zoom_slider")
+                .attr({"max": 1000})
+                .on("input", (event) => {
+                    let val = parseFloat(event.target.value);
+                    this.update_img_css(val, 0, 0);
+                })
+                .on("change", (event) => {
+                    let val = parseFloat(event.target.value);
+                    this.zoom_avg = val;
+                    var to_save = {'zoom': val};
+                    if (val === 100) {
+                        to_save.dx = 0;
+                        to_save.dy = 0;
+                    }
+                    this.models.forEach(function(m){
+                        m.save(to_save);
+                    });
+                    // we don't listenTo zoom change...
+                    this.rerender_image_change();
+                });
 
-            // $("#vp_zoom_slider").slider({
-            //     // NB: these values are updated on render()
-            //     max: 1000,
-            //     min: 100,
-            //     value: self.zoom_avg,
-            //     slide: function(event, ui) {
-            //         self.update_img_css(ui.value, 0, 0);
-            //     },
-            //     stop: function( event, ui ) {
-            //         self.zoom_avg = ui.value;
-            //         var to_save = {'zoom': ui.value};
-            //         if (ui.value === 100) {
-            //             to_save.dx = 0;
-            //             to_save.dy = 0;
-            //         }
-            //         self.models.forEach(function(m){
-            //             m.save(to_save);
-            //         });
-            //         // we don't listenTo zoom change...
-            //         self.rerender_image_change();
-            //     }
-            // });
             this.$vp_zoom_value = $("#vp_zoom_value");
 
             // We nest the ZoomView so we can update it on update_img_css
@@ -742,7 +740,7 @@
         // called by the parent View before .remove()
         clear: function() {
             // clean up zoom slider etc
-            // $( "#vp_zoom_slider" ).slider( "destroy" );
+            $("#vp_zoom_slider").off();
             $("#vp_z_slider").hide();
             $("#vp_t_slider").hide();
             this.$vp_zoom_value.text('');
@@ -1049,8 +1047,7 @@
             max_zoom = Math.max(this.zoom_avg, max_zoom, 1000);
 
             // Current zoom may be larger due to small crop region
-            // $("#vp_zoom_slider").slider({'value': this.zoom_avg,
-            //                              'max': max_zoom});
+            $("#vp_zoom_slider").attr({'max': max_zoom}).val(this.zoom_avg);
 
             return this;
         }
