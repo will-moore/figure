@@ -338,9 +338,9 @@
             var self = this,
                 figureJSON = this.figure_toJSON();
 
-            var url = window.SAVE_WEBFIGURE_URL,
+            var url = BASE_OMEROWEB_URL + "figure/save_web_figure/";
                 // fileId = self.get('fileId'),
-                data = {};
+            var data = {};
 
             if (options.fileId) {
                 data.fileId = options.fileId;
