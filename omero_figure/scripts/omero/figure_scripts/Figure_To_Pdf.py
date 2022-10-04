@@ -1173,7 +1173,7 @@ class FigureExport(object):
                 for value in expr[1:]:
                     try:
                         kv = value.split("=")
-                        if len(kv)>1:
+                        if len(kv) > 1:
                             param_dict[kv[0].strip()] = int(kv[1].strip())
                     except ValueError:
                         pass
