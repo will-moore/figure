@@ -29,6 +29,7 @@ import zipfile
 from math import atan2, atan, sin, cos, sqrt, radians, floor, ceil
 from copy import deepcopy
 import re
+from collections import defaultdict
 
 from omero.model import ImageAnnotationLinkI, ImageI, LengthI
 import omero.scripts as scripts
@@ -1164,48 +1165,45 @@ class FigureExport(object):
             last_idx = 0
             for item in parse_re.finditer(l['text']):
                 new_text.append(l['text'][last_idx:item.start()])
-                expr = item.group()[1:-1].split(".")
                 label_value = ""
 
-                tmp = expr[-1].split("-")
-                expr[-1] = tmp[0]
-                ref_idx = None
-                if len(tmp) > 1:
+                expr = item.group()[1:-1].split(";")
+                prop_nf = expr[0].strip().split(".")
+                param_dict = defaultdict(lambda: None)
+                for value in expr[1:]:
                     try:
-                        ref_idx = int(tmp[1])
+                        kv = value.split("=")
+                        if len(kv)>1:
+                            param_dict[kv[0].strip()] = int(kv[1].strip())
                     except ValueError:
                         pass
 
-                dec_prec = None
-                if len(expr) > 2:
-                    try:
-                        dec_prec = int(expr[2])
-                    except ValueError:
-                        pass
+                offset = param_dict["offset"]
+                precision = param_dict["precision"]
 
-                if expr[0] in ["time", "t"]:
+                if prop_nf[0] in ["time", "t"]:
                     the_t = panel['theT']
                     timestamps = panel.get('deltaT')
                     # default to index
-                    if len(expr) == 1 or expr[1] == "index":
+                    if len(prop_nf) == 1 or prop_nf[1] == "index":
                         label_value = str(the_t + 1)
                     else:
                         d_t = 0
                         if timestamps and the_t < len(timestamps):
                             d_t = timestamps[the_t]
-                            if ref_idx is not None:
-                                if 1 <= ref_idx <= len(timestamps):
-                                    d_t -= timestamps[ref_idx-1]
+                            if offset is not None:
+                                if 1 <= offset <= len(timestamps):
+                                    d_t -= timestamps[offset-1]
 
                         # Set the default precision value (0) if not given
-                        dec_prec = 0 if dec_prec is None else dec_prec
+                        precision = 0 if precision is None else precision
 
                         label_value = self.get_time_label_text(d_t,
-                                                               expr[1],
-                                                               dec_prec)
+                                                               prop_nf[1],
+                                                               precision)
 
-                elif expr[0] == "image":
-                    format = expr[1] if len(expr) > 1 else "name"
+                elif prop_nf[0] == "image":
+                    format = prop_nf[1] if len(prop_nf) > 1 else "name"
                     if format == "name":
                         label_value = panel['name'].split('/')[-1]
                     elif format == "id":
@@ -1213,8 +1211,8 @@ class FigureExport(object):
                     # Escaping "_" for markdown
                     label_value = label_value.replace("_", "\\_")
 
-                elif expr[0] == "dataset":
-                    format = expr[1] if len(expr) > 1 else "name"
+                elif prop_nf[0] == "dataset":
+                    format = prop_nf[1] if len(prop_nf) > 1 else "name"
                     if format == "name":
                         if panel['datasetName']:
                             label_value = panel['datasetName']
@@ -1228,12 +1226,12 @@ class FigureExport(object):
                     # Escaping "_" for markdown
                     label_value = label_value.replace("_", "\\_")
 
-                elif expr[0] in ['x', 'y', 'z', 'width', 'height',
-                                 'w', 'h', 'rotation', 'rot']:
-                    format = expr[1] if len(expr) > 1 else "pixel"
+                elif prop_nf[0] in ['x', 'y', 'z', 'width', 'height',
+                                    'w', 'h', 'rotation', 'rot']:
+                    format = prop_nf[1] if len(prop_nf) > 1 else "pixel"
                     if format == "px":
                         format = "pixel"
-                    prop = expr[0]
+                    prop = prop_nf[0]
                     if prop == "w":
                         prop = "width"
                     elif prop == "h":
@@ -1242,7 +1240,7 @@ class FigureExport(object):
                         prop = "rotation"
 
                     # Set the default precision value (2) if not given
-                    dec_prec = 2 if dec_prec is None else dec_prec
+                    precision = 2 if precision is None else precision
 
                     if prop == "z":
                         size_z = panel.get('sizeZ')
@@ -1259,9 +1257,9 @@ class FigureExport(object):
                                 label_value = (str(z_start + 1) + "-"
                                                + str(z_end + 1))
                             elif format == "unit" and size_z:
-                                z_start = "%.*f" % (dec_prec,
+                                z_start = "%.*f" % (precision,
                                                     (z_start * pixel_size_z))
-                                z_end = "%.*f" % (dec_prec,
+                                z_end = "%.*f" % (precision,
                                                   (z_end * pixel_size_z))
                                 label_value = (z_start + " " + z_symbol + " - "
                                                + z_end + " " + z_symbol)
@@ -1271,7 +1269,7 @@ class FigureExport(object):
                                 label_value = str(the_z + 1)
                             elif (format == "unit" and size_z
                                   and the_z < size_z):
-                                z_pos = "%.*f" % (dec_prec,
+                                z_pos = "%.*f" % (precision,
                                                   (the_z * pixel_size_z))
                                 label_value = (z_pos + " " + z_symbol)
 
@@ -1290,12 +1288,12 @@ class FigureExport(object):
                                 scale = panel.get('pixel_size_y')
                             if scale is None:
                                 scale = 0
-                            rounded = "%.*f" % (dec_prec,
+                            rounded = "%.*f" % (precision,
                                                 (value * scale))
                             label_value = ("" + rounded +
                                            " " + panel['pixel_size_x_symbol'])
 
-                elif expr[0] in ["channels", "c"]:
+                elif prop_nf[0] in ["channels", "c"]:
                     label_value = []
                     for channel in panel["channels"]:
                         if channel["active"]:
