@@ -214,7 +214,7 @@
                         var label_value = "";
                         if (['time', 't'].includes(prop_nf[0])) {
                             format = prop_nf[1] ? prop_nf[1] : "index";
-                            precision = param_dict["precision"] !== null ? param_dict["precision"] : 0; // decimal places default to 0
+                            precision = param_dict["precision"] !== undefined ? param_dict["precision"] : 0; // decimal places default to 0
                             label_value = self.model.get_time_label_text(format, param_dict["offset"], precision);
                         } else if (['image', 'dataset'].includes(prop_nf[0])){
                             format = prop_nf[1] ? prop_nf[1] : "name";
@@ -223,7 +223,7 @@
                             label_value = label_value.replaceAll("_", "\\_");
                         } else if (['x', 'y', 'z', 'width', 'height', 'w', 'h', 'rotation', 'rot'].includes(prop_nf[0])){
                             format = prop_nf[1] ? prop_nf[1] : "pixel";
-                            precision = param_dict["precision"] !== null ? param_dict["precision"] : 2; // decimal places default to 2
+                            precision = param_dict["precision"] !== undefined ? param_dict["precision"] : 2; // decimal places default to 2
                             label_value = self.model.get_view_label_text(prop_nf[0], format, precision);
                         } else if (['channels', 'c'].includes(prop_nf[0])) {
                             label_value = self.model.get_channels_label_text();
