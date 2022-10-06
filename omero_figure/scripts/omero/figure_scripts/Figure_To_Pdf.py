@@ -29,7 +29,6 @@ import zipfile
 from math import atan2, atan, sin, cos, sqrt, radians, floor, ceil
 from copy import deepcopy
 import re
-from collections import defaultdict
 
 from omero.model import ImageAnnotationLinkI, ImageI, LengthI
 import omero.scripts as scripts
@@ -1169,7 +1168,7 @@ class FigureExport(object):
 
                 expr = item.group()[1:-1].split(";")
                 prop_nf = expr[0].strip().split(".")
-                param_dict = defaultdict(lambda: None)
+                param_dict = {}
                 for value in expr[1:]:
                     try:
                         kv = value.split("=")
@@ -1178,8 +1177,8 @@ class FigureExport(object):
                     except ValueError:
                         pass
 
-                offset = param_dict["offset"]
-                precision = param_dict["precision"]
+                offset = param_dict.get("offset", None)
+                precision = param_dict.get("precision", None)
 
                 if prop_nf[0] in ["time", "t"]:
                     the_t = panel['theT']
