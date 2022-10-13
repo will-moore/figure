@@ -1219,7 +1219,7 @@ class FigureExport(object):
                             label_value = "No/Many Datasets"
                     elif format == "id":
                         if panel['datasetId']:
-                            label_value = panel['datasetName']
+                            label_value = str(panel['datasetId'])
                         else:
                             label_value = "null"
                     # Escaping "_" for markdown
