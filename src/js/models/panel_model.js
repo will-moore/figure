@@ -295,7 +295,7 @@
                 text = "", h, m, s;
 
             if (ref_idx){
-                shift = this.get('deltaT')[parseInt(ref_idx)-1];
+                var shift = this.get('deltaT')[parseInt(ref_idx)-1];
                 deltaT = shift==null ? deltaT : deltaT-shift;
             }
             var isNegative = (deltaT < 0);
@@ -361,12 +361,12 @@
             else if (property === "rot") property = "rotation";
 
             
-            x_symbol = this.get('pixel_size_x_symbol');
-            z_symbol = this.get('pixel_size_z_symbol');
+            var x_symbol = this.get('pixel_size_x_symbol'),
+                z_symbol = this.get('pixel_size_z_symbol');
             z_symbol = z_symbol ? z_symbol : x_symbol // Using x symbol when z not defined
-            x_size = this.get('pixel_size_x');
-            y_size = this.get('pixel_size_y');
-            z_size = this.get('pixel_size_z');
+            var x_size = this.get('pixel_size_x'),
+                y_size = this.get('pixel_size_y'),
+                z_size = this.get('pixel_size_z');
             z_size = z_size ? z_size : 0
             x_size = x_size ? x_size : 0
             y_size = y_size ? y_size : 0
@@ -377,8 +377,8 @@
             var text = "";
             if (property === "z") {
                 if (this.get('z_projection')) {
-                    start = this.get('z_start');
-                    end = this.get('z_end');
+                    var start = this.get('z_start'),
+                        end = this.get('z_end');
                     if (format === "pixel") {
                         text = "" + (start+1) + " - " + (end+1);
                     } else if (format === "unit"){
@@ -398,14 +398,14 @@
                 }
                 return text
             }
-            viewport = this.getViewportAsRect();
-            value = viewport[property];
+
+            var value = this.getViewportAsRect()[property];
             if (property === "rotation") {
                 return ""+parseInt(value)+"°";
             } else if (format === "pixel") {
                 return ""+parseInt(value);
             } else if (format === "unit") {
-                scale = ['x', 'width'].includes(property) ? x_size : y_size
+                var scale = ['x', 'width'].includes(property) ? x_size : y_size
                 text = ""+ (value * scale).toFixed(dec_prec) +" "+ x_symbol
             }
             return text

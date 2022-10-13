@@ -201,17 +201,18 @@
                         //   - split label type.format from other parameters (;)
                         //   - split label type and format (.)
                         //   - grab other parameters (key=value)
-                        expr = match[0].slice(1,-1).split(";");
-                        prop_nf = expr[0].trim().split(".")
-                        param_dict = {};
+                        var expr = match[0].slice(1,-1).split(";");
+                        var prop_nf = expr[0].trim().split(".");
+                        var param_dict = {};
                         expr.slice(1).forEach(function(value) {
-                            kv = value.split("=");
+                            var kv = value.split("=");
                             if (kv.length > 1) {
                                 param_dict[kv[0].trim()] = parseInt(kv[1].trim());
                             }
                         });
 
-                        var label_value = "";
+                        var label_value = "",
+                            format, precision;
                         if (['time', 't'].includes(prop_nf[0])) {
                             format = prop_nf[1] ? prop_nf[1] : "index";
                             precision = param_dict["precision"] !== undefined ? param_dict["precision"] : 0; // decimal places default to 0
