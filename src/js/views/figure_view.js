@@ -459,7 +459,7 @@
             if (event) {
                 event.preventDefault();
             }
-            this.$saveBtn.tooltip('hide');
+            // this.$saveBtn.tooltip('hide');
             this.save_figure();
         },
 

@@ -367,7 +367,7 @@
                         options.success(data);
                     }
                 })
-                .error(function(rsp){
+                .fail(function(rsp){
                     console.log('Save Error', rsp.responseText);
 
                     // Save to local storage to avoid data loss

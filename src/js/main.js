@@ -17,6 +17,8 @@ import SvgView from "./views/svg_model_view";
 import RightPanelView from "./views/right_panel_view";
 import { UndoManager, UndoView } from "./models/undo";
 
+import { ajaxSetup } from "./views/util.csrf";
+
 export const figureModel = new FigureModel();
 
 // window.figureModel = new FigureModel();
@@ -191,6 +193,9 @@ let config = { pushState: true };
 if (APP_ROOT_URL) {
   config.root = APP_ROOT_URL;
 }
+
+// jQuery ajaxSetup for COORs
+ajaxSetup();
 
 const app = new FigureRouter();
 Backbone.history.start(config);
