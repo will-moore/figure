@@ -3,6 +3,7 @@
 import Backbone from "backbone";
 import _ from "underscore";
 import $ from "jquery";
+import * as bootstrap from "bootstrap";
 
 import FigureModel from "../models/figure_model";
 
@@ -433,6 +434,7 @@ import FigureModel from "../models/figure_model";
         },
 
         initialize: function(options) {
+            this.modal = new bootstrap.Modal('#addImagesModal');
             this.figureView = options.figureView;   // need this for .getCentre()
 
             var self = this;

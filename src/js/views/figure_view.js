@@ -23,9 +23,12 @@
 
         initialize: function(opts) {
 
+            // Bootstrap router
+            this.app = opts.app;
+
             // Delegate some responsibility to other views
             new AlignmentToolbarView({model: this.model});
-            new AddImagesModalView({model: this.model, figureView: this});
+            this.addImagesModal = new AddImagesModalView({model: this.model, figureView: this});
             new SetIdModalView({model: this.model});
             new PaperSetupModalView({model: this.model});
             new CropModalView({model: this.model});
@@ -375,14 +378,13 @@
 
         goto_newfigure: function(event) {
             if (event) event.preventDefault();
-            $(".modal").modal('hide');
 
             var self = this;
             var callback = function() {
                 self.model.clearFigure();
-                $('#addImagesModal').modal();
+                self.addImagesModal.modal.show();
                 // navigate will be ignored if we're already on /new
-                app.navigate("new/", {trigger: true});
+                self.app.navigate("new/", {trigger: true});
             };
 
             if (this.model.get("unsaved")) {

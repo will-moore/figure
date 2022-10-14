@@ -61,7 +61,6 @@ Backbone.sync = function (method, model, options, error) {
   ]);
 };
 
-new FigureView({ model: figureModel }); // uiState: uiState
 new SvgView({ model: figureModel });
 new RightPanelView({ model: figureModel });
 
@@ -198,6 +197,11 @@ if (APP_ROOT_URL) {
 ajaxSetup();
 
 const app = new FigureRouter();
+
+// view needs the app to be able to navigate 
+new FigureView({ model: figureModel, app }); // uiState: uiState
+
+
 Backbone.history.start(config);
 
 // We want 'a' links (E.g. to open_figure) to use app.navigate
