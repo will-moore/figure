@@ -39,7 +39,7 @@
             new LabelFromMapsModal({model: this.model});
 
             this.figureFiles = new FigureFileList();
-            new FileListView({model:this.figureFiles, figureModel: this.model});
+            this.fileListViewModal = new FileListView({model:this.figureFiles, figureModel: this.model});
 
             // set up various elements and we need repeatedly
             this.$main = $('main');
@@ -419,20 +419,21 @@
 
         chgrp_figure: function (event) {
             event.preventDefault();
-            $(".modal").modal('hide');
+            // TODO:
+            // $(".modal").modal('hide');
             $("#chgrpModal").modal('show');
         },
 
         open_figure: function(event) {
             event.preventDefault();
-            $(".modal").modal('hide');
 
-            var self = this,
-                currentFileId = self.model.get('fileId');
+            // TODO:
+            // $(".modal").modal('hide');
+
+            var self = this;
             var callback = function() {
                 // Opening modal will trigger fetch of files
-                // Handled in FileListView
-                $("#openFigureModal").modal();
+                self.fileListViewModal.modal.show();
             };
 
             if (this.model.get("unsaved")) {

@@ -20,6 +20,9 @@
 import Backbone from "backbone";
 import _ from "underscore";
 import $ from "jquery";
+import * as bootstrap from 'bootstrap'
+
+import figure_file_item_template from '../../templates/files/figure_file_item.template.html?raw';
 
 export var FigureFile = Backbone.Model.extend({
 
@@ -98,7 +101,7 @@ export var FigureFileList = Backbone.Collection.extend({
     },
 
     url: function() {
-        return LIST_WEBFIGURES_URL;
+        return BASE_WEBFIGURE_URL + "list_web_figures/";
     }
 });
 
@@ -108,6 +111,7 @@ export var FileListView = Backbone.View.extend({
     el: $("#openFigureModal"),
 
     initialize:function (options) {
+        this.modal = new bootstrap.Modal("#openFigureModal");
         this.$tbody = $('tbody', this.$el);
         this.$fileFilter = $('#file-filter');
         this.owner = USER_ID;
@@ -122,9 +126,8 @@ export var FileListView = Backbone.View.extend({
         // we only need this to know the currently opened file
         this.figureModel = options.figureModel;
 
-        $("#openFigureModal").bind("show.bs.modal", function(){
+        document.getElementById('openFigureModal').addEventListener("show.bs.modal", function(){
             // When the dialog opens, we load files...
-            var currentFileId = self.figureModel.get('fileId');
             if (self.model.length === 0) {
                 self.refresh_files();
             } else {
@@ -148,7 +151,14 @@ export var FileListView = Backbone.View.extend({
         // will trigger sort & render()
         var loadingHtml = "<tr><td colspan='4' style='text-align:center'><h1><small>Loading Files...</small></h1></td></tr>"
         this.$tbody.html(loadingHtml);
-        this.model.fetch();
+        let load_url = this.model.url();
+        let cors_headers = { mode: 'cors', credentials: 'include' };
+        // Manual fetch instead of this.model.fetch() - works for cross-origin CORS
+        fetch(load_url, cors_headers)
+            .then(rsp => rsp.json())
+            .then(data => {
+                this.model.add(data);
+            });
     },
 
     filter_files: function(event) {
@@ -285,7 +295,7 @@ var FileListItemView = Backbone.View.extend({
 
     tagName:"tr",
 
-    template: _.template("src/templates/files/figure_file_item.html"),
+    template: _.template(figure_file_item_template),
 
     initialize:function () {
         this.model.bind("change", this.render, this);
