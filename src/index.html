@@ -921,7 +921,7 @@
       role="dialog"
       aria-hidden="true"
     >
-      <div class="modal-dialog" style="width: 850px">
+      <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">Open</h5>
@@ -929,28 +929,28 @@
           </div>
 
           <div class="modal-body" style="height: 450px">
-            <table class="table table-condensed">
+            <table class="table table-sm">
               <thead>
                 <tr>
                   <th style="width: 7%"></th>
-                  <th style="width: 47%">
-                    <form class="form-inline" role="form">
-                      <div class="form-group">
+                  <th style="width: 45%">
+                    <form class="row" role="form">
+                      <div class="col-auto">
                         <label class="col-sm-2 control-label">Name</label>
                       </div>
                       <button
                         type="button"
-                        class="btn btn-link btn-sm sort-name muted table-sort-btn"
+                        class="col-auto btn btn-link btn-sm sort-name muted table-sort-btn"
                       >
-                        <span class="glyphicon glyphicon-chevron-up"></span>
+                        <i class="bi-chevron-up" style="font-size: 1rem"></i>
                       </button>
                       <button
                         type="button"
-                        class="btn btn-link btn-sm sort-name-reverse muted table-sort-btn"
+                        class="col-auto btn btn-link btn-sm sort-name-reverse muted table-sort-btn"
                       >
-                        <span class="glyphicon glyphicon-chevron-down"></span>
+                        <i class="bi-chevron-down" style="font-size: 1rem"></i>
                       </button>
-                      <div class="form-group" style="width: 60%">
+                      <div class="col-auto" style="width: 60%">
                         <input
                           class="form-control"
                           id="file-filter"
@@ -959,20 +959,24 @@
                       </div>
                     </form>
                   </th>
-                  <th style="width: 22%">
-                    Created
-                    <button
-                      type="button"
-                      class="btn btn-link btn-sm sort-created sort table-sort-btn"
-                    >
-                      <span class="glyphicon glyphicon-chevron-up"></span>
-                    </button>
-                    <button
-                      type="button"
-                      class="btn btn-link btn-sm sort-created-reverse muted table-sort-btn"
-                    >
-                      <span class="glyphicon glyphicon-chevron-down"></span>
-                    </button>
+                  <th style="width: 25%">
+                    <form class="row" role="form">
+                      <div class="col-auto">
+                        <label class="col-sm-2 control-label">Created</label>
+                      </div>
+                      <button
+                        type="button"
+                        class="col-auto btn btn-link btn-sm sort-created sort table-sort-btn"
+                      >
+                        <i class="bi-chevron-up" style="font-size: 1rem"></i>
+                      </button>
+                      <button
+                        type="button"
+                        class="col-auto btn btn-link btn-sm sort-created-reverse muted table-sort-btn"
+                      >
+                        <i class="bi-chevron-down" style="font-size: 1rem"></i>
+                      </button>
+                    </form>
                   </th>
                   <th style="width: 12%">
                     <div class="btn-group" title="Filter files by owner">

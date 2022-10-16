@@ -149,7 +149,9 @@ export var FileListView = Backbone.View.extend({
 
     refresh_files: function(event) {
         // will trigger sort & render()
-        var loadingHtml = "<tr><td colspan='4' style='text-align:center'><h1><small>Loading Files...</small></h1></td></tr>"
+        var loadingHtml = `<tr><td colspan='5' style='text-align:center'>
+            <h3 class='text-muted' style='opacity:0.7; margin:50px'><small>Loading Files...</small></h3>
+        </td></tr>`
         this.$tbody.html(loadingHtml);
         let load_url = this.model.url();
         let cors_headers = { mode: 'cors', credentials: 'include' };
@@ -157,6 +159,7 @@ export var FileListView = Backbone.View.extend({
         fetch(load_url, cors_headers)
             .then(rsp => rsp.json())
             .then(data => {
+                this.model.reset();
                 this.model.add(data);
             });
     },
