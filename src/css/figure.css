@@ -1161,3 +1161,16 @@
     .okSign {
         display: none
     }
+
+    #openFigureModal .dropdown-toggle {
+        /* th buttons to match other th labels */
+        font-size: var(--bs-body-font-size);
+    }
+
+    #openFigureModal th label {
+        padding-top: 8px;
+    }
+
+    #openFigureModal a {
+        text-decoration: none;
+    }
