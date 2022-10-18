@@ -503,7 +503,7 @@ export const RoiModalView = Backbone.View.extend({
                         type="button" class="btn btn-default btn-sm roisNextPage">
                         Next
                     </button>
-                    <button type="button" class="btn btn-default btn-sm dropdown-toggle" title="Select page" data-toggle="dropdown">
+                    <button type="button" class="btn btn-default btn-sm dropdown-toggle" title="Select page" data-bs-toggle="dropdown">
                         <span class="caret"></span>
                     </button>
                     <ul class="dropdown-menu" role="menu">

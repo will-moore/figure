@@ -253,7 +253,7 @@ export var FileListView = Backbone.View.extend({
             if (file.isVisible(filter)) {
                 var disabled = currentFileId === file.get('id') ? true: false;
                 file.set('disabled', disabled);
-                var e = new FileListItemView({model:file}).render().el;
+                var e = new FileListItemView({model:file, listview:self}).render().el;
                 self.$tbody.prepend(e);
             }
         });
@@ -272,10 +272,10 @@ export var FileListView = Backbone.View.extend({
                 bN = bNames[bNames.length - 1];
             return aN > bN;
         });
-        var ownersHtml = "<li><a class='pick-owner' href='#' data-id='-1'> -- Show All -- </a></li>";
+        var ownersHtml = "<li><a class='dropdown-item pick-owner' href='#' data-id='-1'> -- Show All -- </a></li>";
             ownersHtml += "<li class='divider'></li>";
         _.each(ownersNames, function(name) {
-            ownersHtml += "<li><a class='pick-owner' data-id='" + ownersByName[name] + "' href='#'>" + _.escape(name) + "</a></li>";
+            ownersHtml += "<li><a class='dropdown-item pick-owner' data-id='" + ownersByName[name] + "' href='#'>" + _.escape(name) + "</a></li>";
         });
         $("#owner-menu").html(ownersHtml);
 
@@ -287,8 +287,8 @@ export var FileListView = Backbone.View.extend({
         })
         var groupNames = Object.keys(groupsByName);
         groupNames.sort();
-        var groupsHtml = "<li><a class='pick-group' href='#' data-id='-1'> -- Show All -- </a></li><li class='divider'></li>";
-        groupsHtml += groupNames.map(function (name) { return "<li><a class='pick-group' data-id='" + groupsByName[name] + "' href='#'>" + _.escape(name) + "</a></li>"}).join('\n');
+        var groupsHtml = "<li><a class='dropdown-item pick-group' href='#' data-id='-1'> -- Show All -- </a></li><li class='divider'></li>";
+        groupsHtml += groupNames.map(function (name) { return "<li><a class='dropdown-item pick-group' data-id='" + groupsByName[name] + "' href='#'>" + _.escape(name) + "</a></li>"}).join('\n');
         $("#group-menu").html(groupsHtml);
         return this;
     }
@@ -300,9 +300,11 @@ var FileListItemView = Backbone.View.extend({
 
     template: _.template(figure_file_item_template),
 
-    initialize:function () {
+    initialize:function (opts) {
+        console.log('opts', opts);
         this.model.bind("change", this.render, this);
         this.model.bind("destroy", this.close, this);
+        this.listview = opts.listview;
     },
 
     events: {
@@ -310,7 +312,10 @@ var FileListItemView = Backbone.View.extend({
     },
 
     hide_file_chooser: function() {
-        $("#openFigureModal").modal('hide');
+        // $("#openFigureModal").modal('hide');
+        console.log("hide_file_chooser...");
+        // (new bootstrap.Modal("#openFigureModal")).hide();
+        this.listview.modal.hide();
     },
 
     formatDate: function(secs) {

@@ -5,7 +5,7 @@
         <% if (!edit){ %>
             <div class="input-group-btn">
                 <button type="button" class="btn btn-default btn-sm dropdown-toggle"
-                        data-toggle="dropdown" title="Label from data...">
+                        data-bs-toggle="dropdown" title="Label from data...">
                     <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu float-end">
@@ -59,7 +59,7 @@
 
     <div class="btn-group">
         <button type="button" class="font-size btn btn-default btn-sm dropdown-toggle" title="Font Size"
-            data-toggle="dropdown" style="width:33px">
+            data-bs-toggle="dropdown" style="width:33px">
             <span><%= l.size %></span>
             <span class="caret"></span>
         </button>
@@ -72,7 +72,7 @@
 
     <div class="btn-group">
         <button type="button" class="label-position btn btn-default btn-sm dropdown-toggle" 
-                title="Position" data-toggle="dropdown">
+                title="Position" data-bs-toggle="dropdown">
             <span data-position="<%= position %>" class="labelicon-<%= position %> glyphicon 
                 <% if (_.contains(['top','bottom','left','leftvert','right'],position)) print('glyphicon-log-out'); else {print('glyphicon-new-window')} %>"></span>
             <span class="caret"></span>
@@ -120,7 +120,7 @@
 
     <div class="btn-group">
         <button type="button" class="label-color btn btn-default btn-sm dropdown-toggle" title="Label Color"
-            data-toggle="dropdown">
+            data-bs-toggle="dropdown">
             <span data-color="<%= l.color %>" style="background-color:#<%= l.color %>">&nbsp &nbsp &nbsp</span>
             <span class="caret"></span>
         </button>
