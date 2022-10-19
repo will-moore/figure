@@ -301,7 +301,6 @@ var FileListItemView = Backbone.View.extend({
     template: _.template(figure_file_item_template),
 
     initialize:function (opts) {
-        console.log('opts', opts);
         this.model.bind("change", this.render, this);
         this.model.bind("destroy", this.close, this);
         this.listview = opts.listview;

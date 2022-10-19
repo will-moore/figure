@@ -3,6 +3,9 @@
     import Backbone from "backbone";
     import $ from "jquery";
     import * as bootstrap from 'bootstrap'
+    import Mousetrap from "mousetrap";
+    import _ from "underscore";
+    import backboneMousetrap from "./backbone.mousetrap"
 
     import FigureModel from "../models/figure_model";
     import {FigureFileList, FileListView} from "./files";
@@ -15,6 +18,9 @@
     import {LegendView} from "./legend_view";
     import {LabelFromMapsModal} from "./labels_from_maps_modal";
     import PanelView from "./panel_view";
+
+    // This extends Backbone to support keyboardEvents
+    backboneMousetrap(_, Backbone, Mousetrap);
 
     // var SelectionView = Backbone.View.extend({
     var FigureView = Backbone.View.extend({
@@ -174,7 +180,6 @@
 
         show_about_dialog: function(event) {
             event.preventDefault();
-            console.log("show....")
             this.aboutModal.show();
         },
 
