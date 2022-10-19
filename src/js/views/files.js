@@ -312,9 +312,6 @@ var FileListItemView = Backbone.View.extend({
     },
 
     hide_file_chooser: function() {
-        // $("#openFigureModal").modal('hide');
-        console.log("hide_file_chooser...");
-        // (new bootstrap.Modal("#openFigureModal")).hide();
         this.listview.modal.hide();
     },
 
