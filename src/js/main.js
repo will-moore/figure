@@ -18,6 +18,7 @@ import RightPanelView from "./views/right_panel_view";
 import { UndoManager, UndoView } from "./models/undo";
 
 import { ajaxSetup } from "./views/util.csrf";
+import {figureConfirmDialog} from "./views/util";
 
 export const figureModel = new FigureModel();
 

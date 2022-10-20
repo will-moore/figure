@@ -4,6 +4,8 @@ import $ from "jquery";
 
 import FigureModel from "../models/figure_model";
 
+import {figureConfirmDialog} from "./util";
+
 export const ChgrpModalView = Backbone.View.extend({
 
     el: $("#chgrpModal"),

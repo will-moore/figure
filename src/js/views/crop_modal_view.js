@@ -7,6 +7,8 @@ import Raphael from "raphael";
 import FigureModel from "../models/figure_model";
 import RectView from "./raphael-rect";
 
+import {figureConfirmDialog} from "./util";
+
 export const CropModalView = Backbone.View.extend({
 
         el: $("#cropModal"),

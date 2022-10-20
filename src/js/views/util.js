@@ -18,7 +18,8 @@
 //
 
 import $ from "jquery";
-
+import * as bootstrap from 'bootstrap'
+import _ from 'underscore';
 
 // http://www.sitepoint.com/javascript-json-serialization/
 JSON.stringify = JSON.stringify || function (obj) {
@@ -70,7 +71,7 @@ var clearFigureFromStorage = function() {
     window.sessionStorage.removeItem(LOCAL_STORAGE_RECOVERED_FIGURE);
 }
 
-var recoverFigureFromStorage = function() {
+export const recoverFigureFromStorage = function() {
     var storage = window.sessionStorage;
     var recoveredFigure = storage.getItem(LOCAL_STORAGE_RECOVERED_FIGURE);
     var figureObject;
@@ -82,7 +83,9 @@ var recoverFigureFromStorage = function() {
     return figureObject;
 }
 
-var figureConfirmDialog = function(title, message, buttons, callback) {
+var confirmModal = new bootstrap.Modal('#confirmModal');
+
+export function figureConfirmDialog(title, message, buttons, callback) {
     var $confirmModal = $("#confirmModal"),
         $title = $(".modal-title", $confirmModal),
         $body = $(".modal-body", $confirmModal),
@@ -103,7 +106,7 @@ var figureConfirmDialog = function(title, message, buttons, callback) {
         .addClass('btn-primary');
 
     // show modal
-    $confirmModal.modal('show');
+    confirmModal.show();
 
     // default handler for 'cancel' or 'close'
     $confirmModal.one('hide.bs.modal', function() {

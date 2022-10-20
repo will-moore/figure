@@ -7,6 +7,8 @@
     import _ from "underscore";
     import $ from "jquery";
 
+    import {figureConfirmDialog} from "./util";
+
     import FigureModel from "../models/figure_model";
     import InfoPanelView from "./info_panel_view";
     import ChannelSliderView from "./channel_slider_view";

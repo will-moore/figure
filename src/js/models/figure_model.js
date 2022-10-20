@@ -4,6 +4,7 @@
     import $ from "jquery";
 
     import {PanelList, Panel} from "./panel_model";
+    import { recoverFigureFromStorage, figureConfirmDialog} from "../views/util";
 
     // Version of the json file we're saving.
     // This only needs to increment when we make breaking changes (not linked to release versions.)
