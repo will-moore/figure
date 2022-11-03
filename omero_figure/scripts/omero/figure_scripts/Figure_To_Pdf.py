@@ -1087,7 +1087,7 @@ class FigureExport(object):
 
         return {'x': cropx, 'y': cropy, 'width': tile_w, 'height': tile_h}
 
-    def get_time_label_text(self, delta_t, format, dec_prec):
+    def get_time_label_text(self, delta_t, format, dec_prec=0):
         """ Gets the text for 'live' time-stamp labels """
         # format of "secs" by default
         is_negative = delta_t < 0

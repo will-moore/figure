@@ -294,7 +294,7 @@
                 deltaT = this.get('deltaT')[theT] || 0,
                 text = "", h, m, s;
 
-            if (ref_idx){
+            if (ref_idx) {
                 var shift = this.get('deltaT')[parseInt(ref_idx)-1];
                 deltaT = shift==null ? deltaT : deltaT-shift;
             }
@@ -343,7 +343,7 @@
                     var pathnames = this.get('name').split('/');
                     text = pathnames[pathnames.length-1];
                 }
-            } else if (property === "dataset"){
+            } else if (property === "dataset") {
                 if (format === "id") {
                     text = ""+this.get('datasetId');
                 } else if (format === "name") {
@@ -381,7 +381,7 @@
                         end = this.get('z_end');
                     if (format === "pixel") {
                         text = "" + (start+1) + " - " + (end+1);
-                    } else if (format === "unit"){
+                    } else if (format === "unit") {
                         start = (start * z_size).toFixed(dec_prec)
                         end = (end * z_size).toFixed(dec_prec)
                         text = ""+ start +" "+ z_symbol
@@ -392,7 +392,7 @@
                     var theZ = this.get('theZ');
                     if (format === "pixel") {
                         text = "" + (theZ + 1);
-                    } else if (format === "unit"){
+                    } else if (format === "unit") {
                         text = ""+ (theZ * z_size).toFixed(dec_prec) +" "+ z_symbol
                     }
                 }
@@ -460,9 +460,9 @@
             this.save('channels', chs);
         },
 
-        toggle_channel: function(cIndex, active){
+        toggle_channel: function(cIndex, active ) {
 
-            if (typeof active == "undefined"){
+            if (typeof active == "undefined") {
                 active = !this.get('channels')[cIndex].active;
             }
             this.save_channel(cIndex, 'active', active);
@@ -517,7 +517,7 @@
         // a resize of the rectangle x1, y1, w1, h1 => x2, y2, w2, h2
         // will resize the Panels within it in proportion.
         // This might be during a drag, or drag-stop (save=true)
-        multiselectdrag: function(x1, y1, w1, h1, x2, y2, w2, h2, save){
+        multiselectdrag: function(x1, y1, w1, h1, x2, y2, w2, h2, save) {
 
             var shift_x = function(startX) {
                 return ((startX - x1)/w1) * w2 + x2;
