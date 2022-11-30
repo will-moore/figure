@@ -196,23 +196,43 @@
                     var last_idx = 0;
                     for (const match of matches) {// Loops on the match to replace in the ljson.text the expression by their values
                         var new_text = new_text + ljson.text.slice(last_idx, match.index);
-                        expr = match[0].slice(1,-1).split(".");
-                        var label_value = ""
-                        if (['time', 't'].includes(expr[0])) {
-                            label_value = self.model.get_time_label_text(expr[1] ? expr[1] : "index");
-                        } else if (['image', 'dataset'].includes(expr[0])){
-                            label_value = self.model.get_name_label_text(expr[0], expr[1] ? expr[1] : "name");
+
+                        // Label parsing in three steps:
+                        //   - split label type.format from other parameters (;)
+                        //   - split label type and format (.)
+                        //   - grab other parameters (key=value)
+                        var expr = match[0].slice(1,-1).split(";");
+                        var prop_nf = expr[0].trim().split(".");
+                        var param_dict = {};
+                        expr.slice(1).forEach(function(value) {
+                            var kv = value.split("=");
+                            if (kv.length > 1) {
+                                param_dict[kv[0].trim()] = parseInt(kv[1].trim());
+                            }
+                        });
+
+                        var label_value = "",
+                            format, precision;
+                        if (['time', 't'].includes(prop_nf[0])) {
+                            format = prop_nf[1] ? prop_nf[1] : "index";
+                            precision = param_dict["precision"] !== undefined ? param_dict["precision"] : 0; // decimal places default to 0
+                            label_value = self.model.get_time_label_text(format, param_dict["offset"], precision);
+                        } else if (['image', 'dataset'].includes(prop_nf[0])){
+                            format = prop_nf[1] ? prop_nf[1] : "name";
+                            label_value = self.model.get_name_label_text(prop_nf[0], format);
                             //Escape the underscore for markdown
                             label_value = label_value.replaceAll("_", "\\_");
-                        } else if (['x', 'y', 'z', 'width', 'height', 'w', 'h', 'rotation', 'rot'].includes(expr[0])){
-                            label_value = self.model.get_view_label_text(expr[0], expr[1] ? expr[1] : "pixel");
-                        } else if (['channels', 'c'].includes(expr[0])) {
+                        } else if (['x', 'y', 'z', 'width', 'height', 'w', 'h', 'rotation', 'rot'].includes(prop_nf[0])){
+                            format = prop_nf[1] ? prop_nf[1] : "pixel";
+                            precision = param_dict["precision"] !== undefined ? param_dict["precision"] : 2; // decimal places default to 2
+                            label_value = self.model.get_view_label_text(prop_nf[0], format, precision);
+                        } else if (['channels', 'c'].includes(prop_nf[0])) {
                             label_value = self.model.get_channels_label_text();
                         }
 
-                        //If label_value hasn't been created (invalid expr[0])
-                        //  or is empty (invalid expr[1]), the expr is kept unmodified
-                        new_text = new_text + (label_value?label_value:match[0]); 
+                        //If label_value hasn't been created (invalid prop_nf[0])
+                        //  or is empty (invalid prop_nf[1]), the expression is kept intact
+                        new_text = new_text + (label_value ? label_value : match[0]);
                         last_idx = match.index + match[0].length;
                     }
                     ljson.text = new_text + ljson.text.slice(last_idx);
