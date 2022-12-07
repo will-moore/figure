@@ -417,9 +417,18 @@
             event.preventDefault();
             var fileId = this.model.get('fileId'),
                 figName = this.model.get('figureName');
-            if(fileId) {
+            if (fileId) {
                 this.model.set("unsaved", false);   // prevent "Save?" dialog
-                this.figureFiles.deleteFile(fileId, figName);
+                // may not have fetched files...
+                var msg = "Delete '" + figName + "'?";
+                var self = this;
+                if (confirm(msg)) {
+                    $.post( BASE_WEBFIGURE_URL + "delete_web_figure/", { fileId: fileId })
+                        .done(function(){
+                            self.figureFiles.removeFile(fileId);
+                            self.app.navigate("", {trigger: true});
+                        });
+                }
             }
         },
 
@@ -510,7 +519,8 @@
             var figureName = prompt("Enter Figure Name", defaultName);
 
             var nav = function(data){
-                app.navigate("file/"+data);
+                console.log("nav", data, self.app);
+                self.app.navigate("file/"+data);
                 // in case you've Saved a copy of a file you can't edit
                 self.model.set('canEdit', true);
             };

@@ -86,18 +86,9 @@ export var FigureFileList = Backbone.Collection.extend({
         }
     },
 
-    deleteFile: function(fileId, name) {
-        // may not have fetched files...
-        var f = this.get(fileId),   // might be undefined
-            msg = "Delete '" + name + "'?",
-            self = this;
-        if (confirm(msg)) {
-            $.post( DELETE_WEBFIGURE_URL, { fileId: fileId })
-                .done(function(){
-                    self.remove(f);
-                    app.navigate("", {trigger: true});
-                });
-        }
+    removeFile: function(fileId) {
+        var f = this.get(fileId)
+        this.remove(f);
     },
 
     url: function() {
