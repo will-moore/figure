@@ -1087,34 +1087,36 @@ class FigureExport(object):
 
         return {'x': cropx, 'y': cropy, 'width': tile_w, 'height': tile_h}
 
-    def get_time_label_text(self, delta_t, format):
+    def get_time_label_text(self, delta_t, format, dec_prec=0):
         """ Gets the text for 'live' time-stamp labels """
         # format of "secs" by default
         is_negative = delta_t < 0
         delta_t = abs(delta_t)
-        text = "%d s" % int(round(delta_t))
+        npad = 2 + dec_prec + (dec_prec > 0)
         if format in ["milliseconds", "ms"]:
-            text = "%s ms" % int(round(delta_t * 1000))
+            text = "%.*f ms" % (dec_prec, delta_t * 1000)
         elif format in ["secs", "seconds", "s"]:
-            text = "%d s" % int(round(delta_t))
+            text = "%.*f s" % (dec_prec, delta_t)
         elif format in ["mins", "minutes", "m"]:
-            text = "%s mins" % int(round(delta_t / 60))
+            text = "%.*f mins" % (dec_prec, delta_t / 60)
         elif format in ["mins:secs", "m:s"]:
             m = int(delta_t // 60)
-            s = round(delta_t % 60)
-            text = "%s:%02d" % (m, s)
+            s = delta_t % 60
+            text = "%s:%0*.*f" % (m, npad, dec_prec, s)
         elif format in ["hrs:mins", "h:m"]:
             h = int(delta_t // 3600)
-            m = int(round((delta_t % 3600) / 60))
-            text = "%s:%02d" % (h, m)
+            m = (delta_t % 3600) / 60
+            text = "%s:%0*.*f" % (h, npad, dec_prec, m)
         elif format in ["hrs:mins:secs", "h:m:s"]:
             h = int(delta_t // 3600)
             m = (delta_t % 3600) // 60
-            s = round(delta_t % 60)
-            text = "%s:%02d:%02d" % (h, m, s)
+            s = delta_t % 60
+            text = "%s:%02d:%0*.*f" % (h, m, npad, dec_prec, s)
         else:  # Format unknown
             return ""
-        if text in ["0 s", "0:00", "0 mins", "0:00:00"]:
+        dec_str = "" if dec_prec == 0 else "." + "0" * dec_prec
+        if text in ["0"+dec_str+" s", "0:00"+dec_str,
+                    "0"+dec_str+" mins", "0:00:00"+dec_str]:
             is_negative = False
         return ('-' if is_negative else '') + text
 
@@ -1162,24 +1164,45 @@ class FigureExport(object):
             last_idx = 0
             for item in parse_re.finditer(l['text']):
                 new_text.append(l['text'][last_idx:item.start()])
-                expr = item.group()[1:-1].split(".")
                 label_value = ""
 
-                if expr[0] in ["time", "t"]:
+                expr = item.group()[1:-1].split(";")
+                prop_nf = expr[0].strip().split(".")
+                param_dict = {}
+                for value in expr[1:]:
+                    try:
+                        kv = value.split("=")
+                        if len(kv) > 1:
+                            param_dict[kv[0].strip()] = int(kv[1].strip())
+                    except ValueError:
+                        pass
+
+                offset = param_dict.get("offset", None)
+                precision = param_dict.get("precision", None)
+
+                if prop_nf[0] in ["time", "t"]:
                     the_t = panel['theT']
                     timestamps = panel.get('deltaT')
                     # default to index
-                    if len(expr) == 1 or expr[1] == "index":
+                    if len(prop_nf) == 1 or prop_nf[1] == "index":
                         label_value = str(the_t + 1)
                     else:
+                        d_t = 0
                         if timestamps and the_t < len(timestamps):
                             d_t = timestamps[the_t]
-                        else:
-                            d_t = 0
-                        label_value = self.get_time_label_text(d_t, expr[1])
+                            if offset is not None:
+                                if 1 <= offset <= len(timestamps):
+                                    d_t -= timestamps[offset-1]
 
-                elif expr[0] == "image":
-                    format = expr[1] if len(expr) > 1 else "name"
+                        # Set the default precision value (0) if not given
+                        precision = 0 if precision is None else precision
+
+                        label_value = self.get_time_label_text(d_t,
+                                                               prop_nf[1],
+                                                               precision)
+
+                elif prop_nf[0] == "image":
+                    format = prop_nf[1] if len(prop_nf) > 1 else "name"
                     if format == "name":
                         label_value = panel['name'].split('/')[-1]
                     elif format == "id":
@@ -1187,8 +1210,8 @@ class FigureExport(object):
                     # Escaping "_" for markdown
                     label_value = label_value.replace("_", "\\_")
 
-                elif expr[0] == "dataset":
-                    format = expr[1] if len(expr) > 1 else "name"
+                elif prop_nf[0] == "dataset":
+                    format = prop_nf[1] if len(prop_nf) > 1 else "name"
                     if format == "name":
                         if panel['datasetName']:
                             label_value = panel['datasetName']
@@ -1196,18 +1219,18 @@ class FigureExport(object):
                             label_value = "No/Many Datasets"
                     elif format == "id":
                         if panel['datasetId']:
-                            label_value = panel['datasetName']
+                            label_value = str(panel['datasetId'])
                         else:
                             label_value = "null"
                     # Escaping "_" for markdown
                     label_value = label_value.replace("_", "\\_")
 
-                elif expr[0] in ['x', 'y', 'z', 'width', 'height',
-                                 'w', 'h', 'rotation', 'rot']:
-                    format = expr[1] if len(expr) > 1 else "pixel"
+                elif prop_nf[0] in ['x', 'y', 'z', 'width', 'height',
+                                    'w', 'h', 'rotation', 'rot']:
+                    format = prop_nf[1] if len(prop_nf) > 1 else "pixel"
                     if format == "px":
                         format = "pixel"
-                    prop = expr[0]
+                    prop = prop_nf[0]
                     if prop == "w":
                         prop = "width"
                     elif prop == "h":
@@ -1215,12 +1238,16 @@ class FigureExport(object):
                     elif prop == "rot":
                         prop = "rotation"
 
+                    # Set the default precision value (2) if not given
+                    precision = 2 if precision is None else precision
+
                     if prop == "z":
                         size_z = panel.get('sizeZ')
                         pixel_size_z = panel.get('pixel_size_z')
                         z_symbol = panel.get('pixel_size_z_symbol')
                         if pixel_size_z is None:
                             pixel_size_z = 0
+                            z_symbol = "\xB5m"
 
                         if ("z_projection" in panel.keys()
                            and panel["z_projection"]):
@@ -1229,8 +1256,10 @@ class FigureExport(object):
                                 label_value = (str(z_start + 1) + "-"
                                                + str(z_end + 1))
                             elif format == "unit" and size_z:
-                                z_start = f"{(z_start * pixel_size_z):.2f}"
-                                z_end = f"{(z_end * pixel_size_z):.2f}"
+                                z_start = "%.*f" % (precision,
+                                                    (z_start * pixel_size_z))
+                                z_end = "%.*f" % (precision,
+                                                  (z_end * pixel_size_z))
                                 label_value = (z_start + " " + z_symbol + " - "
                                                + z_end + " " + z_symbol)
                         else:
@@ -1239,7 +1268,8 @@ class FigureExport(object):
                                 label_value = str(the_z + 1)
                             elif (format == "unit" and size_z
                                   and the_z < size_z):
-                                z_pos = f"{(the_z * pixel_size_z):.2f}"
+                                z_pos = "%.*f" % (precision,
+                                                  (the_z * pixel_size_z))
                                 label_value = (z_pos + " " + z_symbol)
 
                     elif prop == "rotation":
@@ -1252,14 +1282,17 @@ class FigureExport(object):
                             label_value = str(int(value))
                         elif format == "unit":
                             if prop in ['x', 'width']:
-                                scale = panel['pixel_size_x']
+                                scale = panel.get('pixel_size_x')
                             elif prop in ['y', 'height']:
-                                scale = panel['pixel_size_y']
-                            rounded = f"{(value * scale):.2f}"
+                                scale = panel.get('pixel_size_y')
+                            if scale is None:
+                                scale = 0
+                            rounded = "%.*f" % (precision,
+                                                (value * scale))
                             label_value = ("" + rounded +
                                            " " + panel['pixel_size_x_symbol'])
 
-                elif expr[0] in ["channels", "c"]:
+                elif prop_nf[0] in ["channels", "c"]:
                     label_value = []
                     for channel in panel["channels"]:
                         if channel["active"]:
@@ -1267,7 +1300,7 @@ class FigureExport(object):
                     label_value = " ".join(label_value)
 
                 new_text.append(label_value if label_value else item.group())
-                last_idx += item.end()
+                last_idx = item.end()
 
             new_text.append(l['text'][last_idx:])
             l['text'] = "".join(new_text)
