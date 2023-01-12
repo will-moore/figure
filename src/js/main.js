@@ -133,8 +133,9 @@ var FigureRouter = Backbone.Router.extend({
   index: function () {
     console.log("index");
     // $(".modal").modal("hide"); // hide any existing dialogs
-    var cb = function () {
-      // $("#welcomeModal").modal();
+    var cb = () => {
+      this.welcomeModal = new bootstrap.Modal('#welcomeModal');
+      this.welcomeModal.show();
     };
     this.checkSaveAndClear(cb);
   },
@@ -142,6 +143,9 @@ var FigureRouter = Backbone.Router.extend({
   openFigure: function () {
     console.log("openFigure...");
     // $(".modal").modal("hide"); // hide any existing dialogs
+    if (this.welcomeModal) {
+      this.welcomeModal.hide();
+    }
     var cb = function () {
       // $("#openFigureModal").modal();
     };
