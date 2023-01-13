@@ -487,7 +487,7 @@ export const CropModalView = Backbone.View.extend({
                 $("#cropRoiMessage").html(`Loaded ${self.roisLoaded} / ${self.roisCount} ROIs`);
 
                 self.cachedRois = cachedRois;
-            }).error(function(){
+            }).fail(function(){
                 var msg = "No rectangular ROIs found on this image in OMERO";
                 self.renderRois([], ".roisFromOMERO", msg);
             });

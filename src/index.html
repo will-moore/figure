@@ -13,6 +13,8 @@
       const WEBINDEX_URL = BASE_OMEROWEB_URL + "webclient/";
       const BASE_WEBFIGURE_URL = BASE_OMEROWEB_URL + "figure/";
       const WEBGATEWAYINDEX = BASE_OMEROWEB_URL + "webgateway/";
+      const MAKE_WEBFIGURE_URL = BASE_WEBFIGURE_URL + "make_web_figure/";
+      const ACTIVITIES_JSON_URL = WEBINDEX_URL + "activities_json/";
       const APP_ROOT_URL = "";
       const USER_ID = 0;
       const PING_URL = "";
@@ -55,7 +57,12 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">Welcome to OMERO.figure</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
           </div>
           <div class="modal-body" style="padding: 25px 25px 35px 25px">
             <p>To get started...</p>
@@ -94,7 +101,12 @@
         <div class="modal-content">
           <div class="modal-header" style="padding: 15px; text-align: center">
             <h5 class="modal-title">About OMERO.figure</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
           </div>
           <div
             class="modal-body"
@@ -124,7 +136,11 @@
             </p>
           </div>
           <div class="modal-footer" style="margin-top: 0">
-            <button type="button" class="btn btn-default" data-bs-dismiss="modal">
+            <button
+              type="button"
+              class="btn btn-default"
+              data-bs-dismiss="modal"
+            >
               Close
             </button>
           </div>
@@ -233,10 +249,18 @@
             <p>Your changes will be lost if you don't save them</p>
           </div>
           <div class="modal-footer" style="margin-top: 0">
-            <button type="button" class="btn btn-default" data-bs-dismiss="modal">
+            <button
+              type="button"
+              class="btn btn-default"
+              data-bs-dismiss="modal"
+            >
               Don't Save
             </button>
-            <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">
+            <button
+              type="submit"
+              class="btn btn-primary"
+              data-bs-dismiss="modal"
+            >
               Save
             </button>
           </div>
@@ -255,7 +279,12 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">Paper Setup</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
           </div>
           <form class="paperSetupForm" role="form">
             <div class="modal-body">
@@ -287,7 +316,12 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">Move Figure to Group</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
           </div>
           <form class="chgrpForm" role="form">
             <div class="modal-body">
@@ -319,7 +353,12 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">Resample Panels</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
           </div>
           <form class="dpiModalForm form-horizontal" role="form">
             <div class="modal-body">
@@ -387,7 +426,12 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">Crop to Region</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
           </div>
           <form class="cropModalForm" role="form">
             <div
@@ -507,7 +551,12 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="setIdLabel">Edit Image ID</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
           </div>
           <div class="modal-body">
             <p>Choose a new Image ID for the selected panels</p>
@@ -534,7 +583,11 @@
             <div class="previewIdChange"></div>
           </div>
           <div class="modal-footer" style="margin-top: 0">
-            <button type="button" class="btn btn-default" data-bs-dismiss="modal">
+            <button
+              type="button"
+              class="btn btn-default"
+              data-bs-dismiss="modal"
+            >
               Close
             </button>
             <button
@@ -561,7 +614,12 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">Color Picker</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
           </div>
           <form class="colorpickerForm" role="form">
             <div class="modal-body">
@@ -655,14 +713,23 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">Lookup Table Chooser</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
           </div>
           <div class="modal-body" style="height: 500px">
             <p>Loading Lookup Tables...</p>
           </div>
           <div class="lutPreview lutBg">&nbsp</div>
           <div class="modal-footer" style="margin-top: 0">
-            <button type="button" class="btn btn-default" data-bs-dismiss="modal">
+            <button
+              type="button"
+              class="btn btn-default"
+              data-bs-dismiss="modal"
+            >
               Cancel
             </button>
             <button type="submit" class="btn btn-primary" disabled="disabled">
@@ -684,7 +751,12 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">Add Images</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
           </div>
           <form class="addImagesForm" role="form">
             <div class="modal-body">
@@ -740,7 +812,12 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">Export as JSON</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
           </div>
           <form class="addImagesForm" role="form">
             <div class="modal-body">
@@ -779,7 +856,12 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">Import from JSON</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
           </div>
           <form class="importJsonForm" role="form">
             <div class="modal-body">
@@ -817,7 +899,12 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">Label Formatting</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
           </div>
           <div class="modal-body" style="max-height: 542px">
             <h4>Markdown formatting</h4>
@@ -894,14 +981,16 @@
                 <td>Width: 4.450 &#181;m</td>
               </tr>
               <tr>
-                  <th>Time relative to the 3rd frame</th>
-                  <td>Time: [time.milliseconds; offset=3]</td>
-                  <td>Time: -58 ms</td>
+                <th>Time relative to the 3rd frame</th>
+                <td>Time: [time.milliseconds; offset=3]</td>
+                <td>Time: -58 ms</td>
               </tr>
               <tr>
-                  <th>Time with decimal precision 2, <br/>relative to the 3rd frame</th>
-                  <td>Time: [time.seconds; precision=2; offset=3]</td>
-                  <td>Time: -0.06 s</td>
+                <th>
+                  Time with decimal precision 2, <br />relative to the 3rd frame
+                </th>
+                <td>Time: [time.seconds; precision=2; offset=3]</td>
+                <td>Time: -0.06 s</td>
               </tr>
               <tr>
                 <th>Image ID</th>
@@ -921,7 +1010,11 @@
             </p>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-bs-dismiss="modal">
+            <button
+              type="button"
+              class="btn btn-default"
+              data-bs-dismiss="modal"
+            >
               Close
             </button>
           </div>
@@ -940,7 +1033,12 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">Open</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
           </div>
 
           <div class="modal-body" style="height: 450px">
@@ -1042,7 +1140,11 @@
             >
               Refresh
             </button>
-            <button type="button" class="btn btn-default" data-bs-dismiss="modal">
+            <button
+              type="button"
+              class="btn btn-default"
+              data-bs-dismiss="modal"
+            >
               Cancel
             </button>
           </div>
@@ -1061,7 +1163,12 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">Labels from Key-Value Pairs</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
           </div>
           <form class="labelsFromMapAnnsForm" role="form">
             <div class="modal-body">
@@ -1417,25 +1524,40 @@
             </div>
 
             <!-- Download and Script export buttons -->
-            <button type="button" class="btn btn-primary btn-sm">
+            <button
+              type="button"
+              style="display: none"
+              class="btn btn-primary btn-sm pdf_inprogress"
+            >
               Exporting Figure
               <i class="bi-arrow-repeat" style="font-size: 1rem"></i>
             </button>
 
             <a
               id="pdf_download"
+              style="display: none"
               href="#"
               target="_blank"
               class="btn btn-primary btn-sm"
               ><i class="bi-download"></i
             ></a>
 
-            <button type="button" class="btn btn-danger btn-sm">
+            <button
+              type="button"
+              style="display: none"
+              class="btn btn-danger btn-sm"
+            >
               <i class="bi-exclamation-triangle"></i>
             </button>
 
             <div class="btn-group">
-              <button type="button" class="btn btn-success">Export PDF</button>
+              <button
+                type="button"
+                data-export-option="PDF"
+                class="btn btn-success export_pdf"
+              >
+                Export PDF
+              </button>
               <button
                 type="button"
                 class="btn btn-success dropdown-toggle dropdown-toggle-split"
@@ -1520,66 +1642,110 @@
       </div>
     </main>
 
-
     <!-- Hacked Bootstrap's modal dialog to be non-modal non-modal-dialog -->
-    <div class="modal non-modal-dialog" style="display: block; left:auto">
+    <div class="modal non-modal-dialog" style="display: block; left: auto">
       <div class="modal-content">
         <ul class="nav nav-tabs" id="myTab" role="tablist">
           <li class="nav-item" role="presentation">
-            <button class="nav-link" id="info-tab" data-bs-toggle="tab" data-bs-target="#info-tab-pane" type="button" role="tab" aria-controls="info-tab-pane" aria-selected="true">Info</button>
+            <button
+              class="nav-link"
+              id="info-tab"
+              data-bs-toggle="tab"
+              data-bs-target="#info-tab-pane"
+              type="button"
+              role="tab"
+              aria-controls="info-tab-pane"
+              aria-selected="true"
+            >
+              Info
+            </button>
           </li>
           <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="preview-tab" data-bs-toggle="tab" data-bs-target="#preview-tab-pane" type="button" role="tab" aria-controls="preview-tab-pane" aria-selected="false">Preview</button>
+            <button
+              class="nav-link active"
+              id="preview-tab"
+              data-bs-toggle="tab"
+              data-bs-target="#preview-tab-pane"
+              type="button"
+              role="tab"
+              aria-controls="preview-tab-pane"
+              aria-selected="false"
+            >
+              Preview
+            </button>
           </li>
           <li class="nav-item" role="presentation">
-            <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact-tab-pane" type="button" role="tab" aria-controls="contact-tab-pane" aria-selected="false">Labels</button>
+            <button
+              class="nav-link"
+              id="contact-tab"
+              data-bs-toggle="tab"
+              data-bs-target="#contact-tab-pane"
+              type="button"
+              role="tab"
+              aria-controls="contact-tab-pane"
+              aria-selected="false"
+            >
+              Labels
+            </button>
           </li>
         </ul>
         <div class="tab-content" id="myTabContent">
-          <div class="tab-pane fade" id="info-tab-pane" role="tabpanel" aria-labelledby="info-tab" tabindex="0">
+          <div
+            class="tab-pane fade"
+            id="info-tab-pane"
+            role="tabpanel"
+            aria-labelledby="info-tab"
+            tabindex="0"
+          >
             Info
           </div>
 
-          <div class="tab-pane fade show active container" id="preview-tab-pane" role="tabpanel" aria-labelledby="preview-tab" tabindex="0">
+          <div
+            class="tab-pane fade show active container"
+            id="preview-tab-pane"
+            role="tabpanel"
+            aria-labelledby="preview-tab"
+            tabindex="0"
+          >
             <div class="row">
-            <div class="col-2 no-padding" id="channelToggle"></div>
-            <div class="col-10 no-padding" id="viewportContainer">
-              <div id="vp_z_slider" class="pull-left" style="display: none">
-                <input type="range" class="z_start" />
-                <input type="range" class="z_end" />
-                <button
-                  type="button"
-                  class="btn btn-link btn-sm z-decrement"
-                  title="Decrease Z-index"
-                >
-                  <i class="bi-chevron-down" style="font-size: 1.0rem"></i>
-                </button>
-                <button
-                  type="button"
-                  class="btn btn-link btn-sm z-increment"
-                  title="Increase Z-index"
-                >
-                <i class="bi-chevron-up" style="font-size: 1.0rem"></i>
-                </button>
+              <div class="col-2 no-padding" id="channelToggle"></div>
+              <div class="col-10 no-padding" id="viewportContainer">
+                <div id="vp_z_slider" class="pull-left" style="display: none">
+                  <input type="range" class="z_start" />
+                  <input type="range" class="z_end" />
+                  <button
+                    type="button"
+                    class="btn btn-link btn-sm z-decrement"
+                    title="Decrease Z-index"
+                  >
+                    <i class="bi-chevron-down" style="font-size: 1rem"></i>
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-link btn-sm z-increment"
+                    title="Increase Z-index"
+                  >
+                    <i class="bi-chevron-up" style="font-size: 1rem"></i>
+                  </button>
+                </div>
+                <div id="vp_t_slider" style="display: none">
+                  <input type="range" />
+                  <button
+                    type="button"
+                    class="btn btn-link btn-sm time-decrement"
+                    title="Decrease T-index"
+                  >
+                    <i class="bi-chevron-left" style="font-size: 1rem"></i>
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-link btn-sm time-increment"
+                    title="Increase T-index"
+                  >
+                    <i class="bi-chevron-right" style="font-size: 1rem"></i>
+                  </button>
+                </div>
               </div>
-              <div id="vp_t_slider" style="display: none">
-                <input type="range"/>
-                <button
-                  type="button"
-                  class="btn btn-link btn-sm time-decrement"
-                  title="Decrease T-index"
-                >
-                  <i class="bi-chevron-left" style="font-size: 1.0rem"></i>
-                </button>
-                <button
-                  type="button"
-                  class="btn btn-link btn-sm time-increment"
-                  title="Increase T-index"
-                >
-                  <i class="bi-chevron-right" style="font-size: 1.0rem"></i>
-                </button>
-              </div>
-            </div>
             </div>
             <div class="clearfix" style="padding-bottom: 13px"></div>
             <div id="channel_sliders"></div>
@@ -1588,8 +1754,8 @@
               <div class="col-2" style="padding-left: 0">
                 <h5>Zoom</h5>
               </div>
-              <div class="col-8" style="position: relative;">
-                <input min="100" max="1000" id="vp_zoom_slider" type="range"/>
+              <div class="col-8" style="position: relative">
+                <input min="100" max="1000" id="vp_zoom_slider" type="range" />
               </div>
               <div
                 id="vp_zoom_value"
@@ -1597,14 +1763,23 @@
                 style="padding-right: 0; text-align: right"
               ></div>
               <div class="clearfix"></div>
-              <div id="reset-zoom-view" style="padding-left: 0; padding-right: 0;">
-                 <!-- button added by ZoomView render() -->
+              <div
+                id="reset-zoom-view"
+                style="padding-left: 0; padding-right: 0"
+              >
+                <!-- button added by ZoomView render() -->
               </div>
             </div>
           </div>
 
           <!-- events for this pane handled by LabelsPanelView -->
-          <div class="tab-pane fade" id="contact-tab-pane" role="tabpanel" aria-labelledby="contact-tab" tabindex="0">
+          <div
+            class="tab-pane fade"
+            id="contact-tab-pane"
+            role="tabpanel"
+            aria-labelledby="contact-tab"
+            tabindex="0"
+          >
             <div id="edit_rois_form"></div>
 
             <div class="clearfix"></div>

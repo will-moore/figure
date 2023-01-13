@@ -218,6 +218,7 @@
         // Heavy lifting of PDF generation handled by OMERO.script...
         export_pdf: function(event){
 
+            console.log("Export pdf...");
             event.preventDefault();
 
             // Status is indicated by showing / hiding 3 buttons
@@ -234,7 +235,7 @@
             $pdf_inprogress.show();
 
             // Map from HTML to script options
-            opts = {"PDF": "PDF",
+            const opts = {"PDF": "PDF",
                 "PDF & images": "PDF_IMAGES",
                 "TIFF": "TIFF",
                 "TIFF & images": "TIFF_IMAGES",
@@ -311,7 +312,7 @@
                                 clearInterval(i);
                             }
 
-                        }).error(function() {
+                        }).fail(function() {
                             clearInterval(i);
                         });
 

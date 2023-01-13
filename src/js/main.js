@@ -18,7 +18,7 @@ import RightPanelView from "./views/right_panel_view";
 import { UndoManager, UndoView } from "./models/undo";
 
 import { ajaxSetup } from "./views/util.csrf";
-import {figureConfirmDialog, hideModals, showModal} from "./views/util";
+import { figureConfirmDialog, hideModals, showModal } from "./views/util";
 
 export const figureModel = new FigureModel();
 
@@ -28,7 +28,7 @@ export const FigureColorPicker = new ColorPickerView();
 // export const FigureLutPicker = new LutPickerView();
 
 const RELEASE_VERSION = import.meta.env.VITE_VERSION;
-console.log("RELEASE_VERSION", RELEASE_VERSION)
+console.log("RELEASE_VERSION", RELEASE_VERSION);
 document.getElementById("release_version").innerHTML = RELEASE_VERSION;
 
 // Override 'Backbone.sync'...
@@ -65,7 +65,7 @@ Backbone.sync = function (method, model, options, error) {
 new SvgView({ model: figureModel });
 new RightPanelView({ model: figureModel });
 
-if (PING_URL){
+if (PING_URL) {
   // keep-alive ping every minute, so that OMERO session doesn't die
   setInterval(function () {
     fetch(PING_URL);
@@ -134,7 +134,6 @@ var FigureRouter = Backbone.Router.extend({
     console.log("index");
     hideModals();
     var cb = () => {
-      console.log("showing modal welcomeModal")
       showModal("welcomeModal");
     };
     this.checkSaveAndClear(cb);
@@ -200,9 +199,8 @@ ajaxSetup();
 
 const app = new FigureRouter();
 
-// view needs the app to be able to navigate 
+// view needs the app to be able to navigate
 new FigureView({ model: figureModel, app }); // uiState: uiState
-
 
 Backbone.history.start(config);
 

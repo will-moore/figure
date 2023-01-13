@@ -882,9 +882,10 @@
         100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); }
     }
 
-    .navbar-right .glyphicon-refresh, .imgContainer .glyphicon-refresh {
+    .navbar .bi-arrow-repeat, .imgContainer .bi-arrow-repeat {
         animation: spin 2s linear infinite;
         padding: 1px 2px 2px 2px;
+        display: inline-block;
     }
 
     .imgContainer .glyphicon-refresh {
