@@ -229,3 +229,21 @@ $(function(){
     });
 
 });
+
+export function hideModals() {
+    // Calls hide() on all bootstrap Modal dialogs
+    $(".modal").each(function() {
+        const thisModal = bootstrap.Modal.getInstance(this);
+        if (thisModal) {
+            thisModal.hide();
+        }
+    });
+};
+
+export function showModal(modalId) {
+    let thisModal = bootstrap.Modal.getInstance(document.getElementById(modalId));
+    if (!thisModal) {
+        thisModal = new bootstrap.Modal("#" + modalId);
+    }
+    thisModal.show();
+}

@@ -18,7 +18,7 @@ import RightPanelView from "./views/right_panel_view";
 import { UndoManager, UndoView } from "./models/undo";
 
 import { ajaxSetup } from "./views/util.csrf";
-import {figureConfirmDialog} from "./views/util";
+import {figureConfirmDialog, hideModals, showModal} from "./views/util";
 
 export const figureModel = new FigureModel();
 
@@ -132,36 +132,33 @@ var FigureRouter = Backbone.Router.extend({
 
   index: function () {
     console.log("index");
-    // $(".modal").modal("hide"); // hide any existing dialogs
+    hideModals();
     var cb = () => {
-      this.welcomeModal = new bootstrap.Modal('#welcomeModal');
-      this.welcomeModal.show();
+      console.log("showing modal welcomeModal")
+      showModal("welcomeModal");
     };
     this.checkSaveAndClear(cb);
   },
 
   openFigure: function () {
     console.log("openFigure...");
-    // $(".modal").modal("hide"); // hide any existing dialogs
-    if (this.welcomeModal) {
-      this.welcomeModal.hide();
-    }
+    hideModals();
     var cb = function () {
-      // $("#openFigureModal").modal();
+      showModal("openFigureModal");
     };
     this.checkSaveAndClear(cb);
   },
 
   recoverFigure: function () {
-    // $(".modal").modal("hide"); // hide any existing dialogs
+    hideModals();
     figureModel.recoverFromLocalStorage();
   },
 
   newFigure: function () {
     console.log("newFigure");
-    // $(".modal").modal("hide"); // hide any existing dialogs
+    hideModals();
     var cb = function () {
-      // $("#addImagesModal").modal();
+      showModal("addImagesModal");
     };
     // Check for ?image=1&image=2
     if (window.location.search.length > 1) {
@@ -183,7 +180,7 @@ var FigureRouter = Backbone.Router.extend({
 
   loadFigure: function (id) {
     console.log("LoadFigure", id);
-    // $(".modal").modal("hide"); // hide any existing dialogs
+    hideModals();
     var fileId = parseInt(id, 10);
     var cb = function () {
       figureModel.load_from_OMERO(fileId);
