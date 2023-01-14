@@ -57,9 +57,9 @@ if (!String.prototype.endsWith)
                          searchStr.length) === searchStr;
   };
 
-var showExportAsJsonModal = function(figureJSON) {
+export const showExportAsJsonModal = function(figureJSON) {
     var figureText = JSON.stringify(figureJSON);
-    $('#exportJsonModal').modal('show');
+    showModal('exportJsonModal');
     $('#exportJsonModal textarea').text(figureText);
 }
 

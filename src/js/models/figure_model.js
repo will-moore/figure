@@ -663,7 +663,7 @@
             for (var r=0; r<grid.length; r++) {
                 row = grid[r];
                 for (var c=0; c<row.length; c++) {
-                    panel = row[c];
+                    let panel = row[c];
                     panel.save({'x':new_x, 'y':new_y});
                     max_h = Math.max(max_h, panel.get('height'));
                     new_x = new_x + spacer + panel.get('width');
