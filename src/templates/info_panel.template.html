@@ -4,7 +4,7 @@
 
     <table class="table">
         <tbody>
-            <tr><td>
+            <tr><td style="border-top-width: 1px;">
                 <span class="glyphicon glyphicon-share"></span> Open with:
                 <% _.each(imageLinks, function(link, i) { %>
                     <% if (i > 0) {print("|")} %>
@@ -13,9 +13,9 @@
                     </a>
                 <% }) %>
             </td></tr>
-            <tr><td>
+            <tr><td class="row">
                 <div class="col-sm-5"><small><strong>Image ID</strong>:</small></div>
-                <div class="col-sm-7">
+                <div class="col-sm-7" style="position: relative">
                     <small><%= imageId %></small>
                     <button type="button"
                             style="position:absolute; top:0px; right:0px"
