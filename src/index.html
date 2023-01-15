@@ -1525,9 +1525,10 @@
 
             <!-- Download and Script export buttons -->
             <button
+              id="pdf_inprogress"
               type="button"
-              style="display: none"
-              class="btn btn-primary btn-sm pdf_inprogress"
+              style="display: none; margin-right: 10px"
+              class="btn btn-primary btn-sm"
             >
               Exporting Figure
               <i class="bi-arrow-repeat" style="font-size: 1rem"></i>
@@ -1535,10 +1536,11 @@
 
             <a
               id="pdf_download"
-              style="display: none"
+              style="display: none; margin-right: 10px"
               href="#"
               target="_blank"
               class="btn btn-primary btn-sm"
+              title="Download Figure"
               ><i class="bi-download"></i
             ></a>
 
@@ -1597,7 +1599,7 @@
                     data-export-option="TIFF"
                     title="Export figure as a TIFF image per page"
                   >
-                    <i class="bi-check-lg"></i>
+                    <i class="bi-check-lg" style="visibility: hidden"></i>
                     TIFF (300 dpi)</a
                   >
                 </li>
@@ -1608,7 +1610,7 @@
                     data-export-option="TIFF & images"
                     title="Export as TIFF, in zip with panel images"
                   >
-                    <i class="bi-check-lg"></i>
+                    <i class="bi-check-lg" style="visibility: hidden"></i>
                     TIFF with images</a
                   >
                 </li>
@@ -1619,7 +1621,7 @@
                     data-export-option="to OMERO"
                     title="Export each page as an Image in OMERO"
                   >
-                    <i class="bi-check-lg"></i>
+                    <i class="bi-check-lg" style="visibility: hidden"></i>
                     New OMERO Image</a
                   >
                 </li>

@@ -162,8 +162,8 @@
             var $target = $(event.target);
 
             // Only show check mark on the selected item.
-            $(".export_options .glyphicon-ok").css('visibility', 'hidden');
-            $(".glyphicon-ok", $target).css('visibility', 'visible');
+            $(".export_options .bi-check-lg").css('visibility', 'hidden');
+            $(".bi-check-lg", $target).css('visibility', 'visible');
 
             // Update text of main export_pdf button.
             var txt = $target.attr('data-export-option');
