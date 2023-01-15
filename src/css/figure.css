@@ -853,16 +853,9 @@
     .dropdown-menu input + span { visibility: hidden; }
     .dropdown-menu input:checked + span { visibility: visible; }
 
-    .rotate-font .glyphicon {
-        -webkit-transform: rotate(-90deg);
-        -moz-transform: rotate(-90deg);
-        -ms-transform: rotate(-90deg);
-        -o-transform: rotate(-90deg);
-        transform: rotate(-90deg);
-        filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
-    }
-    .rotate-font.btn-sm {
-        padding: 6px 11px 2px 7px;
+    .atop i {
+        transform: rotate(90deg);
+        display: inline-block;
     }
 
     .navbar-left .btn-sm {
