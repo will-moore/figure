@@ -11,7 +11,7 @@
 <form class="form-inline" role="form">
 
     <div class="btn-group">
-        <button type="button" class="shape-color btn btn-default btn-sm dropdown-toggle" title="ROI Color"
+        <button type="button" class="shape-color btn btn-outline-secondary btn-sm dropdown-toggle" title="ROI Color"
             <% if (roiCount === 0) print('disabled') %>
             data-bs-toggle="dropdown">
             <span data-color="<%= color %>" style="background-color:#<%= color %>">&nbsp &nbsp &nbsp</span>
@@ -47,7 +47,7 @@
     </div>
 
     <div class="btn-group">
-        <button type="button" class="line-width btn btn-default btn-sm dropdown-toggle" title="Line Width: <%= lineWidth %>"
+        <button type="button" class="line-width btn btn-outline-secondary btn-sm dropdown-toggle" title="Line Width: <%= lineWidth %>"
             <% if (roiCount === 0) print('disabled') %>
             data-bs-toggle="dropdown">
             <span data-line-width="<%= lineWidth %>"><%= lineWidth %> pt</span>
@@ -63,15 +63,15 @@
     </div>
 
     <div class="btn-group">
-        <button type="button" class="btn btn-sm btn-default copyROIs" title="Copy All ROIs"
+        <button type="button" class="btn btn-sm btn-outline-secondary copyROIs" title="Copy All ROIs"
                 <% if (roiCount === 0) print('disabled') %> >
             Copy
         </button>
-        <button type="button" class="btn btn-sm btn-default pasteROIs" title="Paste ROIs"
+        <button type="button" class="btn btn-sm btn-outline-secondary pasteROIs" title="Paste ROIs"
                 <% if (!canPaste) print('disabled') %> >
             Paste
         </button>
-        <button type="button" class="btn btn-sm btn-default deleteROIs" title="Delete All ROIs"
+        <button type="button" class="btn btn-sm btn-outline-secondary deleteROIs" title="Delete All ROIs"
                 <% if (roiCount === 0) print('disabled') %> >
             Delete
         </button>
