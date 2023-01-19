@@ -25,33 +25,35 @@
                 </form>
                 
             </td></tr>
-            <tr><td>
+            <tr><td style="border-bottom-width: 0">
                 <form class="form-horizontal xywh_form" role="form" style="position:relative">
-                    <div class="form-group">
-                        <label class="col-sm-2 control-label">X</label>
+                    <div class="form-group row mb-3">
+                        <label class="col-sm-2 col-form-label">X</label>
                         <div class="col-sm-4">
                             <input type="number" name="x" min="0" class="form-control input-sm" value="<%= x %>">
                         </div>
-                        <label class="col-sm-2 control-label">Width</label>
+                        <label class="col-sm-2  col-form-label">Width</label>
                         <div class="col-sm-4">
                             <input type="number" name="width" min="0" class="form-control input-sm" value="<%= width %>">
                         </div>
                     </div>
-                    <div class="form-group" style="margin-bottom: -15px">
-                        <label class="col-sm-2 control-label">Y</label>
+                    <div class="form-group row mb-2">
+                        <label class="col-sm-2 col-form-label">Y</label>
                         <div class="col-sm-4">
                             <input type="number" name="y" min="0" class="form-control input-sm" value="<%= y %>">
                         </div>
-                        <label class="col-sm-2 control-label">
+                        <label class="col-sm-2 col-form-label">
                             Height
                         </label>
                         <div class="col-sm-4">
                             <input type="number" name="height" min="0" class="form-control input-sm" value="<%= height %>">
                         </div>
                     </div>
-                    <button type="button" class="btn btn-link setAspectRatio"
-                        style="position:absolute; left:195px; top:25px; padding:3px; width:23px; height:24px; outline:none !important" title="Maintain aspect ratio"><span class="glyphicon glyphicon-link"></span><span class="glyphicon glyphicon-ok-sign okSign" style="left:-28px; top:-7px; font-size:10px; color:green"></span></button>
-                    <div style="position:absolute;left: 220px;top: 12px;border: solid #bbb 1px;width: 12px;height: 48px;border-right: 0px;"></div>
+                    <button type="button" class="btn btn-link setAspectRatio" title="Maintain aspect ratio">
+                        <i class="bi-link-45deg"></i>
+                        <i class="bi-check-circle-fill okSign"></i>
+                    </button>
+                    <div style="position:absolute; right: 100px; top: 19px; border: solid #bbb 1px; width: 9px; height: 55px; border-right: 0px;"></div>
                 </form>
             </td></tr>
         </tbody>
