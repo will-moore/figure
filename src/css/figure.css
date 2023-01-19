@@ -130,11 +130,11 @@
     .figure-title {
         color: #FFFFFF;
         font-size: 18px;
-        left: 365px;
+        left: 395px;
         line-height: 20px;
-        padding: 12px;
+        padding: 16px 5px;
         position: absolute;
-        right: 450px;
+        right: 485px;
         text-align: center;
         height: 100%;
     }
