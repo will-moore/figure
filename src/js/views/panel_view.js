@@ -155,10 +155,10 @@
             // But we don't want the previous image showing while we wait...
             if (this.model.is_big_image()) {
                 this.$img_panel.hide();
-                $(".glyphicon-refresh", this.$el).show();
+                $(".image_panel_spinner", this.$el).show();
             }
             this.$img_panel.one("load", function(){
-                $(".glyphicon-refresh", this.$el).hide();
+                $(".image_panel_spinner", this.$el).hide();
                 this.$img_panel.show();
             }.bind(this));
 

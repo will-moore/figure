@@ -877,15 +877,17 @@
         display: inline-block;
     }
 
-    .imgContainer .glyphicon-refresh {
-        font-size: 50px;
-        left: 50%;
-        top: 50%;
-        display: block;
-        margin-left: -25px;
-        margin-top: -25px;
-        color: #bbb;
-        padding: 1px 2px 9px 2px;
+    .imgContainer .image_panel_spinner {
+        position: relative;
+    font-size: 100px;
+    left: 50%;
+    top: 50%;
+    display: block;
+    color: #bbb;
+    width: min-content;
+    padding-right: 2px;
+    margin-left: -53px;
+    margin-top: -70px;
     }
 
     .colorpicker span,
