@@ -19,6 +19,7 @@
 
 import Backbone from "backbone";
 import $ from "jquery";
+import { showModal } from "./util";
 
 // Should only ever have a singleton on this
 var ColorPickerView = Backbone.View.extend({
@@ -171,7 +172,7 @@ var ColorPickerView = Backbone.View.extend({
 
     show: function(options) {
 
-        $("#colorpickerModal").modal('show');
+        showModal("colorpickerModal");
 
         if (options.color) {
             $('.demo-auto').colorpicker('setValue', options.color);

@@ -18,7 +18,7 @@
     import {LegendView} from "./legend_view";
     import {LabelFromMapsModal} from "./labels_from_maps_modal";
     import PanelView from "./panel_view";
-    import {figureConfirmDialog, recoverFigureFromStorage, showExportAsJsonModal} from "./util";
+    import {figureConfirmDialog, recoverFigureFromStorage, showExportAsJsonModal, showModal, hideModals} from "./util";
 
     // This extends Backbone to support keyboardEvents
     backboneMousetrap(_, Backbone, Mousetrap);
@@ -435,16 +435,14 @@
 
         chgrp_figure: function (event) {
             event.preventDefault();
-            // TODO:
-            // $(".modal").modal('hide');
-            $("#chgrpModal").modal('show');
+            hideModals();
+            showModal("chgrpModal");
         },
 
         open_figure: function(event) {
             event.preventDefault();
 
-            // TODO:
-            // $(".modal").modal('hide');
+            hideModals();
 
             var self = this;
             var callback = function() {
@@ -544,7 +542,7 @@
             event.preventDefault();
 
             var showImport = function() {
-              $('#importJsonModal').modal('show');
+              showModal('importJsonModal');
             };
             
             app.checkSaveAndClear(function() { showImport()} );

@@ -6,7 +6,7 @@ import $ from "jquery";
 import info_panel_template from '../../templates/info_panel.template.html?raw';
 import xywh_panel_template from '../../templates/xywh_panel.template.html?raw';
 
-import { OPEN_WITH } from "./util";
+import { OPEN_WITH, showModal } from "./util";
 
 
 var InfoPanelView = Backbone.View.extend({
@@ -126,7 +126,7 @@ var InfoPanelView = Backbone.View.extend({
 
     set_dpi: function(event) {
         event.preventDefault();
-        $("#dpiModal").modal('show');
+        showModal("dpiModal");
     },
 
     // remove optional min_export_dpi attribute from selected panels
@@ -140,7 +140,7 @@ var InfoPanelView = Backbone.View.extend({
     setImageId: function(event) {
         event.preventDefault();
         // Simply show dialog - Everything else handled by SetIdModalView
-        $("#setIdModal").modal('show');
+        showModal("setIdModal");
         $("#setIdModal .imgId").val("").focus();
     },
 

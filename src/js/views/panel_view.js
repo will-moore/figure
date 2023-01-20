@@ -2,6 +2,8 @@
     import Backbone from "backbone";
     import _ from "underscore";
     import $ from "jquery";
+    import * as marked from "marked";
+    import DOMPurify from 'dompurify';
 
     import figure_panel_template from '../../templates/figure_panel.template.html?raw';
     import label_template from '../../templates/labels/label.template.html?raw';
@@ -248,8 +250,7 @@
                     ljson.text = new_text + ljson.text.slice(last_idx);
                 }
 
-                // Markdown also escapes all labels so they are safe
-                ljson.text = markdown.toHTML(ljson.text);
+                ljson.text = DOMPurify.sanitize(marked.parse(ljson.text));
 
                 positions[l.position].push(ljson);
             });

@@ -311,6 +311,10 @@
         bottom: 4px;
     }
 
+    .edit-label-form {
+        position: relative;
+    }
+
     .edit-label-form .input-group {
         width:140px;
         margin-right: 4px;
@@ -318,11 +322,11 @@
 
     .form-inline .close {
         color: #FF0000;
-        left: 3px;
+        right: 0;
         top: 2px;
         margin-left: 4px;
         opacity: 0.5;
-        position: relative;
+        position: absolute;
     }
     .label_layout {
         position:absolute;
@@ -800,7 +804,7 @@
         right: 20px;
         width: 375px;
         z-index: 50;
-        height: fit-content;
+        pointer-events: none;
     }
     .tab-pane {
         padding: 10px;

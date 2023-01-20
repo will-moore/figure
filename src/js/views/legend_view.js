@@ -16,6 +16,7 @@
 
 import Backbone from "backbone";
 import $ from "jquery";
+import { showModal } from "./util";
 
 import FigureModel from "../models/figure_model";
 
@@ -66,7 +67,7 @@ export const LegendView = Backbone.View.extend({
 
         markdownInfo: function(event) {
             event.preventDefault();
-            $("#markdownInfoModal").modal('show');
+            showModal("markdownInfoModal");
         },
 
         collapseLegend: function(event) {

@@ -7,7 +7,7 @@
     import _ from "underscore";
     import $ from "jquery";
 
-    import {figureConfirmDialog} from "./util";
+    import {figureConfirmDialog, showModal} from "./util";
 
     import FigureModel from "../models/figure_model";
     import InfoPanelView from "./info_panel_view";
@@ -275,6 +275,18 @@
 
     });
 
+    const LABEL_POSITION_ICONS = {
+        "topleft": "bi-box-arrow-in-up-left",
+        "topright": "bi-box-arrow-in-up-right",
+        "bottomleft": "bi-box-arrow-in-down-left",
+        "bottomright": "bi-box-arrow-in-down-right",
+        "left": "bi-box-arrow-left",
+        "leftvert": "bi-box-arrow-left",
+        "top": "bi-box-arrow-up",
+        "right": "bi-box-arrow-right",
+        "bottom": "bi-box-arrow-down"
+    }
+
 
     var LabelsPanelView = Backbone.View.extend({
 
@@ -288,7 +300,8 @@
             this.listenTo(this.model, 'change:selection', this.render);
 
             // one-off build 'New Label' form, with same template as used for 'Edit Label' forms
-            var json = {'l': {'text':'', 'size':12, 'color':'000000'}, 'position':'top', 'edit':false};
+            var json = {'l': {'text':'', 'size':12, 'color':'000000'}, 'position':'top',
+                'edit':false, 'position_icon_cls': LABEL_POSITION_ICONS['topleft']};
             $('.new-label-form', this.$el).html(this.template(json));
             // $('.btn-sm').tooltip({container: 'body', placement:'bottom', toggle:"tooltip"});
 
@@ -303,7 +316,7 @@
 
         markdownInfo: function(event) {
             event.preventDefault();
-            $("#markdownInfoModal").modal('show');
+            showModal("markdownInfoModal");
         },
 
         // Handles all the various drop-down menus in the 'New' AND 'Edit Label' forms
@@ -311,13 +324,13 @@
         select_dropdown_option: function(event) {
             event.preventDefault();
             var $a = $(event.target),
-                $span = $a.children('span');
+                $span = $a.children('i');
             // For the Label Text, handle this differently...
             if ($a.attr('data-label')) {
                 $('.new-label-form .label-text', this.$el).val( $a.attr('data-label') );
                 return;
             }
-            // All others, we take the <span> from the <a> and place it in the <button>
+            // All others, we take the <i> from the <a> and place it in the <button>
             if ($span.length === 0) $span = $a;  // in case we clicked on <span>
             var $li = $span.parent().parent();
             // Don't use $li.parent().prev() since bootstrap inserts a div.dropdown-backdrop on Windows
@@ -339,17 +352,18 @@
                     }
                 });
             } else {
-                $('span:first', $button).replaceWith($span);
+                $('i:first', $button).replaceWith($span);
                 $button.trigger('change');      // can listen for this if we want to 'submit' etc
             }
         },
 
         // submission of the New Label form
         handle_new_label: function(event) {
+            event.preventDefault();
             var $form = $(event.target),
                 label_text = $('.label-text', $form).val(),
                 font_size = $('.font-size', $form).text().trim(),
-                position = $('.label-position span:first', $form).attr('data-position'),
+                position = $('.label-position i:first', $form).attr('data-position'),
                 color = $('.label-color span:first', $form).attr('data-color');
 
             if (label_text.length === 0) {
@@ -548,9 +562,12 @@
             var html = "";
             _.each(positions, function(lbls, p) {
 
-                lbls = _.map(lbls, function(label, key){ return label; });
+                let position_icon_cls = LABEL_POSITION_ICONS[p];
+                lbls = _.map(lbls, function(label, key){
+                    return {...label, position_icon_cls};
+                });
 
-                var json = {'position':p, 'labels':lbls};
+                var json = {'position':p, 'labels':lbls, 'position_icon_cls': position_icon_cls};
                 if (lbls.length === 0) return;
                 json.inner_template = self.inner_template;
                 html += self.template(json);
@@ -1116,7 +1133,7 @@
         show_crop_dialog: function(event) {
             event.preventDefault();
             // Simply show dialog - Everything else handled by that
-            $("#cropModal").modal('show');
+            showModal("cropModal");
         },
 
         resetZoomShape: function(event) {
