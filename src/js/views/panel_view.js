@@ -291,8 +291,8 @@
                 sb_json.symbol = sb.units;
 
                 // Use global LENGTH_UNITS to get symbol for unit.
-                if (window.LENGTH_UNITS && window.LENGTH_UNITS[sb.units]){
-                    sb_json.symbol = window.LENGTH_UNITS[sb.units].symbol;
+                if (LENGTH_UNITS && LENGTH_UNITS[sb.units]){
+                    sb_json.symbol = LENGTH_UNITS[sb.units].symbol;
                 }
 
                 var sb_html = this.scalebar_template(sb_json);
