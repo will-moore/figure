@@ -60,12 +60,12 @@
     <div class="btn-group">
         <button type="button" class="font-size btn btn-outline-secondary btn-sm dropdown-toggle" title="Font Size"
             data-bs-toggle="dropdown">
-            <span><%= l.size %></span>
+            <span class='dropdown_icon'><%= l.size %></span>
             <span class="caret"></span>
         </button>
         <ul class="dropdown-menu" role="menu">
         <% _.each([6,8,10,12,14,18,21,24,36,48],function(p){
-            print ("<li><a class='dropdown-item' href='#'><span>"+p+"</></a></li>")
+            print ("<li><a class='dropdown-item' href='#'><span class='dropdown_icon'>"+p+"</span></a></li>")
         }); %>
         </ul>
     </div>
@@ -73,46 +73,47 @@
     <div class="btn-group">
         <button type="button" class="label-position btn btn-outline-secondary btn-sm dropdown-toggle" 
                 title="Position" data-bs-toggle="dropdown">
-            <i data-position="<%= position %>" class="<%= position_icon_cls %>"></i>
+            <i data-position="<%= position %>" class="<%= position_icon_cls %> dropdown_icon"></i>
             <span class="caret"></span>
         </button>
         <ul class="dropdown-menu" role="menu">
             <li role="presentation" class="dropdown-header">Inside Corners</li>
+            <!-- NB: dropdown_icon is picked on choosing dropdown, replaces icon in button above -->
             <li><a class="dropdown-item" href="#">
-                <i data-position="topleft" class="bi-box-arrow-in-up-left"></i>
+                <i data-position="topleft" class="bi-box-arrow-in-up-left dropdown_icon"></i>
                 Top Left</a>
             </li>
             <li><a class="dropdown-item" href="#">
-                <i data-position="topright" class="bi-box-arrow-in-up-right"></i>
+                <i data-position="topright" class="bi-box-arrow-in-up-right dropdown_icon"></i>
                 Top Right</a>
             </li>
             <li><a class="dropdown-item" href="#">
-                <i data-position="bottomleft" class="bi-box-arrow-in-down-left"></i>
+                <i data-position="bottomleft" class="bi-box-arrow-in-down-left dropdown_icon"></i>
                 Bottom Left</a>
             </li>
             <li><a class="dropdown-item" href="#">
-                <i data-position="bottomright" class="bi-box-arrow-in-down-right"></i>
+                <i data-position="bottomright" class="bi-box-arrow-in-down-right dropdown_icon"></i>
                 Bottom Right</a>
             </li>
 
             <li role="presentation" class="divider"></li>
             <li role="presentation" class="dropdown-header">Outside Edges</li>
             <li><a class="dropdown-item" href="#">
-                <i data-position="left" class="bi-box-arrow-left"></i> Left</a>
+                <i data-position="left" class="bi-box-arrow-left dropdown_icon"></i> Left</a>
             </li>
             <li><a class="dropdown-item" href="#">
-                    <i data-position="leftvert" class="bi-box-arrow-left"></i> 
+                    <i data-position="leftvert" class="bi-box-arrow-left dropdown_icon"></i> 
                     Left vertical
                 </a>
             </li>
             <li><a class="dropdown-item" href="#">
-                <i data-position="top" class="bi-box-arrow-up"></i> Top</a>
+                <i data-position="top" class="bi-box-arrow-up dropdown_icon"></i> Top</a>
             </li>
             <li><a class="dropdown-item" href="#">
-                <i data-position="right" class="bi-box-arrow-right"></i> Right</a>
+                <i data-position="right" class="bi-box-arrow-right dropdown_icon"></i> Right</a>
             </li>
             <li><a class="dropdown-item" href="#">
-                <i data-position="bottom" class="bi-box-arrow-down"></i> Bottom</a>
+                <i data-position="bottom" class="bi-box-arrow-down dropdown_icon"></i> Bottom</a>
             </li>
         </ul>
     </div>
@@ -120,34 +121,35 @@
     <div class="btn-group">
         <button type="button" class="label-color btn btn-outline-secondary btn-sm dropdown-toggle" title="Label Color"
             data-bs-toggle="dropdown">
-            <span data-color="<%= l.color %>" style="background-color:#<%= l.color %>">&nbsp &nbsp &nbsp</span>
+            <span data-color="<%= l.color %>" style="background-color:#<%= l.color %>" class="dropdown_icon">&nbsp &nbsp &nbsp</span>
             <span class="caret"></span>
         </button>
         <ul class="dropdown-menu colorpicker" role="menu">
+            <!-- NB: dropdown_icon is picked on choosing dropdown, replaces icon in button above -->
             <li><a class="dropdown-item" href="#">
-                <span data-color="000000" style="background-color:#000">&nbsp &nbsp &nbsp</span>&nbsp Black
+                <span class="dropdown_icon" data-color="000000" style="background-color:#000">&nbsp &nbsp &nbsp</span>&nbsp Black
             </a></li>
             <li><a class="dropdown-item" href="#">
-                <span data-color="0000FF" style="background-color:#00f">&nbsp &nbsp &nbsp</span>&nbsp Blue
+                <span class="dropdown_icon" data-color="0000FF" style="background-color:#00f">&nbsp &nbsp &nbsp</span>&nbsp Blue
             </a></li>
             <li><a class="dropdown-item" href="#">
-                <span data-color="00FF00" style="background-color:#0f0">&nbsp &nbsp &nbsp</span>&nbsp Green
+                <span class="dropdown_icon" data-color="00FF00" style="background-color:#0f0">&nbsp &nbsp &nbsp</span>&nbsp Green
             </a></li>
             <li><a class="dropdown-item" href="#">
-                <span data-color="FF0000" style="background-color:#f00">&nbsp &nbsp &nbsp</span>&nbsp Red
+                <span class="dropdown_icon" data-color="FF0000" style="background-color:#f00">&nbsp &nbsp &nbsp</span>&nbsp Red
             </a></li>
             <li><a class="dropdown-item" href="#">
-                <span data-color="FFFF00" style="background-color:#ff0">&nbsp &nbsp &nbsp</span>&nbsp Yellow
+                <span class="dropdown_icon" data-color="FFFF00" style="background-color:#ff0">&nbsp &nbsp &nbsp</span>&nbsp Yellow
             </a></li>
             <li><a class="dropdown-item" href="#">
-                <span data-color="FFFFFF" style="background-color:#fff">&nbsp &nbsp &nbsp</span>&nbsp White
+                <span class="dropdown_icon" data-color="FFFFFF" style="background-color:#fff">&nbsp &nbsp &nbsp</span>&nbsp White
             </a></li>
             <li><a class="dropdown-item" href="#">
-                <span data-color="FF00FF" style="background-color:#f0f">&nbsp &nbsp &nbsp</span>&nbsp Magenta
+                <span class="dropdown_icon" data-color="FF00FF" style="background-color:#f0f">&nbsp &nbsp &nbsp</span>&nbsp Magenta
             </a></li>
             <li class="divider"></li>
             <li><a class="dropdown-item" data-color="colorpicker" data-oldcolor="<%= l.color %>" href="#">
-                <span class="colorpickerOption">&nbsp &nbsp &nbsp</span>&nbsp More Colors...
+                <span class="dropdown_icon colorpickerOption">&nbsp &nbsp &nbsp</span>&nbsp More Colors...
             </a></li>
         </ul>
     </div>

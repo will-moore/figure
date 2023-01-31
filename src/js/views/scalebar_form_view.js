@@ -85,7 +85,7 @@ var ScalebarFormView = Backbone.View.extend({
 
         var length = $('.scalebar-length', $form).val(),
             units = $('.scalebar-units span:first', $form).attr('data-unit'),
-            position = $('.label-position span:first', $form).attr('data-position'),
+            position = $('.label-position i:first', $form).attr('data-position'),
             color = $('.label-color span:first', $form).attr('data-color'),
             show_label = $('.scalebar_label', $form).prop('checked'),
             font_size = $('.scalebar_font_size span:first', $form).text().trim();

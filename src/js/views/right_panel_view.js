@@ -324,35 +324,35 @@
         select_dropdown_option: function(event) {
             event.preventDefault();
             var $a = $(event.target),
-                $span = $a.children('i');
+                $target = $a.children('.dropdown_icon');
             // For the Label Text, handle this differently...
             if ($a.attr('data-label')) {
                 $('.new-label-form .label-text', this.$el).val( $a.attr('data-label') );
                 return;
             }
-            // All others, we take the <i> from the <a> and place it in the <button>
-            if ($span.length === 0) $span = $a;  // in case we clicked on <span>
-            var $li = $span.parent().parent();
+            // All others, we take the .dropdown_icon from the <a> and place it in the <button>
+            if ($target.length === 0) $target = $a;  // in case we clicked on icon itself
+            var $li = $target.closest("li");
             // Don't use $li.parent().prev() since bootstrap inserts a div.dropdown-backdrop on Windows
             var $button = $("button.dropdown-toggle", $li.parent().parent());
-            $span = $span.clone();
+            $target = $target.clone();
 
-            if ($span.hasClass('colorpickerOption')) {
+            if ($target.hasClass('colorpickerOption')) {
                 var oldcolor = $a.attr('data-oldcolor');
                 FigureColorPicker.show({
                     'color': oldcolor,
                     'success': function(newColor){
-                        $span.css({'background-color': newColor, 'background-image': 'none'});
+                        $target.css({'background-color': newColor, 'background-image': 'none'});
                         // remove # from E.g. #ff00ff
                         newColor = newColor.replace("#", "");
-                        $span.attr('data-color', newColor);
-                        $('span:first', $button).replaceWith($span);
+                        $target.attr('data-color', newColor);
+                        $('span:first', $button).replaceWith($target);
                         // can listen for this if we want to 'submit' etc
                         $button.trigger('change');
                     }
                 });
             } else {
-                $('i:first', $button).replaceWith($span);
+                $('.dropdown_icon', $button).replaceWith($target);
                 $button.trigger('change');      // can listen for this if we want to 'submit' etc
             }
         },
@@ -523,7 +523,7 @@
             var $form = $(event.target),
                 label_text = $('.label-text', $form).val(),
                 font_size = $('.font-size', $form).text().trim(),
-                position = $('.label-position span:first', $form).attr('data-position'),
+                position = $('.label-position i:first', $form).attr('data-position'),
                 color = $('.label-color span:first', $form).attr('data-color'),
                 key = $form.attr('data-key');
 
