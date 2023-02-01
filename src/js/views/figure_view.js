@@ -78,14 +78,9 @@
                 }
             };
 
-            // $("#zoom_slider").slider({
-            //     max: 400,
-            //     min: 10,
-            //     value: 75,
-            //     slide: function(event, ui) {
-            //         self.model.set('curr_zoom', ui.value);
-            //     }
-            // });
+            $("#zoom_slider").on("input", (event) => {
+                self.model.set('curr_zoom', event.target.value);
+            });
 
             // respond to zoom changes
             this.listenTo(this.model, 'change:curr_zoom', this.renderZoom);
@@ -667,8 +662,6 @@
         renderZoom: function() {
             var curr_zoom = this.model.get('curr_zoom'),
                 zoom = curr_zoom * 0.01,
-                newWidth = parseInt(this.orig_width * zoom, 10),
-                newHeight = parseInt(this.orig_height * zoom, 10),
                 scale = "scale("+zoom+", "+zoom+")";
 
             // We want to stay centered on the same spot...
@@ -765,7 +758,7 @@
             zm = (zm * 100) >> 0;
 
             m.set('curr_zoom', zm) ;
-            // $("#zoom_slider").slider({ value: zm });
+            $("#zoom_slider").val(zm);
 
             // seems we sometimes need to wait to workaround bugs
             var self = this;

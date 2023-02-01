@@ -1140,11 +1140,7 @@
             >
               Refresh
             </button>
-            <button
-              type="button"
-              class="btn"
-              data-bs-dismiss="modal"
-            >
+            <button type="button" class="btn" data-bs-dismiss="modal">
               Cancel
             </button>
           </div>
@@ -1346,11 +1342,22 @@
 
           <form class="d-flex me-auto">
             <div class="btn-group">
-              <button class="save_figure btn btn-sm btn-light" title="Save Figure to OMERO">Save</button>
+              <button
+                class="save_figure btn btn-sm btn-light"
+                title="Save Figure to OMERO"
+              >
+                Save
+              </button>
             </div>
           </form>
 
-          <div class="navbar-header figure-title" title="" data-original-title="Edit Name">transfer-test</div>
+          <div
+            class="navbar-header figure-title"
+            title=""
+            data-original-title="Edit Name"
+          >
+            transfer-test
+          </div>
 
           <form id="alignment-toolbars" class="d-flex">
             <div class="btn-group" style="margin-right: 20px">
@@ -1576,7 +1583,10 @@
               >
                 <span class="visually-hidden">Toggle Dropdown</span>
               </button>
-              <ul class="dropdown-menu dropdown-menu-end export_options" role="menu">
+              <ul
+                class="dropdown-menu dropdown-menu-end export_options"
+                role="menu"
+              >
                 <!-- NB: data-export-option attr used to label export button & handled by js on click -->
                 <li>
                   <a
@@ -1652,6 +1662,102 @@
       </div>
     </main>
 
+    <div id="js-legend" class="legend-container" style="z-index: 100">
+      <div class="panel panel-default legend-expanded editing" style="">
+        <button
+          type="button"
+          class="close collapse-legend"
+          title="Collapse legend"
+          style="margin-right: 3px"
+        >
+          <span
+            class="glyphicon glyphicon-collapse-down"
+            aria-hidden="true"
+          ></span>
+        </button>
+        <button
+          type="button"
+          class="close expand-legend"
+          title="Collapse legend"
+          style="margin-right: 3px"
+        >
+          <span
+            class="glyphicon glyphicon-collapse-up"
+            aria-hidden="true"
+          ></span>
+        </button>
+        <button
+          type="button"
+          class="btn btn-link pull-right markdown-info"
+          title="Use Markdown formatting. Click for more info..."
+        >
+          Legend formatting
+        </button>
+        <div class="legend panel-body">
+          <textarea
+            class="form-control"
+            rows="9"
+            style="resize: none"
+          ></textarea>
+        </div>
+      </div>
+      <div class="legend-footer">
+        <button
+          type="button"
+          class="btn btn-light btn-sm cancel-legend"
+          title=""
+          style="margin: 3px"
+          data-original-title="Cancel editing legend"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          class="btn btn-success btn-sm save-legend"
+          title=""
+          style="margin: 3px"
+          data-original-title="Save figure legend"
+        >
+          Save
+        </button>
+        <button
+          type="button"
+          class="btn btn-light btn-sm edit-legend"
+          title=""
+          style="margin: 3px; display: none"
+          data-original-title="Add figure legend"
+        >
+          Add Figure Legend
+        </button>
+      </div>
+    </div>
+
+    <footer>
+      <input
+        id="zoom_slider"
+        type="range"
+        min="10"
+        max="400"
+        title="Zoom"
+      >
+      <input
+        id="zoom_input"
+        type="text"
+        size="3"
+        maxlength="3"
+        disabled="disabled"
+        title="zoom"
+      />
+        <button
+          type="button"
+          class="zoom-paper-to-fit btn btn-light btn-sm"
+          title=""
+          data-original-title="Zoom paper to fit"
+        >
+          <i class="bi bi-arrows-angle-expand"></i>
+        </button>
+    </footer>
+
     <!-- Hacked Bootstrap's modal dialog to be non-modal non-modal-dialog -->
     <div class="modal non-modal-dialog" style="display: block; left: auto">
       <div class="modal-content">
@@ -1706,8 +1812,7 @@
             role="tabpanel"
             aria-labelledby="info-tab"
             tabindex="0"
-          >
-          </div>
+          ></div>
 
           <div
             class="tab-pane fade show active container"

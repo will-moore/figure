@@ -223,12 +223,12 @@
         top: 5px;
     }
 
-    footer .ui-slider {
+    #zoom_slider {
         border: 1px solid #aaa;
         height: 6px;
         left: 15px;
         position: absolute;
-        top: 15px;
+        top: 9px;
         width: 220px;
         background: #bbb;
     }
