@@ -550,9 +550,14 @@
         },
 
         getDefaultFigureName: function() {
+            const padL = (nr, len = 2, chr = `0`) => `${nr}`.padStart(2, chr);
             var d = new Date(),
-                dt = d.getFullYear() + "-" + (d.getMonth()+1) + "-" +d.getDate(),
-                tm = d.getHours() + ":" + d.getMinutes() + ":" + d.getSeconds();
+                dt = [d.getFullYear(),
+                      padL(d.getMonth()+1),
+                      padL(d.getDate())].join('-'),
+                tm = [padL(d.getHours()),
+                      padL(d.getMinutes()),
+                      padL(d.getSeconds())].join('-');
             return "Figure_" + dt + "_" + tm;
         },
 
