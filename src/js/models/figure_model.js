@@ -550,7 +550,7 @@
         },
 
         getDefaultFigureName: function() {
-            const padL = (nr, len = 2, chr = `0`) => `${nr}`.padStart(2, chr);
+            const padL = (nr) => `${nr}`.padStart(2, '0');
             var d = new Date(),
                 dt = [d.getFullYear(),
                       padL(d.getMonth()+1),
