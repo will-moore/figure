@@ -2217,10 +2217,8 @@ class TiffExport(FigureExport):
         y2 = scale_to_export_dpi(y2)
         width = scale_to_export_dpi(width)
 
-        for l in range(width):
-            draw.line([(x, y), (x2, y2)], fill=rgb)
-            y += 1
-            y2 += 1
+        for l in range(-width // 2, width // 2):
+            draw.line([(x, y+l), (x2, y2+l)], fill=rgb)
 
     def draw_temp_label(self, text, fontsize, rgb):
         """Returns a new PIL image with text. Handles html."""
