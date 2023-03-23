@@ -82,7 +82,7 @@ var ScalebarFormView = Backbone.View.extend({
             color = $('.label-color span:first', $form).attr('data-color'),
             show_label = $('.scalebar_label', $form).prop('checked'),
             font_size = $('.scalebar_font_size span:first', $form).text().trim(),
-            height = $('.scalebar-height', $form).val();
+            height = parseInt($('.scalebar-height', $form).val());
 
         this.models.forEach(function(m){
             var old_sb = m.get('scalebar');
