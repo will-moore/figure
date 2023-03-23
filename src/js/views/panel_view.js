@@ -276,10 +276,11 @@
                 sb_json.position = sb.position;
                 sb_json.color = sb.color;
                 sb_json.length = sb.length;
+                sb_json.height = sb.height;
                 sb_json.font_size = sb.font_size;
                 sb_json.show_label = sb.show_label;
                 sb_json.symbol = sb.units;
-
+                console.log(sb.height)
                 // Use global LENGTH_UNITS to get symbol for unit.
                 if (window.LENGTH_UNITS && window.LENGTH_UNITS[sb.units]){
                     sb_json.symbol = window.LENGTH_UNITS[sb.units].symbol;
