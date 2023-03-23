@@ -379,10 +379,10 @@
         width:100%;
     }
 
-    .previewIdChange .glyphicon-ok {
+    .previewIdChange .green {
         color: #0f0;
     }
-    .previewIdChange .glyphicon-flag {
+    .previewIdChange .red {
         color: #f00;
     }
     /* Classes here are generated in templates from 'top' etc See labelicon classes below */

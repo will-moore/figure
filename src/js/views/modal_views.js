@@ -356,9 +356,8 @@ import FigureModel from "../models/figure_model";
                 if (typeof match2 != 'undefined') {
                     match = match && match2;
                 }
-                var m = match ? "ok" : "flag";
-                var rv = "<span class='glyphicon glyphicon-" + m + "'></span>";
-                return rv;
+                if (match) return "<i class='green bi bi-check-lg'></i>";
+                return "<i class='red bi bi-flag-fill'></i>";
             };
 
             // thumbnail
