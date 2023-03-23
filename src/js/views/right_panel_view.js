@@ -8,6 +8,7 @@
     import $ from "jquery";
 
     import {figureConfirmDialog, showModal} from "./util";
+    import { FigureColorPicker } from "../main";
 
     import FigureModel from "../models/figure_model";
     import InfoPanelView from "./info_panel_view";
@@ -301,7 +302,7 @@
 
             // one-off build 'New Label' form, with same template as used for 'Edit Label' forms
             var json = {'l': {'text':'', 'size':12, 'color':'000000'}, 'position':'top',
-                'edit':false, 'position_icon_cls': LABEL_POSITION_ICONS['topleft']};
+                'edit':false, 'position_icon_cls': LABEL_POSITION_ICONS['top']};
             $('.new-label-form', this.$el).html(this.template(json));
             // $('.btn-sm').tooltip({container: 'body', placement:'bottom', toggle:"tooltip"});
 

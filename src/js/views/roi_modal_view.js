@@ -7,7 +7,7 @@ import Mousetrap from "mousetrap";
 import FigureModel from "../models/figure_model";
 import RoiList from "../models/roi_model";
 import ShapeManager from "../shape_editor/shape_manager";
-
+import { FigureColorPicker } from "../main";
 
 export const RoiModalView = Backbone.View.extend({
 

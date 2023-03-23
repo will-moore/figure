@@ -4,7 +4,7 @@ import _ from "underscore";
 import $ from "jquery";
 
 import LutPickerView from "./lutpicker";
-const FigureLutPicker = new LutPickerView();
+import { FigureColorPicker } from "../main";
 
 import channel_slider_template from '../../templates/channel_slider.template.html?raw';
 
@@ -304,7 +304,9 @@ var ChannelSliderView = Backbone.View.extend({
                 var active = actives.reduce(allEqualFn, actives[0]);
                 var style = {'background-position': '0 0'}
                 var sliderClass = '';
-                var lutBgPos = FigureLutPicker.getLutBackgroundPosition(color);
+                console.log("FIXME FigureLutPickergetLutBackgroundPosition(color)");
+                // var lutBgPos = FigureLutPicker.getLutBackgroundPosition(color);
+                var lutBgPos = 0;
                 if (color.endsWith('.lut')) {
                     style['background-position'] = lutBgPos;
                     sliderClass = 'lutBg';

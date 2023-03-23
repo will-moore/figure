@@ -1036,7 +1036,7 @@
     /*  color-picker  */
 
     .colorpickerOption {
-        background-image: url("../3rdparty/bootstrap-colorpicker/img/bootstrap-colorpicker/hue.png");
+        background-image: url("../images/hue.png");
         background-size: 20px 50px;
         background-position: 0 100%;
     }

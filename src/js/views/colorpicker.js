@@ -1,6 +1,6 @@
 
 //
-// Copyright (C) 2015 University of Dundee & Open Microscopy Environment.
+// Copyright (C) 2015-2023 University of Dundee & Open Microscopy Environment.
 // All rights reserved.
 //
 // This program is free software: you can redistribute it and/or modify
@@ -18,8 +18,9 @@
 //
 
 import Backbone from "backbone";
+import _ from "underscore";
 import $ from "jquery";
-import { showModal } from "./util";
+import { showModal, hideModals } from "./util";
 
 // Should only ever have a singleton on this
 var ColorPickerView = Backbone.View.extend({
@@ -30,118 +31,28 @@ var ColorPickerView = Backbone.View.extend({
     pickedColors: [],
 
     initialize:function () {
-        
-        // var sliders = {
-        //     saturation: {
-        //         maxLeft: 200,
-        //         maxTop: 200,
-        //         callLeft: 'setSaturation',
-        //         callTop: 'setBrightness'
-        //     },
-        //     hue: {
-        //         maxLeft: 0,
-        //         maxTop: 200,
-        //         callLeft: false,
-        //         callTop: 'setHue'
-        //     },
-        //     alpha: {
-        //         maxLeft: 0,
-        //         maxTop: 200,
-        //         callLeft: false,
-        //         callTop: 'setAlpha'
-        //     }
-        // };
-
-        // var self = this,
-        //     editingRGB = false;     // flag to prevent update of r,g,b fields
-
         this.$submit_btn = $("#colorpickerModal .modal-footer button[type='submit']");
-
-        // TODO: use <input type="color"/>
-        // var $cp = $('.demo-auto').colorpicker({
-        //     'sliders': sliders,
-        //     'color': '00ff00',
-        // });
-
-        // // Access the colorpicker object for use below...
-        // var cp = $cp.data('colorpicker');
-
-
-        // $cp.on('changeColor', function(event){
-
-        //     // In edge-case of starting with 'black', clicking on Hue slider,
-        //     // default is to stay 'black', but we want to pick the color
-        //     // by setting saturation and brightness.
-        //     var c = event.color;
-        //     if ((c.toHex() === "#000000" || c.toHex() === "#ffffff") &&
-        //             cp.currentSlider && cp.currentSlider.callTop === "setHue") {
-        //         cp.color.setSaturation(1);
-        //         cp.color.setBrightness(0);
-        //         cp.update(true);
-        //         cp.element.trigger({
-        //             type: 'changeColor',
-        //             color: cp.color
-        //         });
-        //         // so we don't do this again until next click
-        //         cp.currentSlider = undefined;
-        //         return;
-        //     }
-
-        //     // enable form submission & show color
-        //     self.$submit_btn.prop('disabled', false);
-        //     $('.oldNewColors li:first-child').css('background-color', event.color.toHex());
-
-        //     // update red, green, blue inputs
-        //     if (!editingRGB) {
-        //         var rgb = event.color.toRGB();
-        //         $(".rgb-group input[name='red']").val(rgb.r);
-        //         $(".rgb-group input[name='green']").val(rgb.g);
-        //         $(".rgb-group input[name='blue']").val(rgb.b);
-        //     }
-        // });
-
-        $(".rgb-group input").bind("change keyup", function(){
-            var $this = $(this),
-                value = $.trim($this.val());
-            // check it's a number between 0 - 255
-            if (value == parseInt(value, 10)) {
-                value = parseInt(value, 10);
-                if (value < 0) {
-                    value = 0;
-                    $this.val(value);
-                }
-                else if (value > 255) {
-                    value = 255;
-                    $this.val(value);
-                }
-            } else {
-                value = 255
-                $this.val(value);
-            }
-
-            // update colorpicker
-            var r = $(".rgb-group input[name='red']").val(),
-                g = $(".rgb-group input[name='green']").val(),
-                b = $(".rgb-group input[name='blue']").val(),
-                rgb = "rgb(" + r + "," + g + "," + b + ")";
-
-            // flag prevents update of r, g, b fields while typing
-            editingRGB = true;
-            $('.demo-auto').colorpicker('setValue', rgb);
-            editingRGB = false;
-        });
     },
 
-    
     events: {
+        "input .color-input": "handleColorInput",
         "submit .colorpickerForm": "handleColorpicker",
         "click .pickedColors button": "pickRecentColor",
+    },
+
+    handleColorInput: function(event) {
+        let color = event.target.value;
+        // enable form submission & show color
+        this.$submit_btn.prop('disabled', false);
+        $('.oldNewColors li:first-child').css('background-color', color);
     },
 
     // 'Recent colors' buttons have color as their title
     pickRecentColor: function(event) {
         var color = $(event.target).prop('title');
-        $('.demo-auto').colorpicker('setValue', color);
+        $('.color-input').val(color).trigger("click");
+        // enable submit
+        this.$submit_btn.prop('disabled', false);
     },
 
     // submit of the form: call the callback and close dialog
@@ -149,7 +60,7 @@ var ColorPickerView = Backbone.View.extend({
         event.preventDefault();
 
         // var color = $(".colorpickerForm input[name='color']").val();
-        var color = $('.demo-auto').colorpicker('getValue');
+        var color = $('.color-input').val();
 
         // very basic validation (in case user has edited color field manually)
         if (color.length === 0) return;
@@ -166,17 +77,15 @@ var ColorPickerView = Backbone.View.extend({
             this.success(color);
         }
 
-        $("#colorpickerModal").modal('hide');
+        hideModals();
         return false;
     },
 
     show: function(options) {
-
         showModal("colorpickerModal");
 
+        $(".color-input", this.$el).trigger("click");
         if (options.color) {
-            $('.demo-auto').colorpicker('setValue', options.color);
-
             // compare old and new colors - init with old color
             $('.oldNewColors li').css('background-color', "#" + options.color);
 
