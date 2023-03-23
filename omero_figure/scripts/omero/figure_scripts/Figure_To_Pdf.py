@@ -1434,19 +1434,20 @@ class FigureExport(object):
         position = 'position' in sb and sb['position'] or 'bottomright'
         align = 'left'
 
+        half_height = sb['height'] // 2
         if position == 'topleft':
             lx = x + spacer
-            ly = y + spacer
+            ly = y + spacer + half_height
         elif position == 'topright':
             lx = x + width - spacer
-            ly = y + spacer
+            ly = y + spacer + half_height
             align = "right"
         elif position == 'bottomleft':
             lx = x + spacer
-            ly = y + height - spacer
+            ly = y + height - spacer - half_height
         elif position == 'bottomright':
             lx = x + width - spacer
-            ly = y + height - spacer
+            ly = y + height - spacer - half_height
             align = "right"
 
         pixel_size_x = panel['pixel_size_x']
@@ -1476,7 +1477,7 @@ class FigureExport(object):
         else:
             lx_end = lx - canvas_length
 
-        self.draw_scalebar_line(lx, ly, lx_end, ly, 3, (red, green, blue))
+        self.draw_scalebar_line(lx, ly, lx_end, ly, sb["height"], (red, green, blue))
 
         if 'show_label' in sb and sb['show_label']:
             symbol = u"\u00B5m"
@@ -1498,7 +1499,10 @@ class FigureExport(object):
                 ly = ly + 5
 
             self.draw_text(
-                label, (lx + lx_end)/2, ly, font_size, (red, green, blue),
+                label, (lx + lx_end)/2,
+                ly + ((-1 if position in ["bottomleft", "bottomright"]
+                       else 1) * half_height),
+                font_size, (red, green, blue),
                 align="center")
 
     def is_big_image(self, image):
