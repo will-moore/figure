@@ -560,25 +560,17 @@
           </div>
           <div class="modal-body">
             <p>Choose a new Image ID for the selected panels</p>
-            <form
-              class="setIdForm form-inline"
-              role="form"
-              style="margin-top: 10px; margin-bottom: 10px"
-            >
-              <div class="form-group">
+            <form class="setIdForm row g-3">
+              <div class="col-auto">
                 <input
                   type="text"
                   class="form-control imgId"
                   placeholder="Image ID"
                 />
               </div>
-              <button
-                type="submit"
-                class="btn btn-primary preview"
-                disabled="disabled"
-              >
-                Preview
-              </button>
+              <div class="col-auto">
+                <button type="submit" class="btn btn-primary mb-3 preview">Preview</button>
+              </div>
             </form>
             <div class="previewIdChange"></div>
           </div>
@@ -1356,7 +1348,6 @@
             title=""
             data-original-title="Edit Name"
           >
-            transfer-test
           </div>
 
           <form id="alignment-toolbars" class="d-flex">
@@ -1663,7 +1654,7 @@
     </main>
 
     <div id="js-legend" class="legend-container" style="z-index: 100">
-      <div class="panel panel-default legend-expanded editing" style="">
+      <div class="panel panel-default legend-expanded editing">
         <button
           type="button"
           class="close collapse-legend"

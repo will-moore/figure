@@ -5,6 +5,8 @@ import _ from "underscore";
 import $ from "jquery";
 import * as bootstrap from "bootstrap";
 
+import preview_id_change_template from '../../templates/modal_dialogs/preview_id_change.template.html?raw';
+
 import FigureModel from "../models/figure_model";
 
     export const DpiModalView = Backbone.View.extend({
@@ -236,7 +238,7 @@ import FigureModel from "../models/figure_model";
 
         el: $("#setIdModal"),
 
-        template: _.template("src/templates/modal_dialogs/preview_Id_change_template.html"),
+        template: _.template(preview_id_change_template),
 
         model:FigureModel,
 
@@ -252,7 +254,8 @@ import FigureModel from "../models/figure_model";
             var self = this;
 
             // when dialog is shown, clear and render
-            $("#setIdModal").bind("show.bs.modal", function(){
+            const myModalEl = document.getElementById('setIdModal')
+            myModalEl.addEventListener('shown.bs.modal', () => {
                 delete self.newImg;
                 self.render();
             });
@@ -278,7 +281,15 @@ import FigureModel from "../models/figure_model";
                 idInput = $('input.imgId', this.$el).val();
 
             // get image Data
-            $.getJSON(BASE_WEBFIGURE_URL + 'imgData/' + parseInt(idInput, 10) + '/', function(data){
+            const imgDataUrl = BASE_WEBFIGURE_URL + 'imgData/' + parseInt(idInput, 10) + '/';
+            $.ajax({
+                url: imgDataUrl,
+                xhrFields: {
+                    withCredentials: true, mode: 'cors'
+                },
+                dataType: 'json',
+                // work with the response
+                success: function( data ) {
 
                 // just pick what we need
                 var newImg = {
@@ -304,6 +315,7 @@ import FigureModel from "../models/figure_model";
                 };
                 self.newImg = newImg;
                 self.render();
+                }
             }).fail(function(event) {
                 alert("Image ID: " + idInput +
                     " could not be found on the server, or you don't have permission to access it");

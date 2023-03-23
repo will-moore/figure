@@ -166,6 +166,30 @@
         overflow-y: auto;
     }
 
+    /* from older bootstrap */
+    .panel {
+        border-radius: 4px;
+        -webkit-box-shadow: 0 1px 1px rgb(0 0 0 / 5%);
+        box-shadow: 0 1px 1px rgb(0 0 0 / 5%);
+    }
+    .panel-body {
+        padding: 15px;
+    }
+    .close {
+        float: right;
+        font-size: 21px;
+        font-weight: bold;
+        line-height: 1;
+        color: #000000;
+        text-shadow: 0 1px 0 #ffffff;
+        opacity: 0.2;
+        filter: alpha(opacity=20);
+    }
+
+    textarea.form-control {
+        height: auto;
+    }
+
     .legend-expanded {
         max-height: 250px;
     }
@@ -237,12 +261,6 @@
         left: 300px;
         position: absolute;
         top: 3px;
-    }
-    #zoom_slider .ui-slider-handle {
-        background: #ddd;
-        border: 1px solid white;
-        height: 14px;
-        border-radius: 5px;
     }
     .toggle_channel {
         border-radius: 6px 6px 6px 6px;
