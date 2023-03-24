@@ -1493,8 +1493,9 @@ class FigureExport(object):
                 pass
 
             # For 'bottom' scalebar, put label above
+            # 5 is an empirically determined offset that "works"
             if 'bottom' in position:
-                ly = ly - font_size
+                ly = ly - font_size - 5
             else:
                 ly = ly + 5
 
@@ -2297,7 +2298,6 @@ class TiffExport(FigureExport):
     def draw_text(self, text, x, y, fontsize, rgb, align="center"):
         """ Add text to the current figure page """
         x = scale_to_export_dpi(x)
-        y = y - 5       # seems to help, but would be nice to fix this!
         y = scale_to_export_dpi(y)
         fontsize = scale_to_export_dpi(fontsize)
 
