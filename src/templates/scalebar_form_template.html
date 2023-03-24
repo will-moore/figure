@@ -14,13 +14,21 @@
             </span>
         </div>
     </div>
-    <form class="scalebar_form">
+    <form class="scalebar_form" style="position: relative">
+        <div style="position: absolute; right: 0;">
+            <% if (show){ %>
+                <button type="submit" class="show_scalebar btn btn-sm btn-success pull-right">Show</button>
+            <% } else { %>
+                <button type="button" class="hide_scalebar btn btn-default btn-sm pull-right">Hide</button>
+            <% } %>
+        </div>
+
         <div class="row">
             <div class="form-group col-sm-2 scalebar_text">
                 Length
             </div>
             <div class="form-group col-sm-2 scalebar_length">
-                <input type="text" class="scalebar-length form-control col-sm-4 input-sm" 
+                <input type="text" class="scalebar-length form-control input-sm" 
                             placeholder="Length" value="<%= length %>" />
             </div>
             <div class="form-group col-sm-1 btn-group scalebar_unit">
@@ -34,41 +42,6 @@
                         <li><a href='#'><%= u.unit %> (<span data-unit="<%= u.unit %>"><%= u.symbol %></span>)</a></li>
                     <% }); %>
                 </ul>
-            </div>
-            <div class="col-sm-1" />
-            <div class="form-group col-sm-2 scalebar_text">
-                Height
-            </div>
-            <div class="form-group col-sm-2 scalebar_length">
-                <input type="text" class="scalebar-height form-control input-sm" 
-                placeholder="Height" value="<%= height %>" />
-            </div>
-            <div class="form-group col-sm-1 scalebar_text" style="padding-left: 2px;">
-                px
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="form-group col-sm-2 scalebar_text">
-                Label
-            </div>
-            <div class="form-group col-sm-1">
-                <input type="checkbox" class="scalebar_label" <% if (show_label) print("checked") %> /> 
-            </div>
-            <div class="form-group col-sm-auto btn-group">
-                <button type="button" class="scalebar_font_size btn btn-default btn-sm dropdown-toggle" title="Label Size"
-                data-toggle="dropdown" style="width:33px; <% if (!show_label) print("display:none") %>">
-                    <span><%= font_size %></span>
-                    <span class="caret"></span>
-                </button>
-                <ul class="dropdown-menu" role="menu">
-                <% _.each([6,8,10,12,14,18,21,24,36,48],function(p){
-                    print ("<li><a href='#'><span>"+p+"</span></a></li>")
-                }); %>
-                </ul>
-            </div>
-            <div class="form-group col-sm-1 scalebar_text" style="padding-left: 2px;">
-                <% if (show_label) print("pt") %>
             </div>
             <div class="col-sm-1" />
             <div class="form-group col-sm-auto btn-group">
@@ -128,13 +101,40 @@
                     </a></li>
                 </ul>
             </div>
-            <div class="col-sm-1" />
-            <div class="col-sm-6">
-                <% if (show){ %>
-                    <button type="submit" class="show_scalebar btn btn-sm btn-success pull-right">Show</button>
-                <% } else { %>
-                    <button type="button" class="hide_scalebar btn btn-default btn-sm pull-right">Hide</button>
-                <% } %>
+        </div>
+
+        <div class="row">
+            <div class="form-group col-sm-2 scalebar_text">
+                Height
+            </div>
+            <div class="form-group col-sm-2 scalebar_length">
+                <input type="text" class="scalebar-height form-control input-sm" 
+                placeholder="Height" value="<%= height %>" />
+            </div>
+            <div class="form-group col-sm-1 scalebar_text" style="padding-left: 2px;">
+                px
+            </div>
+
+            <div class="form-group col-sm-auto scalebar_text">
+                Label
+            </div>
+            <div class="form-group col-sm-auto" style="margin: 2px">
+                <input type="checkbox" class="scalebar_label" <% if (show_label) print("checked") %> /> 
+            </div>
+            <div class="form-group col-sm-1 btn-group" style="padding: 0;">
+                <button type="button" class="scalebar_font_size btn btn-default btn-sm dropdown-toggle" title="Label Size"
+                data-toggle="dropdown" style="width:33px; <% if (!show_label) print("display:none") %>">
+                    <span><%= font_size %></span>
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" role="menu">
+                <% _.each([6,8,10,12,14,18,21,24,36,48],function(p){
+                    print ("<li><a href='#'><span>"+p+"</span></a></li>")
+                }); %>
+                </ul>
+            </div>
+            <div class="form-group col-sm-1 scalebar_text" style="padding-left: 2px;">
+                <% if (show_label) print("pt") %>
             </div>
         </div>
     </form>
