@@ -901,7 +901,7 @@ class FigureExport(object):
         if self.zip_folder_name is not None:
             full_name = os.path.join(self.zip_folder_name, full_name)
 
-        while(os.path.exists(full_name)):
+        while os.path.exists(full_name):
             index += 1
             full_name = "%s_page_%02d.%s" % (name, index, fext)
             if self.zip_folder_name is not None:
@@ -1477,7 +1477,8 @@ class FigureExport(object):
         else:
             lx_end = lx - canvas_length
 
-        self.draw_scalebar_line(lx, ly, lx_end, ly, sb["height"], (red, green, blue))
+        self.draw_scalebar_line(lx, ly, lx_end, ly, sb["height"],
+                                (red, green, blue))
 
         if 'show_label' in sb and sb['show_label']:
             symbol = u"\u00B5m"
