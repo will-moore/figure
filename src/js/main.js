@@ -10,9 +10,7 @@ import Backbone from "backbone";
 import $ from "jquery";
 
 import FigureModel from "./models/figure_model";
-import ColorPickerView from "./views/colorpicker";
-// import LutPickerView from "./views/lutpicker";
-import FigureView from "./views/figure_view";
+import createFigureView from "./views/figure_view";
 import SvgView from "./views/svg_model_view";
 import RightPanelView from "./views/right_panel_view";
 import { UndoManager, UndoView } from "./models/undo";
@@ -21,11 +19,6 @@ import { ajaxSetup } from "./views/util.csrf";
 import { figureConfirmDialog, hideModals, showModal } from "./views/util";
 
 export const figureModel = new FigureModel();
-
-// window.figureModel = new FigureModel();
-
-export const FigureColorPicker = new ColorPickerView();
-// export const FigureLutPicker = new LutPickerView();
 
 const RELEASE_VERSION = import.meta.env.VITE_VERSION;
 console.log("RELEASE_VERSION", RELEASE_VERSION);
@@ -199,8 +192,7 @@ ajaxSetup();
 
 const app = new FigureRouter();
 
-// view needs the app to be able to navigate
-new FigureView({ model: figureModel, app }); // uiState: uiState
+createFigureView({ model: figureModel, app })
 
 Backbone.history.start(config);
 

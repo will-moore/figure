@@ -3,8 +3,8 @@ import Backbone from "backbone";
 import _ from "underscore";
 import $ from "jquery";
 
-import LutPickerView from "./lutpicker";
-import { FigureColorPicker } from "../main";
+import FigureLutPicker from "../views/lutpicker";
+import FigureColorPicker from "../views/colorpicker";
 
 import channel_slider_template from '../../templates/channel_slider.template.html?raw';
 
@@ -303,18 +303,13 @@ var ChannelSliderView = Backbone.View.extend({
                 var reverse = reverses.reduce(allEqualFn, reverses[0]) ? true : false;
                 var active = actives.reduce(allEqualFn, actives[0]);
                 var style = {'background-position': '0 0'}
-                var sliderClass = '';
-                console.log("FIXME FigureLutPickergetLutBackgroundPosition(color)");
-                // var lutBgPos = FigureLutPicker.getLutBackgroundPosition(color);
-                var lutBgPos = 0;
+                var lutBgPos = FigureLutPicker.getLutBackgroundPosition(color);
+                console.log("color", color);
                 if (color.endsWith('.lut')) {
                     style['background-position'] = lutBgPos;
-                    sliderClass = 'lutBg';
+                    color = "ccc";
                 } else if (color.toUpperCase() === "FFFFFF") {
                     color = "ccc";  // white slider would be invisible
-                }
-                if (reverse) {
-                    style.transform = 'scaleX(-1)';
                 }
                 if (color == "FFFFFF") color = "ccc";  // white slider would be invisible
 

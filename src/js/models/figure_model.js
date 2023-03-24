@@ -458,15 +458,12 @@
             this.set('loading_count', this.get('loading_count') + 1);
 
             // Get the json data for the image...
-            $.ajax({
-                url: imgDataUrl,
-                xhrFields: {
-                    withCredentials: true, mode: 'cors'
-                },
-                jsonp: callback, // 'callback'
-                dataType: dataType,
-                // work with the response
-                success: function( data ) {
+            let cors_headers = { mode: 'cors', credentials: 'include', headers: {"Content-Type": "application/json"
+              }, };
+            fetch(imgDataUrl, cors_headers)
+                .then(rsp => rsp.json())
+                .then(data => {
+                    console.log("data", data);
 
                     self.set('loading_count', self.get('loading_count') - 1);
 
@@ -527,13 +524,6 @@
                     // We do some additional processing in Panel.parse()
                     self.panels.create(n, {'parse': true}).set('selected', true);
                     self.notifySelectionChange();
-                },
-
-                error: function(event) {
-                    self.set('loading_count', self.get('loading_count') - 1);
-                    alert("Image not found on the server, " +
-                        "or you don't have permission to access it at " + imgDataUrl);
-                },
             });
         },
 

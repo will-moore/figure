@@ -8,7 +8,7 @@
     import $ from "jquery";
 
     import {figureConfirmDialog, showModal} from "./util";
-    import { FigureColorPicker } from "../main";
+    import FigureColorPicker from "../views/colorpicker";
 
     import FigureModel from "../models/figure_model";
     import InfoPanelView from "./info_panel_view";

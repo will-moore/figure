@@ -24,7 +24,7 @@
     backboneMousetrap(_, Backbone, Mousetrap);
 
     // var SelectionView = Backbone.View.extend({
-    var FigureView = Backbone.View.extend({
+    const FigureView = Backbone.View.extend({
 
         el: $("#body"),
 
@@ -969,4 +969,10 @@
         }
     });
 
-export default FigureView
+function createFigView (config) {
+    console.log("create fig-view test", config);
+    const figView = new FigureView(config);
+    return figView;
+}
+
+export default createFigView;

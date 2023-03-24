@@ -23,6 +23,7 @@ import _ from 'underscore';
 import * as bootstrap from "bootstrap"
 
 import lut_picker_template from '../../templates/lut_picker.template.html?raw';
+import { showModal } from "./util";
 
 // Should only ever have a singleton on this
 var LutPickerView = Backbone.View.extend({
@@ -106,7 +107,6 @@ var LutPickerView = Backbone.View.extend({
 
     getLutBackgroundPosition: function(lutName) {
         var lutIndex = this.LUT_NAMES.indexOf(lutName);
-        var css = {};
         if (lutIndex > -1) {
             return '0px -' + ((lutIndex * 50) +2) + 'px';
         } else {
@@ -124,7 +124,7 @@ var LutPickerView = Backbone.View.extend({
 
     show: function(options) {
 
-        this.lutModal.show();
+        showModal("lutpickerModal");
 
         // save callback to use on submit
         if (options.success) {
@@ -158,4 +158,6 @@ var LutPickerView = Backbone.View.extend({
     }
 });
 
-export default LutPickerView
+const FigureLutPicker = new LutPickerView();
+
+export default FigureLutPicker

@@ -8,6 +8,7 @@ import * as bootstrap from "bootstrap";
 import preview_id_change_template from '../../templates/modal_dialogs/preview_id_change.template.html?raw';
 
 import FigureModel from "../models/figure_model";
+import FigureColorPicker from "../views/colorpicker";
 
     export const DpiModalView = Backbone.View.extend({
 

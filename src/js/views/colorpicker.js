@@ -127,4 +127,7 @@ var ColorPickerView = Backbone.View.extend({
     }
 });
 
-export default ColorPickerView
+// create single instance:
+const FigureColorPicker = new ColorPickerView();
+
+export default FigureColorPicker

@@ -62,9 +62,11 @@
         data-idx="<%=idx%>" value="<%= startAvg %>" max="<%= endAvg %>">
     </span>
     <div class="ch_slider">
+        <!-- We use 2 sliders to simulate a 2-handled slider -->
         <input class="ch_start_slider" data-idx="<%=idx%>"
             min="<%= min %>" max="<%= max %>" step="<%= step %>"
-            type="range" value="<%= startAvg %>" style="background-color:#<%=color%>"/>
+            type="range" value="<%= startAvg %>"
+            style="background-color:#<%=color%>; --bgPos: <%= lutBgPos %>; --scaleX: <%= reverse ? -1 : 1 %>"/>
         <input class="ch_end_slider" data-idx="<%=idx%>"
             min="<%= min %>" max="<%= max %>" step="<%= step %>"
             type="range" value="<%= endAvg %>" style="background-color: rbga(1,1,1,0)"/>
