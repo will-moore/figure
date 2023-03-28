@@ -7,7 +7,7 @@
             title="<%= _.escape(label) %>"
                     class="btn btn-default channel-btn lutBg <% if (isDark) { print('font-white') } %>"
                     data-index="<%= idx %>"
-                    style="background-color:#<%= color %>; background-position: <%= lutBgPos %>">
+                    style="background-color:#<%= color %>; background-position: <%= lutBgPos %>; background-image: url(<%= lutsPngUrl %>)">
 
                     <%= _.escape(label) %>
                     <div class="<% if(active) { %>ch-btn-down<% } else if (typeof active == 'boolean') { %>ch-btn-up<% } else { %>ch-btn-flat<% }%>">&nbsp</div>
@@ -63,10 +63,16 @@
     </span>
     <div class="ch_slider">
         <!-- We use 2 sliders to simulate a 2-handled slider -->
+        <!-- We use a ::before element for background so we can 'flip' it scaleX(-1)
+            without flipping the slider itself (can't just flip background-image)
+         -->
         <input class="ch_start_slider" data-idx="<%=idx%>"
             min="<%= min %>" max="<%= max %>" step="<%= step %>"
             type="range" value="<%= startAvg %>"
-            style="background-color:#<%=color%>; --bgPos: <%= lutBgPos %>; --scaleX: <%= reverse ? -1 : 1 %>"/>
+            style="background-color:#<%=color%>;
+                --bgPos: <%= lutBgPos %>;
+                --lutPng: url(<%= lutsPngUrl %>);
+                --scaleX: <%= reverse ? -1 : 1 %>"/>
         <input class="ch_end_slider" data-idx="<%=idx%>"
             min="<%= min %>" max="<%= max %>" step="<%= step %>"
             type="range" value="<%= endAvg %>" style="background-color: rbga(1,1,1,0)"/>

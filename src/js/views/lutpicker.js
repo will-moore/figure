@@ -25,6 +25,10 @@ import * as bootstrap from "bootstrap"
 import lut_picker_template from '../../templates/lut_picker.template.html?raw';
 import { showModal } from "./util";
 
+import lutsPng from "../../images/luts_10.png";
+// Need to handle dev vv built (omero-web) paths
+const lutsPngUrl = STATIC_DIR + lutsPng;
+
 // Should only ever have a singleton on this
 var LutPickerView = Backbone.View.extend({
 
@@ -152,7 +156,7 @@ var LutPickerView = Backbone.View.extend({
                         'name': lut.name,
                         'displayName': this.formatLutName(lut.name)};
             }.bind(this));
-            html = this.template({'luts': luts});
+            html = this.template({'luts': luts, lutsPngUrl});
         }
         $(".modal-body", this.el).html(html);
     }

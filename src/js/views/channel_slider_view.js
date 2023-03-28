@@ -8,6 +8,9 @@ import FigureColorPicker from "../views/colorpicker";
 
 import channel_slider_template from '../../templates/channel_slider.template.html?raw';
 
+import lutsPng from "../../images/luts_10.png";
+// Need to handle dev vv built (omero-web) paths
+const lutsPngUrl = STATIC_DIR + lutsPng;
 
 const SLIDER_INCR_CUTOFF = 100;
 // If the max value of a slider is below this, use smaller slider increments
@@ -330,7 +333,9 @@ var ChannelSliderView = Backbone.View.extend({
                                                 'lutBgPos': lutBgPos,
                                                 'reverse': reverse,
                                                 'color': color,
-                                                'isDark': this.isDark(color)});
+                                                'isDark': this.isDark(color),
+                                                lutsPngUrl,
+                                            });
                 var $div = $(sliderHtml).appendTo(this.$el);
 
                 // $div.find('.ch_slider').slider({
