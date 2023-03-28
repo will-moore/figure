@@ -27,7 +27,7 @@ var ScalebarFormView = Backbone.View.extend({
         "click .pixel_size_display": "edit_pixel_size",
         "keypress .pixel_size_input"  : "enter_pixel_size",
         "blur .pixel_size_input"  : "save_pixel_size",
-        //"keyup input[type='text']"  : "handle_keyup",
+        "keyup input[type='text']"  : "handle_keyup",
      },
 
     handle_keyup: function (event) {
@@ -82,7 +82,7 @@ var ScalebarFormView = Backbone.View.extend({
     // called when form changes
     update_scalebar: function(event) {
 
-        var $form = $('#scalebar_form');
+        var $form = $('.scalebar_form ');
 
         var length = $('.scalebar-length', $form).val(),
             units = $('.scalebar-units span:first', $form).attr('data-unit'),
