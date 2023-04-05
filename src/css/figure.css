@@ -1144,6 +1144,7 @@
     }
 
     .roiModalRoiItem .glyphicon {
+        display: block;
         width: 16px;
         height: 16px;
     }
@@ -1186,6 +1187,14 @@
     }
     .roiModalRoiItem:hover .btn-sm {
         visibility: visible;
+    }
+
+    /* Copied from Bootstrap 3.1 - Removed in bootstrap 5.3 */
+    .btn-xs {
+        padding: 1px 5px;
+        font-size: 12px;
+        line-height: 1.5;
+        border-radius: 3px;
     }
 
     #xywh_table {

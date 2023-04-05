@@ -4,7 +4,7 @@
     import $ from "jquery";
 
     import {PanelList, Panel} from "./panel_model";
-    import { recoverFigureFromStorage, figureConfirmDialog} from "../views/util";
+    import { recoverFigureFromStorage, figureConfirmDialog, getJson} from "../views/util";
 
     // Version of the json file we're saving.
     // This only needs to increment when we make breaking changes (not linked to release versions.)
@@ -54,21 +54,12 @@
 
             var load_url = BASE_WEBFIGURE_URL + "load_web_figure/" + fileId + "/",
                 self = this;
-            console.log("loading", load_url);
 
-            let cors_headers = { mode: 'cors', credentials: 'include' };
-            fetch(load_url, cors_headers)
-                .then(rsp => rsp.json())
-                .then(data => {
-                    data.fileId = fileId;
-                    self.load_from_JSON(data);
-                    self.set('unsaved', false);
-                });
-            // $.getJSON(load_url, function(data){
-            //     data.fileId = fileId;
-            //     self.load_from_JSON(data);
-            //     self.set('unsaved', false);
-            // });
+            getJson(load_url).then(data => {
+                data.fileId = fileId;
+                self.load_from_JSON(data);
+                self.set('unsaved', false);
+            });
         },
 
         load_from_JSON: function(data) {

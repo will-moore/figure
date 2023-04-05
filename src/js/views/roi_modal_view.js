@@ -11,7 +11,8 @@ import FigureColorPicker from "../views/colorpicker";
 
 import shape_toolbar_template from '../../templates/shapes/shape_toolbar.template.html?raw';
 import roi_zt_buttons from '../../templates/modal_dialogs/roi_zt_buttons.template.html?raw';
-import { hideModal } from "./util";
+import RoiLoaderView from './roi_loader_view';
+import { hideModal, getJson } from "./util";
 
 export const RoiModalView = Backbone.View.extend({
 
@@ -146,10 +147,11 @@ export const RoiModalView = Backbone.View.extend({
             var $btn = $(".loadRois", this.$el)
                 .attr({'disabled': 'disabled'});
             $btn.parent().attr('title', 'Checking for ROIs...');  // title on parent div - still works if btn disabled
-            $.getJSON(url, function(data){
+
+            getJson(url).then((data) => {
                 this.omeroRoiCount = data.roi;
                 this.renderToolbar();
-            }.bind(this));
+            });
         },
 
         loadRoisFirstPage: function (event) {
@@ -185,8 +187,9 @@ export const RoiModalView = Backbone.View.extend({
         // Load Shapes from OMERO and render them
         loadRois: function() {
             var iid = this.m.get('imageId');
-            var roiUrl = ROIS_JSON_URL + '?image=' + iid + '&limit=' + this.roisPageSize + '&offset=' + (this.roisPageSize * this.roisPage);
-            $.getJSON(roiUrl, function(data){
+            let url = BASE_OMEROWEB_URL + 'api/v0/m/rois/';
+            var roiUrl = url + '?image=' + iid + '&limit=' + this.roisPageSize + '&offset=' + (this.roisPageSize * this.roisPage);
+            getJson(roiUrl).then((data) => {
                 this.Rois.set(data.data);
                 $(".loadRois", this.$el).prop('disabled', false);
                 $("#roiModalRoiList table").empty();
@@ -196,10 +199,6 @@ export const RoiModalView = Backbone.View.extend({
                 $("#roiModalRoiList table").append(roiLoaderView.el);
                 roiLoaderView.render();
                 this.renderPagination();
-            }.bind(this))
-            .fail(function(jqxhr, textStatus, error){
-                console.log("fail", arguments);
-                alert("Failed to load ROIS: " + textStatus + ", " + error);
             });
         },
 

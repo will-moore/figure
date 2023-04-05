@@ -1,5 +1,6 @@
 
 import Backbone from "backbone";
+import _ from "underscore";
 
 var ShapeModel = Backbone.Model.extend({
 

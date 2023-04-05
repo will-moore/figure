@@ -1,10 +1,17 @@
 
+import $ from "jquery";
+import _ from "underscore";
+import Backbone from "backbone";
+
+import roi_modal_roi_template from '../../templates/modal_dialogs/roi_modal_roi.template.html?raw';
+import roi_modal_shape_template from '../../templates/modal_dialogs/roi_modal_shape.template.html?raw';
+
 var RoiLoaderView = Backbone.View.extend({
 
     tagName: 'tbody',
 
-    template: JST["src/templates/modal_dialogs/roi_modal_roi.html"],
-    shapeTemplate: JST["src/templates/modal_dialogs/roi_modal_shape.html"],
+    template: _.template(roi_modal_roi_template),
+    shapeTemplate: _.template(roi_modal_shape_template),
 
     initialize: function(options) {
         this.render = _.debounce(this.render);
@@ -177,3 +184,5 @@ var RoiLoaderView = Backbone.View.extend({
         return this;
     }
 });
+
+export default RoiLoaderView

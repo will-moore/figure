@@ -37,7 +37,7 @@
             <%= roi.minT + 1 %><% if (roi.maxT !== roi.minT) print("-" + (roi.maxT + 1)); %>
         <% } %>
     </td>
-    <td>
+    <td style="padding: 4px;">
         <% if (roi.shapes.length === 1 && roi.shapes[0].icon) { %>
         <button type="button" class="addOmeroShape btn btn-success btn-sm"
                 title="Add Shape to image">

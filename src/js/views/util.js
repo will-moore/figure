@@ -255,3 +255,8 @@ export function hideModal(modalId) {
     }
     thisModal.hide();
 }
+
+export async function getJson (url) {
+    let cors_headers = { mode: 'cors', credentials: 'include' };
+    return fetch(url, cors_headers).then(rsp => rsp.json());
+}
