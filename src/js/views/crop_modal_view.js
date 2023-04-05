@@ -7,7 +7,7 @@ import Raphael from "raphael";
 import FigureModel from "../models/figure_model";
 import RectView from "./raphael-rect";
 
-import {figureConfirmDialog} from "./util";
+import {figureConfirmDialog, hideModal} from "./util";
 
 export const CropModalView = Backbone.View.extend({
 
@@ -30,7 +30,7 @@ export const CropModalView = Backbone.View.extend({
             var self = this;
 
             // Here we handle init of the dialog when it's shown...
-            $("#cropModal").bind("show.bs.modal", function(){
+            document.getElementById('cropModal').addEventListener('shown.bs.modal', () => {
                 // Clone the 'first' selected panel as our reference for everything
                 self.m = self.model.getSelected().head().clone();
                 self.listenTo(self.m, 'change:theZ change:theT', self.render);
@@ -263,7 +263,7 @@ export const CropModalView = Backbone.View.extend({
                 };
             }
 
-            $("#cropModal").modal('hide');
+            hideModal("cropModal");
 
             // prepare callback for below
             function cropAndClose(deleteROIs) {

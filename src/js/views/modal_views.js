@@ -9,6 +9,7 @@ import preview_id_change_template from '../../templates/modal_dialogs/preview_id
 
 import FigureModel from "../models/figure_model";
 import FigureColorPicker from "../views/colorpicker";
+import { hideModal } from "./util";
 
     export const DpiModalView = Backbone.View.extend({
 
@@ -20,7 +21,7 @@ import FigureColorPicker from "../views/colorpicker";
 
             var self = this;
             // when dialog is shown, clear and render
-            $("#dpiModal").bind("show.bs.modal", function(){
+            document.getElementById('dpiModal').addEventListener('shown.bs.modal', () => {
                 self.render();
             });
         },
@@ -53,7 +54,7 @@ import FigureColorPicker from "../views/colorpicker";
                 }
                 p.save(toset);
             });
-            $("#dpiModal").modal('hide');
+            hideModal("#dpiModal");
             return false;
         },
 
@@ -102,7 +103,7 @@ import FigureColorPicker from "../views/colorpicker";
         initialize: function(options) {
 
             var self = this;
-            $("#paperSetupModal").bind("show.bs.modal", function(){
+            document.getElementById('paperSetupModal').addEventListener('shown.bs.modal', () => {
                 self.render();
             });
             // don't update while typing
@@ -212,7 +213,7 @@ import FigureColorPicker from "../views/colorpicker";
             }
 
             this.model.set(json);
-            $("#paperSetupModal").modal('hide');
+            hideModal("paperSetupModal");
         },
 
         rerender: function() {
@@ -451,10 +452,10 @@ import FigureColorPicker from "../views/colorpicker";
 
             var self = this;
             // when the modal dialog is shown, focus the input
-            $("#addImagesModal").bind("focus",
+            $("#addImagesModal").on("focus",
                 function() {
                     setTimeout(function(){
-                        $('input.imgIds', self.$el).focus();
+                        $('input.imgIds', self.$el).triggger("focus");
                     },20);
                 });
         },

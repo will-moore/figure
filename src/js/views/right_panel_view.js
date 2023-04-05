@@ -226,7 +226,7 @@
         },
 
         editRois: function(event) {
-            $("#roiModal").modal("show");
+            showModal("roiModal");
             return false;
         },
 

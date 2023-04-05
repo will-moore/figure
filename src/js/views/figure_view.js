@@ -171,7 +171,7 @@
         paper_setup: function(event) {
             event.preventDefault();
 
-            $("#paperSetupModal").modal();
+            showModal("paperSetupModal");
         },
 
         show_about_dialog: function(event) {

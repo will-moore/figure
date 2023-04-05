@@ -20,7 +20,7 @@
 import Backbone from "backbone";
 import _ from "underscore";
 import $ from "jquery";
-import { showModal, hideModals } from "./util";
+import { showModal, hideModal } from "./util";
 
 // Should only ever have a singleton on this
 var ColorPickerView = Backbone.View.extend({
@@ -77,7 +77,7 @@ var ColorPickerView = Backbone.View.extend({
             this.success(color);
         }
 
-        hideModals();
+        hideModal("colorpickerModal");
         return false;
     },
 

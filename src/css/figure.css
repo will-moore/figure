@@ -1122,10 +1122,10 @@
     /** toolbar buttons **/
 
     .btn-toolbar span.glyphicon {
+        display: block;
         width: 16px;
         height: 16px;
         position: relative;
-        top: 3px;
         background-repeat: no-repeat;
     }
 

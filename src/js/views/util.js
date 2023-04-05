@@ -247,3 +247,11 @@ export function showModal(modalId) {
     }
     thisModal.show();
 }
+
+export function hideModal(modalId) {
+    let thisModal = bootstrap.Modal.getInstance(document.getElementById(modalId));
+    if (!thisModal) {
+        thisModal = new bootstrap.Modal("#" + modalId);
+    }
+    thisModal.hide();
+}

@@ -9,11 +9,15 @@ import RoiList from "../models/roi_model";
 import ShapeManager from "../shape_editor/shape_manager";
 import FigureColorPicker from "../views/colorpicker";
 
+import shape_toolbar_template from '../../templates/shapes/shape_toolbar.template.html?raw';
+import roi_zt_buttons from '../../templates/modal_dialogs/roi_zt_buttons.template.html?raw';
+import { hideModal } from "./util";
+
 export const RoiModalView = Backbone.View.extend({
 
-        template: _.template("src/templates/shapes/shape_toolbar_template.html"),
+        template: _.template(shape_toolbar_template),
 
-        roi_zt_buttons_template: _.template("src/templates/modal_dialogs/roi_zt_buttons.html"),
+        roi_zt_buttons_template: _.template(roi_zt_buttons),
 
         el: $("#roiModal"),
 
@@ -67,7 +71,8 @@ export const RoiModalView = Backbone.View.extend({
             });
 
             // Here we handle init of the dialog when it's shown...
-            $("#roiModal").bind("show.bs.modal", function(){
+            document.getElementById('roiModal').addEventListener('shown.bs.modal', () => {
+                console.log("ROI modal shown...")
                 // Clone the 'first' selected panel as our reference for everything
                 self.m = self.model.getSelected().head().clone();
 
@@ -299,7 +304,7 @@ export const RoiModalView = Backbone.View.extend({
                 panel.save({'shapes': shapesJson, 'theZ': theZ, 'theT': theT});
             });
 
-            $("#roiModal").modal("hide");
+            hideModal("roiModal");
             return false;
         },
 
@@ -422,12 +427,12 @@ export const RoiModalView = Backbone.View.extend({
                 "If you copy a region from the Crop dialog (under the 'Preview' tab), you can paste it here to create a new Rectangle."],
                 tip;
             if (this.rotated) {
-                tip = "<span class='label label-warning'>Warning</span> " +
+                tip = "<span class='badge text-bg-primary'>Warning</span> " +
                       "This image panel is rotated in the figure, but this ROI editor can't work with rotated images. " +
                       "The image is displayed here <b>without</b> rotation, but the ROIs you add will be applied " +
                       "correctly to the image panel in the figure.";
             } else {
-                tip = "<span class='label label-primary'>Tip</span> " + tips[parseInt(Math.random() * tips.length, 10)];
+                tip = "<span class='badge text-bg-primary'>Tip</span> " + tips[parseInt(Math.random() * tips.length, 10)];
             }
             $("#roiModalTip").show().html(tip);
         },

@@ -4,7 +4,7 @@ import $ from "jquery";
 
 import FigureModel from "../models/figure_model";
 
-import {figureConfirmDialog} from "./util";
+import {figureConfirmDialog, hideModal} from "./util";
 
 export const ChgrpModalView = Backbone.View.extend({
 
@@ -20,16 +20,16 @@ export const ChgrpModalView = Backbone.View.extend({
         var self = this;
 
         // Here we handle init of the dialog when it's shown...
-        $("#chgrpModal").bind("show.bs.modal", function () {
-            this.enableSubmit(false);
-            if (!this.model.get('fileId')) {
+        document.getElementById('chgrpModal').addEventListener('shown.bs.modal', () => {
+            self.enableSubmit(false);
+            if (!self.model.get('fileId')) {
                 $('#chgrpModal .modal-body').html("<p>Figure not saved. Please Save the Figure first.</p>");
             } else {
                 $('#chgrpModal .modal-body').html("");
                 self.loadGroups();
                 self.loadImageDetails();
             }
-        }.bind(this));
+        });
     },
 
     events: {
@@ -90,7 +90,7 @@ export const ChgrpModalView = Backbone.View.extend({
         }, 1000);
         $.post(url, { group_id: group_id, ann_id: fileId})
             .done(function (data) {
-                $("#chgrpModal").modal('hide');
+                hideModal("chgrpModal");
                 if (data.success) {
                     this.model.set({groupId: group_id});
                     figureConfirmDialog("Success", "Figure moved to Group: " + _.escape(group_name), ["OK"]);

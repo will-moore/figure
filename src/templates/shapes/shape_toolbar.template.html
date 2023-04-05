@@ -1,102 +1,102 @@
 
 
-<div class="btn-group shape-option" role="group" aria-label="...">
+<div class="btn-group me-2 shape-option" role="group" aria-label="...">
     <button type="button" data-state="SELECT"
-        class="btn btn-default<% if (state==='SELECT')print('pressed') %>">
+        class="btn btn-outline-secondary <% if (state==='SELECT')print('pressed') %>">
         <span class="glyphicon select-icon"></span></button>
 </div>
 
 
-<div class="btn-group shape-option" role="group" aria-label="...">
-    <button type="button" class="btn btn-default <% if (state==='RECT')print('pressed') %>"
+<div class="btn-group me-2 shape-option" role="group" aria-label="...">
+    <button type="button" class="btn btn-outline-secondary <% if (state==='RECT')print('pressed') %>"
             title="Rectangle" data-state="RECT">
         <span class="glyphicon rect-icon"></span></button>
-    <button type="button" class="btn btn-default <% if (state==='LINE')print('pressed') %>"
+    <button type="button" class="btn btn-outline-secondary <% if (state==='LINE')print('pressed') %>"
             title="Line" data-state="LINE">
         <span class="glyphicon line-icon"></span></button>
-    <button type="button" class="btn btn-default <% if (state==='ARROW')print('pressed') %>"
+    <button type="button" class="btn btn-outline-secondary <% if (state==='ARROW')print('pressed') %>"
             title="Arrow" data-state="ARROW">
         <span class="glyphicon arrow-icon"></span></button>
-    <button type="button" class="btn btn-default <% if (state==='ELLIPSE')print('pressed') %>"
+    <button type="button" class="btn btn-outline-secondary <% if (state==='ELLIPSE')print('pressed') %>"
             title="Ellipse" data-state="ELLIPSE">
         <span class="glyphicon ellipse-icon"></span></button>
 </div>
 
 
-<div class="btn-group">
-    <button type="button" class="shape-color btn btn-default dropdown-toggle" title="Label Color"
+<div class="btn-group me-2">
+    <button type="button" class="shape-color btn btn-outline-secondary dropdown-toggle" title="Label Color"
         data-bs-toggle="dropdown">
         <span data-color="<%= color %>" style="background-color:#<%= color %>">&nbsp &nbsp &nbsp</span>
         <span class="caret"></span>
     </button>
     <ul class="dropdown-menu dropdownSelect colorpicker" role="menu">
-        <li><a href="#">
+        <li><a class="dropdown-item" href="#">
             <span data-color="000000" style="background-color:#000">&nbsp &nbsp &nbsp</span>&nbsp Black
         </a></li>
-        <li><a href="#">
+        <li><a class="dropdown-item" href="#">
             <span data-color="0000FF" style="background-color:#00f">&nbsp &nbsp &nbsp</span>&nbsp Blue
         </a></li>
-        <li><a href="#">
+        <li><a class="dropdown-item" href="#">
             <span data-color="00FF00" style="background-color:#0f0">&nbsp &nbsp &nbsp</span>&nbsp Green
         </a></li>
-        <li><a href="#">
+        <li><a class="dropdown-item" href="#">
             <span data-color="FF0000" style="background-color:#f00">&nbsp &nbsp &nbsp</span>&nbsp Red
         </a></li>
-        <li><a href="#">
+        <li><a class="dropdown-item" href="#">
             <span data-color="FFFF00" style="background-color:#ff0">&nbsp &nbsp &nbsp</span>&nbsp Yellow
         </a></li>
-        <li><a href="#">
+        <li><a class="dropdown-item" href="#">
             <span data-color="FFFFFF" style="background-color:#fff">&nbsp &nbsp &nbsp</span>&nbsp White
         </a></li>
-        <li><a href="#">
+        <li><a class="dropdown-item" href="#">
             <span data-color="FF00FF" style="background-color:#f0f">&nbsp &nbsp &nbsp</span>&nbsp Magenta
         </a></li>
-        <li class="divider"></li>
-        <li><a data-color="colorpicker" data-oldcolor="<%= color %>" href="#">
+        <li class="dropdown-divider"></li>
+        <li><a class="dropdown-item" data-color="colorpicker" data-oldcolor="<%= color %>" href="#">
             <span class="colorpickerOption">&nbsp &nbsp &nbsp</span>&nbsp More Colors...
         </a></li>
     </ul>
 </div>
 
 
-<div class="btn-group">
-    <button type="button" class="line-width btn btn-default dropdown-toggle" title="Line Width: <%= lineWidth %>"
+<div class="btn-group me-2">
+    <button type="button" class="line-width btn btn-outline-secondary dropdown-toggle" title="Line Width: <%= lineWidth %>"
         data-bs-toggle="dropdown">
         <span data-line-width="<%= lineWidth %>"><%= lineWidth %> pt</span>
         <span class="caret"></span>
     </button>
     <ul class="dropdown-menu dropdownSelect lineWidth" style="min-width: 0" role="menu">
         <% _.each(lineWidths,function(p){ %>
-            <li><a href='#'><span data-line-width='<%= p %>'><%= p %> pt</span></a></li>
+            <li><a class="dropdown-item" href='#'><span data-line-width='<%= p %>'><%= p %> pt</span></a></li>
         <% }); %>
     </ul>
 </div>
 
 
-<div class="btn-group">
-    <button type="button" class="line-width btn btn-default dropdown-toggle" title="Delete, Copy, Paste etc"
+<div class="btn-group me-2">
+    <button type="button" class="line-width btn btn-outline-secondary dropdown-toggle" title="Delete, Copy, Paste etc"
         data-bs-toggle="dropdown">
         <span>Edit</span>
         <span class="caret"></span>
     </button>
     <ul class="dropdown-menu" role="menu">
         <li <% if (!sel) print('class="disabled"') %> >
-            <a href="#" class="copyShape">
+            <a class="dropdown-item" href="#" class="copyShape">
                 Copy Shape   &nbsp&nbsp&nbsp <%= cmdKey %>C
             </a>
         </li>
         <li <% if (!toPaste) print('class="disabled"') %> >
-            <a href="#" class="pasteShape">
+            <a class="dropdown-item" href="#" class="pasteShape">
                 Paste Shape   &nbsp&nbsp&nbsp <%= cmdKey %>V
             </a>
         </li>
         <li <% if (!sel) print('class="disabled"') %> >
-            <a href="#" class="deleteShape">
+            <a class="dropdown-item" href="#" class="deleteShape">
                 Delete Shape    &nbsp&nbsp&nbsp Del
             </a>
         </li>
         <li>
-            <a href="#" class="selectAll">
+            <a class="dropdown-item" href="#" class="selectAll">
                 Select All Shapes    &nbsp&nbsp <%= cmdKey %>A
             </a>
         </li>
@@ -104,7 +104,7 @@
 </div>
 
 
-<div class="btn-group" style="float: right"
+<div class="btn-group me-2" style="float: right"
     <% if (omeroRoiCount > 0) { %>
         title="Load <%=omeroRoiCount%> ROIs from OMERO"
     <% } else { %>

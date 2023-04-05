@@ -4,6 +4,7 @@
     import $ from "jquery";
     import * as marked from "marked";
     import DOMPurify from 'dompurify';
+    import ShapeManager from "../shape_editor/shape_manager";
 
     import figure_panel_template from '../../templates/figure_panel.template.html?raw';
     import label_template from '../../templates/labels/label.template.html?raw';
