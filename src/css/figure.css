@@ -885,7 +885,10 @@
 
     .toggleRoi {
         transition: transform 300ms ease;
-        transform-origin: 30% 75%;
+        width: 22px;
+        font-size: 150%;
+        display: block;
+        line-height: 16px;
     }
     .rotate90 {
         transform: rotate(90deg);

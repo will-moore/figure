@@ -233,7 +233,7 @@ export const RoiModalView = Backbone.View.extend({
         },
 
         showTempShape: function(args) {
-            shape = args[0];
+            const shape = args[0];
             this.shapeManager.deleteShapesByIds([this.TEMP_SHAPE_ID]);
             if (shape) {
                 var viewport = this.m.getViewportAsRect();

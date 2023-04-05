@@ -52,7 +52,7 @@ var RoiLoaderView = Backbone.View.extend({
 
     removeShapes: function(roiId) {
         var roiData = this.collection.get(roiId).toJSON();
-        roiData.shapes.forEach(function(s){
+        roiData.shapes.forEach(s => {
             $(".roiModalRoiItem[data-shapeId='" + s.id + "']", this.$el).remove();
         });
     },
