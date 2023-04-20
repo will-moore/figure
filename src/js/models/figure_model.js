@@ -1,7 +1,7 @@
     
     // Version of the json file we're saving.
     // This only needs to increment when we make breaking changes (not linked to release versions.)
-    var VERSION = 6;
+    var VERSION = 7;
 
 
     // ------------------------- Figure Model -----------------------------------
@@ -260,6 +260,16 @@
                 });
             }
 
+            if (v < 7) {
+                console.log("Transforming to VERSION 7");
+                // Adding the height parameter to the JSON
+                _.each(json.panels, function(p){
+                    // rename lineWidth to strokeWidth
+                    if (p.scalebar && !p.scalebar.height) {
+                        p.scalebar.height = 3;
+                    }
+                });
+            }
             return json;
         },
 

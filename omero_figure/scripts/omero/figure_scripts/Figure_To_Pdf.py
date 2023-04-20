@@ -1434,7 +1434,7 @@ class FigureExport(object):
         position = 'position' in sb and sb['position'] or 'bottomright'
         align = 'left'
 
-        half_height = sb['height'] // 2
+        half_height = sb.get('height', 3) // 2
         if position == 'topleft':
             lx = x + spacer
             ly = y + spacer + half_height
