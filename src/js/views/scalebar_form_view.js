@@ -207,6 +207,7 @@ var ScalebarFormView = Backbone.View.extend({
 
         var html = this.template(json);
         this.$el.html(html);
+        this.$el.find("[title]").tooltip();
 
         return this;
     }
