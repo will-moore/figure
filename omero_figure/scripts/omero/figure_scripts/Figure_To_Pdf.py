@@ -1477,7 +1477,7 @@ class FigureExport(object):
         else:
             lx_end = lx - canvas_length
 
-        self.draw_scalebar_line(lx, ly, lx_end, ly, sb["height"],
+        self.draw_scalebar_line(lx, ly, lx_end, ly, sb.get("height", 3),
                                 (red, green, blue))
 
         if 'show_label' in sb and sb['show_label']:
