@@ -901,7 +901,7 @@ class FigureExport(object):
         if self.zip_folder_name is not None:
             full_name = os.path.join(self.zip_folder_name, full_name)
 
-        while(os.path.exists(full_name)):
+        while os.path.exists(full_name):
             index += 1
             full_name = "%s_page_%02d.%s" % (name, index, fext)
             if self.zip_folder_name is not None:
@@ -1434,19 +1434,20 @@ class FigureExport(object):
         position = 'position' in sb and sb['position'] or 'bottomright'
         align = 'left'
 
+        half_height = sb.get('height', 3) // 2
         if position == 'topleft':
             lx = x + spacer
-            ly = y + spacer
+            ly = y + spacer + half_height
         elif position == 'topright':
             lx = x + width - spacer
-            ly = y + spacer
+            ly = y + spacer + half_height
             align = "right"
         elif position == 'bottomleft':
             lx = x + spacer
-            ly = y + height - spacer
+            ly = y + height - spacer - half_height
         elif position == 'bottomright':
             lx = x + width - spacer
-            ly = y + height - spacer
+            ly = y + height - spacer - half_height
             align = "right"
 
         pixel_size_x = panel['pixel_size_x']
@@ -1476,7 +1477,8 @@ class FigureExport(object):
         else:
             lx_end = lx - canvas_length
 
-        self.draw_scalebar_line(lx, ly, lx_end, ly, 3, (red, green, blue))
+        self.draw_scalebar_line(lx, ly, lx_end, ly, sb.get("height", 3),
+                                (red, green, blue))
 
         if 'show_label' in sb and sb['show_label']:
             symbol = u"\u00B5m"
@@ -1492,13 +1494,17 @@ class FigureExport(object):
                 pass
 
             # For 'bottom' scalebar, put label above
+            # 5 is an empirically determined offset that "works"
             if 'bottom' in position:
-                ly = ly - font_size
+                ly = ly - font_size - 5
             else:
                 ly = ly + 5
 
             self.draw_text(
-                label, (lx + lx_end)/2, ly, font_size, (red, green, blue),
+                label, (lx + lx_end)/2,
+                ly + ((-1 if position in ["bottomleft", "bottomright"]
+                       else 1) * half_height),
+                font_size, (red, green, blue),
                 align="center")
 
     def is_big_image(self, image):
@@ -2213,10 +2219,8 @@ class TiffExport(FigureExport):
         y2 = scale_to_export_dpi(y2)
         width = scale_to_export_dpi(width)
 
-        for l in range(width):
-            draw.line([(x, y), (x2, y2)], fill=rgb)
-            y += 1
-            y2 += 1
+        for l in range(-width // 2, width // 2):
+            draw.line([(x, y+l), (x2, y2+l)], fill=rgb)
 
     def draw_temp_label(self, text, fontsize, rgb):
         """Returns a new PIL image with text. Handles html."""
@@ -2295,7 +2299,6 @@ class TiffExport(FigureExport):
     def draw_text(self, text, x, y, fontsize, rgb, align="center"):
         """ Add text to the current figure page """
         x = scale_to_export_dpi(x)
-        y = y - 5       # seems to help, but would be nice to fix this!
         y = scale_to_export_dpi(y)
         fontsize = scale_to_export_dpi(fontsize)
 

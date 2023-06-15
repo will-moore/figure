@@ -34,7 +34,15 @@ var ScalebarFormView = Backbone.View.extend({
         "click .pixel_size_display": "edit_pixel_size",
         "keypress .pixel_size_input"  : "enter_pixel_size",
         "blur .pixel_size_input"  : "save_pixel_size",
-    },
+        "keyup input[type='text']"  : "handle_keyup",
+     },
+
+    handle_keyup: function (event) {
+        // If Enter key - submit form...
+        if (event.which == 13) {
+            this.update_scalebar();
+        }
+    }, 
 
     // simply show / hide editing field
     edit_pixel_size: function() {
@@ -81,14 +89,15 @@ var ScalebarFormView = Backbone.View.extend({
     // called when form changes
     update_scalebar: function(event) {
 
-        var $form = $('#scalebar_form form');
+        var $form = $('.scalebar_form ');
 
         var length = $('.scalebar-length', $form).val(),
             units = $('.scalebar-units span:first', $form).attr('data-unit'),
             position = $('.label-position i:first', $form).attr('data-position'),
             color = $('.label-color span:first', $form).attr('data-color'),
             show_label = $('.scalebar_label', $form).prop('checked'),
-            font_size = $('.scalebar_font_size span:first', $form).text().trim();
+            font_size = $('.scalebar_font_size span:first', $form).text().trim(),
+            height = parseInt($('.scalebar-height', $form).val());
 
         this.models.forEach(function(m){
             var old_sb = m.get('scalebar');
@@ -111,6 +120,7 @@ var ScalebarFormView = Backbone.View.extend({
             if (color != '-') sb.color = color;
             sb.show_label = show_label;
             if (font_size != '-') sb.font_size = font_size;
+            if (height != '-') sb.height = height;
 
             m.save_scalebar(sb);
         });
@@ -168,6 +178,7 @@ var ScalebarFormView = Backbone.View.extend({
                     json.color = sb.color;
                     json.show_label = sb.show_label;
                     json.font_size = sb.font_size;
+                    json.height = sb.height;
                 }
                 else {
                     // combine attributes. Use '-' if different values found
@@ -177,6 +188,7 @@ var ScalebarFormView = Backbone.View.extend({
                     if (json.color != sb.color) json.color = '-';
                     if (!sb.show_label) json.show_label = false;
                     if (json.font_size != sb.font_size) json.font_size = '-';
+                    if (json.height != sb.height) json.height = '-';
                 }
             }
             // if any panels don't have scalebar - we allow to add
@@ -198,12 +210,15 @@ var ScalebarFormView = Backbone.View.extend({
         json.color = json.color || 'FFFFFF';
         json.font_size = json.font_size || 10;
         json.pixel_size_symbol = json.pixel_size_symbol || '-';
+        json.height = json.height || 3;
 
         var html = this.template(json);
         this.$el.html(html);
+        // this.$el.find("[title]").tooltip();
 
         return this;
     }
 });
 
 export default ScalebarFormView
+
