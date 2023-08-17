@@ -151,6 +151,10 @@ export var FileListView = Backbone.View.extend({
             .then(rsp => rsp.json())
             .then(data => {
                 this.model.reset();
+                if (data.length == 0) {
+                    // if no data, need to trigger render for 'no figures' message
+                    this.render();
+                }
                 this.model.add(data);
             });
     },
