@@ -154,7 +154,7 @@ var ScalebarFormView = Backbone.View.extend({
                 json.pixel_size_symbol = m.get('pixel_size_x_symbol');
                 json.pixel_size_unit = m.get('pixel_size_x_unit');
             } else {
-                pix_sze = m.get('pixel_size_x');
+                let pix_sze = m.get('pixel_size_x');
                 // account for floating point imprecision when comparing
                 if (json.pixel_size_x != '-' &&
                     json.pixel_size_x.toFixed(10) != pix_sze.toFixed(10)) {
