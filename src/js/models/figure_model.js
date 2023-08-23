@@ -525,7 +525,11 @@
                     // We do some additional processing in Panel.parse()
                     self.panels.create(n, {'parse': true}).set('selected', true);
                     self.notifySelectionChange();
-            });
+                })
+                .catch(err => {
+                    alert("Image not found on the server, " +
+                        "or you don't have permission to access it at " + imgDataUrl);
+                });
         },
 
         // Used to position the #figure within canvas and also to coordinate svg layout.
