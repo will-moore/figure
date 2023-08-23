@@ -455,7 +455,7 @@ import { hideModal } from "./util";
             $("#addImagesModal").on("focus",
                 function() {
                     setTimeout(function(){
-                        $('input.imgIds', self.$el).triggger("focus");
+                        $('#addImagesModal input.imgIds').trigger("focus");
                     },20);
                 });
         },
