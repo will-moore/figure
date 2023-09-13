@@ -633,6 +633,8 @@
                 value: self.zoom_avg,
                 slide: function(event, ui) {
                     self.update_img_css(ui.value, 0, 0);
+                    $('#vp_zoom_value').value(ui.value);
+                    console.log($("#vp_zoom_value"))
                 },
                 stop: function( event, ui ) {
                     self.zoom_avg = ui.value;
@@ -649,6 +651,7 @@
                 }
             });
             this.$vp_zoom_value = $("#vp_zoom_value");
+            
 
             // We nest the ZoomView so we can update it on update_img_css
             this.zmView = new ZoomView({models: this.models,
@@ -768,7 +771,7 @@
                     offset_y = dy;
                 }
                 this.$vp_img.css( this.models.head().get_vp_img_css(zoom, frame_w, frame_h, offset_x, offset_y) );
-                this.$vp_zoom_value.text(zoom + "%");
+                this.$vp_zoom_value.text(zoom);
 
                 if (save) {
                     if (typeof dx === "undefined") dx = 0;  // rare crazy-dragging case!
