@@ -18,11 +18,11 @@ var ChannelSliderView = Backbone.View.extend({
     events: {
         "keyup .ch_start": "handle_channel_input",
         "keyup .ch_end": "handle_channel_input",
-        //"click .channel-btn": "toggle_channel",
-        //"click .dropdown-menu a": "pick_color",
+        "click .channel-btn": "toggle_channel",
+        "click .dropdown-menu a": "pick_color",
     },
 
-   /* pick_color: function(e) {
+    pick_color: function(e) {
         var color = e.currentTarget.getAttribute('data-color'),
             $colorbtn = $(e.currentTarget).parent().parent(),
             oldcolor = $(e.currentTarget).attr('data-oldcolor'),
@@ -54,7 +54,7 @@ var ChannelSliderView = Backbone.View.extend({
             this.set_color(idx, color);
         }
         return false;
-    },*/
+    },
 
     set_color: function(idx, color) {
         if (this.models) {
@@ -138,7 +138,6 @@ var ChannelSliderView = Backbone.View.extend({
     },
 
     handle_channel_input: function(event) {
-        console.log("Emter the channel input handle method")
         if (event.type === "keyup" && event.which !== 13) {
             return;     // Ignore keyups except 'Enter'
         }

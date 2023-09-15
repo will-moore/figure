@@ -623,12 +623,7 @@
                 self.listenTo(m,
                     'change:channels change:theZ change:theT',
                     self.rerender_image_change);
-              //  self.listenTo(m, "change:$vp_zoom_value", self.handle_user_zoom)/
             });
-
-            //document.getElementById("vp_zoom_value").addEventListener("keyup", (event) => {self.handle_user_zoom} );*/
-
-           // $('#vp_zoom_value').mouseup(handle_user_zoom)
 
             $("#vp_zoom_slider").slider({
                 // NB: these values are updated on render()
@@ -637,8 +632,7 @@
                 value: self.zoom_avg,
                 slide: function(event, ui) {
                     self.update_img_css(ui.value, 0, 0);
-                   // $('#vp_zoom_value').val(ui.value);
-                    console.log("je passe par ici")
+                    $('#vp_zoom_value').val(ui.value);
                 },
                 stop: function( event, ui ) {
                     self.zoom_avg = ui.value;
@@ -669,7 +663,7 @@
             "mousedown .vp_img": "mousedown",
             "mousemove .vp_img": "mousemove",
             "mouseup .vp_img": "mouseup",
-            //"keyup .vp_zoom_value": "handle_user_zoom",
+            "keyup .vp_zoom_value": "handle_user_zoom",
         },
 
         mousedown: function(event) {
@@ -711,16 +705,12 @@
         },
 
         handle_user_zoom: function(event){
-            console.log("event OK !")
             if (event.type === "keyup" && event.which !== 13) {
-                console.log("Ignore my command")
                 return;     // Ignore keyups except 'Enter'
             }
 
             var value = event.target.getAttribute('value')
-            console.log("value : "+value)
-            console.log("this.min : "+this.min)
-            console.log("this.max_zoom : "+this.max_zoom)
+
             if (value < this.min) value = this.min;
             if(value > this.max_zoom) value = this.max_zoom
 
