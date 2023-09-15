@@ -623,8 +623,12 @@
                 self.listenTo(m,
                     'change:channels change:theZ change:theT',
                     self.rerender_image_change);
+              //  self.listenTo(m, "change:$vp_zoom_value", self.handle_user_zoom)/
             });
 
+            //document.getElementById("vp_zoom_value").addEventListener("keyup", (event) => {self.handle_user_zoom} );*/
+
+           // $('#vp_zoom_value').mouseup(handle_user_zoom)
 
             $("#vp_zoom_slider").slider({
                 // NB: these values are updated on render()
@@ -633,8 +637,8 @@
                 value: self.zoom_avg,
                 slide: function(event, ui) {
                     self.update_img_css(ui.value, 0, 0);
-                    $('#vp_zoom_value').value(ui.value);
-                    console.log($("#vp_zoom_value"))
+                   // $('#vp_zoom_value').val(ui.value);
+                    console.log("je passe par ici")
                 },
                 stop: function( event, ui ) {
                     self.zoom_avg = ui.value;
@@ -665,6 +669,7 @@
             "mousedown .vp_img": "mousedown",
             "mousemove .vp_img": "mousemove",
             "mouseup .vp_img": "mouseup",
+            //"keyup .vp_zoom_value": "handle_user_zoom",
         },
 
         mousedown: function(event) {
@@ -705,6 +710,26 @@
             return false;
         },
 
+        handle_user_zoom: function(event){
+            console.log("event OK !")
+            if (event.type === "keyup" && event.which !== 13) {
+                console.log("Ignore my command")
+                return;     // Ignore keyups except 'Enter'
+            }
+
+            var value = event.target.getAttribute('value')
+            console.log("value : "+value)
+            console.log("this.min : "+this.min)
+            console.log("this.max_zoom : "+this.max_zoom)
+            if (value < this.min) value = this.min;
+            if(value > this.max_zoom) value = this.max_zoom
+
+            $("#vp_zoom_slider").slider({'value': value,
+            'max': this.max_zoom});
+
+            this.update_img_css(value, 0, 0);
+        },
+
         // if the panel is rotated by css, drag events need to be corrected
         correct_rotation: function(dx, dy) {
             if (dx === 0 && dy === 0) {
@@ -716,7 +741,7 @@
                 ang1 = Math.PI + ang1;
             }
             var angr = this.r * (Math.PI/180),  // deg -> rad
-                ang2 = ang1 - angr;
+                ang2 = ang1 - angr;pick_color
             dx = Math.cos(ang2) * length;
             dy = Math.sin(ang2) * length;
             return {'dx': dx, 'dy': dy};
@@ -728,7 +753,7 @@
             $( "#vp_zoom_slider" ).slider( "destroy" );
             $("#vp_z_slider").slider("destroy");
             $("#vp_t_slider").slider("destroy");
-            this.$vp_zoom_value.text('');
+            this.$vp_zoom_value.val();
 
             if (this.zmView) {
                 this.zmView.remove();
@@ -771,7 +796,7 @@
                     offset_y = dy;
                 }
                 this.$vp_img.css( this.models.head().get_vp_img_css(zoom, frame_w, frame_h, offset_x, offset_y) );
-                this.$vp_zoom_value.text(zoom);
+                this.$vp_zoom_value.val(zoom);
 
                 if (save) {
                     if (typeof dx === "undefined") dx = 0;  // rare crazy-dragging case!
@@ -1023,7 +1048,7 @@
             this.$vp_frame = $(".vp_frame", this.$el);  // cache for later
             this.$vp_img = $(".vp_img", this.$el);
             this.zoom_avg = zoom >> 0;
-            this.$vp_zoom_value.text(this.zoom_avg + "%");
+            this.$vp_zoom_value.val(this.zoom_avg);
             // zoom may be > 1000 if set by 'crop'
 
             // We want to be able to zoom Big images to 'actual size' in viewport
