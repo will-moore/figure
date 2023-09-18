@@ -656,6 +656,11 @@
                                         figureModel: this.figureModel}); // auto-renders on init
             $("#reset-zoom-view").append(this.zmView.el);
 
+            // Listen for events on zoom input field
+            $("#vp_zoom_value").on("keyup", function(event){
+                this.handle_user_zoom(event);
+            }.bind(this));
+
             this.render();
         },
 
@@ -663,7 +668,6 @@
             "mousedown .vp_img": "mousedown",
             "mousemove .vp_img": "mousemove",
             "mouseup .vp_img": "mouseup",
-            "keyup .vp_zoom_value": "handle_user_zoom",
         },
 
         mousedown: function(event) {
@@ -709,13 +713,18 @@
                 return;     // Ignore keyups except 'Enter'
             }
 
-            var value = event.target.getAttribute('value')
+            var value = event.target.value;
+            if (isNaN(value)) {
+                return;
+            }
 
-            if (value < this.min) value = this.min;
-            if(value > this.max_zoom) value = this.max_zoom
+            var minVal = $("#vp_zoom_slider").slider("option", "min");
+            var maxVal = $("#vp_zoom_slider").slider("option", "max");
 
-            $("#vp_zoom_slider").slider({'value': value,
-            'max': this.max_zoom});
+            if (value < minVal) value = minVal;
+            if (value > maxVal) value = maxVal;
+
+            $("#vp_zoom_slider").slider({'value': value});
 
             this.update_img_css(value, 0, 0);
         },
@@ -743,6 +752,7 @@
             $( "#vp_zoom_slider" ).slider( "destroy" );
             $("#vp_z_slider").slider("destroy");
             $("#vp_t_slider").slider("destroy");
+            $("#vp_zoom_value").off();
             this.$vp_zoom_value.val();
 
             if (this.zmView) {
