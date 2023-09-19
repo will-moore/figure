@@ -727,6 +727,19 @@
             $("#vp_zoom_slider").slider({'value': value});
 
             this.update_img_css(value, 0, 0);
+
+            this.zoom_avg = value;
+            var to_save = {'zoom': value};
+            if (value == 100) {
+                to_save.dx = 0;
+                to_save.dy = 0;
+            }
+            this.models.forEach(function(m){
+                m.save(to_save);
+            });
+            // we don't listenTo zoom change...
+            this.rerender_image_change();
+
         },
 
         // if the panel is rotated by css, drag events need to be corrected
