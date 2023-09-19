@@ -703,6 +703,7 @@
                     dx = xy.dx;
                     dy = xy.dy;
                 }
+                console.log(this.zoom_avg)
                 this.update_img_css(this.zoom_avg, dx, dy);
             }
             return false;
@@ -757,7 +758,7 @@
                 ang1 = Math.PI + ang1;
             }
             var angr = this.r * (Math.PI/180),  // deg -> rad
-                ang2 = ang1 - angr;pick_color
+                ang2 = ang1 - angr;
             dx = Math.cos(ang2) * length;
             dy = Math.sin(ang2) * length;
             return {'dx': dx, 'dy': dy};
