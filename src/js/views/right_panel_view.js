@@ -713,21 +713,26 @@
                 return;     // Ignore keyups except 'Enter'
             }
 
+            // get the current entered value 
             var value = event.target.value;
             if (isNaN(value)) {
                 return;
             }
 
+            // get min/max and restrict the user input between min/max
             var minVal = $("#vp_zoom_slider").slider("option", "min");
             var maxVal = $("#vp_zoom_slider").slider("option", "max");
 
             if (value < minVal) value = minVal;
             if (value > maxVal) value = maxVal;
 
+            // update the slider position
             $("#vp_zoom_slider").slider({'value': value});
 
+            // update the preview image
             this.update_img_css(value, 0, 0);
 
+            // update the figure image
             this.zoom_avg = value;
             var to_save = {'zoom': value};
             if (value == 100) {
@@ -737,9 +742,8 @@
             this.models.forEach(function(m){
                 m.save(to_save);
             });
-            // we don't listenTo zoom change...
-            this.rerender_image_change();
 
+            this.rerender_image_change();
         },
 
         // if the panel is rotated by css, drag events need to be corrected
