@@ -703,7 +703,6 @@
                     dx = xy.dx;
                     dy = xy.dy;
                 }
-                console.log(this.zoom_avg)
                 this.update_img_css(this.zoom_avg, dx, dy);
             }
             return false;
