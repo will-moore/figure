@@ -281,7 +281,7 @@
                     // 'width': data.size.width,
                     // 'height': data.size.height,
                     'sizeZ': data.size.z,
-                    'theZ': data.rdefs.defaultZ,
+                    //'theZ': data.rdefs.defaultZ,
                     'sizeT': data.size.t,
                     // 'theT': data.rdefs.defaultT,
                     'channels': data.channels,
@@ -380,6 +380,26 @@
                 } else {
                     json.comp.sizeT = true;
                 }
+
+                // special message for sizeZ
+                if (json.selImg.sizeZ != json.newImg.sizeZ) {
+                    // check if any existing images have theZ > new.sizeZ
+                    var tooSmallZ = false;
+                    sel.forEach(function(o){
+                        if (o.get('theZ') > json.newImg.sizeZ) tooSmallZ = true;
+                    });
+                    if (tooSmallZ) {
+                        json.messages.push({"text": "New Image has fewer slices than needed. Check after update.",
+                            "status": "danger"});
+                    } else {
+                        json.messages.push({"text":"Mismatch of slices: should be OK.",
+                            "status": "success"});
+                    }
+                    json.comp.sizeZ = false;
+                } else {
+                    json.comp.sizeZ = true;
+                }
+
                 // compare channels
                 json.comp.channels = json.ok(true);
                 var selC = json.selImg.channels,
