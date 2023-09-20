@@ -281,7 +281,7 @@
                     // 'width': data.size.width,
                     // 'height': data.size.height,
                     'sizeZ': data.size.z,
-                    //'theZ': data.rdefs.defaultZ,
+                    'theZ': data.rdefs.defaultZ,
                     'sizeT': data.size.t,
                     // 'theT': data.rdefs.defaultT,
                     'channels': data.channels,
@@ -398,6 +398,7 @@
                     json.comp.sizeZ = false;
                 } else {
                     json.comp.sizeZ = true;
+                    json.newImg['theZ'] = json.selImg['theZ']
                 }
 
                 // compare channels
