@@ -631,11 +631,11 @@
                 min: 100,
                 value: self.zoom_avg,
                 slide: function(event, ui) {
-                    self.update_img_css(ui.value, 0, 0);
-                    $('#vp_zoom_value').val(ui.value);
+                    self.update_img_css(parseInt(ui.value), 0, 0);
+                    $('#vp_zoom_value').val(parseInt(ui.value));
                 },
                 stop: function( event, ui ) {
-                    self.zoom_avg = ui.value;
+                    self.zoom_avg = parseInt(ui.value);
                     var to_save = {'zoom': ui.value};
                     if (ui.value === 100) {
                         to_save.dx = 0;
@@ -714,7 +714,7 @@
             }
 
             // get the current entered value 
-            var value = event.target.value;
+            var value = parseInt(event.target.value);
             if (isNaN(value)) {
                 return;
             }
