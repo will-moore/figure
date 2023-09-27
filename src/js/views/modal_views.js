@@ -349,8 +349,8 @@
             json.selThumbSrc = WEBGATEWAYINDEX + "render_thumbnail/" + json.selImg.imageId + "/";
 
             // minor attributes ('info' only)
-            var attrs = ["sizeZ", "orig_width", "orig_height"],
-                attrName = ['Z size', 'Width', 'Height'];
+            var attrs = ["orig_width", "orig_height"],
+                attrName = ['Width', 'Height'];
 
             if (this.newImg) {
                 json.newImg = this.newImg;
@@ -391,16 +391,15 @@
                         if (o.get('theZ') > json.newImg.sizeZ) tooSmallZ = true;
                     });
                     if (tooSmallZ) {
-                        json.messages.push({"text": "New Image has fewer slices than needed. Check after update.",
+                        json.messages.push({"text": "New Image has fewer Z slices than needed. Check after update.",
                             "status": "danger"});
                     } else {
-                        json.messages.push({"text":"Mismatch of slices: should be OK.",
+                        json.messages.push({"text":"Mismatch of Z slices: should be OK.",
                             "status": "success"});
                     }
                     json.comp.sizeZ = false;
                 } else {
                     json.comp.sizeZ = true;
-                    json.newImg['theZ'] = json.selImg['theZ']
                 }
 
                 // compare channels
