@@ -507,7 +507,7 @@
         render: function() {
 
             var self = this,
-                positions = {'top':{}, 'bottom':{}, 'left':{}, 'leftvert':{}, 'right':{},
+                positions = {'top':{}, 'bottom':{}, 'left':{}, 'leftvert':{}, 'right':{},'rightvert':{},
                     'topleft':{}, 'topright':{}, 'bottomleft':{}, 'bottomright':{}};
             this.models.forEach(function(m){
                 // group labels by position
