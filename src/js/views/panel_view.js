@@ -171,7 +171,7 @@
                 self = this,
                 positions = {
                     'top':[], 'bottom':[], 'left':[], 'right':[],
-                    'leftvert':[],
+                    'leftvert':[],'rightvert':[],
                     'topleft':[], 'topright':[],
                     'bottomleft':[], 'bottomright':[]
                 };
@@ -182,7 +182,7 @@
                 var ljson = $.extend(true, {}, l);
                 // If label is same color as page (and is outside of panel)
                 if (ljson.color.toLowerCase() == self.page_color.toLowerCase() &&
-                        ["top", "bottom", "left", "right", "leftvert"].indexOf(l.position) > -1 ) {
+                        ["top", "bottom", "left", "right", "leftvert", "rightvert"].indexOf(l.position) > -1 ) {
                     // If black -> white, otherwise -> black
                     if (ljson.color === '000000') {
                         ljson.color = 'ffffff';
@@ -249,7 +249,7 @@
             _.each(positions, function(lbls, p) {
                 var json = {'position':p, 'labels':lbls};
                 if (lbls.length === 0) return;
-                if (p == 'leftvert') {  // vertical
+                if (p == 'leftvert'|| p == 'rightvert') {  // vertical
                     html += self.label_vertical_template(json);
                 } else if (p == 'left' || p == 'right') {
                     html += self.label_table_template(json);
