@@ -7,6 +7,7 @@
         template: JST["src/templates/figure_panel_template.html"],
         label_template: JST["src/templates/labels/label_template.html"],
         label_vertical_template: JST["src/templates/labels/label_vertical_template.html"],
+        label_right_vertical_template: JST["src/templates/labels/label_right_vertical_template.html"],
         label_table_template: JST["src/templates/labels/label_table_template.html"],
         scalebar_template: JST["src/templates/scalebar_panel_template.html"],
 
@@ -76,6 +77,7 @@
 
             // container needs to be square for rotation to vertical
             $('.left_vlabels', this.$el).css('width', 3 * h + 'px');
+            $('.right_vlabels', this.$el).css('width', 3 * h + 'px');
 
             // update the img within the panel
             var zoom = this.model.get('zoom'),
@@ -249,8 +251,10 @@
             _.each(positions, function(lbls, p) {
                 var json = {'position':p, 'labels':lbls};
                 if (lbls.length === 0) return;
-                if (p == 'leftvert'|| p == 'rightvert') {  // vertical
+                if (p == 'leftvert') {  // vertical
                     html += self.label_vertical_template(json);
+                } else if (p == 'rightvert') {
+                    html += self.label_right_vertical_template(json);
                 } else if (p == 'left' || p == 'right') {
                     html += self.label_table_template(json);
                 } else {
@@ -261,6 +265,7 @@
 
             // need to force update of vertical labels layout
             $('.left_vlabels', self.$el).css('width', 3 * self.$el.height() + 'px');
+            $('.right_vlabels', self.$el).css('width', 3 * self.$el.height() + 'px');
 
             return this;
         },
