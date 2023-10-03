@@ -389,10 +389,9 @@
                     }
                 }
                 else {
-                    var theZ = this.get('theZ'),
-                    sizeZ = this.get('sizeZ');
-
+                    var theZ = this.get('theZ');
                     var deltaZ = theZ;
+                    
                     if (ref_idx) {
                         var shift = parseInt(ref_idx)
                         deltaZ = shift == null ? theZ : theZ + shift;
