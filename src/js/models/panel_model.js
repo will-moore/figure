@@ -394,8 +394,8 @@
 
                     var deltaZ = theZ;
                     if (ref_idx) {
-                        var shift = theZ + parseInt(ref_idx)
-                        deltaZ = shift < 0 ? 0 : (shift > sizeZ ? sizeZ : shift);
+                        var shift = parseInt(ref_idx)
+                        deltaZ = shift == null ? theZ : theZ + shift;
                     }
                     if (format === "pixel") {
                         text = "" + (theZ + 1);
