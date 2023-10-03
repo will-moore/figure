@@ -610,6 +610,20 @@
             });
         },
 
+        
+        align_right: function() {
+            var selected = this.getSelected(),
+                x_vals = [];
+            selected.forEach(function(p){
+                x_vals.push(p.get('x'));
+            });
+            var max_x = Math.max.apply(window, x_vals);
+
+            selected.forEach(function(p){
+                p.save('x', max_x);
+            });
+        },
+
         align_top: function() {
             var selected = this.getSelected(),
                 y_vals = [];
@@ -620,6 +634,19 @@
 
             selected.forEach(function(p){
                 p.save('y', min_y);
+            });
+        },
+
+        align_bottom: function() {
+            var selected = this.getSelected(),
+                y_vals = [];
+            selected.forEach(function(p){
+                y_vals.push(p.get('y'));
+            });
+            var max_y = Math.max.apply(window, y_vals);
+
+            selected.forEach(function(p){
+                p.save('y', max_y);
             });
         },
 
