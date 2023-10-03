@@ -353,39 +353,7 @@
             return text;
         },
 
-        get_z_label_text: function(format, ref_idx, dec_prec) {
-            var text = "";
-            if (this.get('z_projection')) {
-                var start = this.get('z_start'),
-                    end = this.get('z_end');
-                if (format === "pixel") {
-                    text = "" + (start+1) + " - " + (end+1);
-                } else if (format === "unit") {
-                    start = (start * z_size).toFixed(dec_prec)
-                    end = (end * z_size).toFixed(dec_prec)
-                    text = ""+ start +" "+ z_symbol
-                           + " - " + end +" "+ z_symbol
-                }
-            }
-            else {
-                var theZ = this.get('theZ'),
-                deltaZ = this.get('deltaZ')[theZ] || 0;
-
-                if (ref_idx) {
-                    var shift = this.get('deltaZ')[parseInt(ref_idx)-1];
-                    deltaZ = shift==null ? deltaZ : deltaZ-shift;
-                }
-
-                if (format === "pixel") {
-                    text = "" + (theZ + 1);
-                } else if (format === "unit") {
-                    text = ""+ (deltaZ * z_size).toFixed(dec_prec) +" "+ z_symbol
-                }
-            }
-            return text
-        },
-
-        get_view_label_text: function(property, format, dec_prec) {
+        get_view_label_text: function(property, format, ref_idx, dec_prec) {
             if (format === "px") format = "pixel";
 
             if (property === "w") property = "width";
@@ -407,7 +375,7 @@
             dec_prec = dec_prec==null ? 2 : dec_prec; // 2 is the default precision
 
             var text = "";
-            /*if (property === "z") {
+            if (property === "z") {
                 if (this.get('z_projection')) {
                     var start = this.get('z_start'),
                         end = this.get('z_end');
@@ -421,15 +389,22 @@
                     }
                 }
                 else {
-                    var theZ = this.get('theZ');
+                    var theZ = this.get('theZ'),
+                    sizeZ = this.get('sizeZ');
+
+                    var deltaZ = theZ;
+                    if (ref_idx) {
+                        var shift = theZ + parseInt(ref_idx)
+                        deltaZ = shift < 0 ? 0 : (shift > sizeZ ? sizeZ : shift);
+                    }
                     if (format === "pixel") {
                         text = "" + (theZ + 1);
                     } else if (format === "unit") {
-                        text = ""+ (theZ * z_size).toFixed(dec_prec) +" "+ z_symbol
+                        text = ""+ (deltaZ * z_size).toFixed(dec_prec) +" "+ z_symbol
                     }
                 }
                 return text
-            }*/
+            }
 
             var value = this.getViewportAsRect()[property];
             if (property === "rotation") {
