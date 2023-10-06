@@ -615,12 +615,12 @@
             var selected = this.getSelected(),
                 x_vals = [];
             selected.forEach(function(p){
-                x_vals.push(p.get('x'));
+                x_vals.push(p.get('x') + p.get('width'));
             });
             var max_x = Math.max.apply(window, x_vals);
 
             selected.forEach(function(p){
-                p.save('x', max_x);
+                p.save('x', max_x - p.get('width'));
             });
         },
 
@@ -641,12 +641,12 @@
             var selected = this.getSelected(),
                 y_vals = [];
             selected.forEach(function(p){
-                y_vals.push(p.get('y'));
+                y_vals.push(p.get('y') + p.get('height'));
             });
             var max_y = Math.max.apply(window, y_vals);
 
             selected.forEach(function(p){
-                p.save('y', max_y);
+                p.save('y', max_y - p.get('height'));
             });
         },
 
