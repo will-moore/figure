@@ -1153,7 +1153,7 @@ class FigureExport(object):
 
         # group by 'position':
         positions = {'top': [], 'bottom': [], 'left': [],
-                     'leftvert': [], 'right': [],
+                     'leftvert': [], 'right': [], 'rightvert': [],
                      'topleft': [], 'topright': [],
                      'bottomleft': [], 'bottomright': []}
 
@@ -1310,7 +1310,7 @@ class FigureExport(object):
             page_color = self.figure_json.get('page_color', 'ffffff').lower()
             label_color = l['color'].lower()
             label_on_page = pos in ('left', 'right', 'top',
-                                    'bottom', 'leftvert')
+                                    'bottom', 'leftvert', 'rightvert')
             if label_on_page:
                 if label_color == '000000' and page_color == '000000':
                     l['color'] = 'ffffff'
@@ -1395,7 +1395,14 @@ class FigureExport(object):
                 labels.reverse()
                 for l in labels:
                     lx = lx - l['size'] - spacer
-                    draw_lab(l, lx, ly, align='vertical')
+                    draw_lab(l, lx, ly, align='left-vertical')
+            elif key == 'rightvert':
+                lx = x + width + spacer
+                ly = y + (height/2)
+                labels.reverse()
+                for l in labels:
+                    lx = lx + l['size'] + spacer
+                    draw_lab(l, lx, ly, align='right-vertical')
 
     def draw_scalebar(self, panel, region_width, page):
         """
@@ -2024,7 +2031,7 @@ class FigureExport(object):
             x = x - para_width
         elif (align == "left"):
             pass
-        elif align == 'vertical':
+        elif align == 'left-vertical':
             # Switch axes
             c.rotate(90)
             px = x
@@ -2033,6 +2040,15 @@ class FigureExport(object):
             # Align center
             alignment = TA_CENTER
             x = x - (para_width/2)
+        elif align == 'right-vertical':
+            # Switch axes
+            c.rotate(-90)
+            px = x
+            x = y
+            y = -px
+            # Align center
+            alignment = TA_CENTER
+            x = x + (para_width/2)
 
         # set fully opaque background color to avoid transparent text
         c.setFillColorRGB(0, 0, 0, 1)
@@ -2050,8 +2066,10 @@ class FigureExport(object):
         para.drawOn(c, x, y - h + int(fontsize * 0.25))
 
         # Rotate back again
-        if align == 'vertical':
+        if align == 'left-vertical':
             c.rotate(-90)
+        elif align == 'right-vertical':
+            c.rotate(90)
 
     def draw_scalebar_line(self, x, y, x2, y2, width, rgb):
         """ Adds line to PDF. Overwritten for TIFF below """
@@ -2308,8 +2326,11 @@ class TiffExport(FigureExport):
 
         temp_label = self.draw_temp_label(text, fontsize, rgb)
 
-        if align == "vertical":
+        if align == "left-vertical":
             temp_label = temp_label.rotate(90, expand=True)
+            y = y - (temp_label.size[1]/2)
+        elif align == "right-vertical":
+            temp_label = temp_label.rotate(-90, expand=True)
             y = y - (temp_label.size[1]/2)
         elif align == "center":
             x = x - (temp_label.size[0] / 2)
