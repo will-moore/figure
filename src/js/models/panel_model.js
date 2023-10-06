@@ -394,7 +394,9 @@
                     
                     if (ref_idx) {
                         var shift = parseInt(ref_idx)
-                        deltaZ = shift == null ? theZ : theZ + shift;
+                        if(!isNaN(shift)){
+                            deltaZ = theZ + shift;
+                        }
                     }
                     if (format === "pixel") {
                         text = "" + (theZ + 1);
