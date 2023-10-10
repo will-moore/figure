@@ -2044,11 +2044,11 @@ class FigureExport(object):
             # Switch axes
             c.rotate(-90)
             px = x
-            x = y
-            y = -px
+            x = -y
+            y = px
             # Align center
             alignment = TA_CENTER
-            x = x + (para_width/2)
+            x = x - (para_width/2)
 
         # set fully opaque background color to avoid transparent text
         c.setFillColorRGB(0, 0, 0, 1)
