@@ -2332,6 +2332,7 @@ class TiffExport(FigureExport):
         elif align == "right-vertical":
             temp_label = temp_label.rotate(-90, expand=True)
             y = y - (temp_label.size[1]/2)
+            x = x - temp_label.size[0]
         elif align == "center":
             x = x - (temp_label.size[0] / 2)
         elif align == "right":
