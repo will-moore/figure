@@ -294,7 +294,9 @@
                 deltaT = this.get('deltaT')[theT] || 0,
                 text = "", h, m, s;
 
+            var shiftIdx;
             if (ref_idx) {
+                shiftIdx = parseInt(ref_idx)
                 var shift = this.get('deltaT')[parseInt(ref_idx)-1];
                 deltaT = shift==null ? deltaT : deltaT-shift;
             }
@@ -330,6 +332,10 @@
             var dec_str = dec_prec>0 ? "."+"0".repeat(dec_prec) : "";
             if (["0"+dec_str+" s", "0"+dec_str+" mins", "0:00"+dec_str, "0:00:00"+dec_str].indexOf(text) > -1) {
                 isNegative = false;
+            }
+
+            if(!isNaN(shiftIdx)){
+                text += " off: "+shiftIdx   
             }
             return (isNegative ? '-' : '') + text;
         },
