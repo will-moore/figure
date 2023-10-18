@@ -400,8 +400,14 @@
                     }
                     if (format === "pixel") {
                         text = "" + (theZ + 1);
+                        if (!isNaN(shift)){
+                            text += " off: "+shift
+                        }
                     } else if (format === "unit") {
                         text = ""+ (deltaZ * z_size).toFixed(dec_prec) +" "+ z_symbol
+                        if (!isNaN(shift)){
+                            text += " off: "+shift
+                        }
                     }
                 }
                 return text
