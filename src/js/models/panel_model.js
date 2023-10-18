@@ -391,23 +391,22 @@
                 else {
                     var theZ = this.get('theZ');
                     var deltaZ = theZ;
-                    
+                    var shift;
+
                     if (ref_idx) {
-                        var shift = parseInt(ref_idx)
+                        shift = parseInt(ref_idx)
                         if(!isNaN(shift)){
                             deltaZ = theZ + shift;
                         }
                     }
                     if (format === "pixel") {
                         text = "" + (theZ + 1);
-                        if (!isNaN(shift)){
-                            text += " off: "+shift
-                        }
+                        
                     } else if (format === "unit") {
                         text = ""+ (deltaZ * z_size).toFixed(dec_prec) +" "+ z_symbol
-                        if (!isNaN(shift)){
-                            text += " off: "+shift
-                        }
+                    }
+                    if (!isNaN(shift)){
+                        text += " off: "+shift
                     }
                 }
                 return text
