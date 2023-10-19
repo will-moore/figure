@@ -297,8 +297,8 @@
             var shiftIdx;
             if (ref_idx) {
                 shiftIdx = parseInt(ref_idx)
-                var shift = this.get('deltaT')[parseInt(ref_idx)-1];
-                deltaT = shift==null ? deltaT : deltaT-shift;
+                var shift = this.get('deltaT')[shiftIdx];
+                deltaT = shift==null ? deltaT : shift;
             }
             var isNegative = (deltaT < 0);
             deltaT = Math.abs(deltaT);
@@ -306,7 +306,9 @@
             var padlen = dec_prec>0 ? dec_prec+3 : 2;
             if (format === "index") {
                 isNegative = false;
-                text = "" + (theT + 1);
+                if(!isNaN(shiftIdx) && shiftIdx > 0)
+                    text = "" + (theT + shiftIdx + 1);
+                else text = "" + (theT + 1);
             } else if (['milliseconds', 'ms'].includes(format)) {
                 text = (deltaT*1000).toFixed(dec_prec) + " ms";
             } else if (['seconds', 'secs', 's'].includes(format)) {
@@ -334,9 +336,6 @@
                 isNegative = false;
             }
 
-            if(!isNaN(shiftIdx)){
-                text += " off: "+shiftIdx   
-            }
             return (isNegative ? '-' : '') + text;
         },
 
@@ -397,22 +396,18 @@
                 else {
                     var theZ = this.get('theZ');
                     var deltaZ = theZ;
-                    var shift;
 
                     if (ref_idx) {
-                        shift = parseInt(ref_idx)
+                        var shift = parseInt(ref_idx)
                         if(!isNaN(shift)){
                             deltaZ = theZ + shift;
                         }
                     }
                     if (format === "pixel") {
-                        text = "" + (theZ + 1);
+                        text = "" + (deltaZ + 1);
                         
                     } else if (format === "unit") {
                         text = ""+ (deltaZ * z_size).toFixed(dec_prec) +" "+ z_symbol
-                    }
-                    if (!isNaN(shift)){
-                        text += " off: "+shift
                     }
                 }
                 return text
