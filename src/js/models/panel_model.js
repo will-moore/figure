@@ -297,8 +297,8 @@
             var shiftIdx;
             if (ref_idx) {
                 shiftIdx = parseInt(ref_idx)
-                var shift = this.get('deltaT')[shiftIdx];
-                deltaT = shift==null ? deltaT : shift;
+                var shift = this.get('deltaT')[shiftIdx - 1];
+                deltaT = shift==null ? deltaT : deltaT - shift;
             }
             var isNegative = (deltaT < 0);
             deltaT = Math.abs(deltaT);
@@ -307,7 +307,7 @@
             if (format === "index") {
                 isNegative = false;
                 if(!isNaN(shiftIdx) && shiftIdx > 0)
-                    text = "" + (theT + shiftIdx + 1);
+                    text = "" + (theT - shiftIdx + 1);
                 else text = "" + (theT + 1);
             } else if (['milliseconds', 'ms'].includes(format)) {
                 text = (deltaT*1000).toFixed(dec_prec) + " ms";
@@ -397,16 +397,20 @@
                     var theZ = this.get('theZ');
                     var deltaZ = theZ;
 
+                    var shift;
                     if (ref_idx) {
-                        var shift = parseInt(ref_idx)
-                        if(!isNaN(shift)){
-                            deltaZ = theZ + shift;
-                        }
+                        shift = parseInt(ref_idx)
                     }
                     if (format === "pixel") {
+                        if(!isNaN(shift)){
+                            deltaZ = theZ - shift;
+                        }
                         text = "" + (deltaZ + 1);
                         
                     } else if (format === "unit") {
+                        if(!isNaN(shift)){
+                            deltaZ = theZ - shift + 1;
+                        }
                         text = ""+ (deltaZ * z_size).toFixed(dec_prec) +" "+ z_symbol
                     }
                 }
