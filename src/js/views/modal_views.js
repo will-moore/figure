@@ -296,6 +296,7 @@
                     'pixel_size_x_unit': data.pixel_size.unitX,
                     'pixel_size_z_unit':data.pixel_size.unitZ,
                     'pixel_size_x_symbol': data.pixel_size.symbolX,
+                    'pixel_size_z_symbol': data.pixel_size.symbolZ,
                     'deltaT': data.deltaT,
                 };
                 self.newImg = newImg;
