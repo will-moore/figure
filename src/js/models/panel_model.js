@@ -405,11 +405,11 @@
                         if(!isNaN(shift)){
                             deltaZ = theZ - shift;
                         }
-                        text = "" + (deltaZ + 1);
+                        text = "" + (deltaZ);
                         
                     } else if (format === "unit") {
                         if(!isNaN(shift)){
-                            deltaZ = theZ - shift + 1;
+                            deltaZ = theZ - shift;
                         }
                         text = ""+ (deltaZ * z_size).toFixed(dec_prec) +" "+ z_symbol
                     }
