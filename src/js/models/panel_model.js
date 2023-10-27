@@ -401,16 +401,12 @@
                     if (ref_idx) {
                         shift = parseInt(ref_idx)
                     }
+                    if(!isNaN(shift)){
+                        deltaZ = theZ - shift;
+                    }
                     if (format === "pixel") {
-                        if(!isNaN(shift)){
-                            deltaZ = theZ - shift;
-                        }
-                        text = "" + (deltaZ);
-                        
+                        text = "" + (deltaZ + 1);
                     } else if (format === "unit") {
-                        if(!isNaN(shift)){
-                            deltaZ = theZ - shift;
-                        }
                         text = ""+ (deltaZ * z_size).toFixed(dec_prec) +" "+ z_symbol
                     }
                 }
