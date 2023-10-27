@@ -294,10 +294,8 @@
                 deltaT = this.get('deltaT')[theT] || 0,
                 text = "", h, m, s;
 
-            var shiftIdx;
             if (ref_idx) {
-                shiftIdx = parseInt(ref_idx)
-                var shift = this.get('deltaT')[shiftIdx - 1];
+                var shift = this.get('deltaT')[parseInt(ref_idx) - 1];
                 deltaT = shift==null ? deltaT : deltaT - shift;
             }
             var isNegative = (deltaT < 0);
@@ -306,9 +304,7 @@
             var padlen = dec_prec>0 ? dec_prec+3 : 2;
             if (format === "index") {
                 isNegative = false;
-                if(!isNaN(shiftIdx) && shiftIdx > 0)
-                    text = "" + (theT - shiftIdx + 1);
-                else text = "" + (theT + 1);
+                text = "" + (theT + 1);
             } else if (['milliseconds', 'ms'].includes(format)) {
                 text = (deltaT*1000).toFixed(dec_prec) + " ms";
             } else if (['seconds', 'secs', 's'].includes(format)) {
