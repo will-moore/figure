@@ -625,7 +625,6 @@
                     self.rerender_image_change);
             });
 
-
             $("#vp_zoom_slider").slider({
                 // NB: these values are updated on render()
                 max: 1000,
@@ -633,8 +632,9 @@
                 value: self.zoom_avg,
                 slide: function(event, ui) {
                     self.update_img_css(ui.value, 0, 0);
+                    $('#vp_zoom_value').val(ui.value);
                 },
-                stop: function( event, ui ) {
+                stop: function(event, ui) {
                     self.zoom_avg = ui.value;
                     var to_save = {'zoom': ui.value};
                     if (ui.value === 100) {
@@ -649,11 +649,17 @@
                 }
             });
             this.$vp_zoom_value = $("#vp_zoom_value");
+            
 
             // We nest the ZoomView so we can update it on update_img_css
             this.zmView = new ZoomView({models: this.models,
                                         figureModel: this.figureModel}); // auto-renders on init
             $("#reset-zoom-view").append(this.zmView.el);
+
+            // Listen for events on zoom input field
+            $("#vp_zoom_value").on("keyup", function(event){
+                this.handle_user_zoom(event);
+            }.bind(this));
 
             this.render();
         },
@@ -702,6 +708,44 @@
             return false;
         },
 
+        handle_user_zoom: function(event){
+            if (event.type === "keyup" && event.which !== 13) {
+                return;     // Ignore keyups except 'Enter'
+            }
+
+            // get the current entered value 
+            var value = parseInt(event.target.value);
+            if (isNaN(value)) {
+                return;
+            }
+
+            // get min/max and restrict the user input between min/max
+            var minVal = $("#vp_zoom_slider").slider("option", "min");
+            var maxVal = $("#vp_zoom_slider").slider("option", "max");
+
+            if (value < minVal) value = minVal;
+            if (value > maxVal) value = maxVal;
+
+            // update the slider position
+            $("#vp_zoom_slider").slider({'value': value});
+
+            // update the preview image
+            this.update_img_css(value, 0, 0);
+
+            // update the figure image
+            this.zoom_avg = value;
+            var to_save = {'zoom': value};
+            if (value == 100) {
+                to_save.dx = 0;
+                to_save.dy = 0;
+            }
+            this.models.forEach(function(m){
+                m.save(to_save);
+            });
+
+            this.rerender_image_change();
+        },
+
         // if the panel is rotated by css, drag events need to be corrected
         correct_rotation: function(dx, dy) {
             if (dx === 0 && dy === 0) {
@@ -725,7 +769,8 @@
             $( "#vp_zoom_slider" ).slider( "destroy" );
             $("#vp_z_slider").slider("destroy");
             $("#vp_t_slider").slider("destroy");
-            this.$vp_zoom_value.text('');
+            $("#vp_zoom_value").off();
+            this.$vp_zoom_value.val();
 
             if (this.zmView) {
                 this.zmView.remove();
@@ -768,7 +813,7 @@
                     offset_y = dy;
                 }
                 this.$vp_img.css( this.models.head().get_vp_img_css(zoom, frame_w, frame_h, offset_x, offset_y) );
-                this.$vp_zoom_value.text(zoom + "%");
+                this.$vp_zoom_value.val(zoom);
 
                 if (save) {
                     if (typeof dx === "undefined") dx = 0;  // rare crazy-dragging case!
@@ -1020,7 +1065,7 @@
             this.$vp_frame = $(".vp_frame", this.$el);  // cache for later
             this.$vp_img = $(".vp_img", this.$el);
             this.zoom_avg = zoom >> 0;
-            this.$vp_zoom_value.text(this.zoom_avg + "%");
+            this.$vp_zoom_value.val(this.zoom_avg);
             // zoom may be > 1000 if set by 'crop'
 
             // We want to be able to zoom Big images to 'actual size' in viewport
