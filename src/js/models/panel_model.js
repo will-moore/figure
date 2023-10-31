@@ -90,7 +90,6 @@
             var newData = {'imageId': data.imageId,
                 'name': data.name,
                 'sizeZ': data.sizeZ,
-                'theZ': data.theZ,
                 'sizeT': data.sizeT,
                 'orig_width': data.orig_width,
                 'orig_height': data.orig_height,
@@ -106,9 +105,12 @@
                 'deltaT': data.deltaT,
             };
 
-            // theT is not changed unless we have to...
+            // theT and theZ are not changed unless we have to...
             if (this.get('theT') >= newData.sizeT) {
                 newData.theT = newData.sizeT - 1;
+            }
+            if (this.get('theZ') >= newData.sizeZ) {
+                newData.theZ = newData.sizeZ - 1;
             }
 
             // Make sure dx and dy are not outside the new image
