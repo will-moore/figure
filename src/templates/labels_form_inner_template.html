@@ -74,7 +74,7 @@
         <button type="button" class="label-position btn btn-default btn-sm dropdown-toggle" 
                 title="Position" data-toggle="dropdown">
             <span data-position="<%= position %>" class="labelicon-<%= position %> glyphicon 
-                <% if (_.contains(['top','bottom','left','leftvert','right'],position)) print('glyphicon-log-out'); else {print('glyphicon-new-window')} %>"></span>
+                <% if (_.contains(['top','bottom','left','leftvert','right','rightvert'],position)) print('glyphicon-log-out'); else {print('glyphicon-new-window')} %>"></span>
             <span class="caret"></span>
         </button>
         <ul class="dropdown-menu" role="menu">
@@ -112,6 +112,11 @@
             <li><a href="#">
                 <span data-position="right" class="labelicon-right glyphicon glyphicon-log-out"></span> Right</a>
             </li>
+            <li><a href="#">
+                <span data-position="rightvert" class="labelicon-rightvert glyphicon glyphicon-log-out"></span> 
+                Right vertical
+            </a>
+        </li>
             <li><a href="#">
                 <span data-position="bottom" class="labelicon-bottom glyphicon glyphicon-log-out"></span> Bottom</a>
             </li>
