@@ -38,6 +38,17 @@ var LabelFromMapsModal = Backbone.View.extend({
         url += imageIds.join("&image=");
 
         $.getJSON(url, function(data) {
+                if (data.hasOwnProperty('inherited')){
+                    let inheritors = data.inherited.inheritors;
+                    data.inherited.annotations.forEach(function(ann) {
+                        for(j = 0; j < inheritors[ann["id"]].length; j++){
+                            // Unpacking the parent annoations for each image
+                            var clone_ann = { ...ann };
+                            clone_ann.link.parent.id = inheritors[ann["id"]][j].id;
+                            data.annotations.push(clone_ann);
+                        }
+                    });
+                }
                 this.isLoading = false;
                 this.annotations = data.annotations;
                 this.render();
@@ -150,7 +161,7 @@ var LabelFromMapsModal = Backbone.View.extend({
             }
         }
         keyList.sort(function(a, b) {
-            return (a.toUpperCase() < b.toUpperCase()) ? -1 : 1; 
+            return (a.toUpperCase() < b.toUpperCase()) ? -1 : 1;
         });
 
         var html = keyList.map(function(key) {
