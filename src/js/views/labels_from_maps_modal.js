@@ -39,12 +39,11 @@ var LabelFromMapsModal = Backbone.View.extend({
 
         $.getJSON(url, function(data) {
                 if (data.hasOwnProperty('inherited')){
-                    let inheritors = data.inherited.inheritors;
                     data.inherited.annotations.forEach(function(ann) {
-                        for(j = 0; j < inheritors[ann["id"]].length; j++){
+                        for(j = 0; j < data.inherited.inheritors[ann["id"]].length; j++){
                             // Unpacking the parent annoations for each image
-                            var clone_ann = { ...ann };
-                            clone_ann.link.parent.id = inheritors[ann["id"]][j].id;
+                            let clone_ann = { ...ann };
+                            clone_ann.link.parent.id = data.inherited.inheritors[ann["id"]][j].id;
                             data.annotations.push(clone_ann);
                         }
                     });

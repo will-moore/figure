@@ -362,7 +362,7 @@
             else if (property === "h") property = "height";
             else if (property === "rot") property = "rotation";
 
-            
+
             var x_symbol = this.get('pixel_size_x_symbol'),
                 z_symbol = this.get('pixel_size_z_symbol');
             z_symbol = z_symbol ? z_symbol : x_symbol // Using x symbol when z not defined
@@ -993,6 +993,16 @@
             var url = WEBINDEX_URL + "api/annotations/?type=tag&limit=1000&" + image_ids;
             $.getJSON(url, function(data){
                 // Map {iid: {id: 'tag'}, {id: 'names'}}
+                if (data.hasOwnProperty('inherited')){
+                    data.inherited.annotations.forEach(function(ann) {
+                        for(j = 0; j < data.inherited.inheritors[ann["id"]].length; j++){
+                            // Unpacking the parent annoations for each image
+                            let clone_ann = { ...ann };
+                            clone_ann.link.parent.id = data.inherited.inheritors[ann["id"]][j].id;
+                            data.annotations.push(clone_ann);
+                        }
+                    });
+                }
                 var imageTags = data.annotations.reduce(function(prev, t){
                     var iid = t.link.parent.id;
                     if (!prev[iid]) {
