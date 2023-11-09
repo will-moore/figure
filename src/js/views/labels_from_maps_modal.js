@@ -54,13 +54,26 @@ var LabelFromMapsModal = Backbone.View.extend({
         event.preventDefault();
         if (this.isLoading) return;
 
-        var key = $('select', this.el).val();
+        var radios = $("input[name='kvpChoice']")
+        var choice
+        for (var i = 0, length = radios.length; i < length; i++) {
+            if (radios[i].checked) {
+                choice = radios[i].value;
+                break;
+            }
+        }
+        console.log(choice)
+        var key;
+        if(choice === "single-key"){
+            key = $('select', this.el).val();
+        }
+
         var includeKey = $("input[name='includeKey']").is(':checked');
         var labelSize = this.options.size || "12";
         var labelPosition = this.options.position || "top";
         var labelColor = this.options.color || "000000";
 
-        var imageValues = this.annotations.reduce(function(prev, t){
+        var imageKeyValues = this.annotations.reduce(function(prev, t){
             var iid = t.link.parent.id;
             if (!prev[iid]) {
                 prev[iid] = [];
@@ -68,8 +81,8 @@ var LabelFromMapsModal = Backbone.View.extend({
             t.values.forEach(function(kv) {
                 var value = kv[1];
                 // If key matches, add to values for the image (no duplicates)
-                if (kv[0] === key && prev[iid].indexOf(value) === -1) {
-                    prev[iid].push(value);
+                if ((choice === "all-keys" || (kv[0] === key)) && prev[iid].indexOf(value) === -1) {
+                    prev[iid].push(kv);
                 }
             });
             return prev;
@@ -77,10 +90,10 @@ var LabelFromMapsModal = Backbone.View.extend({
 
         this.model.getSelected().forEach(function(p){
             var iid = p.get('imageId');
-            if (imageValues[iid]) {
-                var labels = imageValues[iid].map(function(value){
+            if (imageKeyValues[iid]) {
+                var labels = imageKeyValues[iid].map(function(value){
                     return {
-                        'text': includeKey ? (key + ': ' + value) : value,
+                        'text': includeKey ? (value[0] + ': ' + value[1]) : value[1],
                         'size': labelSize,
                         'position': labelPosition,
                         'color': labelColor,
