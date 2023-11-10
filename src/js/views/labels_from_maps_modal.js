@@ -80,7 +80,7 @@ var LabelFromMapsModal = Backbone.View.extend({
             if (imageValues[iid]) {
                 var labels = imageValues[iid].map(function(value){
                     return {
-                        'text': includeKey ? (key + ': ' + value) : value,
+                        'text': includeKey ? (key.replaceAll("_","\\_") + ': ' + value.replaceAll("_","\\_")) : value.replaceAll("_","\\_"),
                         'size': labelSize,
                         'position': labelPosition,
                         'color': labelColor,
