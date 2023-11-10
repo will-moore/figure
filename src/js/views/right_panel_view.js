@@ -483,7 +483,6 @@
 
         // Use the label 'key' to specify which labels to update
         handle_label_edit: function(event) {
-
             var $form = $(event.target),
                 label_text = $('.label-text', $form).val(),
                 font_size = $('.font-size', $form).text().trim(),
@@ -497,7 +496,6 @@
 
             var newlbls = {};
             newlbls[key] = new_label;
-
             this.models.forEach(function(m){
                 m.edit_labels(newlbls);
             });
@@ -524,15 +522,25 @@
 
             // Render template for each position and append to $el
             var html = "";
+            var filteredLbls = []
             _.each(positions, function(lbls, p) {
-
                 lbls = _.map(lbls, function(label, key){ return label; });
 
                 var json = {'position':p, 'labels':lbls};
                 if (lbls.length === 0) return;
+                console.log(lbls)
+                lbls.forEach(function(lbl){
+                    filteredLbls.push(lbl)
+                })
+                
                 json.inner_template = self.inner_template;
                 html += self.template(json);
             });
+           
+            this.models.forEach(function(m){
+                m.save('labels', filteredLbls);
+            })
+
             self.$el.append(html);
 
             return this;

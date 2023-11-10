@@ -241,24 +241,15 @@
             var oldLabs = this.get("labels");
             // Need to clone the list of labels...
             var labs = [];
-            /*for (var i=0; i<oldLabs.length; i++) {
-                labs.push( $.extend(true, {}, oldLabs[i]) );
-            }*/
-           var newLabKey = []
+            var newLabKey = [];
             for (var i=0; i<labels.length; i++) {
                 newLabKey.push(this.get_label_key(labels[i]));
             }
 
             for (var i=0; i<oldLabs.length; i++) {
                 lbl = oldLabs[i];
-
                 lbl_key = this.get_label_key(lbl);
                 // for existing label that matches...
-                console.log(labels)
-                console.log(lbl)
-                console.log(newLabKey)
-                console.log(lbl_key)
-                console.log(newLabKey.includes(lbl_key))
                 if (!newLabKey.includes(lbl_key)) {
                     // otherwise leave un-edited
                     labs.push( $.extend(true, {}, lbl));
@@ -442,21 +433,19 @@
         // labels_map is {labelKey: {size:s, text:t, position:p, color:c}} or {labelKey: false} to delete
         // where labelKey specifies the label to edit. "l.text + '_' + l.size + '_' + l.color + '_' + l.position"
         edit_labels: function(labels_map) {
-
             var oldLabs = this.get('labels');
             // Need to clone the list of labels...
             var labs = [],
-                lbl, lbl_key, replaced = false;
+                lbl, lbl_key;
             for (var i=0; i<oldLabs.length; i++) {
                 lbl = oldLabs[i];
                 lbl_key = this.get_label_key(lbl);
                 // for existing label that matches...
                 if (labels_map.hasOwnProperty(lbl_key)) {
-                    if (labels_map[lbl_key] && !replaced) {
+                    if (labels_map[lbl_key]) {
                         // replace with the new label
                         lbl = $.extend(true, {}, labels_map[lbl_key]);
                         labs.push( lbl );
-                        replaced = true
                     }
                     // else 'false' are ignored (deleted)
                 } else {
