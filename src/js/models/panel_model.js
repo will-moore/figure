@@ -241,13 +241,35 @@
             var oldLabs = this.get("labels");
             // Need to clone the list of labels...
             var labs = [];
-            for (var i=0; i<oldLabs.length; i++) {
+            /*for (var i=0; i<oldLabs.length; i++) {
                 labs.push( $.extend(true, {}, oldLabs[i]) );
+            }*/
+           var newLabKey = []
+            for (var i=0; i<labels.length; i++) {
+                newLabKey.push(this.get_label_key(labels[i]));
             }
+
+            for (var i=0; i<oldLabs.length; i++) {
+                lbl = oldLabs[i];
+
+                lbl_key = this.get_label_key(lbl);
+                // for existing label that matches...
+                console.log(labels)
+                console.log(lbl)
+                console.log(newLabKey)
+                console.log(lbl_key)
+                console.log(newLabKey.includes(lbl_key))
+                if (!newLabKey.includes(lbl_key)) {
+                    // otherwise leave un-edited
+                    labs.push( $.extend(true, {}, lbl));
+                }
+            }
+
             // ... then add new labels ...
             for (var j=0; j<labels.length; j++) {
                 labs.push( $.extend(true, {}, labels[j]) );
             }
+
             // ... so that we get the changed event triggering OK
             this.save('labels', labs);
         },
@@ -424,16 +446,17 @@
             var oldLabs = this.get('labels');
             // Need to clone the list of labels...
             var labs = [],
-                lbl, lbl_key;
+                lbl, lbl_key, replaced = false;
             for (var i=0; i<oldLabs.length; i++) {
                 lbl = oldLabs[i];
                 lbl_key = this.get_label_key(lbl);
                 // for existing label that matches...
                 if (labels_map.hasOwnProperty(lbl_key)) {
-                    if (labels_map[lbl_key]) {
+                    if (labels_map[lbl_key] && !replaced) {
                         // replace with the new label
                         lbl = $.extend(true, {}, labels_map[lbl_key]);
                         labs.push( lbl );
+                        replaced = true
                     }
                     // else 'false' are ignored (deleted)
                 } else {
