@@ -90,7 +90,6 @@
             var newData = {'imageId': data.imageId,
                 'name': data.name,
                 'sizeZ': data.sizeZ,
-                'theZ': data.theZ,
                 'sizeT': data.sizeT,
                 'orig_width': data.orig_width,
                 'orig_height': data.orig_height,
@@ -106,9 +105,12 @@
                 'deltaT': data.deltaT,
             };
 
-            // theT is not changed unless we have to...
+            // theT and theZ are not changed unless we have to...
             if (this.get('theT') >= newData.sizeT) {
                 newData.theT = newData.sizeT - 1;
+            }
+            if (this.get('theZ') >= newData.sizeZ) {
+                newData.theZ = newData.sizeZ - 1;
             }
 
             // Make sure dx and dy are not outside the new image
@@ -877,7 +879,17 @@
 
         getBoundingBoxRight: function() {
             // Ignore right (horizontal) labels since we don't know how long they are
-            return this.get('x') + this.get('width');
+            // but include right vertical labels
+            var labels = this.get("labels");
+            var x = this.get('x') + this.get('width');
+            // get labels by position
+            var right_labels = labels.filter(function(l) {return l.position === 'rightvert'});
+            // offset by font-size of each
+            x = right_labels.reduce(function(prev, l){
+                return prev + (LINE_HEIGHT * l.size);
+            }, x);
+
+            return x;
         },
 
         getBoundingBoxBottom: function() {
