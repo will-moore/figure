@@ -456,8 +456,20 @@
                     labs.push( lbl );
                 }
             }
+
+            // filter unique keys only to remove duplicates
+            var filtered_lbls_map = {}
+            for (var i=0; i<labs.length; i++) {
+                filtered_lbls_map[this.get_label_key(labs[i])] = i
+            }
+        
+            var filtered_lbls = [] 
+            _.each(Object.values(filtered_lbls_map), function(idx){
+                filtered_lbls.push(labs[idx])
+            })
+
             // ... so that we get the changed event triggering OK
-            this.save('labels', labs);
+            this.save('labels', filtered_lbls);
         },
 
         save_channel: function(cIndex, attr, value) {
