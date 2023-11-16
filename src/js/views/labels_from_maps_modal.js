@@ -34,19 +34,19 @@ var LabelFromMapsModal = Backbone.View.extend({
         this.isLoading = true;
         $('select', this.el).html("<option>Loading data...</option>");
 
-        var url = WEBINDEX_URL + "api/annotations/?type=map&parents=yes&image=";
+        var url = WEBINDEX_URL + "api/annotations/?type=map&parents=true&image=";
         url += imageIds.join("&image=");
 
         $.getJSON(url, function(data) {
-                if (data.hasOwnProperty('inherited')){
-                    data.inherited.annotations.forEach(function(ann) {
+                if (data.hasOwnProperty('parents')){
+                    data.parents.annotations.forEach(function(ann) {
                         let class_ = ann.link.parent.class;
                         let id_ = '' + ann.link.parent.id;
-                        let children = data.inherited.inheritors[class_][id_];
-                        for(j = 0; j < children.length; j++){
+                        let lineage = data.parents.lineage[class_][id_];
+                        for(j = 0; j < lineage.length; j++){
                             // Unpacking the parent annoations for each image
                             let clone_ann = { ...ann };
-                            clone_ann.link.parent.id = children[j].id;
+                            clone_ann.link.parent.id = lineage[j].id;
                             data.annotations.push(clone_ann);
                         }
                     });

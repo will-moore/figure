@@ -990,18 +990,18 @@
             var image_ids = this.map(function(s){return s.get('imageId')})
             image_ids = "image=" + image_ids.join("&image=");
             // TODO: Use /api/ when annotations is supported
-            var url = WEBINDEX_URL + "api/annotations/?type=tag&parents=yes&limit=1000&" + image_ids;
+            var url = WEBINDEX_URL + "api/annotations/?type=tag&parents=true&limit=1000&" + image_ids;
             $.getJSON(url, function(data){
                 // Map {iid: {id: 'tag'}, {id: 'names'}}
-                if (data.hasOwnProperty('inherited')){
-                    data.inherited.annotations.forEach(function(ann) {
+                if (data.hasOwnProperty('parents')){
+                    data.parents.annotations.forEach(function(ann) {
                         let class_ = ann.link.parent.class;
                         let id_ = '' + ann.link.parent.id;
-                        let children = data.inherited.inheritors[class_][id_];
-                        for(j = 0; j < children.length; j++){
+                        let lineage = data.parents.lineage[class_][id_];
+                        for(j = 0; j < lineage.length; j++){
                             // Unpacking the parent annoations for each image
                             let clone_ann = { ...ann };
-                            clone_ann.link.parent.id = children[j].id;
+                            clone_ann.link.parent.id = lineage[j].id;
                             data.annotations.push(clone_ann);
                         }
                     });
