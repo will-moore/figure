@@ -243,24 +243,24 @@
             var oldLabs = this.get("labels");
             // Need to clone the list of labels...
             var labs = [];
-            var newLabKey = [];
-            for (var i=0; i<labels.length; i++) {
-                newLabKey.push(this.get_label_key(labels[i]));
-            }
+            var oldLabKeys = [];
 
+            // Keep old labels unchanged...
             for (var i=0; i<oldLabs.length; i++) {
-                lbl = oldLabs[i];
-                lbl_key = this.get_label_key(lbl);
-                // for existing label that matches...
-                if (!newLabKey.includes(lbl_key)) {
-                    // otherwise leave un-edited
-                    labs.push( $.extend(true, {}, lbl));
-                }
+                var lbl = oldLabs[i];
+                var lbl_key = this.get_label_key(lbl);
+                oldLabKeys.push(lbl_key);
+                labs.push( $.extend(true, {}, lbl));
             }
 
             // ... then add new labels ...
             for (var j=0; j<labels.length; j++) {
-                labs.push( $.extend(true, {}, labels[j]) );
+                var lbl = labels[j];
+                var lbl_key = this.get_label_key(lbl);
+                if (!oldLabKeys.includes(lbl_key)) {
+                    // otherwise leave un-edited
+                    labs.push( $.extend(true, {}, lbl));
+                }
             }
 
             // ... so that we get the changed event triggering OK
