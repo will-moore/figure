@@ -252,7 +252,6 @@
                 oldLabKeys.push(lbl_key);
                 labs.push( $.extend(true, {}, lbl));
             }
-
             // ... then add new labels ...
             for (var j=0; j<labels.length; j++) {
                 var lbl = labels[j];
@@ -262,7 +261,6 @@
                     labs.push( $.extend(true, {}, lbl));
                 }
             }
-
             // ... so that we get the changed event triggering OK
             this.save('labels', labs);
         },
@@ -435,6 +433,7 @@
         // labels_map is {labelKey: {size:s, text:t, position:p, color:c}} or {labelKey: false} to delete
         // where labelKey specifies the label to edit. "l.text + '_' + l.size + '_' + l.color + '_' + l.position"
         edit_labels: function(labels_map) {
+            
             var oldLabs = this.get('labels');
             // Need to clone the list of labels...
             var labs = [],
