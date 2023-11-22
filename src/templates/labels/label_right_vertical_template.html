@@ -1,0 +1,8 @@
+
+<div class="label_layout right_vlabels">
+    <div>
+        <% _.each(labels, function(l, i) { %>
+            <div style='color:#<%= l.color %>; font-size:<%= l.size %>px'><%= l.text %></div>
+        <% }); %>
+    </div>
+</div>
