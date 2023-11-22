@@ -463,16 +463,12 @@
                 }
             }
 
-            // filter unique keys only to remove duplicates
-            var filtered_lbls_map = {}
-            for (var i=0; i<labs.length; i++) {
-                filtered_lbls_map[this.get_label_key(labs[i])] = i
-            }
-        
-            var filtered_lbls = [] 
-            _.each(Object.values(filtered_lbls_map), function(idx){
-                filtered_lbls.push(labs[idx])
-            })
+            // Extract all the keys (even duplicates)
+            var keys = labs.map(lbl => this.get_label_key(lbl));
+
+            // get all unique labels based on filtering keys 
+            //(i.e removing duplicate keys based on the index of the first occurrence of the value)
+            var filtered_lbls = labs.filter((lbl, index) => index == keys.indexOf(this.get_label_key(lbl)));
 
             // ... so that we get the changed event triggering OK
             this.save('labels', filtered_lbls);
