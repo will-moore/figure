@@ -54,15 +54,7 @@ var LabelFromMapsModal = Backbone.View.extend({
         event.preventDefault();
         if (this.isLoading) return;
 
-        var radios = $("input[name='kvpChoice']")
-        var choice
-        for (var i = 0, length = radios.length; i < length; i++) {
-            if (radios[i].checked) {
-                choice = radios[i].value;
-                break;
-            }
-        }
-        console.log(choice)
+        var choice = $("input[name='kvpChoice']:checked").val();
         var key;
         if(choice === "single-key"){
             key = $('select', this.el).val();
