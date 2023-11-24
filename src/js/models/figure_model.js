@@ -459,6 +459,11 @@
                 dataType: dataType,
                 // work with the response
                 success: function( data ) {
+                    if (data.Exception) {
+                        // If something went wrong, show error and don't add to figure
+                        alert(`Image loading from ${imgDataUrl} included an Error: ${data.Exception}`);
+                        return;
+                    }
 
                     self.set('loading_count', self.get('loading_count') - 1);
 
