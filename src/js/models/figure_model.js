@@ -459,9 +459,10 @@
                 dataType: dataType,
                 // work with the response
                 success: function( data ) {
-                    if (data.Exception) {
+                    if (data.Exception || data.ConcurrencyException) {
                         // If something went wrong, show error and don't add to figure
-                        alert(`Image loading from ${imgDataUrl} included an Error: ${data.Exception}`);
+                        message = data.Exception || "ConcurrencyException"
+                        alert(`Image loading from ${imgDataUrl} included an Error: ${message}`);
                         return;
                     }
 
