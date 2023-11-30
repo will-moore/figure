@@ -1265,9 +1265,13 @@ class FigureExport(object):
                         else:
                             the_z = panel['theZ'] if panel['theZ'] else 0
                             if format == "pixel":
+                                if offset is not None and 1 <= offset:
+                                    the_z -= offset
                                 label_value = str(the_z + 1)
                             elif (format == "unit" and size_z
                                   and the_z < size_z):
+                                if offset is not None and 1 <= offset:
+                                    the_z -= offset
                                 z_pos = "%.*f" % (precision,
                                                   (the_z * pixel_size_z))
                                 label_value = (z_pos + " " + z_symbol)

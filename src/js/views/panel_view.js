@@ -227,7 +227,7 @@
                         } else if (['x', 'y', 'z', 'width', 'height', 'w', 'h', 'rotation', 'rot'].includes(prop_nf[0])){
                             format = prop_nf[1] ? prop_nf[1] : "pixel";
                             precision = param_dict["precision"] !== undefined ? param_dict["precision"] : 2; // decimal places default to 2
-                            label_value = self.model.get_view_label_text(prop_nf[0], format, precision);
+                            label_value = self.model.get_view_label_text(prop_nf[0], format, param_dict["offset"], precision);  
                         } else if (['channels', 'c'].includes(prop_nf[0])) {
                             label_value = self.model.get_channels_label_text();
                         } else if (['zoom'].includes(prop_nf[0])) {

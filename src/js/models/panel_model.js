@@ -298,8 +298,8 @@
                 text = "", h, m, s;
 
             if (ref_idx) {
-                var shift = this.get('deltaT')[parseInt(ref_idx)-1];
-                deltaT = shift==null ? deltaT : deltaT-shift;
+                var shift = this.get('deltaT')[parseInt(ref_idx) - 1];
+                deltaT = shift==null ? deltaT : deltaT - shift;
             }
             var isNegative = (deltaT < 0);
             deltaT = Math.abs(deltaT);
@@ -334,6 +334,7 @@
             if (["0"+dec_str+" s", "0"+dec_str+" mins", "0:00"+dec_str, "0:00:00"+dec_str].indexOf(text) > -1) {
                 isNegative = false;
             }
+
             return (isNegative ? '-' : '') + text;
         },
 
@@ -362,7 +363,7 @@
             return text;
         },
 
-        get_view_label_text: function(property, format, dec_prec) {
+        get_view_label_text: function(property, format, ref_idx, dec_prec) {
             if (format === "px") format = "pixel";
 
             if (property === "w") property = "width";
@@ -399,10 +400,19 @@
                 }
                 else {
                     var theZ = this.get('theZ');
+                    var deltaZ = theZ;
+
+                    var shift;
+                    if (ref_idx) {
+                        shift = parseInt(ref_idx)
+                    }
+                    if(!isNaN(shift)){
+                        deltaZ = theZ - shift;
+                    }
                     if (format === "pixel") {
-                        text = "" + (theZ + 1);
+                        text = "" + (deltaZ + 1);
                     } else if (format === "unit") {
-                        text = ""+ (theZ * z_size).toFixed(dec_prec) +" "+ z_symbol
+                        text = ""+ (deltaZ * z_size).toFixed(dec_prec) +" "+ z_symbol
                     }
                 }
                 return text
