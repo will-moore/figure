@@ -273,7 +273,7 @@
                     // If channel has LUT, make grey (visible on black/white bg)
                     var chColor = c.color.endsWith('lut') ? 'BBBBBB' : c.color;
                     newLabels.push({
-                        'text': c.label,
+                        'text': c.label.replaceAll("_","\\_"),
                         'size': options.size,
                         'position': options.position,
                         'color': options.color || chColor
@@ -291,7 +291,7 @@
                     else text = text + " " + c.label
                 }
             });
-            return text ? text : " ";
+            return text ? text.replaceAll("_","\\_") : " ";
         },
 
         getDeltaT: function() {
@@ -1034,7 +1034,7 @@
                     if (!prev[iid]) {
                         prev[iid] = {};
                     }
-                    prev[iid][t.id] = t.textValue;
+                    prev[iid][t.id] = t.textValue.replaceAll("_","\\_");
                     return prev;
                 }, {});
                 // Apply tags to panels
