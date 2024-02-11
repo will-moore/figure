@@ -516,6 +516,18 @@
                 return false;
             }
 
+            // If we need SPW info and we don't have it, load...
+            if (label_text.includes('[plate.name]') || label_text.includes('well.name') || label_text.includes('field.index')) {
+                // Load Plate Name for images...
+                console.log("label_text", label_text);
+                selected.addLabelsFromPlatesWellsFields({
+                    text: label_text,
+                    position: position,
+                    size: font_size,
+                    color: color});
+                return false;
+            }
+
             if (label_text == '[tags]') {
                 // Load Tags for this image and create labels
 

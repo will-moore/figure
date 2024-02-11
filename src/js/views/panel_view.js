@@ -256,11 +256,12 @@
                             format = prop_nf[1] ? prop_nf[1] : "index";
                             precision = param_dict["precision"] !== undefined ? param_dict["precision"] : 0; // decimal places default to 0
                             label_value = self.model.get_time_label_text(format, param_dict["offset"], precision);
-                        } else if (['image', 'dataset'].includes(prop_nf[0])){
+                        } else if (['image', 'dataset', 'screen', 'plate', 'well', 'wellsample'].includes(prop_nf[0])){
                             format = prop_nf[1] ? prop_nf[1] : "name";
                             label_value = self.model.get_name_label_text(prop_nf[0], format);
+                            console.log("render_label label_value", label_value, prop_nf);
                             //Escape the underscore for markdown
-                            label_value = label_value.replaceAll("_", "\\_");
+                            label_value = ("" + label_value).replaceAll("_", "\\_");
                         } else if (['x', 'y', 'z', 'width', 'height', 'w', 'h', 'rotation', 'rot'].includes(prop_nf[0])){
                             format = prop_nf[1] ? prop_nf[1] : "pixel";
                             precision = param_dict["precision"] !== undefined ? param_dict["precision"] : 2; // decimal places default to 2

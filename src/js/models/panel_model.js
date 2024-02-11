@@ -510,6 +510,10 @@
                 } else if (format === "name") {
                     text = this.get('datasetName') ? this.get('datasetName') : "No/Many Datasets";
                 }
+            } else {
+                // screen, plate, well, (name or id)
+                console.log("get_name_label_text", property, format, this.get(property));
+                text = this.get(property)?.[format] ?? "Not Found";
             }
             return text;
         },
@@ -1212,6 +1216,30 @@
             if (_.max(vals) === _.min(vals)) {
                 return _.max(vals);
             }
+        },
+
+        addLabelsFromPlatesWellsFields: function(label_data) {
+
+            // TODO: could ignore image IDs if Plate/Well/Field loaded already
+            var image_ids = this.map(function(s){return s.get('imageId')});
+            image_ids = "image=" + image_ids.join("&image=");
+            var url = BASE_WEBFIGURE_URL + "parents/?" + image_ids;
+            console.log('url', url);
+            $.getJSON(url, function(data){
+                console.log(data);
+                // {screen: {id:3, name:abc}, plate: {id:1, name:foo}, well:{id:2, name:A1}}
+                const parents = data.parents;
+                
+                // Add parents to each panel, then add label
+                this.forEach(function(p){
+                    var iid = p.get('imageId');
+                    if (parents[iid]) {
+                        p.set(parents[iid]);
+                    }
+                    console.log("Adding label..", label_data);
+                    p.add_labels([label_data]);
+                });
+            }.bind(this));
         },
 
         createLabelsFromTags: function(options) {
