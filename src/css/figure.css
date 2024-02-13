@@ -262,6 +262,11 @@
         position: absolute;
         top: 3px;
     }
+    #vp_zoom_value {
+        float: right;
+        width: 50px;
+        margin-top: 5px;
+    }
     .toggle_channel {
         border-radius: 6px 6px 6px 6px;
         margin: 2px;
