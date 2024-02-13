@@ -1,0 +1,165 @@
+
+    <div class="input-group pull-left">
+        <input type="text" class="label-text form-control input-sm" 
+                placeholder="Label" value="<% print(_.escape(l.text)) %>" style="max-height:29px"/>
+        <% if (!edit){ %>
+            <div class="input-group-btn">
+                <button type="button" class="btn btn-default btn-sm dropdown-toggle"
+                        data-toggle="dropdown" title="Label from data...">
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu pull-right">
+                    <li role="presentation" class="dropdown-header">Create Label(s) From:</li>
+                    <li role="presentation" class="divider"></li>
+                    <li><a href="#" data-label="[image.name]">Image Name</a></li>
+                    <li><a href="#" data-label="[dataset.name]">Dataset Name</a></li>
+                    <li title="Create labels from active Channels on the selected panel">
+                        <a href="#" data-label="[channels labels]">Channels (separate labels)</a>
+                    </li>
+                    <li title="Create labels from active Channels on the selected panel">
+                        <a href="#" data-label="[channels]">Channels (single label)</a>
+                    </li>
+                    <li title="Create labels from Tags on this Image in OMERO">
+                        <a href="#" data-label="[tags]">Tags</a>
+                    </li>
+                    <li title="Create labels from Map Annotations on this Image in OMERO">
+                        <a href="#" data-label="[key-values]">Key-Value Pairs</a>
+                    </li>
+                    <li title="Add a label that shows the current T-index">
+                        <a href="#" data-label="[time.index]">Time (T-index)</a>
+                    </li>
+                    <li class="add_time_label" title="Label shows time in milliseconds">
+                        <a href="#" data-label="[time.milliseconds]">Time (milliseconds)</a>
+                    </li>
+                    <li class="add_time_label">
+                        <a href="#" data-label="[time.secs]">Time (seconds)</a>
+                    </li>
+                    <li class="add_time_label">
+                        <a href="#" data-label="[time.mins]">Time (mins)</a>
+                    </li>
+                    <li class="add_time_label" title="Label shows time in mins:secs">
+                        <a href="#" data-label="[time.mins:secs]">Time (mins:secs)</a>
+                    </li>
+                    <li class="add_time_label">
+                        <a href="#" data-label="[time.hrs:mins:secs]">Time (hrs:mins:secs)</a>
+                    </li>
+                    <li class="add_time_label">
+                        <a href="#" data-label="[time.hrs:mins]">Time (hrs:mins)</a>
+                    </li>
+                    <li title="Add a label that shows the viewport X and Y in pixels">
+                        <a href="#" data-label="X: [x.pixel] Y: [y.pixel]">X and Y (pixel or unit)</a>
+                    </li>
+                    <li  title="Add a label that shows the current Z-index">
+                        <a href="#" data-label="Z: [z.pixel]">Z (pixel or unit)</a>
+                    </li>
+                </ul>
+            </div>
+        <% } %>
+    </div>
+
+    <div class="btn-group">
+        <button type="button" class="font-size btn btn-default btn-sm dropdown-toggle" title="Font Size"
+            data-toggle="dropdown" style="width:33px">
+            <span><%= l.size %></span>
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" role="menu">
+        <% _.each([6,8,10,12,14,18,21,24,36,48],function(p){
+            print ("<li><a href='#'><span>"+p+"</span></a></li>")
+        }); %>
+        </ul>
+    </div>
+
+    <div class="btn-group">
+        <button type="button" class="label-position btn btn-default btn-sm dropdown-toggle" 
+                title="Position" data-toggle="dropdown">
+            <span data-position="<%= position %>" class="labelicon-<%= position %> glyphicon 
+                <% if (_.contains(['top','bottom','left','leftvert','right'],position)) print('glyphicon-log-out'); else {print('glyphicon-new-window')} %>"></span>
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" role="menu">
+            <li role="presentation" class="dropdown-header">Inside Corners</li>
+            <li><a href="#">
+                <span data-position="topleft" class="labelicon-topleft glyphicon glyphicon-new-window"></span>
+                Top Left</a>
+            </li>
+            <li><a href="#">
+                <span data-position="topright" class="labelicon-topright glyphicon glyphicon-new-window"></span>
+                Top Right</a>
+            </li>
+            <li><a href="#">
+                <span data-position="bottomleft" class="labelicon-bottomleft glyphicon glyphicon-new-window"></span>
+                Bottom Left</a>
+            </li>
+            <li><a href="#">
+                <span data-position="bottomright" class="labelicon-bottomright glyphicon glyphicon-new-window"></span>
+                Bottom Right</a>
+            </li>
+
+            <li role="presentation" class="divider"></li>
+            <li role="presentation" class="dropdown-header">Outside Edges</li>
+            <li><a href="#">
+                <span data-position="left" class="labelicon-left glyphicon glyphicon-log-out"></span> Left</a>
+            </li>
+            <li><a href="#">
+                    <span data-position="leftvert" class="labelicon-leftvert glyphicon glyphicon-log-out"></span> 
+                    Left vertical
+                </a>
+            </li>
+            <li><a href="#">
+                <span data-position="top" class="labelicon-top glyphicon glyphicon-log-out"></span> Top</a>
+            </li>
+            <li><a href="#">
+                <span data-position="right" class="labelicon-right glyphicon glyphicon-log-out"></span> Right</a>
+            </li>
+            <li><a href="#">
+                <span data-position="bottom" class="labelicon-bottom glyphicon glyphicon-log-out"></span> Bottom</a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="btn-group">
+        <button type="button" class="label-color btn btn-default btn-sm dropdown-toggle" title="Label Color"
+            data-toggle="dropdown">
+            <span data-color="<%= l.color %>" style="background-color:#<%= l.color %>">&nbsp &nbsp &nbsp</span>
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu colorpicker" role="menu">
+            <li><a href="#">
+                <span data-color="000000" style="background-color:#000">&nbsp &nbsp &nbsp</span>&nbsp Black
+            </a></li>
+            <li><a href="#">
+                <span data-color="0000FF" style="background-color:#00f">&nbsp &nbsp &nbsp</span>&nbsp Blue
+            </a></li>
+            <li><a href="#">
+                <span data-color="00FF00" style="background-color:#0f0">&nbsp &nbsp &nbsp</span>&nbsp Green
+            </a></li>
+            <li><a href="#">
+                <span data-color="FF0000" style="background-color:#f00">&nbsp &nbsp &nbsp</span>&nbsp Red
+            </a></li>
+            <li><a href="#">
+                <span data-color="FFFF00" style="background-color:#ff0">&nbsp &nbsp &nbsp</span>&nbsp Yellow
+            </a></li>
+            <li><a href="#">
+                <span data-color="FFFFFF" style="background-color:#fff">&nbsp &nbsp &nbsp</span>&nbsp White
+            </a></li>
+            <li><a href="#">
+                <span data-color="FF00FF" style="background-color:#f0f">&nbsp &nbsp &nbsp</span>&nbsp Magenta
+            </a></li>
+            <li><a href="#">
+                <span data-color="00FFFF" style="background-color:#0ff">&nbsp &nbsp &nbsp</span>&nbsp Cyan
+            </a></li>
+            <li class="divider"></li>
+            <li><a data-color="colorpicker" data-oldcolor="<%= l.color %>" href="#">
+                <span class="colorpickerOption">&nbsp &nbsp &nbsp</span>&nbsp More Colors...
+            </a></li>
+        </ul>
+    </div>
+
+    <% if (edit){ %>
+        <button type="button" title="Delete Label" class="close delete-label" aria-hidden="true">&times;</button>
+    <% } else { %>
+
+        <button type="submit" class="btn btn-sm btn-success pull-right">Add</button>
+
+    <% } %>
