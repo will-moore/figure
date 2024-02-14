@@ -317,6 +317,7 @@
             sel.forEach(function(p) {
                 p.setId(self.newImg);
             });
+            this.model.set('unsaved', true);
 
         },
 
