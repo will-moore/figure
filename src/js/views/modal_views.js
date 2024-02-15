@@ -311,8 +311,11 @@ import { hideModal } from "./util";
                     'datasetName': data.meta.datasetName,
                     'pixel_size_x': data.pixel_size.valueX,
                     'pixel_size_y': data.pixel_size.valueY,
+                    'pixel_size_z': data.pixel_size.valueZ,
                     'pixel_size_x_unit': data.pixel_size.unitX,
+                    'pixel_size_z_unit':data.pixel_size.unitZ,
                     'pixel_size_x_symbol': data.pixel_size.symbolX,
+                    'pixel_size_z_symbol': data.pixel_size.symbolZ,
                     'deltaT': data.deltaT,
                 };
                 self.newImg = newImg;
@@ -366,8 +369,8 @@ import { hideModal } from "./util";
             json.selThumbSrc = WEBGATEWAYINDEX + "render_thumbnail/" + json.selImg.imageId + "/";
 
             // minor attributes ('info' only)
-            var attrs = ["sizeZ", "orig_width", "orig_height"],
-                attrName = ['Z size', 'Width', 'Height'];
+            var attrs = ["orig_width", "orig_height"],
+                attrName = ['Width', 'Height'];
 
             if (this.newImg) {
                 json.newImg = this.newImg;
@@ -399,6 +402,26 @@ import { hideModal } from "./util";
                 } else {
                     json.comp.sizeT = true;
                 }
+
+                // special message for sizeZ
+                if (json.selImg.sizeZ != json.newImg.sizeZ) {
+                    // check if any existing images have theZ > new.sizeZ
+                    var tooSmallZ = false;
+                    sel.forEach(function(o){
+                        if (o.get('theZ') > json.newImg.sizeZ) tooSmallZ = true;
+                    });
+                    if (tooSmallZ) {
+                        json.messages.push({"text": "New Image has fewer Z slices than needed. Check after update.",
+                            "status": "danger"});
+                    } else {
+                        json.messages.push({"text":"Mismatch of Z slices: should be OK.",
+                            "status": "success"});
+                    }
+                    json.comp.sizeZ = false;
+                } else {
+                    json.comp.sizeZ = true;
+                }
+
                 // compare channels
                 json.comp.channels = json.ok(true);
                 var selC = json.selImg.channels,
