@@ -107,6 +107,7 @@
                 'pixel_size_x_unit': data.pixel_size_x_unit,
                 'pixel_size_z_unit': data.pixel_size_z_unit,
                 'deltaT': data.deltaT,
+                'zoom':data.zoom,
             };
 
             // theT and theZ are not changed unless we have to...
@@ -247,12 +248,23 @@
             var oldLabs = this.get("labels");
             // Need to clone the list of labels...
             var labs = [];
+            var oldLabKeys = [];
+
+            // Keep old labels unchanged...
             for (var i=0; i<oldLabs.length; i++) {
-                labs.push( $.extend(true, {}, oldLabs[i]) );
+                var lbl = oldLabs[i];
+                var lbl_key = this.get_label_key(lbl);
+                oldLabKeys.push(lbl_key);
+                labs.push( $.extend(true, {}, lbl));
             }
             // ... then add new labels ...
             for (var j=0; j<labels.length; j++) {
-                labs.push( $.extend(true, {}, labels[j]) );
+                var lbl = labels[j];
+                var lbl_key = this.get_label_key(lbl);
+                if (!oldLabKeys.includes(lbl_key)) {
+                    // otherwise leave un-edited
+                    labs.push( $.extend(true, {}, lbl));
+                }
             }
             // ... so that we get the changed event triggering OK
             this.save('labels', labs);
@@ -265,7 +277,7 @@
                     // If channel has LUT, make grey (visible on black/white bg)
                     var chColor = c.color.endsWith('lut') ? 'BBBBBB' : c.color;
                     newLabels.push({
-                        'text': c.label,
+                        'text': c.label.replaceAll("_","\\_"),
                         'size': options.size,
                         'position': options.position,
                         'color': options.color || chColor
@@ -283,7 +295,7 @@
                     else text = text + " " + c.label
                 }
             });
-            return text ? text : " ";
+            return text ? text.replaceAll("_","\\_") : " ";
         },
 
         getDeltaT: function() {
@@ -300,8 +312,10 @@
                 deltaT = this.get('deltaT')[theT] || 0,
                 text = "", h, m, s;
 
+            var shiftIdx;
             if (ref_idx) {
-                var shift = this.get('deltaT')[parseInt(ref_idx) - 1];
+                shiftIdx = parseInt(ref_idx)
+                var shift = this.get('deltaT')[shiftIdx - 1];
                 deltaT = shift==null ? deltaT : deltaT - shift;
             }
             var isNegative = (deltaT < 0);
@@ -310,7 +324,9 @@
             var padlen = dec_prec>0 ? dec_prec+3 : 2;
             if (format === "index") {
                 isNegative = false;
-                text = "" + (theT + 1);
+                if(!isNaN(shiftIdx) && !(this.get('deltaT')[shiftIdx - 1] == null))
+                    text = "" + (theT - shiftIdx + 1);
+                else text = "" + (theT + 1);
             } else if (['milliseconds', 'ms'].includes(format)) {
                 text = (deltaT*1000).toFixed(dec_prec) + " ms";
             } else if (['seconds', 'secs', 's'].includes(format)) {
@@ -340,6 +356,12 @@
 
             return (isNegative ? '-' : '') + text;
         },
+
+        get_zoom_label_text: function() {
+            var text = "" + this.get('zoom') + " %"
+            return text;
+        },
+
 
         get_name_label_text: function(property, format) {
             var text = "";
@@ -436,7 +458,7 @@
         // labels_map is {labelKey: {size:s, text:t, position:p, color:c}} or {labelKey: false} to delete
         // where labelKey specifies the label to edit. "l.text + '_' + l.size + '_' + l.color + '_' + l.position"
         edit_labels: function(labels_map) {
-
+            
             var oldLabs = this.get('labels');
             // Need to clone the list of labels...
             var labs = [],
@@ -458,8 +480,16 @@
                     labs.push( lbl );
                 }
             }
+
+            // Extract all the keys (even duplicates)
+            var keys = labs.map(lbl => this.get_label_key(lbl));
+
+            // get all unique labels based on filtering keys 
+            //(i.e removing duplicate keys based on the index of the first occurrence of the value)
+            var filtered_lbls = labs.filter((lbl, index) => index == keys.indexOf(this.get_label_key(lbl)));
+
             // ... so that we get the changed event triggering OK
-            this.save('labels', labs);
+            this.save('labels', filtered_lbls);
         },
 
         save_channel: function(cIndex, attr, value) {
@@ -1012,7 +1042,7 @@
                     if (!prev[iid]) {
                         prev[iid] = {};
                     }
-                    prev[iid][t.id] = t.textValue;
+                    prev[iid][t.id] = t.textValue.replaceAll("_","\\_");
                     return prev;
                 }, {});
                 // Apply tags to panels

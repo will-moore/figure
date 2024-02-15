@@ -573,8 +573,10 @@ class ShapeToPilExport(ShapeExport):
         except Exception:
             font = ImageFont.load(
                 '%s/pilfonts/B%0.2d.pil' % (self.GATEWAYPATH, size))
-        textsize = font.getbbox(text)[2:]
-        xy = (center[0] - textsize[0] / 2.0, center[1] - textsize[1] / 2.0)
+        box = font.getbbox(text)
+        width = box[2] - box[0]
+        height = box[3] - box[1]
+        xy = (center[0] - width / 2.0, center[1] - height / 2.0)
         self.draw.text(xy, text, fill=rgba, font=font)
 
     def draw_arrow(self, shape):
@@ -1158,12 +1160,12 @@ class FigureExport(object):
                      'bottomleft': [], 'bottomright': []}
 
         parse_re = re.compile(r"\[.+?\]")
-        for l in labels:
+        for label in labels:
             # Substitution of special label by their values
             new_text = []
             last_idx = 0
-            for item in parse_re.finditer(l['text']):
-                new_text.append(l['text'][last_idx:item.start()])
+            for item in parse_re.finditer(label['text']):
+                new_text.append(label['text'][last_idx:item.start()])
                 label_value = ""
 
                 expr = item.group()[1:-1].split(";")
@@ -1247,6 +1249,7 @@ class FigureExport(object):
                         z_symbol = panel.get('pixel_size_z_symbol')
                         if pixel_size_z is None:
                             pixel_size_z = 0
+                        if z_symbol is None:
                             z_symbol = "\xB5m"
 
                         if ("z_projection" in panel.keys()
@@ -1303,25 +1306,27 @@ class FigureExport(object):
                             label_value.append(channel["label"])
                     label_value = " ".join(label_value)
 
+                elif prop_nf[0] in ["zoom"]:
+                    label_value = str(panel["zoom"]) + " %"
                 new_text.append(label_value if label_value else item.group())
                 last_idx = item.end()
 
-            new_text.append(l['text'][last_idx:])
-            l['text'] = "".join(new_text)
-            pos = l['position']
-            l['size'] = int(l['size'])   # make sure 'size' is number
+            new_text.append(label['text'][last_idx:])
+            label['text'] = "".join(new_text)
+            pos = label['position']
+            label['size'] = int(label['size'])   # make sure 'size' is number
             # If page is black and label is black, make label white
             page_color = self.figure_json.get('page_color', 'ffffff').lower()
-            label_color = l['color'].lower()
+            label_color = label['color'].lower()
             label_on_page = pos in ('left', 'right', 'top',
                                     'bottom', 'leftvert', 'rightvert')
             if label_on_page:
                 if label_color == '000000' and page_color == '000000':
-                    l['color'] = 'ffffff'
+                    label['color'] = 'ffffff'
                 if label_color == 'ffffff' and page_color == 'ffffff':
-                    l['color'] = '000000'
+                    label['color'] = '000000'
             if pos in positions:
-                positions[pos].append(l)
+                positions[pos].append(label)
 
         def draw_lab(label, lx, ly, align='left'):
             label_h = label['size']
@@ -1341,72 +1346,72 @@ class FigureExport(object):
             if key == 'topleft':
                 lx = x + spacer
                 ly = y + spacer
-                for l in labels:
-                    label_h = draw_lab(l, lx, ly)
+                for label in labels:
+                    label_h = draw_lab(label, lx, ly)
                     ly += label_h + spacer
             elif key == 'topright':
                 lx = x + width - spacer
                 ly = y + spacer
-                for l in labels:
-                    label_h = draw_lab(l, lx, ly, align='right')
+                for label in labels:
+                    label_h = draw_lab(label, lx, ly, align='right')
                     ly += label_h + spacer
             elif key == 'bottomleft':
                 lx = x + spacer
                 ly = y + height
                 labels.reverse()  # last item goes bottom
-                for l in labels:
-                    ly = ly - l['size'] - spacer
-                    draw_lab(l, lx, ly)
+                for label in labels:
+                    ly = ly - label['size'] - spacer
+                    draw_lab(label, lx, ly)
             elif key == 'bottomright':
                 lx = x + width - spacer
                 ly = y + height
                 labels.reverse()  # last item goes bottom
-                for l in labels:
-                    ly = ly - l['size'] - spacer
-                    draw_lab(l, lx, ly, align='right')
+                for label in labels:
+                    ly = ly - label['size'] - spacer
+                    draw_lab(label, lx, ly, align='right')
             elif key == 'top':
                 lx = x + (width/2)
                 ly = y
                 labels.reverse()
-                for l in labels:
-                    ly = ly - l['size'] - spacer
-                    draw_lab(l, lx, ly, align='center')
+                for label in labels:
+                    ly = ly - label['size'] - spacer
+                    draw_lab(label, lx, ly, align='center')
             elif key == 'bottom':
                 lx = x + (width/2)
                 ly = y + height + spacer
-                for l in labels:
-                    label_h = draw_lab(l, lx, ly, align='center')
+                for label in labels:
+                    label_h = draw_lab(label, lx, ly, align='center')
                     ly += label_h + spacer
             elif key == 'left':
                 lx = x - spacer
-                sizes = [l['size'] for l in labels]
+                sizes = [label['size'] for label in labels]
                 total_h = sum(sizes) + spacer * (len(labels)-1)
                 ly = y + (height-total_h)/2
-                for l in labels:
-                    label_h = draw_lab(l, lx, ly, align='right')
+                for label in labels:
+                    label_h = draw_lab(label, lx, ly, align='right')
                     ly += label_h + spacer
             elif key == 'right':
                 lx = x + width + spacer
-                sizes = [l['size'] for l in labels]
+                sizes = [label['size'] for label in labels]
                 total_h = sum(sizes) + spacer * (len(labels)-1)
                 ly = y + (height-total_h)/2
-                for l in labels:
-                    label_h = draw_lab(l, lx, ly)
+                for label in labels:
+                    label_h = draw_lab(label, lx, ly)
                     ly += label_h + spacer
             elif key == 'leftvert':
                 lx = x - spacer
                 ly = y + (height/2)
                 labels.reverse()
-                for l in labels:
-                    lx = lx - l['size'] - spacer
-                    draw_lab(l, lx, ly, align='left-vertical')
+                for label in labels:
+                    lx = lx - label['size'] - spacer
+                    draw_lab(label, lx, ly, align='left-vertical')
             elif key == 'rightvert':
                 lx = x + width + spacer
                 ly = y + (height/2)
                 labels.reverse()
-                for l in labels:
-                    lx = lx + l['size'] + spacer
-                    draw_lab(l, lx, ly, align='right-vertical')
+                for label in labels:
+                    lx = lx + label['size'] + spacer
+                    draw_lab(label, lx, ly, align='right-vertical')
 
     def draw_scalebar(self, panel, region_width, page):
         """
@@ -2241,8 +2246,8 @@ class TiffExport(FigureExport):
         y2 = scale_to_export_dpi(y2)
         width = scale_to_export_dpi(width)
 
-        for l in range(-width // 2, width // 2):
-            draw.line([(x, y+l), (x2, y2+l)], fill=rgb)
+        for value in range(-width // 2, width // 2):
+            draw.line([(x, y+value), (x2, y2+value)], fill=rgb)
 
     def draw_temp_label(self, text, fontsize, rgb):
         """Returns a new PIL image with text. Handles html."""
@@ -2252,7 +2257,9 @@ class TiffExport(FigureExport):
         heights = []
         for t in tokens:
             font = self.get_font(fontsize, t['bold'], t['italics'])
-            txt_w, txt_h = font.getbbox(t['text'])[2:]
+            box = font.getbbox(t['text'])
+            txt_w = box[2] - box[0]
+            txt_h = box[3] - box[1]
             widths.append(txt_w)
             heights.append(txt_h)
 
@@ -2265,7 +2272,9 @@ class TiffExport(FigureExport):
         w = 0
         for t in tokens:
             font = self.get_font(fontsize, t['bold'], t['italics'])
-            txt_w, txt_h = font.getbbox(t['text'])[2:]
+            box = font.getbbox(t['text'])
+            txt_w = box[2] - box[0]
+            txt_h = box[3] - box[1]
             textdraw.text((w, 0), t['text'], font=font, fill=rgb)
             w += txt_w
         return temp_label

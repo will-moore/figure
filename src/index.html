@@ -861,8 +861,14 @@
             <h4>Markdown formatting</h4>
             <p>
               You can use "Markdown" syntax to add formatting to plain text. For
-              example, **this text will be bold** and this *word* will be
-              italic. NB: Links are not supported for panel labels.
+              example, **this text will be bold** and this *word* will be italic. 
+            </p>
+            <p>
+                NB: Links are not supported for panel labels.
+            </p>
+            <p>
+                NB: You can escape a certain character to not be interpreted as Markdown by adding \ in front of the 
+                character. Ex: "my_string_" is interpreted as "my<i>string</i>" but "my\_string\_" is now interpreted as "my_string_"
             </p>
 
             <table class="table">
@@ -962,6 +968,11 @@
                 <th>Dataset ID</th>
                 <td>Dataset ID: [dataset.id]</td>
                 <td>Dataset ID: 1654</td>
+              </tr>
+              <tr>
+                <th>Zoom</th>
+                <td>[zoom]</td>
+                <td>100 %</td>
               </tr>
             </table>
             <h4>Legend</h4>
@@ -1129,10 +1140,13 @@
           </div>
           <form class="labelsFromMapAnnsForm" role="form">
             <div class="modal-body">
-              <p>
-                Choose Key
-                <small class="text-muted">(shows numbers of images)</small>:
-              </p>
+              <div>                                                    
+                <input type="radio" id="all-keys" name="kvpChoice" value="all-keys" />
+                <label for="all-keys">All Keys </label>
+
+                <input type="radio" id="single-key" name="kvpChoice" value="single-key" checked />
+                <label for="single-key">Choose Key <small class="text-muted">(shows numbers of images)</small>:</label>
+            </div>
               <select></select>
               <div>
                 <label>

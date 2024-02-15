@@ -244,6 +244,8 @@
                             label_value = self.model.get_view_label_text(prop_nf[0], format, param_dict["offset"], precision);  
                         } else if (['channels', 'c'].includes(prop_nf[0])) {
                             label_value = self.model.get_channels_label_text();
+                        } else if (['zoom'].includes(prop_nf[0])) {
+                            label_value = self.model.get_zoom_label_text();
                         }
 
                         //If label_value hasn't been created (invalid prop_nf[0])
