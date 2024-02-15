@@ -802,10 +802,10 @@
                 btnText = (canEdit || noFile) ? "Save" : "Can't Save";
             this.$saveBtn.text(btnText);
             if (this.model.get('unsaved') && (canEdit || noFile)) {
-                this.$saveBtn.addClass('btn-success').removeClass('btn-default').removeAttr('disabled');
+                this.$saveBtn.removeAttr('disabled');
                 this.$saveOption.removeClass('disabled');
             } else {
-                this.$saveBtn.addClass('btn-default').removeClass('btn-success').attr('disabled', 'disabled');
+                this.$saveBtn.attr('disabled', 'disabled');
                 this.$saveOption.addClass('disabled');
             }
             if (this.model.get('fileId')) {
