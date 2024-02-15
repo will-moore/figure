@@ -285,6 +285,7 @@
         "leftvert": "bi-box-arrow-left",
         "top": "bi-box-arrow-up",
         "right": "bi-box-arrow-right",
+        "rightvert": "bi-box-arrow-right",
         "bottom": "bi-box-arrow-down"
     }
 
@@ -544,7 +545,7 @@
         render: function() {
 
             var self = this,
-                positions = {'top':{}, 'bottom':{}, 'left':{}, 'leftvert':{}, 'right':{},
+                positions = {'top':{}, 'bottom':{}, 'left':{}, 'leftvert':{}, 'right':{},'rightvert':{},
                     'topleft':{}, 'topright':{}, 'bottomleft':{}, 'bottomright':{}};
             this.models.forEach(function(m){
                 // group labels by position

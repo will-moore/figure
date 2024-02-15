@@ -883,7 +883,17 @@
 
         getBoundingBoxRight: function() {
             // Ignore right (horizontal) labels since we don't know how long they are
-            return this.get('x') + this.get('width');
+            // but include right vertical labels
+            var labels = this.get("labels");
+            var x = this.get('x') + this.get('width');
+            // get labels by position
+            var right_labels = labels.filter(function(l) {return l.position === 'rightvert'});
+            // offset by font-size of each
+            x = right_labels.reduce(function(prev, l){
+                return prev + (LINE_HEIGHT * l.size);
+            }, x);
+
+            return x;
         },
 
         getBoundingBoxBottom: function() {
