@@ -923,7 +923,7 @@
     .dropdown-menu input + span { visibility: hidden; }
     .dropdown-menu input:checked + span { visibility: visible; }
 
-    .atop i {
+    .atop i, .aheight i {
         transform: rotate(90deg);
         display: inline-block;
     }
