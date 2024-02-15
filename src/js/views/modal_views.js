@@ -54,7 +54,7 @@ import { hideModal } from "./util";
                 }
                 p.save(toset);
             });
-            hideModal("#dpiModal");
+            hideModal("dpiModal");
             return false;
         },
 
