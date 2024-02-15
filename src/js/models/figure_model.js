@@ -4,7 +4,11 @@
     import $ from "jquery";
 
     import {PanelList, Panel} from "./panel_model";
-    import { recoverFigureFromStorage, figureConfirmDialog, getJson} from "../views/util";
+    import { recoverFigureFromStorage,
+        clearFigureFromStorage,
+        figureConfirmDialog,
+        getJson,
+        saveFigureToStorage} from "../views/util";
 
     // Version of the json file we're saving.
     // This only needs to increment when we make breaking changes (not linked to release versions.)
@@ -386,7 +390,7 @@
                     var callback = function(btnText) {
                         if (btnText === "Reload in new Tab") {
                             var recoverUrl = BASE_WEBFIGURE_URL + 'recover/';
-                            window.open(WEBLOGIN_URL + '?url=' + recoverUrl, '_blank')
+                            window.open(recoverUrl, '_blank')
                         }
                     }
                     figureConfirmDialog(errorTitle, message, buttons, callback);

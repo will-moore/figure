@@ -63,11 +63,11 @@ export const showExportAsJsonModal = function(figureJSON) {
     $('#exportJsonModal textarea').text(figureText);
 }
 
-var saveFigureToStorage = function (figureJSON) {
+export const saveFigureToStorage = function (figureJSON) {
     window.sessionStorage.setItem(LOCAL_STORAGE_RECOVERED_FIGURE, JSON.stringify(figureJSON));
 }
 
-var clearFigureFromStorage = function() {
+export const clearFigureFromStorage = function() {
     window.sessionStorage.removeItem(LOCAL_STORAGE_RECOVERED_FIGURE);
 }
 

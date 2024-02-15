@@ -18,7 +18,12 @@
     import {LegendView} from "./legend_view";
     import {LabelFromMapsModal} from "./labels_from_maps_modal";
     import PanelView from "./panel_view";
-    import {figureConfirmDialog, recoverFigureFromStorage, showExportAsJsonModal, showModal, hideModals} from "./util";
+    import {figureConfirmDialog,
+        recoverFigureFromStorage,
+        clearFigureFromStorage,
+        showExportAsJsonModal,
+        showModal,
+        hideModals} from "./util";
 
     // This extends Backbone to support keyboardEvents
     backboneMousetrap(_, Backbone, Mousetrap);
