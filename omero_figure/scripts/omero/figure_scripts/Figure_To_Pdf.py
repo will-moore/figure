@@ -573,7 +573,7 @@ class ShapeToPilExport(ShapeExport):
         except Exception:
             font = ImageFont.load(
                 '%s/pilfonts/B%0.2d.pil' % (self.GATEWAYPATH, size))
-        textsize = font.getsize(text)
+        textsize = font.getbbox(text)[2:]
         xy = (center[0] - textsize[0] / 2.0, center[1] - textsize[1] / 2.0)
         self.draw.text(xy, text, fill=rgba, font=font)
 
@@ -2252,7 +2252,7 @@ class TiffExport(FigureExport):
         heights = []
         for t in tokens:
             font = self.get_font(fontsize, t['bold'], t['italics'])
-            txt_w, txt_h = font.getsize(t['text'])
+            txt_w, txt_h = font.getbbox(t['text'])[2:]
             widths.append(txt_w)
             heights.append(txt_h)
 
@@ -2265,7 +2265,7 @@ class TiffExport(FigureExport):
         w = 0
         for t in tokens:
             font = self.get_font(fontsize, t['bold'], t['italics'])
-            txt_w, txt_h = font.getsize(t['text'])
+            txt_w, txt_h = font.getbbox(t['text'])[2:]
             textdraw.text((w, 0), t['text'], font=font, fill=rgb)
             w += txt_w
         return temp_label
