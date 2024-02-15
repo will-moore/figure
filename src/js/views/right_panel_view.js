@@ -1263,6 +1263,22 @@
         events: {
             "click .show-rotation": "show_rotation",
             "click .z-projection": "z_projection",
+            "input .rotation-slider": "rotation_input",
+            "change .rotation-slider": "rotation_change",
+        },
+
+        rotation_input: function(event) {
+            let val = parseInt(event.target.value);
+            $(".vp_img").css({'transform':'rotate(' + val + 'deg)'});
+            $(".rotation_value").text(val);
+        },
+
+        rotation_change: function(event) {
+            let val = parseInt(event.target.value);
+            this.rotation = val;
+            this.models.forEach(function(m){
+                m.save('rotation', val);
+            });
         },
 
         z_projection:function(e) {
@@ -1280,38 +1296,7 @@
         },
 
         show_rotation: function(e) {
-            var $rc = this.$el.find('.rotation-controls').toggleClass('rotation-controls-shown'),
-                self = this;
-
-            if ($rc.hasClass('rotation-controls-shown')) {
-                // $rc.find('.rotation-slider').slider({
-                //     orientation: "vertical",
-                //     max: 360,
-                //     min: 0,
-                //     step: 2,
-                //     value: self.rotation,
-                //     slide: function(event, ui) {
-                //         $(".vp_img").css({'-webkit-transform':'rotate(' + ui.value + 'deg)',
-                //                         'transform':'rotate(' + ui.value + 'deg)'});
-                //         $(".rotation_value").text(ui.value);
-                //     },
-                //     stop: function( event, ui ) {
-                //         self.rotation = ui.value;
-                //         self.models.forEach(function(m){
-                //             m.save('rotation', ui.value);
-                //         });
-                //     }
-                // });
-            } else {
-                // $rc.find('.rotation-slider').slider("destroy");
-            }
-        },
-
-        clear: function() {
-            try {
-                // this.$el.find('.rotation-slider').slider("destroy");
-            } catch (e) {}
-            return this;
+            this.$el.find('.rotation-controls').toggleClass('rotation-controls-shown');
         },
 
         render: function() {
@@ -1321,8 +1306,7 @@
                 sum_sizeZ = 0,
                 rotation,
                 z_projection,
-                zp,
-                self = this;
+                zp;
             if (this.models) {
                 this.models.forEach(function(m, i){
                     rotation = m.get('rotation');

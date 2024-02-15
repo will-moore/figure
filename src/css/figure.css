@@ -599,15 +599,27 @@
     .image-display-options {
         padding: 2px;
     }
+    .rotation-slider {
+        display: none;
+    }
     .rotation-controls-shown .rotation-slider {
-        height: 150px;
-        margin-left: 15px;
-        margin-top: 35px;
-        background: #666;
+        margin-left: 22px;
+        margin-top: 150px;
+        height: 2px;
+        background: #aaa;
+        transform: rotate(-90deg);
+        display: block;
+        width: 140px;
+        position: absolute;
+        transform-origin: left;
+        pointer-events: all;
     }
     .show-rotation {
         padding: 2px;
         min-width: 45px;
+    }
+    .rotation_value {
+        margin: -4px;
     }
     .z-projection {
         padding: 1px 5px 5px;
