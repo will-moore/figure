@@ -134,7 +134,7 @@
         line-height: 20px;
         padding: 12px 5px;
         position: absolute;
-        right: 485px;
+        right: 520px;
         text-align: center;
         height: 100%;
     }
@@ -921,6 +921,10 @@
 
     .atop i {
         transform: rotate(90deg);
+        display: inline-block;
+    }
+    .abottom i {
+        transform: rotate(270deg);
         display: inline-block;
     }
 

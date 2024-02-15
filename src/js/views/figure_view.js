@@ -895,6 +895,8 @@
             "click .aleft": "align_left",
             "click .agrid": "align_grid",
             "click .atop": "align_top",
+            "click .aright": "align_right",
+            "click .abottom": "align_bottom",
 
             "click .awidth": "align_width",
             "click .aheight": "align_height",
@@ -943,6 +945,16 @@
         align_top: function(event) {
             event.preventDefault();
             this.model.align_top();
+        },
+
+        align_right: function(event) {
+            event.preventDefault();
+            this.model.align_right();
+        },
+
+        align_bottom: function(event) {
+            event.preventDefault();
+            this.model.align_bottom();
         },
 
         custom_grid_gap: function() {
