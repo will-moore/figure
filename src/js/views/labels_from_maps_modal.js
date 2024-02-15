@@ -45,7 +45,7 @@ var LabelFromMapsModal = Backbone.View.extend({
                         let lineage = data.parents.lineage[class_][id_];
                         for(j = 0; j < lineage.length; j++){
                             // Unpacking the parent annoations for each image
-                            let clone_ann = { ...ann };
+                            let clone_ann = JSON.parse(JSON.stringify(ann));
                             clone_ann.link.parent.id = lineage[j].id;
                             data.annotations.push(clone_ann);
                         }
