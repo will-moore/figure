@@ -81,22 +81,22 @@
     </button>
     <ul class="dropdown-menu" role="menu">
         <li <% if (!sel) print('class="disabled"') %> >
-            <a class="dropdown-item" href="#" class="copyShape">
+            <a class="dropdown-item copyShape" href="#">
                 Copy Shape   &nbsp&nbsp&nbsp <%= cmdKey %>C
             </a>
         </li>
         <li <% if (!toPaste) print('class="disabled"') %> >
-            <a class="dropdown-item" href="#" class="pasteShape">
+            <a class="dropdown-item pasteShape" href="#">
                 Paste Shape   &nbsp&nbsp&nbsp <%= cmdKey %>V
             </a>
         </li>
         <li <% if (!sel) print('class="disabled"') %> >
-            <a class="dropdown-item" href="#" class="deleteShape">
+            <a class="dropdown-item deleteShape" href="#">
                 Delete Shape    &nbsp&nbsp&nbsp Del
             </a>
         </li>
         <li>
-            <a class="dropdown-item" href="#" class="selectAll">
+            <a class="dropdown-item selectAll" href="#">
                 Select All Shapes    &nbsp&nbsp <%= cmdKey %>A
             </a>
         </li>
