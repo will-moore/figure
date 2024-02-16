@@ -1,10 +1,11 @@
 
 import Backbone from "backbone";
 import $ from "jquery";
+import _ from "underscore";
 
 import FigureModel from "../models/figure_model";
 
-import {figureConfirmDialog, hideModal} from "./util";
+import {figureConfirmDialog, hideModal, getJson} from "./util";
 
 export const ChgrpModalView = Backbone.View.extend({
 
@@ -40,7 +41,7 @@ export const ChgrpModalView = Backbone.View.extend({
     loadImageDetails: function() {
         var imgIds = this.model.panels.pluck('imageId');
         var url = `${BASE_WEBFIGURE_URL}images_details/?image=${_.uniq(imgIds).join(',')}`;
-        $.getJSON(url, function (data) {
+        getJson(url).then(data => {
             // Sort images by Group
             this.imagesByGroup = data.data.reduce(function(prev, img){
                 if (!prev[img.group.id]) {
@@ -50,16 +51,16 @@ export const ChgrpModalView = Backbone.View.extend({
                 return prev;
             }, {});
             this.render();
-        }.bind(this));
+        });
     },
 
     loadGroups: function() {
         var url = `${API_BASE_URL_V0}m/experimenters/${USER_ID}/experimentergroups/`;
-        $.getJSON(url, function(data){
+        getJson(url).then(data => {
             this.omeroGroups = data.data.map(group => {return {id: group['@id'], name: group.Name}})
                 .filter(group => group.name != 'user');
             this.render();
-        }.bind(this));
+        });
     },
 
     inputClicked: function() {
