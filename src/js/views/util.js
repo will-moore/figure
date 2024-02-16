@@ -240,12 +240,12 @@ export function hideModals() {
     });
 };
 
-export function showModal(modalId) {
+export function showModal(modalId, args) {
     let thisModal = bootstrap.Modal.getInstance(document.getElementById(modalId));
     if (!thisModal) {
         thisModal = new bootstrap.Modal("#" + modalId);
     }
-    thisModal.show();
+    thisModal.show(args);
 }
 
 export function hideModal(modalId) {

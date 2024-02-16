@@ -1,8 +1,10 @@
 
 import Backbone from "backbone";
-import $ from "jquery"
+import $ from "jquery";
+import _ from "underscore";
 
 import FigureModel from "../models/figure_model";
+import { getJson, hideModal } from "./util";
 
 
 export var LabelFromMapsModal = Backbone.View.extend({
@@ -19,11 +21,11 @@ export var LabelFromMapsModal = Backbone.View.extend({
      */
     initialize: function() {
         // when dialog is shown, load map annotations for selected images
-        $("#labelsFromMapAnns").bind("show.bs.modal", function(event){
+        document.getElementById('labelsFromMapAnns').addEventListener('shown.bs.modal', (event) => {
             // event options from the label form: {position: 'top', size: '12', color: '0000'}
             this.options = event.relatedTarget;
             this.loadMapAnns();
-        }.bind(this));
+        });
     },
 
     events: {
@@ -43,11 +45,11 @@ export var LabelFromMapsModal = Backbone.View.extend({
         var url = WEBINDEX_URL + "api/annotations/?type=map&image=";
         url += imageIds.join("&image=");
 
-        $.getJSON(url, function(data) {
+        getJson(url).then(data => {
                 this.isLoading = false;
                 this.annotations = data.annotations;
                 this.render();
-            }.bind(this)
+            }
         );
     },
 
@@ -100,7 +102,7 @@ export var LabelFromMapsModal = Backbone.View.extend({
                 p.add_labels(labels);
             }
         });
-        $("#labelsFromMapAnns").modal('hide');
+        hideModal("labelsFromMapAnns");
         return false;
     },
 

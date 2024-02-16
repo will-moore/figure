@@ -60,7 +60,7 @@
             }
 
             if (this.ctv) {
-                this.ctv.clear().remove();
+                this.ctv.remove();
             }
             if (selected.length > 0) {
                 this.ctv = new ImageDisplayOptionsView({models: selected});
@@ -384,9 +384,9 @@
 
             if (label_text == '[key-values]') {
                 // Load Map Annotations for this image and create labels
-                $("#labelsFromMapAnns").modal("show", {
-                    position:position,
-                    size:font_size,
+                showModal("labelsFromMapAnns", {
+                    position: position,
+                    size: font_size,
                     color: color});
                 return false;
             }
