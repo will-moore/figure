@@ -128,8 +128,8 @@ export function figureConfirmDialog(title, message, buttons, callback) {
     });
 };
 
-if (OME === undefined) {
-    var OME = {};
+if (window.OME === undefined) {
+    window.OME = {};
 }
 
 export let OPEN_WITH = [];

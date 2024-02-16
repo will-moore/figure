@@ -38,6 +38,11 @@
       const MAX_PLANE_SIZE = 10188864;
 
       const LOCAL_STORAGE_RECOVERED_FIGURE = "recoveredFigure" + USER_ID;
+
+      // Hack! Since the iviewer openwith.js evaluates in global scope and it
+      // checks for... if ($ && $.jstree)... without this it errors and causes
+      // the Info panel to fail! jQuery is imported into other scripts as $
+      const $ = undefined;
     </script>
 
     <!-- Use cdn for vite, but this is served from static by Django -->

@@ -34,7 +34,7 @@ var ScalebarFormView = Backbone.View.extend({
         "click .pixel_size_display": "edit_pixel_size",
         "keypress .pixel_size_input"  : "enter_pixel_size",
         "blur .pixel_size_input"  : "save_pixel_size",
-        "keyup input[type='text']"  : "handle_keyup",
+        "keyup input[type='number']"  : "handle_keyup",
      },
 
     handle_keyup: function (event) {
