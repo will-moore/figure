@@ -6,6 +6,7 @@ import $ from "jquery";
 import * as bootstrap from "bootstrap";
 
 import preview_id_change_template from '../../templates/modal_dialogs/preview_id_change.template.html?raw';
+import paper_setup_modal_template from '../../templates/modal_dialogs/paper_setup_modal.template.html?raw';
 
 import FigureModel from "../models/figure_model";
 import FigureColorPicker from "../views/colorpicker";
@@ -72,7 +73,7 @@ import { hideModal } from "./util";
 
         el: $("#paperSetupModal"),
 
-        template: _.template("src/templates/modal_dialogs/paper_setup_modal_template.html"),
+        template: _.template(paper_setup_modal_template),
 
         model:FigureModel,
 
@@ -124,7 +125,7 @@ import { hideModal } from "./util";
                 pageColor = $('.pageColor', $form).val().replace('#', ''),
                 dx, dy;
 
-            var w_mm, h_m, w_pixels, h_pixels;
+            var w_mm, h_mm, w_pixels, h_pixels;
             if (size == 'A4') {
                 w_mm = 210;
                 h_mm = 297;

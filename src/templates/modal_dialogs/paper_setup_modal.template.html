@@ -1,36 +1,27 @@
 
-    <div class="col-sm-12">
-        <div class="form-horizontal">
-            <div class="form-group col-sm-6" style="margin-bottom: 15px;">
-                <label>Page Color</label>
-                <input class="pageColor form-control"
-                    value="#<%= page_color %>"
-                    type="color" style="padding: 0" />
-            </div>
-        </div>
-        <div class="form-group col-sm-6"></div>
-        <div class="clearfix"></div>
+<div class="row" style="margin-bottom: 15px;">
+    <div class="form-group col-sm-6">
+        <label>Page Color</label>
+        <input class="pageColor form-control"
+            value="#<%= page_color %>"
+            type="color" style="padding: 0" />
     </div>
+    <div class="form-group col-sm-6"></div>
+</div>
 
-
-    <div class="col-sm-12">
-
-        <div class="form-horizontal">
-            <div class="form-group col-sm-6">
-                <label>Number of Pages</label>
-                <select class="pageCountSelect form-control">
-                    <% _.each([1,2,3,4,5,6,7,8,9,10],function(p){
-                        print ("<option value='"+p+"'" + ((p == page_count) ? " selected " : "") + " >"+p+"</option>")
-                    }); %>
-                </select>
-            </div>
-            <div class="form-group col-sm-6"></div>
-            <div class="clearfix"></div>
-        </div>
-
+<div class="row" style="margin-bottom: 15px;">
+    <div class="form-group col-sm-6">
+        <label>Number of Pages</label>
+        <select class="pageCountSelect form-control">
+            <% _.each([1,2,3,4,5,6,7,8,9,10],function(p){
+                print ("<option value='"+p+"'" + ((p == page_count) ? " selected " : "") + " >"+p+"</option>")
+            }); %>
+        </select>
     </div>
+    <div class="form-group col-sm-6"></div>
+</div>
 
-
+<div class="row" style="margin-bottom: 15px;">
     <div class="col-sm-6">
         <label>Size</label>
         <div class="form-horizontal">
@@ -72,8 +63,8 @@
     </div>
     <div class="col-sm-6">
         <label>Orientation</label>
-        <div class="form-horizontal">
-            <div class="form-group col-sm-6">
+        <div class="form-horizontal row" style="margin-top: 8px;">
+            <div class="form-group col-sm-6" style="padding-left: 0;">
                 <input type="radio" name="pageOrientation" value="vertical"
                     <% if (orientation == 'vertical') { print('checked') } %> >
                 <label class="control-label text-muted">Vertical</label>
@@ -85,31 +76,33 @@
             </div>
         </div>
     </div>
-    <div class="clearfix"></div>
+</div>
 
-    <div class="col-sm-3<% if (wh_disabled) { print(' wh_disabled')} %>">
-        <label>Width</label>
-        <div class="form-horizontal">
-            <div class="form-group col-sm-10">
-                <input id='paperWidth' type="number"
-                    <% if (wh_disabled) { print('disabled')} %>
-                    class="form-control" value="<%= width_mm %>">
-            </div>
-            <label class="col-sm-4 control-label text-muted wh_units" style="text-align:left">
-                mm
-            </label>
-        </div>
+<div class="row g-4 align-items-center <% if (wh_disabled) { print(' wh_disabled')} %>">
+    <div class="col-auto">
+        <labelclass="col-form-label">Width</label>
     </div>
-    <div class="col-sm-3<% if (wh_disabled) { print(' wh_disabled')} %>">
-        <label>Height</label>
-        <div class="form-horizontal">
-            <div class="form-group col-sm-10">
-                <input id='paperHeight' type="number"
-                    <% if (wh_disabled) { print('disabled')} %>
-                    class="form-control" value="<%= height_mm %>">
-            </div>
-            <label class="col-sm-4 control-label text-muted wh_units" style="text-align:left">
-                mm
-            </label>
-        </div>
+    <div class="col-auto">
+        <input id='paperWidth' type="number" style="width:70px"
+        <% if (wh_disabled) { print('disabled')} %>
+        class="form-control" value="<%= width_mm %>">
     </div>
+    <div class="col-auto">
+        <span class="form-text">
+        mm
+        </span>
+    </div>
+    <div class="col-auto">
+        <label class="col-form-label">Height</label>
+    </div>
+    <div class="col-auto">
+        <input id='paperHeight' type="number" style="width:70px"
+            <% if (wh_disabled) { print('disabled')} %>
+            class="form-control" value="<%= height_mm %>">
+    </div>
+    <div class="col-auto">
+        <span class="form-text">
+        mm
+        </span>
+    </div>
+</div>
