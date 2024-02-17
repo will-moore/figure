@@ -41,6 +41,11 @@ var Line = function Line(options) {
   this._y2 = options.y2;
   this._strokeColor = options.strokeColor;
   this._strokeWidth = options.strokeWidth || 2;
+  this._area =
+    Math.pow(
+      Math.pow(this._x2 - this._x1, 2) + Math.pow(this._y2 - this._y1, 2),
+      0.5
+    ) * this._strokeWidth;
   this.handle_wh = 6;
   this._selected = false;
   this._zoomFraction = 1;
@@ -98,6 +103,11 @@ Line.prototype.toJson = function toJson() {
     x2: this._x2,
     y1: this._y1,
     y2: this._y2,
+    area:
+      Math.pow(
+        Math.pow(this._x2 - this._x1, 2) + Math.pow(this._y2 - this._y1, 2),
+        0.5
+      ) * this._strokeWidth,
     strokeWidth: this._strokeWidth,
     strokeColor: this._strokeColor,
   };
@@ -170,6 +180,8 @@ Line.prototype.getStrokeColor = function getStrokeColor() {
 
 Line.prototype.setStrokeWidth = function setStrokeWidth(strokeWidth) {
   this._strokeWidth = strokeWidth;
+  this._area =
+    Math.abs((this._x2 - this._x1) * (this._y2 - this._y1)) * this._strokeWidth;
   this.drawShape();
 };
 
@@ -231,7 +243,6 @@ Line.prototype.drawShape = function drawShape() {
   });
 
   if (this.isSelected()) {
-    this.element.toFront();
     this.handles.show().toFront();
   } else {
     this.handles.hide();
@@ -303,6 +314,11 @@ Line.prototype.createHandles = function createHandles() {
           }
         }
       }
+      self._area =
+        Math.pow(
+          Math.pow(self._x2 - self._x1, 2) + Math.pow(self._y2 - self._y1, 2),
+          0.5
+        ) * self._strokeWidth;
       self.drawShape();
       return false;
     };
@@ -494,6 +510,7 @@ CreateLine.prototype.startDrag = function startDrag(startX, startY) {
     y1: startY,
     x2: startX,
     y2: startY,
+    area: 0,
     strokeWidth: strokeWidth,
     zoom: zoom,
     strokeColor: strokeColor,
@@ -516,6 +533,11 @@ CreateLine.prototype.drag = function drag(dragX, dragY, shiftKey) {
   }
 
   this.line.setCoords({ x2: dragX, y2: dragY });
+  this._area =
+    Math.pow(
+      Math.pow(dragX - this._x1, 2) + Math.pow(dragY - this._y1, 2),
+      0.5
+    ) * this._strokeWidth;
 };
 
 CreateLine.prototype.stopDrag = function stopDrag() {
@@ -551,6 +573,7 @@ var CreateArrow = function CreateArrow(options) {
       y1: startY,
       x2: startX,
       y2: startY,
+      area: 0,
       strokeWidth: strokeWidth,
       zoom: zoom,
       strokeColor: strokeColor,
@@ -560,4 +583,4 @@ var CreateArrow = function CreateArrow(options) {
   return that;
 };
 
-export {CreateLine, Line, CreateArrow, Arrow}
+export { CreateLine, Line, CreateArrow, Arrow };

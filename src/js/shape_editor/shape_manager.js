@@ -31,7 +31,6 @@ import { CreateLine, Line, CreateArrow, Arrow } from "./line";
 import { CreateEllipse, Ellipse } from "./ellipse";
 import { Polygon, Polyline } from "./polygon";
 
-
 var ShapeManager = function ShapeManager(elementId, width, height, options) {
   var self = this;
   options = options || {};
@@ -382,6 +381,7 @@ ShapeManager.prototype.addShapeJson = function addShapeJson(
     }
   }
   this._shapes.push(newShape);
+  this.sortShape(this._shapes);
   return newShape;
 };
 
@@ -410,24 +410,28 @@ ShapeManager.prototype.createShapeJson = function createShapeJson(jsonShape) {
     options.radiusY = s.radiusY;
     options.rotation = s.rotation || 0;
     options.transform = s.transform;
+    options.area = s.radiusX * s.radiusY * Math.PI;
     newShape = new Ellipse(options);
   } else if (s.type === "Rectangle") {
     options.x = s.x;
     options.y = s.y;
     options.width = s.width;
     options.height = s.height;
+    options.area = s.width * s.height;
     newShape = new Rect(options);
   } else if (s.type === "Line") {
     options.x1 = s.x1;
     options.y1 = s.y1;
     options.x2 = s.x2;
     options.y2 = s.y2;
+    options.area = Math.abs((s.x2 - s.x1) * (s.y2 - s.y1));
     newShape = new Line(options);
   } else if (s.type === "Arrow") {
     options.x1 = s.x1;
     options.y1 = s.y1;
     options.x2 = s.x2;
     options.y2 = s.y2;
+    options.area = Math.abs((s.x2 - s.x1) * (s.y2 - s.y1));
     newShape = new Arrow(options);
   } else if (s.type === "Polygon") {
     options.points = s.points;
@@ -442,7 +446,26 @@ ShapeManager.prototype.createShapeJson = function createShapeJson(jsonShape) {
 // Add a shape object
 ShapeManager.prototype.addShape = function addShape(shape) {
   this._shapes.push(shape);
+  this.sortShape(this._shapes);
   this.$el.trigger("new:shape", [shape]);
+};
+
+ShapeManager.prototype.sortShape = function sortShape(shapes) {
+  shapes.sort(function (a, b) {
+    var x = a._area;
+    var y = b._area;
+    if (x == undefined) {
+      x = Number.MAX_SAFE_INTEGER;
+    }
+    if (y == undefined) {
+      y = Number.MAX_SAFE_INTEGER;
+    }
+    return x < y ? -1 : x > y ? 1 : 0;
+  });
+
+  shapes.reverse().forEach(function (s) {
+    s.element.toFront();
+  });
 };
 
 ShapeManager.prototype.getShapes = function getShapes() {
@@ -634,6 +657,7 @@ ShapeManager.prototype.notifySelectedShapesChanged =
 ShapeManager.prototype.notifyShapesChanged = function notifyShapesChanged(
   shapes
 ) {
+  this.sortShape(this._shapes);
   this.$el.trigger("change:shape", [shapes]);
 };
 
@@ -644,4 +668,4 @@ ShapeManager.prototype.getRandomId = function getRandomId() {
   return -parseInt(rndString.slice(2), 10); // -7158358106389642
 };
 
-export default ShapeManager
+export default ShapeManager;
