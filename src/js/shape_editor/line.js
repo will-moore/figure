@@ -1,5 +1,5 @@
 /*
-// Copyright (C) 2015-2022 University of Dundee & Open Microscopy Environment.
+// Copyright (C) 2015-2024 University of Dundee & Open Microscopy Environment.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following
@@ -187,6 +187,17 @@ Line.prototype.setStrokeWidth = function setStrokeWidth(strokeWidth) {
 
 Line.prototype.getStrokeWidth = function getStrokeWidth() {
   return this._strokeWidth;
+};
+
+Line.prototype.getFillColor = function getFillColor() {
+  return this._fillColor;
+};
+
+Line.prototype.getFillOpacity = function getFillOpacity() {
+  return 0.01;
+};
+
+Line.prototype.setFillOpacity = function setFillOpacity() {
 };
 
 Line.prototype.destroy = function destroy() {
@@ -533,11 +544,11 @@ CreateLine.prototype.drag = function drag(dragX, dragY, shiftKey) {
   }
 
   this.line.setCoords({ x2: dragX, y2: dragY });
-  this._area =
+  self._area =
     Math.pow(
-      Math.pow(dragX - this._x1, 2) + Math.pow(dragY - this._y1, 2),
+      Math.pow(dragX - self._x1, 2) + Math.pow(dragY - self._y1, 2),
       0.5
-    ) * this._strokeWidth;
+    ) * self._strokeWidth;
 };
 
 CreateLine.prototype.stopDrag = function stopDrag() {
