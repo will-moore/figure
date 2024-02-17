@@ -1860,14 +1860,16 @@
             <div class="clearfix" style="padding-bottom: 13px"></div>
             <div id="channel_sliders"></div>
             <div class="clearfix"></div>
-            <div class="tab-footer row">
-              <div class="col-2" style="padding-left: 0">
-                <h5>Zoom %</h5>
+            <div class="tab-footer row align-items-center">
+              <div class="col-auto" style="padding-left: 0">
+                <label>Zoom %</label>
               </div>
-              <div class="col-8" style="position: relative">
+              <div class="col-auto" style="position: relative; padding-left: 0; flex: 1 1 auto">
                 <input min="100" max="1000" id="vp_zoom_slider" type="range" />
               </div>
-              <input id="vp_zoom_value" type="number" size="4"/>
+              <div class="col-auto" style="padding-right: 0">
+                <input id="vp_zoom_value" type="number" size="4"/>
+              </div>
               <div class="clearfix"></div>
               <div
                 id="reset-zoom-view"

@@ -807,9 +807,8 @@
     }
     #vp_zoom_slider {
         background: #aaa;
-        width: 95%;
         height: 2px;
-        margin-top: 10px;
+        margin-top: 0;
     }
     .z-decrement, .z-increment, .time-decrement, .time-increment {
         position: absolute;
