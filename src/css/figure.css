@@ -213,6 +213,12 @@
     .legend-collapsed .collapse-legend{
         display: none;
     }
+    .collapse-legend, .expand-legend {
+        margin-right: 3px;
+        padding: 0;
+        border-width: 1px;
+        margin-top: 2px;
+    }
     .legend-expanded .expand-legend{
         display: none;
     }

@@ -17,6 +17,8 @@
 import Backbone from "backbone";
 import $ from "jquery";
 import { showModal } from "./util";
+import * as marked from "marked";
+import DOMPurify from 'dompurify';
 
 import FigureModel from "../models/figure_model";
 
@@ -163,7 +165,7 @@ export const LegendView = Backbone.View.extend({
                     $edit.text("Add Figure Legend");
                 } else {
                     $panel.show();
-                    legendText = markdown.toHTML( legendText );
+                    legendText = DOMPurify.sanitize(marked.parse(legendText));
                     $legend.html(legendText);
                     $edit.text("Edit Figure Legend");
                 }
