@@ -7,7 +7,8 @@
   "scripts": {
     "start": "vite",
     "build": "vite build --emptyOutDir && ./deploy_build.sh",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "watch 'npm run build' ./src"
   },
   "repository": {
     "type": "git",
@@ -26,7 +27,8 @@
   "homepage": "https://github.com/ome/omero-figure",
   "devDependencies": {
     "sass": "^1.54.1",
-    "vite": "^3.0.4"
+    "vite": "^3.0.4",
+    "watch": "^1.0.2"
   },
   "dependencies": {
     "@popperjs/core": "^2.11.5",

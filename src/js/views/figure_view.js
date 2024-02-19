@@ -987,7 +987,6 @@
     });
 
 function createFigView (config) {
-    console.log("create fig-view test", config);
     const figView = new FigureView(config);
     return figView;
 }
