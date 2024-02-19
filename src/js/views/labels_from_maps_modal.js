@@ -42,15 +42,27 @@ export var LabelFromMapsModal = Backbone.View.extend({
         this.isLoading = true;
         $('select', this.el).html("<option>Loading data...</option>");
 
-        var url = WEBINDEX_URL + "api/annotations/?type=map&image=";
+        var url = WEBINDEX_URL + "api/annotations/?type=map&parents=true&image=";
         url += imageIds.join("&image=");
 
         getJson(url).then(data => {
-                this.isLoading = false;
-                this.annotations = data.annotations;
-                this.render();
+            if (data.hasOwnProperty('parents')){
+                data.parents.annotations.forEach(function(ann) {
+                    let class_ = ann.link.parent.class;
+                    let id_ = '' + ann.link.parent.id;
+                    let lineage = data.parents.lineage[class_][id_];
+                    for(let j = 0; j<lineage.length; j++){
+                        // Unpacking the parent annoations for each image
+                        let clone_ann = JSON.parse(JSON.stringify(ann));
+                        clone_ann.link.parent.id = lineage[j].id;
+                        data.annotations.push(clone_ann);
+                    }
+                });
             }
-        );
+            this.isLoading = false;
+            this.annotations = data.annotations;
+            this.render();
+        });
     },
 
     /**
@@ -163,7 +175,7 @@ export var LabelFromMapsModal = Backbone.View.extend({
             }
         }
         keyList.sort(function(a, b) {
-            return (a.toUpperCase() < b.toUpperCase()) ? -1 : 1; 
+            return (a.toUpperCase() < b.toUpperCase()) ? -1 : 1;
         });
 
         var html = keyList.map(function(key) {

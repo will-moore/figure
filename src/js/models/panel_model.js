@@ -389,7 +389,7 @@
             else if (property === "h") property = "height";
             else if (property === "rot") property = "rotation";
 
-            
+
             var x_symbol = this.get('pixel_size_x_symbol'),
                 z_symbol = this.get('pixel_size_z_symbol');
             z_symbol = z_symbol ? z_symbol : x_symbol // Using x symbol when z not defined
@@ -1034,9 +1034,22 @@
             var image_ids = this.map(function(s){return s.get('imageId')})
             image_ids = "image=" + image_ids.join("&image=");
             // TODO: Use /api/ when annotations is supported
-            var url = WEBINDEX_URL + "api/annotations/?type=tag&limit=1000&" + image_ids;
+            var url = WEBINDEX_URL + "api/annotations/?type=tag&parents=true&limit=1000&" + image_ids;
             $.getJSON(url, function(data){
                 // Map {iid: {id: 'tag'}, {id: 'names'}}
+                if (data.hasOwnProperty('parents')){
+                    data.parents.annotations.forEach(function(ann) {
+                        let class_ = ann.link.parent.class;
+                        let id_ = '' + ann.link.parent.id;
+                        let lineage = data.parents.lineage[class_][id_];
+                        for(j = 0; j < lineage.length; j++){
+                            // Unpacking the parent annoations for each image
+                            let clone_ann = JSON.parse(JSON.stringify(ann));
+                            clone_ann.link.parent.id = lineage[j].id;
+                            data.annotations.push(clone_ann);
+                        }
+                    });
+                }
                 var imageTags = data.annotations.reduce(function(prev, t){
                     var iid = t.link.parent.id;
                     if (!prev[iid]) {

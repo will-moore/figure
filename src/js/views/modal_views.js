@@ -167,7 +167,7 @@ import { hideModal } from "./util";
                 h_mm = Math.round(h_pixels * 25.4 / dpi);
             }
 
-            if (orientation == 'horizontal' && size != 'mm') {
+            if (orientation == 'horizontal' && size != 'mm' && size != 'crop') {
                 var tmp = w_mm; w_mm = h_mm; h_mm = tmp;
                 tmp = w_pixels; w_pixels = h_pixels; h_pixels = tmp;
             }
@@ -338,6 +338,7 @@ import { hideModal } from "./util";
             sel.forEach(function(p) {
                 p.setId(self.newImg);
             });
+            this.model.set('unsaved', true);
 
         },
 
