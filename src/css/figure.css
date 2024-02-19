@@ -22,6 +22,18 @@
         --bs-body-font-size: 14px;
     }
 
+    /* copied these from previous figure (Bootstrap 3.0.0) */
+    .btn-success {
+        --bs-btn-bg: #5cb85c;
+        --bs-btn-border-color: #5cb85c;
+        --bs-btn-hover-bg: #58a558;
+        --bs-btn-hover-border-color: #58a558;
+        --bs-btn-active-bg: #58a558;
+        --bs-btn-active-border-color: #58a558;
+        --bs-btn-disabled-bg: #5cb85c;
+        --bs-btn-disabled-border-color: #4cae4c;
+    }
+
     /* override bootstrap variables */
     body .modal {
         /* Make modal dialogs a bit wider */
