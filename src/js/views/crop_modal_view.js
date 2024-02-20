@@ -7,13 +7,15 @@ import Raphael from "raphael";
 import FigureModel from "../models/figure_model";
 import RectView from "./raphael-rect";
 
-import {figureConfirmDialog, hideModal} from "./util";
+import {figureConfirmDialog, hideModal, getJson} from "./util";
+
+import crop_modal_roi_template from '../../templates/modal_dialogs/crop_modal_roi.template.html?raw';
 
 export const CropModalView = Backbone.View.extend({
 
         el: $("#cropModal"),
 
-        roiTemplate: _.template("src/templates/modal_dialogs/crop_modal_roi.html"),
+        roiTemplate: _.template(crop_modal_roi_template),
 
         model: FigureModel,
 
@@ -352,7 +354,7 @@ export const CropModalView = Backbone.View.extend({
             var clipboardRects = [],
                 clipboard = this.model.get('clipboard');
             if (clipboard && clipboard.CROP) {
-                roi = clipboard.CROP;
+                var roi = clipboard.CROP;
                 clipboardRects.push({
                     x: roi.x, y: roi.y, width: roi.width, height: roi.height,
                     rotation: roi.rotation
@@ -397,8 +399,8 @@ export const CropModalView = Backbone.View.extend({
                 iid = self.m.get('imageId');
             var offset = this.roisPageSize * this.roisPage;
             var url = BASE_WEBFIGURE_URL + 'roiRectangles/' + iid + '/?limit=' + self.roisPageSize + '&offset=' + offset;
-            $.getJSON(url, function(rsp){
-                data = rsp.data;
+            getJson(url).then(rsp => {
+                var data = rsp.data;
                 self.roisLoaded += data.length;
                 self.roisPage += 1;
                 self.roisCount = rsp.meta.totalCount;
@@ -487,9 +489,6 @@ export const CropModalView = Backbone.View.extend({
                 $("#cropRoiMessage").html(`Loaded ${self.roisLoaded} / ${self.roisCount} ROIs`);
 
                 self.cachedRois = cachedRois;
-            }).fail(function(){
-                var msg = "No rectangular ROIs found on this image in OMERO";
-                self.renderRois([], ".roisFromOMERO", msg);
             });
         },
 
@@ -565,11 +564,11 @@ export const CropModalView = Backbone.View.extend({
         },
 
         zoomToFit: function() {
-            var max_w = 500,
-                max_h = 450,
-                w = this.m.get('orig_width'),
-                h = this.m.get('orig_height');
-                scale = Math.min(max_w/w, max_h/h);
+            var max_w = 500;
+            var max_h = 450;
+            var w = this.m.get('orig_width');
+            var h = this.m.get('orig_height');
+            var scale = Math.min(max_w/w, max_h/h);
             this.setZoom(scale * 100);
         },
 
