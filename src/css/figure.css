@@ -23,6 +23,13 @@
     }
 
     /* copied these from previous figure (Bootstrap 3.0.0) */
+    .btn {
+        /* only used for default buttons. Overridden for other buttons */
+        /* .btn-default class is still on lots of buttons (legacy from bootstrap 3.0.0) 
+         but now has no effect */
+        --bs-btn-border-color: #cccccc;;
+    }
+    /* prefer these colors */
     .btn-success {
         --bs-btn-bg: #5cb85c;
         --bs-btn-border-color: #5cb85c;
