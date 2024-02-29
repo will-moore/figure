@@ -545,9 +545,14 @@
         transform: rotate(90deg);
     }
 
-    .imageViewer {
+    .imageViewer, .ztSliders {
         height: 270px;
     }
+    .ztSliders {
+        position: absolute;
+        top: 0;
+    }
+
     .vp_img {
         position:absolute;
     }
@@ -582,7 +587,7 @@
     }
     #vp_deltaT {
         position: absolute;
-        right: 100px;
+        left: 100px;
         bottom: -19px;
     }
     .no-padding {

@@ -1042,7 +1042,7 @@
                         let class_ = ann.link.parent.class;
                         let id_ = '' + ann.link.parent.id;
                         let lineage = data.parents.lineage[class_][id_];
-                        for(j = 0; j < lineage.length; j++){
+                        for(let j = 0; j < lineage.length; j++){
                             // Unpacking the parent annoations for each image
                             let clone_ann = JSON.parse(JSON.stringify(ann));
                             clone_ann.link.parent.id = lineage[j].id;

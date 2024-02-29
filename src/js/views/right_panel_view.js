@@ -14,6 +14,7 @@
     import InfoPanelView from "./info_panel_view";
     import ChannelSliderView from "./channel_slider_view";
     import ScalebarFormView from "./scalebar_form_view";
+    import ZtSlidersView from "./zt_sliders_view";
 
     import image_display_options_template from '../../templates/image_display_options.template.html?raw';
     import rois_form_template from '../../templates/rois_form.template.html?raw';
@@ -34,7 +35,6 @@
 
             // this.render();
             new LabelsPanelView({model: this.model});
-            new SliderButtonsView({model: this.model});
             new RoisFormView({model: this.model});
         },
 
@@ -45,9 +45,15 @@
                 this.vp.clear().remove();
                 delete this.vp;     // so we don't call clear() on it again.
             }
+            if (this.ztsliders) {
+                this.ztsliders.remove();
+                delete this.ztsliders;
+            }
             if (selected.length > 0) {
                 this.vp = new ImageViewerView({models: selected, figureModel: this.model}); // auto-renders on init
                 $("#viewportContainer").append(this.vp.el);
+                this.ztsliders = new ZtSlidersView({models: selected});
+                $("#viewportContainer").append(this.ztsliders.el);
             }
 
             if (this.ipv) {
@@ -581,64 +587,6 @@
     });
 
 
-    // This simply handles buttons to increment time/z
-    // since other views don't have an appropriate container
-    var SliderButtonsView = Backbone.View.extend({
-
-        el: $("#viewportContainer"),
-
-        initialize: function(opts) {
-            this.model = opts.model;
-        },
-
-        events: {
-            "click .z-increment": "z_increment",
-            "click .z-decrement": "z_decrement",
-            "click .time-increment": "time_increment",
-            "click .time-decrement": "time_decrement",
-        },
-
-        z_increment: function(event) {
-            this.model.getSelected().forEach(function(m){
-                var newZ = {};
-                if (m.get('z_projection')) {
-                    newZ.z_start = m.get('z_start') + 1;
-                    newZ.z_end = m.get('z_end') + 1;
-                } else {
-                    newZ.theZ = m.get('theZ') + 1;
-                }
-                m.set(newZ, {'validate': true});
-            });
-            return false;
-        },
-        z_decrement: function(event) {
-            this.model.getSelected().forEach(function(m){
-                var newZ = {};
-                if (m.get('z_projection')) {
-                    newZ.z_start = m.get('z_start') - 1;
-                    newZ.z_end = m.get('z_end') - 1;
-                } else {
-                    newZ.theZ = m.get('theZ') - 1;
-                }
-                m.set(newZ, {'validate': true});
-            });
-            return false;
-        },
-        time_increment: function(event) {
-            this.model.getSelected().forEach(function(m){
-                m.set({'theT': m.get('theT') + 1}, {'validate': true});
-            });
-            return false;
-        },
-        time_decrement: function(event) {
-            this.model.getSelected().forEach(function(m){
-                m.set({'theT': m.get('theT') - 1}, {'validate': true});
-            });
-            return false;
-        },
-    });
-
-
     var ImageViewerView = Backbone.View.extend({
 
         template: _.template(viewport_template),
@@ -808,8 +756,6 @@
         clear: function() {
             // clean up zoom slider etc
             $("#vp_zoom_slider").off();
-            $("#vp_z_slider").hide();
-            $("#vp_t_slider").hide();
             $("#vp_zoom_value").off();
             this.$vp_zoom_value.val();
 
@@ -869,24 +815,6 @@
             this.zmView.renderXYWH(zoom, scaled_dx, scaled_dy);
         },
 
-        formatTime: function(seconds) {
-
-            if (typeof seconds === 'undefined') {
-                return "";
-            }
-            var isNegative = seconds < 0;
-            seconds = Math.abs(seconds);
-            function leftPad(s) {
-                s = s + '';
-                if (s.split('.')[0].length === 1) return '0' + s;
-                return s;
-            }
-            var hours = parseInt(seconds / 3600);
-            var mins = parseInt(seconds % 3600 / 60);
-            var secs = (seconds % 60).toFixed(2);
-            return (isNegative ? '-' : '') + leftPad(hours) + ":" + leftPad(mins) + ":" + leftPad(secs);
-        },
-
         get_imgs_css: function() {
             // Get img src & positioning css for each panel,
             var imgs_css = [];
@@ -927,48 +855,6 @@
             this.$vp_frame.append(html);
             // update this to include new images
             this.$vp_img = $(".vp_img", this.$el);
-
-            this.render_z_t_labels();
-        },
-
-        render_z_t_labels: function() {
-            // Rendering Z/T labels without rendering whole component
-            // means we don't re-build z/t sliders (they don't lose focus)
-            var sizeZ = this.models.getIfEqual('sizeZ');
-            var sizeT = this.models.getIfEqual('sizeT');
-            var theT = this.models.getAverage('theT');
-            var theZ = this.models.getAverage('theZ');
-            var z_projection = this.models.allTrue('z_projection');
-            var deltaT = this.models.getDeltaTIfEqual();
-
-            var z_label = theZ + 1;
-            $("#vp_z_slider input[type='range']").val(theZ + 1)
-            if (z_projection) {
-                var z_start = Math.round(this.models.getAverage('z_start'));
-                var z_end = Math.round(this.models.getAverage('z_end'));
-                z_label = (z_start + 1) + "-" + (z_end + 1);
-                $("#vp_z_slider .z_end").val(z_end + 1);
-                $("#vp_z_slider .z_start").val(z_start + 1);
-            } else if (!this.models.allEqual('theZ')) {
-                z_label = "-";
-            }
-            // $("#vp_z_slider").slider({'value': theZ + 1});
-            $("#vp_z_value").text(z_label + "/" + (sizeZ || '-'));
-
-            var t_label = theT + 1;
-            var dt_label;
-            if (!this.models.allEqual('theT')) {
-                t_label = "-";
-            }
-            $("#vp_t_slider input[type='range']").val(theT + 1)
-            $("#vp_t_value").text(t_label + "/" + (sizeT || '-'));
-
-            if ((deltaT === 0 || deltaT) && sizeT > 1) {
-                dt_label = this.formatTime(deltaT);
-            } else {
-                dt_label = "";
-            }
-            $("#vp_deltaT").text(dt_label);
         },
 
         render: function() {
@@ -977,20 +863,9 @@
             this.zmView.render();
 
             // only show viewport if original w / h ratio is same for all models
-            var model = this.models.head(),
-                self = this;
-            var imgs_css;
-
             // get average viewport frame w/h & zoom
             var wh = this.models.getAverageWH(),
-                zoom = this.models.getAverage('zoom'),
-                theZ = this.models.getAverage('theZ'),
-                z_start = Math.round(this.models.getAverage('z_start')),
-                z_end = Math.round(this.models.getAverage('z_end')),
-                theT = this.models.getAverage('theT'),
-                sizeZ = this.models.getIfEqual('sizeZ'),
-                sizeT = this.models.getIfEqual('sizeT'),
-                z_projection = this.models.allTrue('z_projection');
+                zoom = this.models.getAverage('zoom');
 
             if (wh <= 1) {
                 var frame_h = this.full_size;
@@ -1000,94 +875,7 @@
                 var frame_h = this.full_size / wh;
             }
 
-            imgs_css = this.get_imgs_css();
-
-            // update sliders
-            var Z_disabled = false,
-                Z_max = sizeZ;
-            if (!sizeZ || sizeZ === 1) {    // undefined or 1
-                Z_disabled = true;
-                Z_max = 1;
-                $("#vp_z_slider").hide();
-            } else {
-                $("#vp_z_slider").show();
-            }
-
-            // setup single Z slider(s)
-            if (z_projection) {
-                // show the z_end slider...
-                $("#vp_z_slider .z_end").show().attr({max: Z_max, min: 1}).val(z_end + 1);
-                $("#vp_z_slider .z_start").show().attr({max: Z_max, min: 1}).val(z_start + 1);
-                // slide and stop events for both sliders
-                if (!Z_disabled) {
-                $("#vp_z_slider input[type='range']")
-                    .on("input", (event) => {
-                        let start = $("#vp_z_slider .z_start").val();
-                        let end = $("#vp_z_slider .z_end").val();
-                        $("#vp_z_value").text(start + "-" + end + "/" + sizeZ);
-                    })
-                    .on("change", (event) => {
-                        let start = $("#vp_z_slider .z_start").val();
-                        let end = $("#vp_z_slider .z_end").val();
-                        self.models.forEach(function(m){
-                            m.save({
-                                'z_start': start - 1,
-                                'z_end': end -1
-                            });
-                        });
-                    });
-                }
-            } else {
-                // hide the z_end slider (not needed)
-                $("#vp_z_slider .z_end").hide();
-                $("#vp_z_slider .z_start")
-                    .show()
-                    .attr({max: sizeZ, min: 1})
-                    .val(theZ + 1)
-                    .on("input", (event) => {
-                        $("#vp_z_value").text(event.target.value + "/" + sizeZ);
-                    })
-                    .on("change", (event) => {
-                        self.models.forEach(function(m){
-                            m.save('theZ', event.target.value - 1);
-                        });
-                    });
-            }
-
-            // T-slider should be enabled even if we have a mixture of sizeT values.
-            // Slider T_max is the minimum of sizeT values
-            // Slider value is average of theT values (but smaller than T_max)
-            var T_disabled = false,
-                T_slider_max = self.models.getMin('sizeT');
-            if (T_slider_max === 1) {
-                T_disabled = true;
-                $("#vp_t_slider").hide();
-            } else {
-                $("#vp_t_slider").show();
-            }
-            var t_slider_value = Math.min(theT, T_slider_max);
-
-            // setup T slider
-            $("#vp_t_slider input[type='range']")
-                .show()
-                .attr({max: T_slider_max, min: 1})
-                .val(t_slider_value + 1)
-                .on("input", (event) => {
-                    var theT = event.target.value;
-                    $("#vp_t_value").text(theT + "/" + (sizeT || '-'));
-                    var dt = self.models.head().get('deltaT')[theT-1];
-                    self.models.forEach(function(m){
-                        if (m.get('deltaT')[theT-1] != dt) {
-                            dt = undefined;
-                        }
-                    });
-                    $("#vp_deltaT").text(self.formatTime(dt));
-                })
-                .on("change", (event) => {
-                    self.models.forEach(function(m){
-                        m.save('theT', event.target.value - 1);
-                    });
-                });
+            var imgs_css = this.get_imgs_css();
 
             var json = {};
             json.inner_template = this.inner_template;
@@ -1096,11 +884,8 @@
             json.frame_w = frame_w;
             json.frame_h = frame_h;
 
-            // We render without z/t labels...
             var html = this.template(json);
             this.$el.html(html);
-            // ...then update them dynamically 
-            this.render_z_t_labels();
 
             this.$vp_frame = $(".vp_frame", this.$el);  // cache for later
             this.$vp_img = $(".vp_img", this.$el);

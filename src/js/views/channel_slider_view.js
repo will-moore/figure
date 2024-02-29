@@ -307,7 +307,6 @@ var ChannelSliderView = Backbone.View.extend({
                 var active = actives.reduce(allEqualFn, actives[0]);
                 var style = {'background-position': '0 0'}
                 var lutBgPos = FigureLutPicker.getLutBackgroundPosition(color);
-                console.log("color", color);
                 if (color.endsWith('.lut')) {
                     style['background-position'] = lutBgPos;
                     color = "ccc";
