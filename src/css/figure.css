@@ -358,11 +358,6 @@
         padding-right: 0;
     }
 
-    .scalebar_form .scalebar_unit {
-        padding-left: 0;
-        padding-right: 10px;
-    }
-
     .scalebar {
         position: absolute;
         margin: 5% !important;
