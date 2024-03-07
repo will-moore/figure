@@ -220,7 +220,6 @@ const ZtSlidersView = Backbone.View.extend({
         // Slider T_max is the minimum of sizeT values
         // Slider value is average of theT values (but smaller than T_max)
         var T_slider_max = this.models.getMin('sizeT');
-        console.log("T_slider_max", T_slider_max);
         var T_disabled = (T_slider_max === 1);
         if ((deltaT === 0 || deltaT) && sizeT > 1) {
             dt_label = this.formatTime(deltaT);
@@ -279,8 +278,6 @@ const ZtSlidersView = Backbone.View.extend({
                 <i class="bi-chevron-right" style="font-size: 1rem"></i>
             </button>
         </div>`);
-
-        // this.render_z_t_labels();
     }
 });
 

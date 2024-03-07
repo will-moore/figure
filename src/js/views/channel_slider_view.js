@@ -180,7 +180,7 @@ var ChannelSliderView = Backbone.View.extend({
     channel_slider_slide: function(event) {
         // Handle sliding action for start slider and end slider
         let $target = $(event.target);
-        let value = event.target.value;
+        let value = parseFloat(event.target.value);
         let max = $target.attr('max');
         let chIndex = $target.data('idx');
         value = (max > SLIDER_INCR_CUTOFF) ? value : value.toFixed(2);
@@ -194,15 +194,15 @@ var ChannelSliderView = Backbone.View.extend({
 
     channel_slider_stop: function(event) {
         // Handle slide -> stop for start slider and end slider
-        console.log("stop", this, event.target.value);
+        let value = parseFloat(event.target.value);
         let $target = $(event.target);
         let chIndex = $target.data('idx');
         let toUpdate = {};
         // Save change to 'start' or 'end' value;
         if ($target.hasClass("ch_start_slider")) {
-            toUpdate.start = event.target.value;
+            toUpdate.start = value;
         } else {
-            toUpdate.end = event.target.value;
+            toUpdate.end = value;
         }
         this.models.forEach(function(m) {
             m.save_channel_window(chIndex, toUpdate);
@@ -246,7 +246,7 @@ var ChannelSliderView = Backbone.View.extend({
             }
             var windowFn = function (idx, attr) {
                 return function (ch) {
-                    return ch[idx].window[attr];
+                    return parseFloat(ch[idx].window[attr]);
                 }
             };
             var allEqualFn = function(prev, value) {
@@ -335,29 +335,7 @@ var ChannelSliderView = Backbone.View.extend({
                                                 'isDark': this.isDark(color),
                                                 lutsPngUrl,
                                             });
-                var $div = $(sliderHtml).appendTo(this.$el);
-
-                // $div.find('.ch_slider').slider({
-                //     range: true,
-                //     min: min,
-                //     max: max,
-                //     step: (max > SLIDER_INCR_CUTOFF) ? 1 : 0.01,
-                //     values: [startAvg, endAvg],
-                //     slide: function(event, ui) {
-                //         let chStart = (max > SLIDER_INCR_CUTOFF) ? ui.values[0] : ui.values[0].toFixed(2);
-                //         let chEnd = (max > SLIDER_INCR_CUTOFF) ? ui.values[1] : ui.values[1].toFixed(2);
-                //         $('.ch_start input', $div).val(chStart);
-                //         $('.ch_end input', $div).val(chEnd);
-                //     },
-                //     stop: function(event, ui) {
-                //         self.models.forEach(function(m) {
-                //             m.save_channel_window(chIdx, {'start': ui.values[0], 'end': ui.values[1]});
-                //         });
-                //     }
-                // })
-                // // Need to add background style to newly created div.ui-slider-range
-                // .children('.ui-slider-range').css(style)
-                // .addClass(sliderClass);
+                $(sliderHtml).appendTo(this.$el);
 
             }.bind(this));
         return this;
