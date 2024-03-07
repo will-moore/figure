@@ -87,6 +87,11 @@
                 self.model.set('curr_zoom', event.target.value);
             });
 
+            // enable export (script is available)
+            if (EXPORT_ENABLED) {
+                $("button.export_pdf").removeAttr("disabled");
+            }
+
             // respond to zoom changes
             this.listenTo(this.model, 'change:curr_zoom', this.renderZoom);
             this.listenTo(this.model, 'change:selection', this.renderSelectionChange);
