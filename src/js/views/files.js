@@ -182,15 +182,19 @@ export var FileListView = Backbone.View.extend({
 
     sort_name: function(event) {
         this.render_sort_btn(event);
-        this.model.comparator = 'name';
+        this.model.comparator = function(left, right) {
+            var l = left.get('name').toLowerCase(),
+                r = right.get('name').toLowerCase();
+            return l < r ? -1 : l > r ? 1 : 0;
+        };
         this.model.sort();
     },
 
     sort_name_reverse: function(event) {
         this.render_sort_btn(event);
         this.model.comparator = function(left, right) {
-            var l = left.get('name'),
-                r = right.get('name');
+            var l = left.get('name').toLowerCase(),
+                r = right.get('name').toLowerCase();
             return l < r ? 1 : l > r ? -1 : 0;
         };
         this.model.sort();
