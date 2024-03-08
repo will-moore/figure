@@ -18,10 +18,8 @@
             <ul class="dropdown-menu colorpicker" data-index="<%= idx %>">
                 <li>
                     <a data-color="reverse" class="reverseIntensity dropdown-item" href="#">
-                        <span style="font-size: 18px; position: relative; top: 4px;;"
-                            class="glyphicon
-                            <% if(reverse) { %>glyphicon-check<% } else { %>glyphicon-unchecked<% } %>">
-                        </span> Invert
+                        <% if(reverse) { %> <i class="bi-check-lg"></i> <% } else { %> &nbsp &nbsp <% } %>
+                        Invert
                     </a>
                 </li>
                 <li class="dropdown-divider"></li>
