@@ -40,8 +40,6 @@ var ShapeManager = function ShapeManager(elementId, width, height, options) {
   this._state = "SELECT";
   this._strokeColor = "#ff0000";
   this._strokeWidth = 2;
-  this._fillColor = "#ffffff";
-  this._fillOpacity = 0.01;
   this._orig_width = width;
   this._orig_height = height;
   this._zoom = 100;
@@ -249,31 +247,6 @@ ShapeManager.prototype.getStrokeColor = function getStrokeColor() {
   return this._strokeColor;
 };
 
-ShapeManager.prototype.getFillColor = function getFillColor() {
-  return this._fillColor;
-};
-
-ShapeManager.prototype.setFillColor = function setFillColor(fillColor) {
-  this._fillColor = fillColor;
-  var selected = this.getSelectedShapes();
-  for (var s = 0; s < selected.length; s++) {
-    selected[s].setFillColor(fillColor);
-  }
-};
-
-ShapeManager.prototype.getFillOpacity = function getFillOpacity() {
-  return this._fillOpacity;
-};
-
-ShapeManager.prototype.setFillOpacity = function setFillOpacity(fillOpacity) {
-  fillOpacity = parseFloat(fillOpacity, 10);
-  this._fillOpacity = fillOpacity;
-  var selected = this.getSelectedShapes();
-  for (var s = 0; s < selected.length; s++) {
-    selected[s].setFillOpacity(fillOpacity);
-  }
-};
-
 ShapeManager.prototype.setStrokeWidth = function setStrokeWidth(strokeWidth) {
   strokeWidth = parseFloat(strokeWidth, 10);
   this._strokeWidth = strokeWidth;
@@ -417,8 +390,6 @@ ShapeManager.prototype.createShapeJson = function createShapeJson(jsonShape) {
   var s = jsonShape,
     newShape,
     strokeColor = s.strokeColor || this.getStrokeColor(),
-    fillColor = s.fillColor || this.getFillColor(),
-    fillOpacity = s.fillOpacity || this.getFillOpacity(),
     strokeWidth = s.strokeWidth || this.getStrokeWidth(),
     zoom = this.getZoom(),
     options = {
@@ -427,8 +398,6 @@ ShapeManager.prototype.createShapeJson = function createShapeJson(jsonShape) {
       strokeWidth: strokeWidth,
       zoom: zoom,
       strokeColor: strokeColor,
-      fillColor: fillColor,
-      fillOpacity: fillOpacity,
     };
   if (jsonShape.id) {
     options.id = jsonShape.id;
@@ -639,10 +608,7 @@ ShapeManager.prototype.selectAllShapes = function selectAllShapes(region) {
 
 // select shapes: 'shape' can be shape object or ID
 ShapeManager.prototype.selectShapes = function selectShapes(shapes) {
-  var strokeColor;
-  var strokeWidth;
-  var fillColor;
-  var fillOpacity;
+  var strokeColor, strokeWidth;
 
   // Clear selected with silent:true, since we notify again below
   this.clearSelectedShapes(true);
@@ -662,15 +628,6 @@ ShapeManager.prototype.selectShapes = function selectShapes(shapes) {
           strokeColor = false;
         }
       }
-      // for first shape, pick color
-      if (fillColor === undefined) {
-        fillColor = shape.getFillColor();
-      } else {
-        // for subsequent shapes, if colors don't match - set false
-        if (fillColor !== shape.getFillColor()) {
-          fillColor = false;
-        }
-      }
       // for first shape, pick strokeWidth
       if (strokeWidth === undefined) {
         strokeWidth = shape.getStrokeWidth();
@@ -678,15 +635,6 @@ ShapeManager.prototype.selectShapes = function selectShapes(shapes) {
         // for subsequent shapes, if colors don't match - set false
         if (strokeWidth !== shape.getStrokeWidth()) {
           strokeWidth = false;
-        }
-      }
-      // for first shape, pick fillOpacity
-      if (fillOpacity === undefined) {
-        fillOpacity = shape.getFillOpacity();
-      } else {
-        // for subsequent shapes, if colors don't match - set false
-        if (fillOpacity !== shape.getFillOpacity()) {
-          fillOpacity = false;
         }
       }
       shape.setSelected(true);
@@ -697,12 +645,6 @@ ShapeManager.prototype.selectShapes = function selectShapes(shapes) {
   }
   if (strokeWidth) {
     this._strokeWidth = strokeWidth;
-  }
-  if (fillColor) {
-    this._fillColor = fillColor;
-  }
-  if (fillOpacity) {
-    this._fillOpacity = fillOpacity;
   }
   this.$el.trigger("change:selected");
 };
