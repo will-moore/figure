@@ -247,8 +247,8 @@ const ZtSlidersView = Backbone.View.extend({
         <div id="vp_deltaT">${dt_label}</div>
         
         <div id="vp_z_slider" style="${Z_disabled ? "display:none" : ""}">
-            <input type="range" class="z_end" value="${z_end + 1}" min="1" max="${Z_max}" style="${!z_projection ? "display:none" : ""}" />
             <input type="range" class="z_start" value="${theZ + 1}" min="1" max="${Z_max}" />
+            <input type="range" class="z_end" value="${z_end + 1}" min="1" max="${Z_max}" style="${!z_projection ? "display:none" : ""}" />
             <button
               type="button"
               class="btn btn-link btn-sm z-decrement"
