@@ -1137,6 +1137,10 @@
     /*  color-picker  */
 
     .colorpickerOption {
+        background: conic-gradient(red, orange, yellow, green, blue, red);
+    }
+
+    .hueBg {
         background-image: url("../images/hue.png");
         background-size: 20px 50px;
         background-position: 0 100%;
