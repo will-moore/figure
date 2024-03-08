@@ -12,7 +12,7 @@
                     <%= _.escape(label) %>
                     <div class="<% if(active) { %>ch-btn-down<% } else if (typeof active == 'boolean') { %>ch-btn-up<% } else { %>ch-btn-flat<% }%>">&nbsp</div>
             </button>
-            <button type="button" class="btn dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+            <button type="button" class="btn btn-default dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
                 <span class="visually-hidden">Toggle Dropdown</span>
               </button>
             <ul class="dropdown-menu colorpicker" data-index="<%= idx %>">
@@ -68,13 +68,15 @@
             without flipping the slider itself (can't just flip background-image)
          -->
         <input class="ch_start_slider" data-idx="<%=idx%>"
+            data-slidemax="<%= endAvg %>"
             min="<%= min %>" max="<%= max %>" step="<%= step %>"
             type="range" value="<%= startAvg %>"
             style="background-color:#<%=color%>;
                 --bgPos: <%= lutBgPos %>;
                 --lutPng: url(<%= lutsPngUrl %>);
                 --scaleX: <%= reverse ? -1 : 1 %>"/>
-        <input class="ch_end_slider" data-idx="<%=idx%>"
+        <!-- data-slidemin and data-slidemax used to prevent sliding start > end etc -->
+        <input class="ch_end_slider" data-idx="<%=idx%>" data-slidemin="<%= startAvg %>"
             min="<%= min %>" max="<%= max %>" step="<%= step %>"
             type="range" value="<%= endAvg %>" style="background-color: rbga(1,1,1,0)"/>
     </div>
