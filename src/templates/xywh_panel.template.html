@@ -13,9 +13,9 @@
                         <% if (export_dpi != dpi && !isNaN(export_dpi)) { %>
                         (Export at <%= export_dpi %> dpi
                             <% if (export_dpi > dpi) { %>
-                            <button type="button" title="Delete Label" class="close clear_dpi"
+                            <button type="button" title="Delete Label" class="close btn btn-sm btn-light clear_dpi"
                                 title="Remove (don't change dpi on export)"
-                                aria-hidden="true" style="float: none; left: 0; margin: 0; top: -2px;">×</button>
+                                aria-hidden="true" style="float: none; padding: 0; margin-top: -3px;">×</button>
                             <% } %>
                         <label>)</label>
                         <% } %>

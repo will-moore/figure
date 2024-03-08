@@ -388,11 +388,8 @@
 
     .form-inline .close {
         color: #FF0000;
-        right: 0;
-        top: 2px;
         margin-left: 4px;
         opacity: 0.5;
-        position: absolute;
     }
     .label_layout {
         position:absolute;
