@@ -1064,10 +1064,10 @@
     }
 
     .lutPreview {
+        /* background-image css add by lutpicker.js */
         width: 100%;
         height: 45px;
         border-top: 1px solid #e5e5e5;
-        background-image: url(/images/luts_10.png);
     }
 
     .small-thumb {

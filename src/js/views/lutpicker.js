@@ -98,7 +98,7 @@ var LutPickerView = Backbone.View.extend({
 
         // Update preview to show LUT
         var bgPos = this.getLutBackgroundPosition(lutName);
-        $(".lutPreview", this.el).css('background-position', bgPos);
+        $(".lutPreview", this.el).css({'background-position': bgPos, 'background-image': `url(${lutsPngUrl})`});
         // Enable OK button
         $("button[type='submit']", this.el).removeAttr('disabled');
     },
