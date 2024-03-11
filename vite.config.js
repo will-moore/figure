@@ -12,6 +12,7 @@ export default {
     hot: true
   },
   build: {
+    sourcemap: true,
     // output into Django's static dir
     outDir: "../omero_figure/static/omero_figure/"
   },
