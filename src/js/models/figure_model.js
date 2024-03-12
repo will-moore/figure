@@ -407,6 +407,52 @@
             figureModel.trigger('reset_undo_redo');
         },
 
+        checkSaveAndClear: function (callback, allowCancel) {
+            var self = this;
+            var doClear = function () {
+                self.clearFigure();
+                if (callback) {
+                    callback();
+                }
+            };
+            if (self.get("unsaved")) {
+                var saveBtnTxt = "Save",
+                    canEdit = self.get("canEdit");
+                if (!canEdit) saveBtnTxt = "Save a Copy";
+                // show the confirm dialog...
+                let buttons = ["Don't Save", saveBtnTxt];
+                if (allowCancel) {
+                    buttons = ["Canel"].concat(buttons);
+                }
+                figureConfirmDialog(
+                    "Save Changes to Figure?",
+                    "Your changes will be lost if you don't save them",
+                    buttons,
+                    function (btnTxt) {
+                        if (btnTxt === saveBtnTxt) {
+                            var options = {};
+                            // Save current figure or New figure...
+                            var fileId = self.get("fileId");
+                            if (fileId && canEdit) {
+                            options.fileId = fileId;
+                            } else {
+                            var defaultName = self.getDefaultFigureName();
+                            var figureName = prompt("Enter Figure Name", defaultName);
+                            options.figureName = figureName || defaultName;
+                            }
+                            options.success = doClear;
+                            self.save_to_OMERO(options);
+                        } else if (btnTxt === "Don't Save") {
+                            self.set("unsaved", false);
+                            doClear();
+                        }
+                    }
+                );
+            } else {
+                doClear();
+            }
+        },
+        
         addImages: function(iIds) {
             this.clearSelected();
 

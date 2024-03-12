@@ -23,7 +23,8 @@
         clearFigureFromStorage,
         showExportAsJsonModal,
         showModal,
-        hideModals} from "./util";
+        hideModals,
+        hideModal} from "./util";
 
     // This extends Backbone to support keyboardEvents
     backboneMousetrap(_, Backbone, Mousetrap);
@@ -546,23 +547,21 @@
         import_json: function(event) {
             event.preventDefault();
 
-            var showImport = function() {
-              showModal('importJsonModal');
-            };
-            
-            app.checkSaveAndClear(function() { showImport()} );
+            var allowCancel = true;
+            this.model.checkSaveAndClear(function() {
+                showModal('importJsonModal')
+            }, allowCancel);
         },
 
         import_json_form: function(event) {
-          event.preventDefault();
+            event.preventDefault();
           
-          var $form = $('.importJsonForm'),
-              figureJSON = $('.form-control', $form).val();
-          this.model.figure_fromJSON(figureJSON);
+            var figureJSON = $('.importJsonForm .form-control').val();
+            this.model.figure_fromJSON(figureJSON);
             
-          $('#importJsonModal').modal('hide');
-          $('#importJsonModal textarea').val('');
-          this.render();
+            hideModal('importJsonModal');
+            $('#importJsonModal textarea').val('');
+            this.render();
         },
         
         copy_selected_panels: function(event) {

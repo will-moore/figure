@@ -16,7 +16,7 @@ import RightPanelView from "./views/right_panel_view";
 import { UndoManager, UndoView } from "./models/undo";
 
 import { ajaxSetup } from "./views/util.csrf";
-import { figureConfirmDialog, hideModals, showModal } from "./views/util";
+import { hideModals, showModal } from "./views/util";
 
 export const figureModel = new FigureModel();
 
@@ -80,56 +80,13 @@ var FigureRouter = Backbone.Router.extend({
     "file/:id(/)": "loadFigure",
   },
 
-  checkSaveAndClear: function (callback) {
-    var doClear = function () {
-      figureModel.clearFigure();
-      if (callback) {
-        callback();
-      }
-    };
-    if (figureModel.get("unsaved")) {
-      var saveBtnTxt = "Save",
-        canEdit = figureModel.get("canEdit");
-      if (!canEdit) saveBtnTxt = "Save a Copy";
-      // show the confirm dialog...
-      figureConfirmDialog(
-        "Save Changes to Figure?",
-        "Your changes will be lost if you don't save them",
-        ["Don't Save", saveBtnTxt],
-        function (btnTxt) {
-          if (btnTxt === saveBtnTxt) {
-            var options = {};
-            // Save current figure or New figure...
-            var fileId = figureModel.get("fileId");
-            if (fileId && canEdit) {
-              options.fileId = fileId;
-            } else {
-              var defaultName = figureModel.getDefaultFigureName();
-              var figureName = prompt("Enter Figure Name", defaultName);
-              options.figureName = figureName || defaultName;
-            }
-            options.success = doClear;
-            figureModel.save_to_OMERO(options);
-          } else if (btnTxt === "Don't Save") {
-            figureModel.set("unsaved", false);
-            doClear();
-          } else {
-            doClear();
-          }
-        }
-      );
-    } else {
-      doClear();
-    }
-  },
-
   index: function () {
     console.log("index");
     hideModals();
     var cb = () => {
       showModal("welcomeModal");
     };
-    this.checkSaveAndClear(cb);
+    figureModel.checkSaveAndClear(cb);
   },
 
   openFigure: function () {
@@ -138,7 +95,7 @@ var FigureRouter = Backbone.Router.extend({
     var cb = function () {
       showModal("openFigureModal");
     };
-    this.checkSaveAndClear(cb);
+    figureModel.checkSaveAndClear(cb);
   },
 
   recoverFigure: function () {
@@ -167,7 +124,7 @@ var FigureRouter = Backbone.Router.extend({
         };
       }
     }
-    this.checkSaveAndClear(cb);
+    figureModel.checkSaveAndClear(cb);
   },
 
   loadFigure: function (id) {
@@ -177,7 +134,7 @@ var FigureRouter = Backbone.Router.extend({
     var cb = function () {
       figureModel.load_from_OMERO(fileId);
     };
-    this.checkSaveAndClear(cb);
+    figureModel.checkSaveAndClear(cb);
   },
 });
 
