@@ -52,9 +52,25 @@ const ZtSlidersView = Backbone.View.extend({
         // Handles z_start and z_end sliders
         // TODO: cache z_projection?
         var z_projection = this.models.allTrue('z_projection');
-        let start = $("#vp_z_slider .z_start").val();
-        let end = $("#vp_z_slider .z_end").val();
+        let $target = $(event.target);
+        let value = parseInt(event.target.value);
+        let start = parseInt($("#vp_z_slider .z_start").val());
+        let end = parseInt($("#vp_z_slider .z_end").val());
+
+        const sliding_start = $target.hasClass("z_start");
         if (z_projection) {
+            // ensure that start < end
+            if (sliding_start) {
+                if (value >= end) {
+                    $target.val(end - 1);
+                    return;
+                }
+            } else {
+                if (value <= start) {
+                    $target.val(start + 1);
+                    return;
+                }
+            }
             start = start + "-" + end;
         }
         $("#vp_z_value").text(start + "/" + this.sizeZ);
