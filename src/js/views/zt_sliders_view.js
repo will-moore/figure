@@ -28,6 +28,39 @@ const ZtSlidersView = Backbone.View.extend({
         "change #vp_t_slider input[type='range']": "slidestop_time",
         "input #vp_z_slider input[type='range']": "slide_z",
         "change #vp_z_slider input[type='range']": "slidestop_z",
+        "mousemove .z_start": "start_slider_mousemove",
+        "mousemove .z_end": "end_slider_mousemove",
+    },
+
+    start_slider_mousemove: function(event) {
+        // To avoid clicking start-slider when the mouse is ABOVE the midpoint (between slider handles)
+        // On mouseover we add pointer events to end-slider (which is on top, so clicks will be handled by it)
+        let $target = $(event.target);
+        let fraction = event.offsetX/$target.width();
+        let midfraction = this.get_midfraction($target);
+        if (fraction > midfraction) {
+            $(".z_end", $target.parent()).css("pointer-events", "all");
+        }
+    },
+
+    end_slider_mousemove: function(event) {
+        // To avoid clicking end-slider when the mouse is BELOW the midpoint (between slider handles)
+        // On mouseover we REMOVE pointer events from end-slider (so they fall to the start-slider underneath)
+        let $target = $(event.target);
+        let fraction = event.offsetX/$target.width();
+        let midfraction = this.get_midfraction($target);
+        if (fraction < midfraction) {
+            $target.css("pointer-events", "none");
+        }
+    },
+
+    get_midfraction($target) {
+        let start = parseInt($("#vp_z_slider .z_start").val());
+        let end = parseInt($("#vp_z_slider .z_end").val());
+        let midvalue = (start + end) / 2;
+        let minval = parseFloat($target.attr('min'));
+        let maxval = parseFloat($target.attr('max'));
+        return (midvalue - minval) / (maxval - minval);
     },
 
     slide_time(event) {
@@ -81,7 +114,6 @@ const ZtSlidersView = Backbone.View.extend({
         let start = $("#vp_z_slider .z_start").val();
         let end = $("#vp_z_slider .z_end").val();
 
-        console.log("slidestop Z", z_projection, start, end);
         this.models.forEach(function(m){
             if (z_projection) {
                 m.save({
