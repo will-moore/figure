@@ -35,6 +35,43 @@ var ChannelSliderView = Backbone.View.extend({
         "click .dropdown-menu a": "pick_color",
         "input .ch_slider input": "channel_slider_slide",
         "change .ch_slider input": "channel_slider_stop",
+        "mousemove .ch_start_slider": "start_slider_mousemove",
+        "mousemove .ch_end_slider": "end_slider_mousemove",
+    },
+
+    start_slider_mousemove: function(event) {
+        // To avoid clicking start-slider when the mouse is ABOVE the midpoint (between slider handles)
+        // On mouseover we add pointer events to end-slider (which is on top, so clicks will be handled by it)
+        let $target = $(event.target);
+        let fraction = event.offsetX/$target.width();
+        // value of the 'end' slider is stored on the start-slider
+        let slidemax = parseFloat($target.data('slidemax'));
+        let slideval = parseFloat($target.val());
+        let midfraction = this.get_midfraction(slideval, slidemax, $target);
+        if (fraction > midfraction) {
+            $(".ch_end_slider", $target.parent()).css("pointer-events", "all");
+        }
+    },
+
+    end_slider_mousemove: function(event) {
+        // To avoid clicking end-slider when the mouse is BELOW the midpoint (between slider handles)
+        // On mouseover we REMOVE pointer events from end-slider (so they fall to the start-slider underneath)
+        let $target = $(event.target);
+        let fraction = event.offsetX/$target.width();
+        // value of the 'start' slider is stored on the end-slider
+        let slidemin = parseFloat($target.data('slidemin'));
+        let slideval = parseFloat($target.val());
+        let midfraction = this.get_midfraction(slidemin, slideval, $target);
+        if (fraction < midfraction) {
+            $target.css("pointer-events", "none");
+        }
+    },
+
+    get_midfraction(start, end, $target) {
+        let midvalue = (start + end) / 2;
+        let minval = parseFloat($target.attr('min'));
+        let maxval = parseFloat($target.attr('max'));
+        return (midvalue - minval) / (maxval - minval);
     },
 
     pick_color: function(e) {

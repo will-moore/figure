@@ -678,7 +678,6 @@
         background-color: transparent;
         -webkit-appearance: none;
         z-index: 0;
-        pointer-events: none;
       }
       input[type=range]:focus {
         outline: none;
