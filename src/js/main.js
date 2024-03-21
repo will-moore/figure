@@ -18,7 +18,9 @@ import { UndoManager, UndoView } from "./models/undo";
 import { ajaxSetup } from "./views/util.csrf";
 import { hideModals, showModal } from "./views/util";
 
-export const figureModel = new FigureModel();
+const figureModel = new FigureModel();
+// make this global so we can access it from the browser console
+window.figureModel = figureModel;
 
 const RELEASE_VERSION = import.meta.env.VITE_VERSION;
 console.log("RELEASE_VERSION", RELEASE_VERSION);
