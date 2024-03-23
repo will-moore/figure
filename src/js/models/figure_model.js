@@ -45,6 +45,12 @@
         initialize: function() {
             this.panels = new PanelList();      //this.get("shapes"));
 
+            // listen for new Panels added so we can pass in a reference
+            // to this figureModel...
+            this.panels.on('add', (panel) => {
+                panel.setFigureModel(this);
+            });
+
             // wrap selection notification in a 'debounce', so that many rapid
             // selection changes only trigger a single re-rendering 
             this.notifySelectionChange = _.debounce( this.notifySelectionChange, 10);

@@ -11,6 +11,9 @@
     // Attributes can be added as we need them.
     export var Panel = Backbone.Model.extend({
 
+        // see setFigureModel() below
+        figureModel: undefined,
+
         defaults: {
             x: 100,     // coordinates on the 'paper'
             y: 100,
@@ -35,7 +38,42 @@
         },
 
         initialize: function() {
+            // listen for changes to the viewport...
+            this.on("change:zoom change:dx change:dy change:width change:height", (panel) => {
+                // if this panel has 'insetRoiId' it is an "inset" panel so we need to
+                // notify other panels that contain the corresponding ROI (rectangle)
+                if (this.get('insetRoiId') && this.figureModel) {
+                    this.figureModel.trigger('zoomPanUpdated', panel);
+                }
+            })
+        },
 
+        setFigureModel(figureModel) {
+            this.figureModel = figureModel;
+            // listen for other panels zooming - might need to update "inset" ROI...
+            this.listenTo(figureModel, 'zoomPanUpdated', this.handleZoomPanChange);
+        },
+
+        handleZoomPanChange(panel) {
+            var insetRoiId = panel.get('insetRoiId');
+            if (!insetRoiId) return;
+            // find Rectangles that have insetRoiId...
+            let insetShapes = this.get('shapes');
+            if (insetShapes) {
+                insetShapes = insetShapes.filter(sh => sh.type == 'Rectangle');
+
+                if (insetShapes.length > 0) {
+                    let rect = panel.getViewportAsRect();
+                    // update the "inset" Rectangle
+                    let updated = this.get('shapes').map(shape => {
+                        if (shape.type == 'Rectangle' && shape.id == insetRoiId) {
+                            return {...shape, ...rect}
+                        }
+                        return shape;
+                    });
+                    this.save('shapes', updated);
+                }
+            }
         },
 
         // When we're creating a Panel, we process the data a little here:

@@ -110,9 +110,70 @@
             "click .copyROIs": "copyROIs",
             "click .pasteROIs": "pasteROIs",
             "click .deleteROIs": "deleteROIs",
+            "click .create_inset": "createInset",
             // triggered by select_dropdown_option below
             "change .shape-color": "changeROIColor",
             "change .line-width": "changeLineWidth",
+        },
+
+        createInset: function() {
+            let selected = this.model.getSelected();
+
+            // get bounding box of selected panels...
+            let minX = selected.reduce((prev, panel) => Math.min(panel.get('x'), prev), Infinity);
+            let maxX = selected.reduce((prev, panel) => Math.max(panel.get('x') + panel.get('width'), prev), -Infinity);
+            let minY = selected.reduce((prev, panel) => Math.min(panel.get('y'), prev), Infinity);
+            let maxY = selected.reduce((prev, panel) => Math.max(panel.get('y') + panel.get('height'), prev), -Infinity);
+            let selWidth = maxX - minX;
+            let selHeight = maxY - minY;
+
+            selected.forEach(panel => {
+                let randomId = parseInt(Math.random() * 10000000000);
+                // Add Rectangle (square) in centre of viewport
+                let vp = panel.getViewportAsRect();
+                let minSide = Math.min(vp.width, vp.height);
+                // Square is 1/3 size of the viewport
+                let rectSize = minSide / 3;
+                var color = $('button.shape-color span:first', this.$el).attr('data-color');
+                var strokeWidth = parseFloat($('button.line-width span:first', this.$el).attr('data-line-width'));
+                let rect = {
+                    type: "Rectangle",
+                    strokeWidth,
+                    strokeColor: "#" + color,
+                    x: vp.x + ((vp.width - rectSize) / 2),
+                    y: vp.y + ((vp.height - rectSize) / 2),
+                    width: rectSize,
+                    height: rectSize,
+                    id: randomId,
+                }
+                panel.add_shapes([rect]);
+
+                // Create duplicate panels
+                let panelJson = panel.toJSON();
+
+                if (selWidth > selHeight) {
+                    panelJson.y = panelJson.y + 1.1 * panelJson.height;
+                } else {
+                    panelJson.x = panelJson.x + 1.1 * panelJson.width;
+                }
+                // cropped to match new Rectangle
+                let orig_width = panelJson.orig_width;
+                let orig_height = panelJson.orig_height;
+                let targetCx = Math.round(rect.x + (rect.width/2));
+                let targetCy = Math.round(rect.y + (rect.height/2));
+
+                panelJson.dx = (orig_width/2) - targetCx;
+                panelJson.dy = (orig_height/2) - targetCy;
+                // zoom to correct percentage
+                var xPercent = orig_width / rect.width;
+                var yPercent = orig_height / rect.height;
+                panelJson.zoom = Math.min(xPercent, yPercent) * 100;
+                panelJson.selected = false;
+                panelJson.shapes = [];
+                panelJson.insetRoiId = randomId;
+
+                this.model.panels.create(panelJson);
+            });
         },
 
         changeLineWidth: function() {
