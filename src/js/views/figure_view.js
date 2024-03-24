@@ -24,7 +24,8 @@
         showExportAsJsonModal,
         showModal,
         hideModals,
-        hideModal} from "./util";
+        hideModal,
+        updateRoiIds} from "./util";
 
     // This extends Backbone to support keyboardEvents
     backboneMousetrap(_, Backbone, Mousetrap);
@@ -645,8 +646,11 @@
             // apply offset to clipboard data & paste
             // NB: we are modifying the list that is in the clipboard
             _.each(clipboard_panels, function(m) {
+                m = JSON.parse(JSON.stringify(m))
                 m.x = m.x + offset_x;
                 m.y = m.y + offset_y;
+                // we want duplicated panels to have unique ROI IDs 
+                m = updateRoiIds(m);
                 self.model.panels.create(m);
             });
             // only pasted panels are selected - simply trigger...

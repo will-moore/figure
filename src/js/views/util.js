@@ -260,3 +260,30 @@ export async function getJson (url) {
     let cors_headers = { mode: 'cors', credentials: 'include' };
     return fetch(url, cors_headers).then(rsp => rsp.json());
 }
+
+export const RANDOM_NUMBER_RANGE = 100000000;
+
+export function getRandomId() {
+    return parseInt(Math.random() * RANDOM_NUMBER_RANGE);
+}
+
+export function newIdFromRandomId(oldId) {
+    return parseInt((oldId * Math.PI) % RANDOM_NUMBER_RANGE);
+}
+
+export function updateRoiIds(panelJson) {
+    // used when copy/pasting panel to duplicate it, we want to avoid duplicate ROI IDs
+    // so we update ROI IDs, and the corresponding `insetRoiId` on any inset panels
+
+    if (panelJson.insetRoiId) {
+        panelJson.insetRoiId = newIdFromRandomId(panelJson.insetRoiId);
+    }
+    if (panelJson.shapes) {
+        panelJson.shapes.forEach(shape => {
+            if (shape.id) {
+                shape.id = newIdFromRandomId(shape.id);
+            }
+        });
+    }
+    return panelJson;
+}

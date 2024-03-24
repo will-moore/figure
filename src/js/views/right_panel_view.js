@@ -7,7 +7,7 @@
     import _ from "underscore";
     import $ from "jquery";
 
-    import {figureConfirmDialog, showModal} from "./util";
+    import {figureConfirmDialog, showModal, getRandomId} from "./util";
     import FigureColorPicker from "../views/colorpicker";
 
     import FigureModel from "../models/figure_model";
@@ -128,7 +128,7 @@
             let selHeight = maxY - minY;
 
             selected.forEach(panel => {
-                let randomId = parseInt(Math.random() * 10000000000);
+                let randomId = getRandomId();
                 // Add Rectangle (square) in centre of viewport
                 let vp = panel.getViewportAsRect();
                 let minSide = Math.min(vp.width, vp.height);
