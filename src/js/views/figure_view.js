@@ -572,6 +572,8 @@
             var cd = [];
             s.forEach(function(m) {
                 var copy = m.toJSON();
+                // deep copy (e.g. includes shapes)
+                copy = JSON.parse(JSON.stringify(copy));
                 delete copy.id;
                 cd.push(copy);
             });
@@ -645,12 +647,11 @@
 
             // apply offset to clipboard data & paste
             // NB: we are modifying the list that is in the clipboard
+            clipboard_panels = updateRoiIds(clipboard_panels);
+
             _.each(clipboard_panels, function(m) {
-                m = JSON.parse(JSON.stringify(m))
                 m.x = m.x + offset_x;
                 m.y = m.y + offset_y;
-                // we want duplicated panels to have unique ROI IDs 
-                m = updateRoiIds(m);
                 self.model.panels.create(m);
             });
             // only pasted panels are selected - simply trigger...
