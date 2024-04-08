@@ -43,15 +43,49 @@
                 // if this panel has 'insetRoiId' it is an "inset" panel so we need to
                 // notify other panels that contain the corresponding ROI (rectangle)
                 if (this.get('insetRoiId') && this.figureModel) {
-                    this.figureModel.trigger('zoomPanUpdated', panel);
+                    if (!this.silenceTriggers) {
+                        this.figureModel.trigger('zoomPanUpdated', panel);
+                    }
                 }
-            })
+            });
+            // listen for changes to shapes...
+            this.on("change:shapes", (panel) => {
+                // notify all other panels via the figureModel...
+                console.log("trigger shapesUpdated...");
+                if (!this.silenceTriggers && this.figureModel) {
+                    this.figureModel.trigger('shapesUpdated', panel);
+                }
+            });
         },
 
         setFigureModel(figureModel) {
             this.figureModel = figureModel;
-            // listen for other panels zooming - might need to update "inset" ROI...
+            // listen for *other* panels zooming - might need to update "inset" ROI...
             this.listenTo(figureModel, 'zoomPanUpdated', this.handleZoomPanChange);
+            // listen for *other* panels shape updates - might need to update zoom/pan...
+            this.listenTo(figureModel, 'shapesUpdated', this.handleShapesChange);
+        },
+
+        handleShapesChange(panel) {
+            // The ROI rectangle has been updated on another panel - update viewport to match...
+            // Update zoom/panel but don't trigger zoomPanUpdated or we could get
+            // recursive feedback!?
+            var insetRoiId = this.get('insetRoiId');
+            console.log("handleShapesChange insetRoiId", insetRoiId, "coming from shapes", panel.get("shapes"));
+            if (!insetRoiId) return;
+
+            this.silenceTriggers = true;
+
+            // find Rectangle from panel that corresponds to this panel
+            // TODO: use shape.insetRoiId for storing the ID, instead of the shape's actual id
+            let rect = panel.get("shapes").find(shape => shape.id == insetRoiId);
+            console.log('handleShapesChange, rect', rect);
+
+            if (rect) {
+                this.cropToRoi(rect);
+            }
+
+            this.silenceTriggers = false;
         },
 
         handleZoomPanChange(panel) {
@@ -63,6 +97,8 @@
                 insetShapes = insetShapes.filter(sh => sh.type == 'Rectangle');
 
                 if (insetShapes.length > 0) {
+                    this.silenceTriggers = true;
+
                     let rect = panel.getViewportAsRect();
                     // update the "inset" Rectangle
                     let updated = this.get('shapes').map(shape => {
@@ -72,6 +108,8 @@
                         return shape;
                     });
                     this.save('shapes', updated);
+
+                    this.silenceTriggers = false;
                 }
             }
         },
