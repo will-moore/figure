@@ -166,17 +166,17 @@ $(function() {
         } else {
            $("input[name='strokeColor']").removeProp('checked');
         }
-        var fillColor = shapeManager.getFillColor();
-        if (fillColor) {
-          $("input[name='fillColor'][value='" + fillColor + "']").prop('checked', 'checked');
-        } else {
-           $("input[name='fillColor']").removeProp('checked');
-        }
+        // var fillColor = shapeManager.getFillColor();
+        // if (fillColor) {
+        //   $("input[name='fillColor'][value='" + fillColor + "']").prop('checked', 'checked');
+        // } else {
+        //    $("input[name='fillColor']").removeProp('checked');
+        // }
         var strokeWidth = shapeManager.getStrokeWidth() || 1;
         $("select[name='strokeWidth']").val(strokeWidth);
 
-        var fillOpacity = shapeManager.getFillOpacity() || 0.01;
-        $("select[name='fillOpacity']").val(fillOpacity);
+        // var fillOpacity = shapeManager.getFillOpacity() || 0.01;
+        // $("select[name='fillOpacity']").val(fillOpacity);
     });
 
     $("#shapesCanvas").bind("change:shape", function(event, shapes){
