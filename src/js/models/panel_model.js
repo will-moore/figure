@@ -39,7 +39,7 @@
 
         initialize: function() {
             // listen for changes to the viewport...
-            this.on("change:zoom change:dx change:dy change:width change:height", (panel) => {
+            this.on("change:zoom change:dx change:dy change:width change:height change:rotation", (panel) => {
                 // if this panel has 'insetRoiId' it is an "inset" panel so we need to
                 // notify other panels that contain the corresponding ROI (rectangle)
                 if (this.get('insetRoiId') && this.figureModel) {
@@ -690,7 +690,10 @@
 
             var toSet = { 'width': newW, 'height': newH, 'dx': dx, 'dy': dy, 'zoom': zoom };
             var rotation = coords.rotation || 0;
+            // if the rectangle/viewport is rotated clockwise, the image within the
+            // viewport is rotated anti-clockwise
             if (!isNaN(rotation)) {
+                rotation = -(rotation - 360);
                 toSet.rotation = rotation;
             }
             this.save(toSet);
@@ -702,6 +705,12 @@
             dx = dx !== undefined ? dx : this.get('dx');
             dy = dy !== undefined ? dy : this.get('dy');
             var rotation = this.get('rotation');
+            if (isNaN(rotation)) {
+                rotation = 0;
+            };
+            // if we have rotated the panel clockwise within the viewport 
+            // it's as if the viewport rectangle has rotated anti-clockwise
+            rotation = 360 - rotation;
 
             var width = this.get('width'),
                 height = this.get('height'),
