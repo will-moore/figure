@@ -69,9 +69,8 @@
         handleShapesChange(panel) {
             // The ROI rectangle has been updated on another panel - update viewport to match...
             // Update zoom/panel but don't trigger zoomPanUpdated or we could get
-            // recursive feedback!?
+            // recursive feedback
             var insetRoiId = this.get('insetRoiId');
-            console.log("handleShapesChange insetRoiId", insetRoiId, "coming from shapes", panel.get("shapes"));
             if (!insetRoiId) return;
 
             this.silenceTriggers = true;
@@ -79,8 +78,6 @@
             // find Rectangle from panel that corresponds to this panel
             // TODO: use shape.insetRoiId for storing the ID, instead of the shape's actual id
             let rect = (panel.get("shapes") || []).find(shape => shape.id == insetRoiId);
-            console.log('handleShapesChange, rect', rect);
-
             if (rect) {
                 this.cropToRoi(rect);
             }
@@ -89,6 +86,8 @@
         },
 
         handleZoomPanChange(panel) {
+            // An inset panel has zoomed/panned. If we have corresponding inset Rectangle
+            // then update it accordingly...
             var insetRoiId = panel.get('insetRoiId');
             if (!insetRoiId) return;
             // find Rectangles that have insetRoiId...
