@@ -947,7 +947,7 @@
                 rect = clipboard_data.CROP;
             } else if ('SHAPES' in clipboard_data){
                 // Look for first Rectangle in SHAPES
-                shapeJson = clipboard_data.SHAPES;
+                var shapeJson = clipboard_data.SHAPES;
                 shapeJson.forEach(function(shape) {
                     if (!rect && shape.type === "Rectangle") {
                         rect = {x: shape.x, y: shape.y, width: shape.width, height: shape.height};
