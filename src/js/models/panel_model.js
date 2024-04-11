@@ -93,6 +93,8 @@
             // we replace these attributes...
             var newData = {'imageId': data.imageId,
                 'name': data.name,
+                'pixelsType': data.pixelsType,
+                'pixel_range': data.pixel_range,
                 'sizeZ': data.sizeZ,
                 'sizeT': data.sizeT,
                 'orig_width': data.orig_width,
@@ -556,6 +558,21 @@
                     this.set('z_projection', false);
                 }
             }
+        },
+
+        getMaxZprojPlanes: function() {
+            const MAX_BYTES = 1024 * 1024 * 256;
+            let bytes_per_pixel = 4;
+            if (this.get("pixel_range")) {
+                bytes_per_pixel = Math.ceil(Math.log2(this.get("pixel_range")[1]) / 8.0);
+            }
+            console.log('pixel_range', this.get("pixel_range"), 'bytes_per_pixel', bytes_per_pixel);
+            let active_channels = this.get("channels").reduce((prev, channel) => channel.active ? prev + 1 : prev, 0);
+            console.log('active_channels', active_channels);
+            let max_planes = MAX_BYTES / bytes_per_pixel / (this.get('orig_width') * this.get('orig_height'));
+            max_planes = Math.floor(max_planes / active_channels);
+            console.log("max_planes", max_planes);
+            return max_planes;
         },
 
         // When a multi-select rectangle is drawn around several Panels

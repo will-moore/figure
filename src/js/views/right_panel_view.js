@@ -1091,9 +1091,11 @@
                 sum_sizeZ = 0,
                 rotation,
                 z_projection,
+                max_z_proj_planes = Infinity,
                 zp;
             if (this.models) {
                 this.models.forEach(function(m, i){
+                    max_z_proj_planes = Math.min(max_z_proj_planes, m.getMaxZprojPlanes());
                     rotation = m.get('rotation');
                     max_rotation = Math.max(max_rotation, rotation);
                     sum_rotation += rotation;
@@ -1123,6 +1125,7 @@
                 const z_projection_disabled = ((sum_sizeZ === this.models.length) || anyBig);
 
                 html = this.template({
+                    zrange_max: max_z_proj_planes,
                     projectionIconUrl,
                     'z_projection_disabled': z_projection_disabled,
                     'rotation': rotation,

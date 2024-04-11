@@ -12,7 +12,7 @@
 
     // Version of the json file we're saving.
     // This only needs to increment when we make breaking changes (not linked to release versions.)
-    var VERSION = 7;
+    var VERSION = 8;
 
 
     // ------------------------- Figure Model -----------------------------------
@@ -280,6 +280,31 @@
                     }
                 });
             }
+
+            if (v < 8) {
+                console.log("Transforming to VERSION 8");
+                // need to load pixelsType.
+                var iids = json.panels.map(p => p.imageId);
+                console.log('Load pixelsType for images', iids);
+                if (iids.length > 0) {
+                    var ptUrl = BASE_WEBFIGURE_URL + 'pixels_type/';
+                    ptUrl += '?image=' + iids.join('&image=');
+                    getJson(ptUrl).then(data => {
+                        // Update all panels
+                        // NB: By the time that this callback runs, the panels will have been created
+                        self.panels.forEach(function(p){
+                            var iid = p.get('imageId');
+                            if (data[iid]) {
+                                p.set({
+                                    'pixelsType': data[iid].pixelsType,
+                                    'pixel_range': data[iid].pixel_range
+                                });
+                            }
+                        });
+                    });
+                }
+            }
+
             return json;
         },
 
@@ -573,6 +598,8 @@
                         'pixel_size_x_unit': data.pixel_size.unitX,
                         'pixel_size_z_unit': data.pixel_size.unitZ,
                         'deltaT': data.deltaT,
+                        'pixelsType': data.meta.pixelsType,
+                        'pixels_range': data.pixels_range,
                     };
                     if (baseUrl) {
                         n.baseUrl = baseUrl;
