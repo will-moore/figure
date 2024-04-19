@@ -1537,15 +1537,15 @@ class FigureExport(object):
         # e.g. {0: 1.0, 1: 0.25, 2: 0.0625, 3: 0.03123, 4: 0.01440}
         # Pick zoom such that returned image is below MAX size
         max_level = len(zm_levels.keys()) - 1
-
-        # Maximum size that the rendering engine will render without OOM
-        max_plane = self.conn.getDownloadAsMaxSizeSetting()
+        # Maximum size that the rendering engine will render
+        max_sizes = self.conn.getMaxPlaneSize()
 
         # start big, and go until we reach target size
         zm = 0
         while (zm < max_level and
                zm_levels[zm] * width > max_width or
-               zm_levels[zm] * width * zm_levels[zm] * height > max_plane):
+               zm_levels[zm] * width > max_sizes[0] or
+               zm_levels[zm] * height > max_sizes[1]):
             zm = zm + 1
 
         level = max_level - zm
