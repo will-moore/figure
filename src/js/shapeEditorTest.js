@@ -247,6 +247,11 @@ $(function() {
                           "y": 260.5,
                           "x": 419});
 
+    shapeManager.addShapeJson({"type": "Point",
+                          "strokeWidth": 2,
+                          "y": 30,
+                          "x": 30});
+
     var s = shapeManager.addShapeJson({"type": "Line",
                                "strokeColor": "#00ff00",
                                "strokeWidth": 2,

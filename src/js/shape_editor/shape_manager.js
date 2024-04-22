@@ -28,7 +28,7 @@ import $ from "jquery";
 
 import { CreateRect, Rect } from "./rect";
 import { CreateLine, Line, CreateArrow, Arrow } from "./line";
-import { CreateEllipse, Ellipse } from "./ellipse";
+import { CreatePoint, Point, CreateEllipse, Ellipse } from "./ellipse";
 import { Polygon, Polyline } from "./polygon";
 
 var ShapeManager = function ShapeManager(elementId, width, height, options) {
@@ -412,6 +412,11 @@ ShapeManager.prototype.createShapeJson = function createShapeJson(jsonShape) {
     options.transform = s.transform;
     options.area = s.radiusX * s.radiusY * Math.PI;
     newShape = new Ellipse(options);
+  } else if (s.type === "Point") {
+    options.x = s.x;
+    options.y = s.y;
+    options.area = 0;
+    newShape = new Point(options);
   } else if (s.type === "Rectangle") {
     options.x = s.x;
     options.y = s.y;
