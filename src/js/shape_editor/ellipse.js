@@ -46,19 +46,19 @@ var Point = function Point(options) {
   // This is used as a one-off transform of the handles positions
   // when they are created. This then updates the _x, _y, _radiusX, _radiusY & rotation
   // of the Point itself (see below)
-  if (options.transform && options.transform.startsWith("matrix")) {
-    var tt = options.transform
-      .replace("matrix(", "")
-      .replace(")", "")
-      .split(" ");
-    var a1 = parseFloat(tt[0]);
-    var a2 = parseFloat(tt[1]);
-    var b1 = parseFloat(tt[2]);
-    var b2 = parseFloat(tt[3]);
-    var c1 = parseFloat(tt[4]);
-    var c2 = parseFloat(tt[5]);
-    this.Matrix = Raphael.matrix(a1, a2, b1, b2, c1, c2);
-  }
+  // if (options.transform && options.transform.startsWith("matrix")) {
+  //   var tt = options.transform
+  //     .replace("matrix(", "")
+  //     .replace(")", "")
+  //     .split(" ");
+  //   var a1 = parseFloat(tt[0]);
+  //   var a2 = parseFloat(tt[1]);
+  //   var b1 = parseFloat(tt[2]);
+  //   var b2 = parseFloat(tt[3]);
+  //   var c1 = parseFloat(tt[4]);
+  //   var c2 = parseFloat(tt[5]);
+  //   this.Matrix = Raphael.matrix(a1, a2, b1, b2, c1, c2);
+  // }
 
   if (this._radiusX === 0 || this._radiusY === 0) {
     this._yxRatio = 0.5;
@@ -83,7 +83,7 @@ var Point = function Point(options) {
   this.element = this.paper.ellipse();
   this.element.attr({ "fill-opacity": 0.01, fill: "#fff", cursor: "pointer" });
 
-  // Drag handling of ellipse
+  // Drag handling of point
   if (this.manager.canEdit) {
     this.element.drag(
       function (dx, dy) {
@@ -407,39 +407,13 @@ Point.prototype.createHandles = function createHandles() {
     handleAttrs = {
       stroke: "#4b80f9",
       fill: "#fff",
-      cursor: "move",
+      cursor: "default",
       "fill-opacity": 1.0,
     };
 
-  // draw handles
+  // draw handles - Can't drag handles to resize, but they are useful
+  // simply to indicate that the Point is selected
   self.handles = this.paper.set();
-  var _handle_drag = function () {
-    return function (dx, dy, mouseX, mouseY, event) {
-      dx = dx / self._zoomFraction;
-      dy = dy / self._zoomFraction;
-      // on DRAG...
-      var absX = dx + this.ox,
-        absY = dy + this.oy;
-      self.updateHandle(this.h_id, absX, absY, event.shiftKey);
-      return false;
-    };
-  };
-  var _handle_drag_start = function () {
-    return function () {
-      // START drag: simply note the location we started
-      // we scale by zoom to get the 'model' coordinates
-      this.ox = (this.attr("x") + this.attr("width") / 2) / self._zoomFraction;
-      this.oy = (this.attr("y") + this.attr("height") / 2) / self._zoomFraction;
-      return false;
-    };
-  };
-  var _handle_drag_end = function () {
-    return function () {
-      // simply notify manager that shape has changed
-      self.manager.notifyShapesChanged([self]);
-      return false;
-    };
-  };
 
   var hsize = this.handle_wh,
     hx,
@@ -448,40 +422,10 @@ Point.prototype.createHandles = function createHandles() {
   for (var key in this._handleIds) {
     hx = this._handleIds[key].x;
     hy = this._handleIds[key].y;
-    // If we have a transformation matrix, apply it...
-    if (this.Matrix) {
-      var matrixStr = this.Matrix.toTransformString();
-      // Matrix that only contains rotation and translation
-      // E.g. t111.894472287,-140.195845758r32.881,0,0  Will be handled correctly:
-      // Resulting handles position and x,y radii will be calculated
-      // so we don't need to apply transform to ellipse itself
-      // BUT, if we have other transforms such as skew, we can't do this.
-      // Best to just show warning if Raphael can't resolve matrix to simpler transforms:
-      // E.g. m2.39,-0.6,2.1,0.7,-1006,153
-      if (matrixStr.indexOf("m") > -1) {
-        console.log(
-          "Matrix only supports rotation & translation. " +
-            matrixStr +
-            " may contain skew for shape: ",
-          this.toJson()
-        );
-      }
-      var mx = this.Matrix.x(hx, hy);
-      var my = this.Matrix.y(hx, hy);
-      hx = mx;
-      hy = my;
-      // update the source coordinates
-      this._handleIds[key].x = hx;
-      this._handleIds[key].y = hy;
-    }
     handle = this.paper.rect(hx - hsize / 2, hy - hsize / 2, hsize, hsize);
     handle.attr({ cursor: "move" });
     handle.h_id = key;
     handle.line = self;
-
-    if (this.manager.canEdit) {
-      handle.drag(_handle_drag(), _handle_drag_start(), _handle_drag_end());
-    }
     self.handles.push(handle);
   }
 
@@ -490,11 +434,13 @@ Point.prototype.createHandles = function createHandles() {
 
 Point.prototype.getHandleCoords = function getHandleCoords() {
   // Returns MODEL coordinates (not zoom coordinates)
+  let margin = 2;
+
   var rot = Raphael.rad(this._rotation),
     x = this._x,
     y = this._y,
-    radiusX = this._radiusX,
-    radiusY = this._radiusY,
+    radiusX = this._radiusX + margin,
+    radiusY = this._radiusY + margin,
     startX = x - Math.cos(rot) * radiusX,
     startY = y - Math.sin(rot) * radiusX,
     endX = x + Math.cos(rot) * radiusX,
@@ -528,8 +474,8 @@ CreatePoint.prototype.startDrag = function startDrag(startX, startY) {
     paper: this.paper,
     x: startX,
     y: startY,
-    radiusX: 0,
-    radiusY: 0,
+    radiusX: POINT_RADIUS,
+    radiusY: POINT_RADIUS,
     area: 0,
     rotation: 0,
     strokeWidth: strokeWidth,
@@ -1007,7 +953,7 @@ Ellipse.prototype.createHandles = function createHandles() {
     handle = this.paper.rect(hx - hsize / 2, hy - hsize / 2, hsize, hsize);
     handle.attr({ cursor: "move" });
     handle.h_id = key;
-    handle.line = self;
+    // handle.line = self;
 
     if (this.manager.canEdit) {
       handle.drag(_handle_drag(), _handle_drag_start(), _handle_drag_end());
