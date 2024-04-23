@@ -36,7 +36,7 @@ var ShapeManager = function ShapeManager(elementId, width, height, options) {
   options = options || {};
 
   // Keep track of state, strokeColor etc
-  this.STATES = ["SELECT", "RECT", "LINE", "ARROW", "ELLIPSE", "POLYGON"];
+  this.STATES = ["SELECT", "RECT", "LINE", "ARROW", "ELLIPSE", "POLYGON", "POINT"];
   this._state = "SELECT";
   this._strokeColor = "#ff0000";
   this._strokeWidth = 2;
@@ -87,6 +87,7 @@ var ShapeManager = function ShapeManager(elementId, width, height, options) {
       ELLIPSE: new CreateEllipse({ manager: this, paper: this.paper }),
       LINE: new CreateLine({ manager: this, paper: this.paper }),
       ARROW: new CreateArrow({ manager: this, paper: this.paper }),
+      POINT: new CreatePoint({ manager: this, paper: this.paper }),
     };
 
     this.createShape = this.shapeFactories.LINE;
@@ -172,7 +173,7 @@ ShapeManager.prototype.setState = function setState(state) {
     return;
   }
   // When creating shapes, cover existing shapes with newShapeBg
-  var shapes = ["RECT", "LINE", "ARROW", "ELLIPSE", "POLYGON"];
+  var shapes = ["RECT", "LINE", "ARROW", "ELLIPSE", "POLYGON", "POINT"];
   if (shapes.indexOf(state) > -1) {
     this.newShapeBg.toFront();
     this.newShapeBg.attr({ cursor: "crosshair" });

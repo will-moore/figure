@@ -485,7 +485,7 @@ CreatePoint.prototype.startDrag = function startDrag(startX, startY) {
 };
 
 CreatePoint.prototype.drag = function drag(dragX, dragY, shiftKey) {
-  this.point.updateHandle("end", dragX, dragY, shiftKey);
+  // no drag behaviour on Point creation
 };
 
 CreatePoint.prototype.stopDrag = function stopDrag() {
@@ -498,7 +498,7 @@ CreatePoint.prototype.stopDrag = function stopDrag() {
   }
   // on the 'new:shape' trigger, this shape will already be selected
   this.point.setSelected(true);
-  this.manager.addShape(this.ellipse);
+  this.manager.addShape(this.point);
 };
 
 
