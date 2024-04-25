@@ -130,13 +130,9 @@ var Point = function Point(options) {
 
 Point.prototype.toJson = function toJson() {
   var rv = {
-    type: "Ellipse",
+    type: "Point",
     x: this._x,
     y: this._y,
-    radiusX: this._radiusX,
-    radiusY: this._radiusY,
-    area: this._radiusX * this._radiusY * Math.PI,
-    rotation: this._rotation,
     strokeWidth: this._strokeWidth,
     strokeColor: this._strokeColor,
   };
@@ -152,7 +148,7 @@ Point.prototype.compareCoords = function compareCoords(json) {
   if (json.type !== selfJson.type) {
     return false;
   }
-  ["x", "y", "radiusX", "radiusY", "rotation"].forEach(function (c) {
+  ["x", "y"].forEach(function (c) {
     if (Math.round(json[c]) !== Math.round(selfJson[c])) {
       match = false;
     }
