@@ -3,6 +3,30 @@
     // It listens to selection changes on the FigureModel and updates it's display
     // By creating new Sub-Views
 
+    import Backbone from "backbone";
+    import _ from "underscore";
+    import $ from "jquery";
+
+    import {figureConfirmDialog, showModal, rotatePoint} from "./util";
+    import FigureColorPicker from "../views/colorpicker";
+
+    import FigureModel from "../models/figure_model";
+    import InfoPanelView from "./info_panel_view";
+    import ChannelSliderView from "./channel_slider_view";
+    import ScalebarFormView from "./scalebar_form_view";
+    import ZtSlidersView from "./zt_sliders_view";
+
+    import image_display_options_template from '../../templates/image_display_options.template.html?raw';
+    import rois_form_template from '../../templates/rois_form.template.html?raw';
+    import labels_form_inner_template from '../../templates/labels_form_inner.template.html?raw';
+    import labels_form_template from '../../templates/labels_form.template.html?raw';
+    import viewport_template from '../../templates/viewport.template.html?raw';
+    import viewport_inner_template from '../../templates/viewport_inner.template.html?raw';
+    import zoom_crop_template from '../../templates/zoom_crop.template.html?raw';
+
+    import projectionIconUrl from '../../images/projection20.png';
+
+
     var RightPanelView = Backbone.View.extend({
 
         initialize: function(opts) {
@@ -11,7 +35,6 @@
 
             // this.render();
             new LabelsPanelView({model: this.model});
-            new SliderButtonsView({model: this.model});
             new RoisFormView({model: this.model});
         },
 
@@ -22,9 +45,15 @@
                 this.vp.clear().remove();
                 delete this.vp;     // so we don't call clear() on it again.
             }
+            if (this.ztsliders) {
+                this.ztsliders.remove();
+                delete this.ztsliders;
+            }
             if (selected.length > 0) {
                 this.vp = new ImageViewerView({models: selected, figureModel: this.model}); // auto-renders on init
                 $("#viewportContainer").append(this.vp.el);
+                this.ztsliders = new ZtSlidersView({models: selected});
+                $("#viewportContainer").append(this.ztsliders.el);
             }
 
             if (this.ipv) {
@@ -33,11 +62,11 @@
             if (selected.length > 0) {
                 this.ipv = new InfoPanelView({models: selected, figureModel: this.model});
                 this.ipv.render();
-                $("#infoTab").append(this.ipv.el);
+                $("#info-tab-pane").append(this.ipv.el);
             }
 
             if (this.ctv) {
-                this.ctv.clear().remove();
+                this.ctv.remove();
             }
             if (selected.length > 0) {
                 this.ctv = new ImageDisplayOptionsView({models: selected});
@@ -58,7 +87,7 @@
 
         model: FigureModel,
 
-        roisTemplate: JST["src/templates/rois_form_template.html"],
+        roisTemplate: _.template(rois_form_template),
 
         el: $("#labelsTab"),
 
@@ -203,7 +232,7 @@
         },
 
         editRois: function(event) {
-            $("#roiModal").modal("show");
+            showModal("roiModal");
             return false;
         },
 
@@ -253,12 +282,25 @@
 
     });
 
+    const LABEL_POSITION_ICONS = {
+        "topleft": "bi-box-arrow-in-up-left",
+        "topright": "bi-box-arrow-in-up-right",
+        "bottomleft": "bi-box-arrow-in-down-left",
+        "bottomright": "bi-box-arrow-in-down-right",
+        "left": "bi-box-arrow-left",
+        "leftvert": "bi-box-arrow-left",
+        "top": "bi-box-arrow-up",
+        "right": "bi-box-arrow-right",
+        "rightvert": "bi-box-arrow-right",
+        "bottom": "bi-box-arrow-down"
+    }
+
 
     var LabelsPanelView = Backbone.View.extend({
 
         model: FigureModel,
 
-        template: JST["src/templates/labels_form_inner_template.html"],
+        template: _.template(labels_form_inner_template),
 
         el: $("#labelsTab"),
 
@@ -266,9 +308,10 @@
             this.listenTo(this.model, 'change:selection', this.render);
 
             // one-off build 'New Label' form, with same template as used for 'Edit Label' forms
-            var json = {'l': {'text':'', 'size':12, 'color':'000000'}, 'position':'top', 'edit':false};
+            var json = {'l': {'text':'', 'size':12, 'color':'000000'}, 'position':'top',
+                'edit':false, 'position_icon_cls': LABEL_POSITION_ICONS['top']};
             $('.new-label-form', this.$el).html(this.template(json));
-            $('.btn-sm').tooltip({container: 'body', placement:'bottom', toggle:"tooltip"});
+            // $('.btn-sm').tooltip({container: 'body', placement:'bottom', toggle:"tooltip"});
 
             this.render();
         },
@@ -281,7 +324,7 @@
 
         markdownInfo: function(event) {
             event.preventDefault();
-            $("#markdownInfoModal").modal('show');
+            showModal("markdownInfoModal");
         },
 
         // Handles all the various drop-down menus in the 'New' AND 'Edit Label' forms
@@ -289,45 +332,46 @@
         select_dropdown_option: function(event) {
             event.preventDefault();
             var $a = $(event.target),
-                $span = $a.children('span');
+                $target = $a.children('.dropdown_icon');
             // For the Label Text, handle this differently...
             if ($a.attr('data-label')) {
                 $('.new-label-form .label-text', this.$el).val( $a.attr('data-label') );
                 return;
             }
-            // All others, we take the <span> from the <a> and place it in the <button>
-            if ($span.length === 0) $span = $a;  // in case we clicked on <span>
-            var $li = $span.parent().parent();
+            // All others, we take the .dropdown_icon from the <a> and place it in the <button>
+            if ($target.length === 0) $target = $a;  // in case we clicked on icon itself
+            var $li = $target.closest("li");
             // Don't use $li.parent().prev() since bootstrap inserts a div.dropdown-backdrop on Windows
             var $button = $("button.dropdown-toggle", $li.parent().parent());
-            $span = $span.clone();
+            $target = $target.clone();
 
-            if ($span.hasClass('colorpickerOption')) {
+            if ($target.hasClass('colorpickerOption')) {
                 var oldcolor = $a.attr('data-oldcolor');
                 FigureColorPicker.show({
                     'color': oldcolor,
                     'success': function(newColor){
-                        $span.css({'background-color': newColor, 'background-image': 'none'});
+                        $target.css({'background-color': newColor, 'background-image': 'none'});
                         // remove # from E.g. #ff00ff
                         newColor = newColor.replace("#", "");
-                        $span.attr('data-color', newColor);
-                        $('span:first', $button).replaceWith($span);
+                        $target.attr('data-color', newColor);
+                        $('span:first', $button).replaceWith($target);
                         // can listen for this if we want to 'submit' etc
                         $button.trigger('change');
                     }
                 });
             } else {
-                $('span:first', $button).replaceWith($span);
+                $('.dropdown_icon', $button).replaceWith($target);
                 $button.trigger('change');      // can listen for this if we want to 'submit' etc
             }
         },
 
         // submission of the New Label form
         handle_new_label: function(event) {
+            event.preventDefault();
             var $form = $(event.target),
                 label_text = $('.label-text', $form).val(),
                 font_size = $('.font-size', $form).text().trim(),
-                position = $('.label-position span:first', $form).attr('data-position'),
+                position = $('.label-position i:first', $form).attr('data-position'),
                 color = $('.label-color span:first', $form).attr('data-color');
 
             if (label_text.length === 0) {
@@ -346,9 +390,9 @@
 
             if (label_text == '[key-values]') {
                 // Load Map Annotations for this image and create labels
-                $("#labelsFromMapAnns").modal("show", {
-                    position:position,
-                    size:font_size,
+                showModal("labelsFromMapAnns", {
+                    position: position,
+                    size: font_size,
                     color: color});
                 return false;
             }
@@ -437,8 +481,8 @@
     // Created new for each selection change
     var SelectedPanelsLabelsView = Backbone.View.extend({
 
-        template: JST["src/templates/labels_form_template.html"],
-        inner_template: JST["src/templates/labels_form_inner_template.html"],
+        template: _.template(labels_form_template),
+        inner_template: _.template(labels_form_inner_template),
 
         initialize: function(opts) {
 
@@ -487,7 +531,7 @@
             var $form = $(event.target),
                 label_text = $('.label-text', $form).val(),
                 font_size = $('.font-size', $form).text().trim(),
-                position = $('.label-position span:first', $form).attr('data-position'),
+                position = $('.label-position i:first', $form).attr('data-position'),
                 color = $('.label-color span:first', $form).attr('data-color'),
                 key = $form.attr('data-key');
 
@@ -526,9 +570,12 @@
             var html = "";
             _.each(positions, function(lbls, p) {
 
-                lbls = _.map(lbls, function(label, key){ return label; });
+                let position_icon_cls = LABEL_POSITION_ICONS[p];
+                lbls = _.map(lbls, function(label, key){
+                    return {...label, position_icon_cls};
+                });
 
-                var json = {'position':p, 'labels':lbls};
+                var json = {'position':p, 'labels':lbls, 'position_icon_cls': position_icon_cls};
                 if (lbls.length === 0) return;
                 json.inner_template = self.inner_template;
                 html += self.template(json);
@@ -540,68 +587,10 @@
     });
 
 
-    // This simply handles buttons to increment time/z
-    // since other views don't have an appropriate container
-    var SliderButtonsView = Backbone.View.extend({
-
-        el: $("#viewportContainer"),
-
-        initialize: function(opts) {
-            this.model = opts.model;
-        },
-
-        events: {
-            "click .z-increment": "z_increment",
-            "click .z-decrement": "z_decrement",
-            "click .time-increment": "time_increment",
-            "click .time-decrement": "time_decrement",
-        },
-
-        z_increment: function(event) {
-            this.model.getSelected().forEach(function(m){
-                var newZ = {};
-                if (m.get('z_projection')) {
-                    newZ.z_start = m.get('z_start') + 1;
-                    newZ.z_end = m.get('z_end') + 1;
-                } else {
-                    newZ.theZ = m.get('theZ') + 1;
-                }
-                m.set(newZ, {'validate': true});
-            });
-            return false;
-        },
-        z_decrement: function(event) {
-            this.model.getSelected().forEach(function(m){
-                var newZ = {};
-                if (m.get('z_projection')) {
-                    newZ.z_start = m.get('z_start') - 1;
-                    newZ.z_end = m.get('z_end') - 1;
-                } else {
-                    newZ.theZ = m.get('theZ') - 1;
-                }
-                m.set(newZ, {'validate': true});
-            });
-            return false;
-        },
-        time_increment: function(event) {
-            this.model.getSelected().forEach(function(m){
-                m.set({'theT': m.get('theT') + 1}, {'validate': true});
-            });
-            return false;
-        },
-        time_decrement: function(event) {
-            this.model.getSelected().forEach(function(m){
-                m.set({'theT': m.get('theT') - 1}, {'validate': true});
-            });
-            return false;
-        },
-    });
-
-
     var ImageViewerView = Backbone.View.extend({
 
-        template: JST["src/templates/viewport_template.html"],
-        inner_template: JST["src/templates/viewport_inner_template.html"],
+        template: _.template(viewport_template),
+        inner_template: _.template(viewport_inner_template),
 
         className: "imageViewer",
 
@@ -625,29 +614,28 @@
                     self.rerender_image_change);
             });
 
-            $("#vp_zoom_slider").slider({
-                // NB: these values are updated on render()
-                max: 1000,
-                min: 100,
-                value: self.zoom_avg,
-                slide: function(event, ui) {
-                    self.update_img_css(ui.value, 0, 0);
-                    $('#vp_zoom_value').val(ui.value);
-                },
-                stop: function(event, ui) {
-                    self.zoom_avg = ui.value;
-                    var to_save = {'zoom': ui.value};
-                    if (ui.value === 100) {
+            $("#vp_zoom_slider")
+                .attr({"max": 1000})
+                .on("input", (event) => {
+                    let val = parseFloat(event.target.value);
+                    this.update_img_css(val, 0, 0);
+                    $('#vp_zoom_value').val(val);
+                })
+                .on("change", (event) => {
+                    let val = parseFloat(event.target.value);
+                    this.zoom_avg = val;
+                    var to_save = {'zoom': val};
+                    if (val === 100) {
                         to_save.dx = 0;
                         to_save.dy = 0;
                     }
-                    self.models.forEach(function(m){
+                    this.models.forEach(function(m){
                         m.save(to_save);
                     });
                     // we don't listenTo zoom change...
-                    self.rerender_image_change();
-                }
-            });
+                    this.rerender_image_change();
+                });
+
             this.$vp_zoom_value = $("#vp_zoom_value");
             
 
@@ -720,14 +708,15 @@
             }
 
             // get min/max and restrict the user input between min/max
-            var minVal = $("#vp_zoom_slider").slider("option", "min");
-            var maxVal = $("#vp_zoom_slider").slider("option", "max");
+            const zmslider = document.getElementById("vp_zoom_slider");
+            var minVal = parseFloat(zmslider.min);
+            var maxVal = parseFloat(zmslider.max);
 
             if (value < minVal) value = minVal;
             if (value > maxVal) value = maxVal;
 
             // update the slider position
-            $("#vp_zoom_slider").slider({'value': value});
+            zmslider.value = value;
 
             // update the preview image
             this.update_img_css(value, 0, 0);
@@ -766,9 +755,7 @@
         // called by the parent View before .remove()
         clear: function() {
             // clean up zoom slider etc
-            $( "#vp_zoom_slider" ).slider( "destroy" );
-            $("#vp_z_slider").slider("destroy");
-            $("#vp_t_slider").slider("destroy");
+            $("#vp_zoom_slider").off();
             $("#vp_zoom_value").off();
             this.$vp_zoom_value.val();
 
@@ -828,24 +815,6 @@
             this.zmView.renderXYWH(zoom, scaled_dx, scaled_dy);
         },
 
-        formatTime: function(seconds) {
-
-            if (typeof seconds === 'undefined') {
-                return "";
-            }
-            var isNegative = seconds < 0;
-            seconds = Math.abs(seconds);
-            function leftPad(s) {
-                s = s + '';
-                if (s.split('.')[0].length === 1) return '0' + s;
-                return s;
-            }
-            var hours = parseInt(seconds / 3600);
-            var mins = parseInt(seconds % 3600 / 60);
-            var secs = (seconds % 60).toFixed(2);
-            return (isNegative ? '-' : '') + leftPad(hours) + ":" + leftPad(mins) + ":" + leftPad(secs);
-        },
-
         get_imgs_css: function() {
             // Get img src & positioning css for each panel,
             var imgs_css = [];
@@ -886,45 +855,6 @@
             this.$vp_frame.append(html);
             // update this to include new images
             this.$vp_img = $(".vp_img", this.$el);
-
-            this.render_z_t_labels();
-        },
-
-        render_z_t_labels: function() {
-            // Rendering Z/T labels without rendering whole component
-            // means we don't re-build z/t sliders (they don't lose focus)
-            var sizeZ = this.models.getIfEqual('sizeZ');
-            var sizeT = this.models.getIfEqual('sizeT');
-            var theT = this.models.getAverage('theT');
-            var theZ = this.models.getAverage('theZ');
-            var z_projection = this.models.allTrue('z_projection');
-            var deltaT = this.models.getDeltaTIfEqual();
-
-            var z_label = theZ + 1;
-            if (z_projection) {
-                var z_start = Math.round(this.models.getAverage('z_start'));
-                var z_end = Math.round(this.models.getAverage('z_end'));
-                z_label = (z_start + 1) + "-" + (z_end + 1);
-            } else if (!this.models.allEqual('theZ')) {
-                z_label = "-";
-            }
-            $("#vp_z_slider").slider({'value': theZ + 1});
-            $("#vp_z_value").text(z_label + "/" + (sizeZ || '-'));
-
-            var t_label = theT + 1;
-            var dt_label;
-            if (!this.models.allEqual('theT')) {
-                t_label = "-";
-            }
-            $("#vp_t_slider").slider({'value': theT + 1});
-            $("#vp_t_value").text(t_label + "/" + (sizeT || '-'));
-
-            if ((deltaT === 0 || deltaT) && sizeT > 1) {
-                dt_label = this.formatTime(deltaT);
-            } else {
-                dt_label = "";
-            }
-            $("#vp_deltaT").text(dt_label);
         },
 
         render: function() {
@@ -933,22 +863,9 @@
             this.zmView.render();
 
             // only show viewport if original w / h ratio is same for all models
-            var model = this.models.head(),
-                self = this;
-            var imgs_css;
-
             // get average viewport frame w/h & zoom
             var wh = this.models.getAverageWH(),
-                zoom = this.models.getAverage('zoom'),
-                theZ = this.models.getAverage('theZ'),
-                z_start = Math.round(this.models.getAverage('z_start')),
-                z_end = Math.round(this.models.getAverage('z_end')),
-                theT = this.models.getAverage('theT'),
-                // deltaT = sum_deltaT/this.models.length,
-                sizeZ = this.models.getIfEqual('sizeZ'),
-                sizeT = this.models.getIfEqual('sizeT'),
-                deltaT = this.models.getDeltaTIfEqual(),
-                z_projection = this.models.allTrue('z_projection');
+                zoom = this.models.getAverage('zoom');
 
             if (wh <= 1) {
                 var frame_h = this.full_size;
@@ -958,96 +875,7 @@
                 var frame_h = this.full_size / wh;
             }
 
-            imgs_css = this.get_imgs_css();
-
-            // update sliders
-            var Z_disabled = false,
-                Z_max = sizeZ;
-            if (!sizeZ || sizeZ === 1) {    // undefined or 1
-                Z_disabled = true;
-                Z_max = 1;
-            }
-
-            // Destroy any existing slider...
-            try {
-                // ...but will throw if not already a slider
-                $("#vp_z_slider").slider("destroy");
-            } catch (e) {}
-
-            if (z_projection) {
-                $("#vp_z_slider").slider({
-                    orientation: "vertical",
-                    range: true,
-                    max: Z_max,
-                    disabled: Z_disabled,
-                    min: 1,             // model is 0-based, UI is 1-based
-                    values: [z_start + 1, z_end + 1],
-                    slide: function(event, ui) {
-                        $("#vp_z_value").text(ui.values[0] + "-" + ui.values[1] + "/" + sizeZ);
-                    },
-                    stop: function( event, ui ) {
-                        self.models.forEach(function(m){
-                            m.save({
-                                'z_start': ui.values[0] - 1,
-                                'z_end': ui.values[1] -1
-                            });
-                        });
-                    }
-                });
-            } else {
-                $("#vp_z_slider").slider({
-                    orientation: "vertical",
-                    max: sizeZ,
-                    disabled: Z_disabled,
-                    min: 1,             // model is 0-based, UI is 1-based
-                    value: theZ + 1,
-                    slide: function(event, ui) {
-                        $("#vp_z_value").text(ui.value + "/" + sizeZ);
-                    },
-                    stop: function( event, ui ) {
-                        self.models.forEach(function(m){
-                            m.save('theZ', ui.value - 1);
-                        });
-                    }
-                });
-            }
-
-            // T-slider should be enabled even if we have a mixture of sizeT values.
-            // Slider T_max is the minimum of sizeT values
-            // Slider value is average of theT values (but smaller than T_max)
-            var T_disabled = false,
-                T_slider_max = self.models.getMin('sizeT');
-            if (T_slider_max === 1) {
-                T_disabled = true;
-            }
-            var t_slider_value = Math.min(theT, T_slider_max);
-            // in case it's already been initialised:
-            try {
-                $("#vp_t_slider").slider("destroy");
-            } catch (e) {}
-
-            $("#vp_t_slider").slider({
-                max: T_slider_max,
-                disabled: T_disabled,
-                min: 1,             // model is 0-based, UI is 1-based
-                value: t_slider_value + 1,
-                slide: function(event, ui) {
-                    var theT = ui.value;
-                    $("#vp_t_value").text(theT + "/" + (sizeT || '-'));
-                    var dt = self.models.head().get('deltaT')[theT-1];
-                    self.models.forEach(function(m){
-                        if (m.get('deltaT')[theT-1] != dt) {
-                            dt = undefined;
-                        }
-                    });
-                    $("#vp_deltaT").text(self.formatTime(dt));
-                },
-                stop: function( event, ui ) {
-                    self.models.forEach(function(m){
-                        m.save('theT', ui.value - 1);
-                    });
-                }
-            });
+            var imgs_css = this.get_imgs_css();
 
             var json = {};
             json.inner_template = this.inner_template;
@@ -1056,11 +884,8 @@
             json.frame_w = frame_w;
             json.frame_h = frame_h;
 
-            // We render without z/t labels...
             var html = this.template(json);
             this.$el.html(html);
-            // ...then update them dynamically 
-            this.render_z_t_labels();
 
             this.$vp_frame = $(".vp_frame", this.$el);  // cache for later
             this.$vp_img = $(".vp_img", this.$el);
@@ -1075,8 +900,7 @@
             max_zoom = Math.max(this.zoom_avg, max_zoom, 1000);
 
             // Current zoom may be larger due to small crop region
-            $("#vp_zoom_slider").slider({'value': this.zoom_avg,
-                                         'max': max_zoom});
+            $("#vp_zoom_slider").attr({'max': max_zoom}).val(this.zoom_avg);
 
             return this;
         }
@@ -1085,7 +909,7 @@
 
     var ZoomView = Backbone.View.extend({
 
-        template: JST["src/templates/zoom_crop_template.html"],
+        template: _.template(zoom_crop_template),
 
         initialize: function(opts) {
 
@@ -1123,7 +947,7 @@
                 rect = clipboard_data.CROP;
             } else if ('SHAPES' in clipboard_data){
                 // Look for first Rectangle in SHAPES
-                shapeJson = clipboard_data.SHAPES;
+                var shapeJson = clipboard_data.SHAPES;
                 shapeJson.forEach(function(shape) {
                     if (!rect && shape.type === "Rectangle") {
                         rect = {x: shape.x, y: shape.y, width: shape.width, height: shape.height};
@@ -1143,7 +967,7 @@
         show_crop_dialog: function(event) {
             event.preventDefault();
             // Simply show dialog - Everything else handled by that
-            $("#cropModal").modal('show');
+            showModal("cropModal");
         },
 
         resetZoomShape: function(event) {
@@ -1210,7 +1034,7 @@
     // Options such as Rotation, Z-Projection etc.
     var ImageDisplayOptionsView = Backbone.View.extend({
         tagName: "div",
-        template: JST["src/templates/image_display_options_template.html"],
+        template: _.template(image_display_options_template),
 
         initialize: function(opts) {
             // This View may apply to a single PanelModel or a list
@@ -1224,6 +1048,22 @@
         events: {
             "click .show-rotation": "show_rotation",
             "click .z-projection": "z_projection",
+            "input .rotation-slider": "rotation_input",
+            "change .rotation-slider": "rotation_change",
+        },
+
+        rotation_input: function(event) {
+            let val = parseInt(event.target.value);
+            $(".vp_img").css({'transform':'rotate(' + val + 'deg)'});
+            $(".rotation_value").text(val);
+        },
+
+        rotation_change: function(event) {
+            let val = parseInt(event.target.value);
+            this.rotation = val;
+            this.models.forEach(function(m){
+                m.save('rotation', val);
+            });
         },
 
         z_projection:function(e) {
@@ -1241,38 +1081,7 @@
         },
 
         show_rotation: function(e) {
-            var $rc = this.$el.find('.rotation-controls').toggleClass('rotation-controls-shown'),
-                self = this;
-
-            if ($rc.hasClass('rotation-controls-shown')) {
-                $rc.find('.rotation-slider').slider({
-                    orientation: "vertical",
-                    max: 360,
-                    min: 0,
-                    step: 2,
-                    value: self.rotation,
-                    slide: function(event, ui) {
-                        $(".vp_img").css({'-webkit-transform':'rotate(' + ui.value + 'deg)',
-                                        'transform':'rotate(' + ui.value + 'deg)'});
-                        $(".rotation_value").text(ui.value);
-                    },
-                    stop: function( event, ui ) {
-                        self.rotation = ui.value;
-                        self.models.forEach(function(m){
-                            m.save('rotation', ui.value);
-                        });
-                    }
-                });
-            } else {
-                $rc.find('.rotation-slider').slider("destroy");
-            }
-        },
-
-        clear: function() {
-            try {
-                this.$el.find('.rotation-slider').slider("destroy");
-            } catch (e) {}
-            return this;
+            this.$el.find('.rotation-controls').toggleClass('rotation-controls-shown');
         },
 
         render: function() {
@@ -1282,8 +1091,7 @@
                 sum_sizeZ = 0,
                 rotation,
                 z_projection,
-                zp,
-                self = this;
+                zp;
             if (this.models) {
                 this.models.forEach(function(m, i){
                     rotation = m.get('rotation');
@@ -1312,9 +1120,10 @@
                 var anyBig = this.models.any(function(m){return m.is_big_image()});
                 // if all panels have sizeZ == 1, don't allow z_projection
                 // Don't currently support Z_projection on Big images.
-                z_projection_disabled = ((sum_sizeZ === this.models.length) || anyBig);
+                const z_projection_disabled = ((sum_sizeZ === this.models.length) || anyBig);
 
                 html = this.template({
+                    projectionIconUrl,
                     'z_projection_disabled': z_projection_disabled,
                     'rotation': rotation,
                     'z_projection': z_projection});
@@ -1323,3 +1132,5 @@
             return this;
         }
     });
+
+    export default RightPanelView;

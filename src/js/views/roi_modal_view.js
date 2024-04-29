@@ -1,10 +1,24 @@
 
+import Backbone from "backbone";
+import _ from "underscore";
+import $ from "jquery";
+import Mousetrap from "mousetrap";
 
-var RoiModalView = Backbone.View.extend({
+import FigureModel from "../models/figure_model";
+import RoiList from "../models/roi_model";
+import ShapeManager from "../shape_editor/shape_manager";
+import FigureColorPicker from "../views/colorpicker";
 
-        template: JST["src/templates/shapes/shape_toolbar_template.html"],
+import shape_toolbar_template from '../../templates/shapes/shape_toolbar.template.html?raw';
+import roi_zt_buttons from '../../templates/modal_dialogs/roi_zt_buttons.template.html?raw';
+import RoiLoaderView from './roi_loader_view';
+import { hideModal, getJson } from "./util";
 
-        roi_zt_buttons_template: JST["src/templates/modal_dialogs/roi_zt_buttons.html"],
+export const RoiModalView = Backbone.View.extend({
+
+        template: _.template(shape_toolbar_template),
+
+        roi_zt_buttons_template: _.template(roi_zt_buttons),
 
         el: $("#roiModal"),
 
@@ -58,7 +72,8 @@ var RoiModalView = Backbone.View.extend({
             });
 
             // Here we handle init of the dialog when it's shown...
-            $("#roiModal").bind("show.bs.modal", function(){
+            document.getElementById('roiModal').addEventListener('shown.bs.modal', () => {
+                console.log("ROI modal shown...")
                 // Clone the 'first' selected panel as our reference for everything
                 self.m = self.model.getSelected().head().clone();
 
@@ -132,10 +147,11 @@ var RoiModalView = Backbone.View.extend({
             var $btn = $(".loadRois", this.$el)
                 .attr({'disabled': 'disabled'});
             $btn.parent().attr('title', 'Checking for ROIs...');  // title on parent div - still works if btn disabled
-            $.getJSON(url, function(data){
+
+            getJson(url).then((data) => {
                 this.omeroRoiCount = data.roi;
                 this.renderToolbar();
-            }.bind(this));
+            });
         },
 
         loadRoisFirstPage: function (event) {
@@ -171,8 +187,9 @@ var RoiModalView = Backbone.View.extend({
         // Load Shapes from OMERO and render them
         loadRois: function() {
             var iid = this.m.get('imageId');
-            var roiUrl = ROIS_JSON_URL + '?image=' + iid + '&limit=' + this.roisPageSize + '&offset=' + (this.roisPageSize * this.roisPage);
-            $.getJSON(roiUrl, function(data){
+            let url = BASE_OMEROWEB_URL + 'api/v0/m/rois/';
+            var roiUrl = url + '?image=' + iid + '&limit=' + this.roisPageSize + '&offset=' + (this.roisPageSize * this.roisPage);
+            getJson(roiUrl).then((data) => {
                 this.Rois.set(data.data);
                 $(".loadRois", this.$el).prop('disabled', false);
                 $("#roiModalRoiList table").empty();
@@ -182,10 +199,6 @@ var RoiModalView = Backbone.View.extend({
                 $("#roiModalRoiList table").append(roiLoaderView.el);
                 roiLoaderView.render();
                 this.renderPagination();
-            }.bind(this))
-            .fail(function(jqxhr, textStatus, error){
-                console.log("fail", arguments);
-                alert("Failed to load ROIS: " + textStatus + ", " + error);
             });
         },
 
@@ -220,7 +233,7 @@ var RoiModalView = Backbone.View.extend({
         },
 
         showTempShape: function(args) {
-            shape = args[0];
+            const shape = args[0];
             this.shapeManager.deleteShapesByIds([this.TEMP_SHAPE_ID]);
             if (shape) {
                 var viewport = this.m.getViewportAsRect();
@@ -290,7 +303,7 @@ var RoiModalView = Backbone.View.extend({
                 panel.save({'shapes': shapesJson, 'theZ': theZ, 'theT': theT});
             });
 
-            $("#roiModal").modal("hide");
+            hideModal("roiModal");
             return false;
         },
 
@@ -413,12 +426,12 @@ var RoiModalView = Backbone.View.extend({
                 "If you copy a region from the Crop dialog (under the 'Preview' tab), you can paste it here to create a new Rectangle."],
                 tip;
             if (this.rotated) {
-                tip = "<span class='label label-warning'>Warning</span> " +
+                tip = "<span class='badge text-bg-primary'>Warning</span> " +
                       "This image panel is rotated in the figure, but this ROI editor can't work with rotated images. " +
                       "The image is displayed here <b>without</b> rotation, but the ROIs you add will be applied " +
                       "correctly to the image panel in the figure.";
             } else {
-                tip = "<span class='label label-primary'>Tip</span> " + tips[parseInt(Math.random() * tips.length, 10)];
+                tip = "<span class='badge text-bg-primary'>Tip</span> " + tips[parseInt(Math.random() * tips.length, 10)];
             }
             $("#roiModalTip").show().html(tip);
         },
@@ -494,7 +507,7 @@ var RoiModalView = Backbone.View.extend({
                         type="button" class="btn btn-default btn-sm roisNextPage">
                         Next
                     </button>
-                    <button type="button" class="btn btn-default btn-sm dropdown-toggle" title="Select page" data-toggle="dropdown">
+                    <button type="button" class="btn btn-default btn-sm dropdown-toggle" title="Select page" data-bs-toggle="dropdown">
                         <span class="caret"></span>
                     </button>
                     <ul class="dropdown-menu" role="menu">

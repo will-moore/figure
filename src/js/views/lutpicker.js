@@ -17,13 +17,24 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+import Backbone from "backbone";
+import $ from "jquery";
+import _ from 'underscore';
+import * as bootstrap from "bootstrap"
+
+import lut_picker_template from '../../templates/lut_picker.template.html?raw';
+import { showModal } from "./util";
+
+import lutsPng from "../../images/luts_10.png";
+// Need to handle dev vv built (omero-web) paths
+const lutsPngUrl = STATIC_DIR + lutsPng;
 
 // Should only ever have a singleton on this
 var LutPickerView = Backbone.View.extend({
 
     el: $("#lutpickerModal"),
 
-    template: JST["src/templates/lut_picker.html"],
+    template: _.template(lut_picker_template),
 
     LUT_NAMES: ["16_colors.lut",
                 "3-3-2_rgb.lut",
@@ -66,6 +77,7 @@ var LutPickerView = Backbone.View.extend({
                 "yellow_hot.lut"],
 
     initialize:function () {
+        this.lutModal = new bootstrap.Modal('#lutpickerModal');
     },
 
     
@@ -76,7 +88,7 @@ var LutPickerView = Backbone.View.extend({
 
     handleSubmit: function() {
         this.success(this.pickedLut);
-        $("#lutpickerModal").modal('hide');
+        this.lutModal.hide();
     },
 
     pickLut: function(event) {
@@ -86,20 +98,19 @@ var LutPickerView = Backbone.View.extend({
 
         // Update preview to show LUT
         var bgPos = this.getLutBackgroundPosition(lutName);
-        $(".lutPreview", this.el).css('background-position', bgPos);
+        $(".lutPreview", this.el).css({'background-position': bgPos, 'background-image': `url(${lutsPngUrl})`});
         // Enable OK button
         $("button[type='submit']", this.el).removeAttr('disabled');
     },
 
     loadLuts: function() {
         var url = WEBGATEWAYINDEX + 'luts/';
-        var promise = $.getJSON(url);
-        return promise;
+        let cors_headers = { mode: 'cors', credentials: 'include' };
+        return fetch(url, cors_headers).then(rsp => rsp.json());
     },
 
     getLutBackgroundPosition: function(lutName) {
         var lutIndex = this.LUT_NAMES.indexOf(lutName);
-        var css = {};
         if (lutIndex > -1) {
             return '0px -' + ((lutIndex * 50) +2) + 'px';
         } else {
@@ -117,20 +128,18 @@ var LutPickerView = Backbone.View.extend({
 
     show: function(options) {
 
-        $("#lutpickerModal").modal('show');
+        showModal("lutpickerModal");
 
         // save callback to use on submit
         if (options.success) {
             this.success = options.success;
         }
 
-        this.loadLuts().done(function(data){
+        this.loadLuts().then((data) => {
+            console.log('data', data);
             this.luts = data.luts;
             this.render();
-        }.bind(this)).fail(function(){
-            // E.g. 404 with Older OMERO (pre 5.3.0)
-            this.render();
-        }.bind(this));
+        });
     },
 
     render:function() {
@@ -147,8 +156,12 @@ var LutPickerView = Backbone.View.extend({
                         'name': lut.name,
                         'displayName': this.formatLutName(lut.name)};
             }.bind(this));
-            html = this.template({'luts': luts});
+            html = this.template({'luts': luts, lutsPngUrl});
         }
         $(".modal-body", this.el).html(html);
     }
 });
+
+const FigureLutPicker = new LutPickerView();
+
+export default FigureLutPicker

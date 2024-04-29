@@ -14,8 +14,15 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import Backbone from "backbone";
+import $ from "jquery";
+import { showModal } from "./util";
+import * as marked from "marked";
+import DOMPurify from 'dompurify';
 
-var LegendView = Backbone.View.extend({
+import FigureModel from "../models/figure_model";
+
+export const LegendView = Backbone.View.extend({
 
         // Use 'body' to handle Menu: File > Add Figure Legend
         el: $("body"),
@@ -62,7 +69,7 @@ var LegendView = Backbone.View.extend({
 
         markdownInfo: function(event) {
             event.preventDefault();
-            $("#markdownInfoModal").modal('show');
+            showModal("markdownInfoModal");
         },
 
         collapseLegend: function(event) {
@@ -158,7 +165,7 @@ var LegendView = Backbone.View.extend({
                     $edit.text("Add Figure Legend");
                 } else {
                     $panel.show();
-                    legendText = markdown.toHTML( legendText );
+                    legendText = DOMPurify.sanitize(marked.parse(legendText));
                     $legend.html(legendText);
                     $edit.text("Edit Figure Legend");
                 }

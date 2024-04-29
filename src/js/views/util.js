@@ -17,6 +17,10 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+import $ from "jquery";
+import * as bootstrap from 'bootstrap'
+import _ from 'underscore';
+
 // http://www.sitepoint.com/javascript-json-serialization/
 JSON.stringify = JSON.stringify || function (obj) {
     var t = typeof (obj);
@@ -53,21 +57,21 @@ if (!String.prototype.endsWith)
                          searchStr.length) === searchStr;
   };
 
-var showExportAsJsonModal = function(figureJSON) {
+export const showExportAsJsonModal = function(figureJSON) {
     var figureText = JSON.stringify(figureJSON);
-    $('#exportJsonModal').modal('show');
+    showModal('exportJsonModal');
     $('#exportJsonModal textarea').text(figureText);
 }
 
-var saveFigureToStorage = function (figureJSON) {
+export const saveFigureToStorage = function (figureJSON) {
     window.sessionStorage.setItem(LOCAL_STORAGE_RECOVERED_FIGURE, JSON.stringify(figureJSON));
 }
 
-var clearFigureFromStorage = function() {
+export const clearFigureFromStorage = function() {
     window.sessionStorage.removeItem(LOCAL_STORAGE_RECOVERED_FIGURE);
 }
 
-var recoverFigureFromStorage = function() {
+export const recoverFigureFromStorage = function() {
     var storage = window.sessionStorage;
     var recoveredFigure = storage.getItem(LOCAL_STORAGE_RECOVERED_FIGURE);
     var figureObject;
@@ -79,7 +83,9 @@ var recoverFigureFromStorage = function() {
     return figureObject;
 }
 
-var figureConfirmDialog = function(title, message, buttons, callback) {
+var confirmModal = new bootstrap.Modal('#confirmModal');
+
+export function figureConfirmDialog(title, message, buttons, callback) {
     var $confirmModal = $("#confirmModal"),
         $title = $(".modal-title", $confirmModal),
         $body = $(".modal-body", $confirmModal),
@@ -100,7 +106,7 @@ var figureConfirmDialog = function(title, message, buttons, callback) {
         .addClass('btn-primary');
 
     // show modal
-    $confirmModal.modal('show');
+    confirmModal.show();
 
     // default handler for 'cancel' or 'close'
     $confirmModal.one('hide.bs.modal', function() {
@@ -122,11 +128,11 @@ var figureConfirmDialog = function(title, message, buttons, callback) {
     });
 };
 
-if (OME === undefined) {
-    var OME = {};
+if (window.OME === undefined) {
+    window.OME = {};
 }
 
-OPEN_WITH = [];
+export let OPEN_WITH = [];
 
 OME.setOpenWithEnabledHandler = function(id, fn) {
     // look for id in OPEN_WITH
@@ -173,7 +179,7 @@ $.prototype.slider = function() {
 
 
 // Get coordinates for point x, y rotated around cx, cy, by rotation degrees
-var rotatePoint = function (x, y, cx, cy, rotation) {
+export function rotatePoint(x, y, cx, cy, rotation) {
     let length = Math.sqrt(Math.pow((x - cx), 2) + Math.pow((y - cy), 2));
     let rot = Math.atan2((y - cy), (x - cx));
     rot = rot + (rotation * (Math.PI / 180));  // degrees to rad
@@ -185,7 +191,8 @@ var rotatePoint = function (x, y, cx, cy, rotation) {
 $(function(){
 
 
-    $(".draggable-dialog").draggable();
+    // TODO: find replacement for jquery-ui
+    // $(".draggable-dialog").draggable();
 
     $('#previewInfoTabs a').click(function (e) {
         e.preventDefault();
@@ -194,10 +201,10 @@ $(function(){
 
 
     // Header button tooltips
-    $('.btn-sm').tooltip({container: 'body', placement:'bottom', toggle:"tooltip"});
-    $('.figure-title').tooltip({container: 'body', placement:'bottom', toggle:"tooltip"});
+    // $('.btn-sm').tooltip({container: 'body', placement:'bottom', toggle:"tooltip"});
+    // $('.figure-title').tooltip({container: 'body', placement:'bottom', toggle:"tooltip"});
     // Footer button tooltips
-    $('.btn-xs').tooltip({container: 'body', placement:'top', toggle:"tooltip"});
+    // $('.btn-xs').tooltip({container: 'body', placement:'top', toggle:"tooltip"});
 
 
     // If we're on Mac, update dropdown menus for keyboard short cuts:
@@ -222,3 +229,34 @@ $(function(){
     });
 
 });
+
+export function hideModals() {
+    // Calls hide() on all bootstrap Modal dialogs
+    $(".modal").each(function() {
+        const thisModal = bootstrap.Modal.getInstance(this);
+        if (thisModal) {
+            thisModal.hide();
+        }
+    });
+};
+
+export function showModal(modalId, args) {
+    let thisModal = bootstrap.Modal.getInstance(document.getElementById(modalId));
+    if (!thisModal) {
+        thisModal = new bootstrap.Modal("#" + modalId);
+    }
+    thisModal.show(args);
+}
+
+export function hideModal(modalId) {
+    let thisModal = bootstrap.Modal.getInstance(document.getElementById(modalId));
+    if (!thisModal) {
+        thisModal = new bootstrap.Modal("#" + modalId);
+    }
+    thisModal.hide();
+}
+
+export async function getJson (url) {
+    let cors_headers = { mode: 'cors', credentials: 'include' };
+    return fetch(url, cors_headers).then(rsp => rsp.json());
+}

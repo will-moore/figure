@@ -1,15 +1,29 @@
 
+    import Backbone from "backbone";
+    import _ from "underscore";
+    import $ from "jquery";
+    import * as marked from "marked";
+    import DOMPurify from 'dompurify';
+    import ShapeManager from "../shape_editor/shape_manager";
+
+    import figure_panel_template from '../../templates/figure_panel.template.html?raw';
+    import label_template from '../../templates/labels/label.template.html?raw';
+    import label_vertical_template from '../../templates/labels/label_vertical.template.html?raw';
+    import label_right_vertical_template from '../../templates/labels/label_right_vertical.template.html?raw';
+    import label_table_template from '../../templates/labels/label_table.template.html?raw';
+    import scalebar_panel_template from '../../templates/scalebar_panel.template.html?raw';
+    
     // -------------------------Panel View -----------------------------------
     // A Panel is a <div>, added to the #paper by the FigureView below.
     var PanelView = Backbone.View.extend({
         tagName: "div",
         className: "imagePanel",
-        template: JST["src/templates/figure_panel_template.html"],
-        label_template: JST["src/templates/labels/label_template.html"],
-        label_vertical_template: JST["src/templates/labels/label_vertical_template.html"],
-        label_right_vertical_template: JST["src/templates/labels/label_right_vertical_template.html"],
-        label_table_template: JST["src/templates/labels/label_table_template.html"],
-        scalebar_template: JST["src/templates/scalebar_panel_template.html"],
+        template: _.template(figure_panel_template),
+        label_template: _.template(label_template),
+        label_vertical_template: _.template(label_vertical_template),
+        label_right_vertical_template: _.template(label_right_vertical_template),
+        label_table_template: _.template(label_table_template),
+        scalebar_template: _.template(scalebar_panel_template),
 
 
         initialize: function(opts) {
@@ -147,10 +161,10 @@
             // But we don't want the previous image showing while we wait...
             if (this.model.is_big_image()) {
                 this.$img_panel.hide();
-                $(".glyphicon-refresh", this.$el).show();
+                $(".image_panel_spinner", this.$el).show();
             }
             this.$img_panel.one("load", function(){
-                $(".glyphicon-refresh", this.$el).hide();
+                $(".image_panel_spinner", this.$el).hide();
                 this.$img_panel.show();
             }.bind(this));
 
@@ -242,8 +256,7 @@
                     ljson.text = new_text + ljson.text.slice(last_idx);
                 }
 
-                // Markdown also escapes all labels so they are safe
-                ljson.text = markdown.toHTML(ljson.text);
+                ljson.text = DOMPurify.sanitize(marked.parse(ljson.text));
 
                 positions[l.position].push(ljson);
             });
@@ -288,8 +301,8 @@
                 sb_json.show_label = sb.show_label;
                 sb_json.symbol = sb.units;
                 // Use global LENGTH_UNITS to get symbol for unit.
-                if (window.LENGTH_UNITS && window.LENGTH_UNITS[sb.units]){
-                    sb_json.symbol = window.LENGTH_UNITS[sb.units].symbol;
+                if (LENGTH_UNITS && LENGTH_UNITS[sb.units]){
+                    sb_json.symbol = LENGTH_UNITS[sb.units].symbol;
                 }
 
                 var sb_html = this.scalebar_template(sb_json);
@@ -332,3 +345,5 @@
             return this;
         }
     });
+
+    export default PanelView

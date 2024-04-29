@@ -1,10 +1,21 @@
 
+import Backbone from "backbone";
+import _ from "underscore";
+import $ from "jquery";
+import Raphael from "raphael";
 
-var CropModalView = Backbone.View.extend({
+import FigureModel from "../models/figure_model";
+import RectView from "./raphael-rect";
+
+import {figureConfirmDialog, hideModal, getJson, rotatePoint} from "./util";
+
+import crop_modal_roi_template from '../../templates/modal_dialogs/crop_modal_roi.template.html?raw';
+
+export const CropModalView = Backbone.View.extend({
 
         el: $("#cropModal"),
 
-        roiTemplate: JST["src/templates/modal_dialogs/crop_modal_roi.html"],
+        roiTemplate: _.template(crop_modal_roi_template),
 
         model: FigureModel,
 
@@ -21,7 +32,7 @@ var CropModalView = Backbone.View.extend({
             var self = this;
 
             // Here we handle init of the dialog when it's shown...
-            $("#cropModal").bind("show.bs.modal", function(){
+            document.getElementById('cropModal').addEventListener('shown.bs.modal', () => {
                 // Clone the 'first' selected panel as our reference for everything
                 self.m = self.model.getSelected().head().clone();
                 self.listenTo(self.m, 'change:theZ change:theT', self.render);
@@ -254,7 +265,7 @@ var CropModalView = Backbone.View.extend({
                 };
             }
 
-            $("#cropModal").modal('hide');
+            hideModal("cropModal");
 
             // prepare callback for below
             function cropAndClose(deleteROIs) {
@@ -343,7 +354,7 @@ var CropModalView = Backbone.View.extend({
             var clipboardRects = [],
                 clipboard = this.model.get('clipboard');
             if (clipboard && clipboard.CROP) {
-                roi = clipboard.CROP;
+                var roi = clipboard.CROP;
                 clipboardRects.push({
                     x: roi.x, y: roi.y, width: roi.width, height: roi.height,
                     rotation: roi.rotation
@@ -388,8 +399,8 @@ var CropModalView = Backbone.View.extend({
                 iid = self.m.get('imageId');
             var offset = this.roisPageSize * this.roisPage;
             var url = BASE_WEBFIGURE_URL + 'roiRectangles/' + iid + '/?limit=' + self.roisPageSize + '&offset=' + offset;
-            $.getJSON(url, function(rsp){
-                data = rsp.data;
+            getJson(url).then(rsp => {
+                var data = rsp.data;
                 self.roisLoaded += data.length;
                 self.roisPage += 1;
                 self.roisCount = rsp.meta.totalCount;
@@ -478,9 +489,6 @@ var CropModalView = Backbone.View.extend({
                 $("#cropRoiMessage").html(`Loaded ${self.roisLoaded} / ${self.roisCount} ROIs`);
 
                 self.cachedRois = cachedRois;
-            }).error(function(){
-                var msg = "No rectangular ROIs found on this image in OMERO";
-                self.renderRois([], ".roisFromOMERO", msg);
             });
         },
 
@@ -556,11 +564,11 @@ var CropModalView = Backbone.View.extend({
         },
 
         zoomToFit: function() {
-            var max_w = 500,
-                max_h = 450,
-                w = this.m.get('orig_width'),
-                h = this.m.get('orig_height');
-                scale = Math.min(max_w/w, max_h/h);
+            var max_w = 500;
+            var max_h = 450;
+            var w = this.m.get('orig_width');
+            var h = this.m.get('orig_height');
+            var scale = Math.min(max_w/w, max_h/h);
             this.setZoom(scale * 100);
         },
 

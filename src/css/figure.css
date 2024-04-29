@@ -1,0 +1,1322 @@
+
+
+/* Copyright (C) 2014 University of Dundee & Open Microscopy Environment.
+ All rights reserved.
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as
+ published by the Free Software Foundation, either version 3 of the
+ License, or (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http:www.gnu.org/licenses/>.
+*/
+
+    body {
+        padding: 0;
+        --bs-body-font-size: 14px;
+    }
+
+    /* copied these from previous figure (Bootstrap 3.0.0) */
+    .btn-default {
+        /* only used for default buttons. Overridden for other buttons */
+        /* .btn-default class is still on lots of buttons (legacy from bootstrap 3.0.0) 
+         but now has no effect */
+        --bs-btn-border-color: #cccccc;;
+    }
+    /* prefer these colors */
+    .btn-success {
+        --bs-btn-bg: #5cb85c;
+        --bs-btn-border-color: #5cb85c;
+        --bs-btn-hover-bg: #58a558;
+        --bs-btn-hover-border-color: #58a558;
+        --bs-btn-active-bg: #58a558;
+        --bs-btn-active-border-color: #58a558;
+        --bs-btn-disabled-bg: #5cb85c;
+        --bs-btn-disabled-border-color: #4cae4c;
+    }
+
+    /* override bootstrap variables */
+    body .modal {
+        /* Make modal dialogs a bit wider */
+        --bs-modal-width: 650px;
+    }
+    h5, .h5 {
+        font-size: 1.0rem;
+    }
+
+    header {
+        background: gray;
+        height: 30px;
+        width: 100%;
+        position: fixed;
+        top: 0;
+    }
+
+    main {
+        position: fixed;
+        top: 45px;
+        bottom: 36px;
+        width: 100%;
+        overflow: auto;
+        background-color: #bbb;
+    }
+
+    #canvas_wrapper {
+        overflow: hidden;
+        position: relative;
+        margin: auto;
+    }
+
+    #canvas_wrapper svg {
+        z-index: 10;
+    }
+
+    #canvas {
+        z-index: 1;
+        background-color: #EFF1F4;
+        position: absolute;
+    }
+
+    .pixelated {
+        /* Try to show images in their original pixelated form Although 'pixelated' isn't 
+        supported yet: https://developer.mozilla.org/en-US/docs/Web/CSS/image-rendering
+        Code from http://phrogz.net/tmp/canvas_image_zoom.html */
+        image-rendering:optimizeSpeed;             /* Legal fallback */
+        image-rendering:-moz-crisp-edges;          /* Firefox        */
+        image-rendering:-o-crisp-edges;            /* Opera          */
+        image-rendering:-webkit-optimize-contrast; /* Safari         */
+        image-rendering:optimize-contrast;         /* CSS3 Proposed  */
+        image-rendering:crisp-edges;               /* CSS4 Proposed  */
+        image-rendering:pixelated;                 /* CSS4 Proposed  */
+        -ms-interpolation-mode:nearest-neighbor;   /* IE8+           */
+    }
+
+    /* #figure is a container of .paper */
+    #figure {
+        position: absolute;
+    }
+
+    .paper {
+        position: absolute;
+        border: solid gray 2px;
+        background: white;
+    }
+
+    .imagePanel {
+        position: absolute;
+        background: #fff;
+    }
+
+    .dragging{
+        background: none;
+    }
+
+    .imgContainer {
+        overflow: hidden;
+        width: 100%;
+        height: 100%;
+        position: absolute;
+    }
+    .imgContainer img, .imgContainer div {
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+
+    .dragging .imgContainer {
+        opacity: 0.7;
+    }
+
+    .img_panel{
+        position: absolute;
+    }
+
+    .export_pdf>span {
+        margin-left: 6px;
+    }
+
+    .wh_disabled {
+        /*opacity: 0.5;*/
+        display: none;
+    }
+
+    .figure-title {
+        color: #FFFFFF;
+        font-size: 18px;
+        left: 395px;
+        line-height: 20px;
+        padding: 12px 5px;
+        position: absolute;
+        right: 520px;
+        text-align: center;
+        height: 100%;
+    }
+    .figure-title:hover {
+        color: #eee;
+        text-decoration: underline;
+    }
+    /* when editing name */
+    .figure-title input {
+        width: 75%;
+        text-align: center;
+    }
+
+    /* -- Legend -- */
+    .legend-container {
+        z-index: 1;
+        position:fixed;
+        bottom: 54px;
+        width: 60%;
+        min-width:400px;
+        left:20%;
+        right:20%;
+    }
+
+    .legend-container .panel {
+        background-color:white;
+        margin-bottom: 0;
+        padding-bottom: 0;
+        overflow-y: auto;
+    }
+
+    /* from older bootstrap */
+    .panel {
+        border-radius: 4px;
+        -webkit-box-shadow: 0 1px 1px rgb(0 0 0 / 5%);
+        box-shadow: 0 1px 1px rgb(0 0 0 / 5%);
+    }
+    .panel-body {
+        padding: 15px;
+    }
+    .close {
+        float: right;
+        font-size: 21px;
+        font-weight: bold;
+        line-height: 1;
+        color: #000000;
+        text-shadow: 0 1px 0 #ffffff;
+        opacity: 0.2;
+        filter: alpha(opacity=20);
+    }
+
+    textarea.form-control {
+        height: auto;
+    }
+
+    .legend-expanded {
+        max-height: 250px;
+    }
+
+    .legend-collapsed {
+        max-height: 25px;
+    }
+
+    .legend-collapsed .panel-body{
+        padding: 3px 15px;
+    }
+
+    .legend-container .markdown-info {
+        display: none;
+    }
+    .legend-container .editing .markdown-info {
+        display: block;
+    }
+
+    /* hide appropriate collapse/hide button */
+    .legend-collapsed .collapse-legend{
+        display: none;
+    }
+    .collapse-legend, .expand-legend {
+        margin-right: 3px;
+        padding: 0;
+        border-width: 1px;
+        margin-top: 2px;
+    }
+    .legend-expanded .expand-legend{
+        display: none;
+    }
+
+    .legend-collapsed textarea {
+        position: relative;
+        top: -12px;
+        width: 95%;
+    }
+
+    .legend-footer {
+        position: absolute;
+        right: 0;
+        bottom: -54px;
+    }
+
+    footer {
+        background: rgb(97, 97, 97);
+        height: 36px;
+        width: 100%;
+        position: fixed;
+        bottom: 0;
+    }
+
+    footer .btn-xs, .legend-footer .btn-xs {
+        padding: 5px 10px;
+    }
+
+    footer input {
+        position: absolute;
+        left: 250px;
+        top: 5px;
+    }
+
+    #zoom_slider {
+        border: 1px solid #aaa;
+        height: 6px;
+        left: 15px;
+        position: absolute;
+        top: 9px;
+        width: 220px;
+        background: #bbb;
+    }
+
+    footer .zoom-paper-to-fit {
+        left: 300px;
+        position: absolute;
+        top: 3px;
+    }
+    #vp_zoom_value {
+        float: right;
+        width: 50px;
+        margin-top: 5px;
+    }
+    .toggle_channel {
+        border-radius: 6px 6px 6px 6px;
+        margin: 2px;
+        padding: 4px 4px 4px 6px;
+    }
+    .ch-btn-down {
+        background-image: url("../images/button-down.png")
+    }
+    .ch-btn-up {
+        background-image: url("../images/button-up.png")
+    }
+    .ch-btn-flat {
+        background-image: url("../images/button-flat.png")
+    }
+    .ch-btn-down, .ch-btn-up, .ch-btn-flat {
+        position: absolute;
+        left: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        background-size: 100% 100%;
+    }
+
+    .zp-btn-down {
+        background-image: url("../images/button-down-grey.png")
+    }
+
+    .pixel_size_div {
+        position: absolute;
+        top: -27px;
+        left: 100px;
+    }
+
+    .pixel_size_display {
+        cursor: pointer;
+    }
+
+    .new-label-form .input-group {
+        width:160px;
+        margin-right: 4px;
+    }
+
+    .scalebar_form .input-group {
+        width:80px;
+        margin-right: 4px;
+    }
+
+    .scalebar_form .form-group {
+        margin-bottom: 0;
+    }
+
+    .scalebar_form .row {
+        align-items: center;
+        display: flex;
+        gap: 3px;
+        margin-top: 3px;
+    }
+
+    .scalebar_form .scalebar_length {
+        padding-right: 0;
+    }
+
+    .scalebar_form .scalebar_text {
+        padding-right: 0;
+    }
+
+    .scalebar {
+        position: absolute;
+        margin: 5% !important;
+    }
+
+    .scalebar-label {
+        position: absolute;
+        left: -100%;
+        width: 300%;
+        text-align: center;
+        line-height: 1;
+    }
+    .label_topleft .scalebar-label, .label_topright .scalebar-label {
+        top: 3px;
+    }
+    .label_bottomleft .scalebar-label, .label_bottomright .scalebar-label {
+        bottom: 4px;
+    }
+
+    .edit-label-form {
+        position: relative;
+    }
+
+    .edit-label-form .input-group {
+        width:140px;
+        margin-right: 4px;
+    }
+
+    .form-inline .close {
+        color: #FF0000;
+        margin-left: 4px;
+        opacity: 0.5;
+    }
+    .label_layout {
+        position:absolute;
+    }
+    .label_layout p {
+        margin: 0;
+    }
+    .left_vlabels>div {
+        margin-bottom: 5px;
+    }
+    .right_vlabels>div {
+        margin-bottom: 5px;
+    }
+    .label_middle, .label_middle table, .label_middle td {
+        height:100%;
+        width:10000px;
+    }
+    .label_middle td {
+        vertical-align: middle;
+    }
+
+    .left_vlabels{
+        position: absolute;
+        right: 100%;
+        height: 300%;
+        top: -100%;
+        width: 300%;
+        text-align: center;
+        -webkit-transform: rotate(-90deg);
+        transform: rotate(-90deg);
+    }
+    .right_vlabels{
+        position: absolute;
+        left: 100%;
+        height: 300%;
+        top: -100%;
+        width: 300%;
+        text-align: center;
+        -webkit-transform: rotate(90deg);
+        transform: rotate(90deg);
+    }
+    .left_vlabels>div {
+        position: absolute;
+        bottom:0;
+        width:100%;
+    }
+    .right_vlabels>div {
+        position: absolute;
+        bottom:0;
+        width:100%;
+    }
+
+    .previewIdChange .green {
+        color: #0f0;
+    }
+    .previewIdChange .red {
+        color: #f00;
+    }
+    /* Classes here are generated in templates from 'top' etc See labelicon classes below */
+    .label_top {
+        bottom: 100%;
+        width: 300%;
+        left: -100%;
+        text-align: center;
+        margin-bottom: 3px;
+    }
+    .label_bottom {
+        top: 100%;
+        width: 300%;
+        left: -100%;
+        text-align:center;
+    }
+    .label_left {
+        right: 100%;
+        text-align: right;
+    }
+    .label_right {
+        left: 100%;
+        text-align: left;
+        width: 100%;
+    }
+    .label_topleft,
+    .label_topright,
+    .label_bottomleft,
+    .label_bottomright {
+        margin: 0 5px 1px 4px;
+    }
+
+    .label_topleft {
+        top: 0;
+        left: 0;
+        text-align: left;
+    }
+    .label_topright {
+        top: 0;
+        right: 0;
+        text-align: right;
+    }
+    .label_bottomleft {
+        bottom: 0;
+        left: 0;
+        text-align: left;
+    }
+    .label_bottomright {
+        bottom: 0;
+        right: 0;
+        text-align: right;
+    }
+
+    /* Transformation to font-based icons - These are split('-') to get position: 'top' etc */
+    .labelicon-topleft {
+        -webkit-transform: rotate(-90deg);
+        transform: rotate(-90deg)
+    }
+    .labelicon-bottomleft {
+        -webkit-transform: rotate(-180deg);
+        transform: rotate(-180deg);
+        position: relative;
+        top: 5px;
+    }
+    .labelicon-bottomright {
+        -webkit-transform: rotate(90deg);
+        transform: rotate(90deg);
+    }
+    .labelicon-top {
+        -webkit-transform: rotate(-90deg);
+        transform: rotate(-90deg);
+    }
+    .labelicon-left {
+        position: relative;
+        top: 5px;
+        -webkit-transform: rotate(-180deg);
+        transform: rotate(-180deg)
+    }
+    .labelicon-leftvert {
+        position: relative;
+        top: 5px;
+        -webkit-transform: rotate(-180deg);
+        transform: rotate(-180deg);
+    }
+    .labelicon-right {
+    }
+    .labelicon-bottom {
+        -webkit-transform: rotate(90deg);
+        transform: rotate(90deg);
+    }
+
+    .imageViewer, .ztSliders {
+        height: 270px;
+    }
+    .ztSliders {
+        position: absolute;
+        top: 0;
+    }
+
+    .vp_img {
+        position:absolute;
+    }
+    .vp_frame {
+        position: absolute;
+        left: 20px;
+        overflow: hidden;
+        border: solid black 1px;
+        background: #ddd;
+    }
+    #vp_z_label {
+        position:absolute;
+        top: -5px;
+        left: 1px;
+        padding: 0 2px;
+    }
+    #vp_z_value {
+        position: absolute;
+        bottom: 20px;
+        right: 95%;
+        white-space: nowrap;
+    }
+    #vp_t_label {
+        position: absolute;
+        left: 6px;
+        bottom: -2px;
+    }
+    #vp_t_value {
+        position: absolute;
+        left: 240px;
+        bottom: 0;
+    }
+    #vp_deltaT {
+        position: absolute;
+        left: 100px;
+        bottom: -19px;
+    }
+    .no-padding {
+        padding: 0;
+    }
+    .tab-footer {
+        border-top: solid #dddddd 1px;
+        margin-top:15px;
+        padding-top: 4px;
+    }
+    .tab-pane .ui-slider {
+        margin: 13px 5px 6px;
+        border: 4px solid #fff;
+        cursor: pointer;
+    }
+    #viewportContainer {
+        position: relative;
+    }
+    .tab-pane .ui-slider-handle {
+        background: none repeat scroll 0 0 #DDDDDD;
+        border: 1px solid #aaa;
+        height: 14px;
+    }
+    .tab-pane .ui-slider-horizontal {
+        height: 10px;
+        width: 215px;
+    }
+    .tab-pane .ui-slider-horizontal .ui-slider-handle {
+        top: -6px;
+    }
+    #vp_z_slider {
+        width: 10px;
+        height: 188px;
+        margin-right: 10px;
+        margin-top: 30px;
+        float: left;
+        position: relative;
+    }
+    .image-display-options {
+        padding: 2px;
+    }
+    .rotation-slider {
+        display: none;
+    }
+    .rotation-controls-shown .rotation-slider {
+        margin-left: 22px;
+        margin-top: 150px;
+        height: 2px;
+        background: #aaa;
+        transform: rotate(-90deg);
+        display: block;
+        width: 140px;
+        position: absolute;
+        transform-origin: left;
+        pointer-events: all;
+    }
+    .show-rotation {
+        padding: 2px;
+        min-width: 45px;
+    }
+    .rotation_value {
+        margin: -4px;
+    }
+    .z-projection {
+        padding: 1px 5px 5px;
+    }
+    .z-projection span{
+        background-image: url("../images/projection20.png");
+        width: 20px;
+        height: 20px;
+    }
+    .crop-btn span{
+        background-image: url("../images/crop20.png");
+        width: 20px;
+        height: 20px;
+    }
+    .tab-pane .ui-slider-vertical .ui-slider-handle {
+        left: -7px;
+    }
+    #channel_sliders>div{
+        position: relative;
+    }
+    .ch_slider {
+        width: 173px !important;
+        top: 8px;
+        left: 130px;
+        position: absolute !important;
+    }
+
+    /* Range input for channel sliders */
+
+    input[type=range] {
+        position: absolute;
+        width: 100%;
+        margin: 6px 0;
+        background-color: transparent;
+        -webkit-appearance: none;
+        z-index: 0;
+        height: 4px;
+      }
+      input[type=range]:focus {
+        outline: none;
+      }
+      input[type=range]::-webkit-slider-runnable-track {
+        border: 0;
+        border-radius: 1.3px;
+        width: 100%;
+        height: 4px;
+        cursor: pointer;
+      }
+      input[type=range]::-webkit-slider-thumb {
+        margin-top: -6px;
+        width: 16px;
+        height: 16px;
+        background: #dedddd;
+        border: 1px solid #aaaaaa;
+        border-radius: 3px;
+        cursor: pointer;
+        -webkit-appearance: none;
+        z-index: 10;
+        pointer-events: all;
+      }
+      input[type=range]:focus::-webkit-slider-runnable-track {
+        /* background: #ff1a1a; */
+      }
+      input[type=range]::-moz-range-track {
+        /* background: #ff0000; */
+        border: 0;
+        border-radius: 1.3px;
+        width: 100%;
+        height: 4px;
+        cursor: pointer;
+      }
+      input[type=range]::-moz-range-thumb {
+        width: 16px;
+        height: 16px;
+        background: #dedddd;
+        border: 1px solid #aaaaaa;
+        border-radius: 3px;
+        cursor: pointer;
+        pointer-events: all;
+      }
+      input[type=range]::-ms-track {
+        background: transparent;
+        border-color: transparent;
+        border-width: 6px 0;
+        color: transparent;
+        width: 100%;
+        height: 4px;
+        cursor: pointer;
+      }
+      input[type=range]::-ms-fill-lower {
+        /* background: #e60000; */
+        border: 0;
+        border-radius: 2.6px;
+      }
+      input[type=range]::-ms-fill-upper {
+        /* background: #ff0000; */
+        border: 0;
+        border-radius: 2.6px;
+      }
+      input[type=range]::-ms-thumb {
+        width: 16px;
+        height: 16px;
+        background: #dedddd;
+        border: 1px solid #aaaaaa;
+        border-radius: 3px;
+        cursor: pointer;
+        margin-top: 0px;
+        pointer-events: none;
+        /*Needed to keep the Edge thumb centred*/
+      }
+      input[type=range]:focus::-ms-fill-lower {
+        /* background: #ff0000; */
+      }
+      input[type=range]:focus::-ms-fill-upper {
+        /* background: #ff1a1a; */
+      }
+      /*TODO: Use one of the selectors from https://stackoverflow.com/a/20541859/7077589 and figure out
+      how to remove the virtical space around the range input in IE*/
+      @supports (-ms-ime-align:auto) {
+        /* Pre-Chromium Edge only styles, selector taken from hhttps://stackoverflow.com/a/32202953/7077589 */
+        input[type=range] {
+          margin: 0;
+          /*Edge starts the margin from the thumb, not the track as other browsers do*/
+        }
+      }
+    
+    #vp_z_slider input[type="range"], #vp_t_slider input[type="range"] {
+        background-color: #bbbbbb;
+        margin: 0;
+        height: 2px;
+    }
+
+    #vp_z_slider input[type="range"] {
+        transform: rotate(270deg);
+        transform-origin: left;
+        background-color: #bbbbbb;
+        margin: 0;
+        height: 2px;
+        left: 7px;
+        width: 180px;
+        bottom: 6px;
+    }
+    #vp_z_slider input.z_end {
+        background-color: transparent;
+    }
+
+    .ch_start, .ch_end {
+        position: absolute;
+        top: 0px;
+    }
+    .ch_start, .ch_end {
+        position: absolute;
+        top: 0px;
+    }
+    .ch_start input, .ch_end input {
+        width: 45px;
+        height: 33px;
+        text-align: center;
+    }
+    /* Hide spinner added to 'number' inputs */
+    input[type='number'] {
+        -moz-appearance:textfield;
+    }
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+    .ch_start {
+        left: 80px;
+        text-align: right;
+        width: 30px;
+    }
+    .ch_end {
+        right: 0;
+    }
+    .ui-slider-disabled a {
+        display: none;
+    }
+    #vp_t_slider {
+        position: absolute;
+        bottom: 11px;
+        left: 40px;
+        width: 180px;
+    }
+    #vp_zoom_slider {
+        background: #aaa;
+        height: 2px;
+        margin-top: 0;
+    }
+    .z-decrement, .z-increment, .time-decrement, .time-increment {
+        position: absolute;
+        padding: 2px;
+        display: none;
+    }
+    /* only show these buttons when container div is slider */
+    .time-increment, .time-decrement,
+    .z-increment, .z-decrement {
+        display: block;
+        padding: 0;
+    }
+    .time-increment:hover, .time-decrement:hover,
+    .z-increment:hover, .z-decrement:hover {
+        border: solid #ddd 1px;
+    }
+    .z-decrement {
+        left: -1px;
+        bottom: -14px;
+    }
+    .z-increment {
+        left: -1px;
+        top: -20px;
+    }
+    .time-decrement {
+        left: -20px;
+        top: -12px;
+    }
+    .time-increment {
+        right: -20px;
+        top: -12px;
+    }
+    .rotation-controls-shown {
+        background-color: #FAFAFA;
+        border: 1px solid #CCCCCC;
+        border-radius: 3px;
+        height: 200px;
+        padding: 2px;
+        position: absolute;
+        z-index: 100;
+    }
+    /* Over-riding Bootstrap Styles */
+    /* This helps with migration from bootstrap 3 to 5 */
+    .row {
+        margin-left: 0;
+        margin-right: 0;
+    }
+    .alert {
+        margin-bottom: 10px;
+        padding: 5px;
+    }
+    .modal-dialog {
+        left: 0;
+    }
+    .modal-header {
+        padding: 10px;
+    }
+    .modal-body {
+        padding: 15px;
+        max-height: 450px;
+        overflow-y: auto;
+    }
+    .non-modal-dialog {
+        left:auto;
+        margin-right: 0;
+        padding-top: 0;
+        top:55px;
+        right: 20px;
+        width: 375px;
+        z-index: 50;
+        pointer-events: none;
+        /* restrict height to avoid hidden behind footer */
+        position: absolute;
+        bottom: 40px;
+        height: inherit;
+    }
+    .tab-pane {
+        padding: 10px;
+    }
+    .btn-group > .btn.dropdown-toggle, .input-group-btn > .btn.dropdown-toggle {
+        padding-left: 3px;
+        padding-right: 3px;
+    }
+    .navbar-nav > li > a {
+        padding-bottom: 12px;
+        padding-top: 12px;
+    }
+    .navbar-fixed-top {
+        z-index:100;
+    }
+    .navbar {
+        min-height: 40px;
+        padding: 0;
+    }
+    .navbar>div.container {
+        max-width: 100%;
+    }
+    /** Add my class to boost size of font icons **/
+    .icon-buttons {
+        margin-right: 20px;
+    }
+    .icon-buttons .glyphicon {
+        font-size: 14px;
+    }
+    .icon-buttons .btn-sm {
+        padding: 4px 9px;
+    }
+    /* drop-down list uses radio buttons to choose grid gap */
+    /* copies from bootstrap .dropdown-menu li a */
+    .dropdown-menu li label {
+        font-weight: normal;
+        display: block;
+        padding: 3px 20px;
+        white-space: nowrap;
+    }
+    .dropdown-menu li label:hover{
+        color: #ffffff;
+        text-decoration: none;
+        background-color: #428bca;
+    }
+    /* hide radio buttons - show tick icon after checked input */
+    .dropdown-menu input { display: none; }
+    .dropdown-menu input + span { visibility: hidden; }
+    .dropdown-menu input:checked + span { visibility: visible; }
+
+    .atop i, .aheight i {
+        transform: rotate(90deg);
+        display: inline-block;
+    }
+    .abottom i {
+        transform: rotate(270deg);
+        display: inline-block;
+    }
+
+    .navbar-left .btn-sm {
+        font-size: 14px;
+        padding: 4px 8px;
+    }
+
+    .toggleRoi {
+        transition: transform 300ms ease;
+        width: 22px;
+        font-size: 150%;
+        display: block;
+        line-height: 16px;
+    }
+    .rotate90 {
+        transform: rotate(90deg);
+    }
+
+    @keyframes spin {
+        100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); }
+    }
+
+    .navbar .bi-arrow-repeat, .imgContainer .bi-arrow-repeat {
+        animation: spin 2s linear infinite;
+        display: inline-block;
+    }
+
+    .imgContainer .image_panel_spinner {
+        position: relative;
+    font-size: 100px;
+    left: 50%;
+    top: 50%;
+    display: block;
+    color: #bbb;
+    width: min-content;
+    padding-right: 2px;
+    margin-left: -53px;
+    margin-top: -70px;
+    }
+
+    .colorpicker span,
+    .label-color span:first-child,
+    .shape-color span:first-child {
+        border: solid 1px #bbb;
+    }
+
+    /* remove border from above */
+    .colorpicker .reverseIntensity span {
+        border-width: 0;
+    }
+
+    .lutOption {
+        text-align: left;
+    }
+
+    .lutOption span {
+        width: 85px;
+        display: inline-block;
+    }
+
+    .ch_slider .ui-slider-range {
+        background-size: 100% 50px;
+        background-position: 0 0;
+        background-repeat: no-repeat;
+    }
+
+    .lutBg {
+        /* NB: when updating png, consider using different name to avoid cache */
+        background-size: 100% 1950px;  /* height is stretched 5x (50px per LUT) */
+        background-repeat: no-repeat;
+    }
+
+    .ch_start_slider::before {
+        content: "";
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        background-image: var(--lutPng);   /* each lut is 10px high */
+        background-size: 100% 1950px;  /* height is stretched 5x (50px per LUT) */
+        background-repeat: no-repeat;
+        transform: scaleX(var(--scaleX));
+        background-position: var(--bgPos);
+      }
+
+    .channel-btn {
+        width: 59px;
+        padding-left: 6px;
+        padding-right: 6px;
+        overflow: hidden;
+        white-space: nowrap;
+        max-width: 60px;
+        height: 36px;
+        border-width: 0;
+    }
+
+    .font-white {
+        color: white;
+    }
+
+    .lutPreview {
+        /* background-image css add by lutpicker.js */
+        width: 100%;
+        height: 45px;
+        border-top: 1px solid #e5e5e5;
+    }
+
+    .small-thumb {
+        width: 40px;
+        height: 40px;
+    }
+
+    .missingThumb {
+        background: #eeeeee;
+    }
+
+    .table-sort-btn {
+        padding-left: 3px;
+        padding-right: 3px;
+    }
+
+    #figure_files th .btn-sm:first-child {
+        padding-right: 0
+    }
+    #figure_files th .btn-sm:last-child {
+        padding-left: 0
+    }
+    .muted {
+        opacity: 0.4;
+    }
+
+    #cropViewer {
+        width: 500px;
+        height: 450px;
+        overflow: auto;
+        position: relative;
+    }
+
+    #crop_paper svg {
+        cursor:  crosshair;
+        cursor:  url("../images/crop20.png") 10 10, crosshair;
+        z-index: 10;
+    }
+
+    .roiPickMe {
+        cursor: pointer;
+    }
+    /* On hover, use selected blue color */
+    .roiPickMe:hover {
+        background-color: rgb(190, 212, 253);
+    }
+
+    .roiViewer {
+        overflow: hidden;
+        position: relative;
+    }
+
+    table.roiPicker {
+        margin-bottom: 5px;
+    }
+
+    .setAspectRatio {
+        position: absolute;
+        right: 120px;
+        top: 31px;
+        padding: 3px;
+        width: 23px;
+        height: 24px;
+        outline: none !important;
+        font-size: 1.2rem;
+    }
+
+    /*  color-picker  */
+
+    .colorpickerOption {
+        background: conic-gradient(red, orange, yellow, green, blue, red);
+    }
+
+    .hueBg {
+        background-image: url("../images/hue.png");
+        background-size: 20px 50px;
+        background-position: 0 100%;
+    }
+
+    .colorpicker-hue {
+        height: 200px;
+        width: 30px;
+        background-size: 200px 200px;
+    }
+    .colorpicker-saturation {
+        width: 200px;
+        height: 200px;
+        background-size: 200px 200px;
+    }
+    .colorpicker-color {
+        display: none;
+    }
+
+    .oldNewColors {
+        width: 120px;
+        position: absolute;
+        top: 15px;
+        right: 15px;
+    }
+
+    .oldNewColors li {
+        height: 60px;
+    }
+
+    .rgb-group {
+        position: absolute;
+        top: 40px;
+        width: 120px;
+        right: 175px;
+    }
+
+    .pickedColors {
+        position: absolute;
+        right: 15px;
+        bottom: 15px;
+        width: 120px;
+    }
+
+    .pickedColors .btn-group {
+        margin-left: 0 !important;
+    }
+
+    .pickedColors .btn {
+        height: 30px;
+        width: 30px;
+    }
+
+    /** ------------------- Shape Editor styles --------------------- **/
+
+    .shape_canvas {
+        position: absolute;
+        top: 0px;
+        left: 0px;
+    }
+    .image_wrapper img {
+        width: 100%;
+        height: 100%;
+    }
+    .new_shape_layer {
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        width: 100%;
+        height: 100%;
+    }
+
+    /** toolbar buttons **/
+
+    .btn-toolbar span.glyphicon {
+        display: block;
+        width: 16px;
+        height: 16px;
+        position: relative;
+        background-repeat: no-repeat;
+    }
+
+    .roiModalForm .modal-body {
+        max-height: 650px;
+        padding-top: 10px;
+    }
+
+    .roi_toolbar {
+        overflow: visible;
+        padding-bottom: 10px;
+    }
+
+    .roi_toolbar .pressed {
+        background: #ddd;
+    }
+
+    .roiModalRoiItem .glyphicon {
+        display: block;
+        width: 16px;
+        height: 16px;
+    }
+
+    .select-icon {
+        background-image: url("../images/cursor-icon-16.png");
+    }
+    .rect-icon{
+        background-image: url("../images/square-outline-icon-16.png");
+    }
+    .line-icon{
+        background-image: url("../images/line-icon-16.png");
+    }
+    .arrow-icon{
+        background-image: url("../images/arrow-icon-16.png");
+    }
+    .ellipse-icon{
+        background-image: url("../images/ellipse-icon-16.png");
+    }
+    .polygon-icon{
+        background-image: url("../images/polygon-icon-16.png");
+    }
+    .polyline-icon{
+        background-image: url("../images/polyline-icon-16.png");
+    }
+    .roiModalRoiItem {
+        cursor: pointer;
+    }
+    .roiModalRoiItem.shape td {
+        border-top: 0 solid transparent;
+    }
+    .roiViewport {
+        position:relative;
+        width:55px;
+        height:55px;
+    }
+    .roiModalRoiItem .btn-sm {
+        padding: 3px 6px;
+        visibility: hidden;
+    }
+    .roiModalRoiItem:hover .btn-sm {
+        visibility: visible;
+    }
+
+    /* Copied from Bootstrap 3.1 - Removed in bootstrap 5.3 */
+    .btn-xs {
+        padding: 1px 5px;
+        font-size: 12px;
+        line-height: 1.5;
+        border-radius: 3px;
+    }
+
+    #xywh_table {
+        margin-bottom: 0;
+    }
+
+    .aspectRatioSelected .okSign {
+        display: inline-block
+    }
+    .okSign {
+        display: none;
+        position: absolute;
+        font-size:12px;
+        color:green;
+        left: 0;
+        top: 0;
+    }
+
+    #openFigureModal .dropdown-toggle {
+        /* th buttons to match other th labels */
+        font-size: var(--bs-body-font-size);
+    }
+
+    #openFigureModal th label {
+        padding-top: 8px;
+    }
+
+    #openFigureModal a {
+        text-decoration: none;
+    }

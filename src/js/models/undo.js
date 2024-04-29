@@ -18,9 +18,11 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-/*global Backbone:true */
+import Backbone from "backbone";
+import _ from "underscore";
+import $ from "jquery";
 
-var UndoManager = Backbone.Model.extend({
+export const UndoManager = Backbone.Model.extend({
     defaults: function(){
         return {
             undo_pointer: -1
@@ -224,7 +226,7 @@ var UndoManager = Backbone.Model.extend({
     }
 });
 
-var UndoView = Backbone.View.extend({
+export const UndoView = Backbone.View.extend({
     
     el: $("#edit_actions"),
     
@@ -263,7 +265,7 @@ var UndoView = Backbone.View.extend({
 
     // If modal dialags are visible, we want to ignore undo/redo
     modal_visible: function() {
-        return $("div.modal:visible").length > 0;
+        return $("div.modal.show").length > 0;
     },
 
     undo: function(event) {

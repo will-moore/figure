@@ -1,7 +1,18 @@
 
 // Events, show/hide and rendering for various Modal dialogs.
+import Backbone from "backbone";
+import _ from "underscore";
+import $ from "jquery";
+import * as bootstrap from "bootstrap";
 
-    var DpiModalView = Backbone.View.extend({
+import preview_id_change_template from '../../templates/modal_dialogs/preview_id_change.template.html?raw';
+import paper_setup_modal_template from '../../templates/modal_dialogs/paper_setup_modal.template.html?raw';
+
+import FigureModel from "../models/figure_model";
+import FigureColorPicker from "../views/colorpicker";
+import { hideModal } from "./util";
+
+    export const DpiModalView = Backbone.View.extend({
 
         el: $("#dpiModal"),
 
@@ -11,7 +22,7 @@
 
             var self = this;
             // when dialog is shown, clear and render
-            $("#dpiModal").bind("show.bs.modal", function(){
+            document.getElementById('dpiModal').addEventListener('shown.bs.modal', () => {
                 self.render();
             });
         },
@@ -44,7 +55,7 @@
                 }
                 p.save(toset);
             });
-            $("#dpiModal").modal('hide');
+            hideModal("dpiModal");
             return false;
         },
 
@@ -58,11 +69,11 @@
         }
     });
 
-    var PaperSetupModalView = Backbone.View.extend({
+    export const PaperSetupModalView = Backbone.View.extend({
 
         el: $("#paperSetupModal"),
 
-        template: JST["src/templates/modal_dialogs/paper_setup_modal_template.html"],
+        template: _.template(paper_setup_modal_template),
 
         model:FigureModel,
 
@@ -93,7 +104,7 @@
         initialize: function(options) {
 
             var self = this;
-            $("#paperSetupModal").bind("show.bs.modal", function(){
+            document.getElementById('paperSetupModal').addEventListener('shown.bs.modal', () => {
                 self.render();
             });
             // don't update while typing
@@ -114,7 +125,7 @@
                 pageColor = $('.pageColor', $form).val().replace('#', ''),
                 dx, dy;
 
-            var w_mm, h_m, w_pixels, h_pixels;
+            var w_mm, h_mm, w_pixels, h_pixels;
             if (size == 'A4') {
                 w_mm = 210;
                 h_mm = 297;
@@ -203,7 +214,7 @@
             }
 
             this.model.set(json);
-            $("#paperSetupModal").modal('hide');
+            hideModal("paperSetupModal");
         },
 
         rerender: function() {
@@ -226,11 +237,11 @@
     });
 
 
-    var SetIdModalView = Backbone.View.extend({
+    export const SetIdModalView = Backbone.View.extend({
 
         el: $("#setIdModal"),
 
-        template: JST["src/templates/modal_dialogs/preview_Id_change_template.html"],
+        template: _.template(preview_id_change_template),
 
         model:FigureModel,
 
@@ -246,7 +257,8 @@
             var self = this;
 
             // when dialog is shown, clear and render
-            $("#setIdModal").bind("show.bs.modal", function(){
+            const myModalEl = document.getElementById('setIdModal')
+            myModalEl.addEventListener('shown.bs.modal', () => {
                 delete self.newImg;
                 self.render();
             });
@@ -272,7 +284,15 @@
                 idInput = $('input.imgId', this.$el).val();
 
             // get image Data
-            $.getJSON(BASE_WEBFIGURE_URL + 'imgData/' + parseInt(idInput, 10) + '/', function(data){
+            const imgDataUrl = BASE_WEBFIGURE_URL + 'imgData/' + parseInt(idInput, 10) + '/';
+            $.ajax({
+                url: imgDataUrl,
+                xhrFields: {
+                    withCredentials: true, mode: 'cors'
+                },
+                dataType: 'json',
+                // work with the response
+                success: function( data ) {
 
                 // just pick what we need
                 var newImg = {
@@ -301,6 +321,7 @@
                 };
                 self.newImg = newImg;
                 self.render();
+                }
             }).fail(function(event) {
                 alert("Image ID: " + idInput +
                     " could not be found on the server, or you don't have permission to access it");
@@ -342,9 +363,8 @@
                 if (typeof match2 != 'undefined') {
                     match = match && match2;
                 }
-                var m = match ? "ok" : "flag";
-                var rv = "<span class='glyphicon glyphicon-" + m + "'></span>";
-                return rv;
+                if (match) return "<i class='green bi bi-check-lg'></i>";
+                return "<i class='red bi bi-flag-fill'></i>";
             };
 
             // thumbnail
@@ -438,7 +458,7 @@
     });
 
 
-    var AddImagesModalView = Backbone.View.extend({
+    export const AddImagesModalView = Backbone.View.extend({
 
         el: $("#addImagesModal"),
 
@@ -452,14 +472,15 @@
         },
 
         initialize: function(options) {
+            this.modal = new bootstrap.Modal('#addImagesModal');
             this.figureView = options.figureView;   // need this for .getCentre()
 
             var self = this;
             // when the modal dialog is shown, focus the input
-            $("#addImagesModal").bind("focus",
+            $("#addImagesModal").on("focus",
                 function() {
                     setTimeout(function(){
-                        $('input.imgIds', self.$el).focus();
+                        $('#addImagesModal input.imgIds').trigger("focus");
                     },20);
                 });
         },

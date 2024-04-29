@@ -1,17 +1,47 @@
 
     // -------------------------- Backbone VIEWS -----------------------------------------
+    import Backbone from "backbone";
+    import $ from "jquery";
+    import * as bootstrap from 'bootstrap'
+    import Mousetrap from "mousetrap";
+    import _ from "underscore";
+    import backboneMousetrap from "./backbone.mousetrap"
 
+    import FigureModel from "../models/figure_model";
+    import {FigureFileList, FileListView} from "./files";
+
+    import {AddImagesModalView, DpiModalView, PaperSetupModalView, SetIdModalView } from "./modal_views";
+
+    import {CropModalView} from "./crop_modal_view";
+    import {ChgrpModalView} from "./chgrp_modal_view";
+    import {RoiModalView} from "./roi_modal_view";
+    import {LegendView} from "./legend_view";
+    import {LabelFromMapsModal} from "./labels_from_maps_modal";
+    import PanelView from "./panel_view";
+    import {figureConfirmDialog,
+        recoverFigureFromStorage,
+        clearFigureFromStorage,
+        showExportAsJsonModal,
+        showModal,
+        hideModals,
+        hideModal} from "./util";
+
+    // This extends Backbone to support keyboardEvents
+    backboneMousetrap(_, Backbone, Mousetrap);
 
     // var SelectionView = Backbone.View.extend({
-    var FigureView = Backbone.View.extend({
+    const FigureView = Backbone.View.extend({
 
         el: $("#body"),
 
         initialize: function(opts) {
 
+            // Bootstrap router
+            this.app = opts.app;
+
             // Delegate some responsibility to other views
             new AlignmentToolbarView({model: this.model});
-            new AddImagesModalView({model: this.model, figureView: this});
+            this.addImagesModal = new AddImagesModalView({model: this.model, figureView: this});
             new SetIdModalView({model: this.model});
             new PaperSetupModalView({model: this.model});
             new CropModalView({model: this.model});
@@ -21,8 +51,8 @@
             new LegendView({model: this.model});
             new LabelFromMapsModal({model: this.model});
 
-            this.figureFiles = new FileList();
-            new FileListView({model:this.figureFiles, figureModel: this.model});
+            this.figureFiles = new FigureFileList();
+            this.fileListViewModal = new FileListView({model:this.figureFiles, figureModel: this.model});
 
             // set up various elements and we need repeatedly
             this.$main = $('main');
@@ -35,6 +65,8 @@
             this.$saveOption = $("li.save_figure");
             this.$saveAsOption = $("li.save_as");
             this.$deleteOption = $("li.delete_figure");
+
+            this.aboutModal = new bootstrap.Modal('#aboutModal');
 
             var self = this;
 
@@ -52,14 +84,14 @@
                 }
             };
 
-            $("#zoom_slider").slider({
-                max: 400,
-                min: 10,
-                value: 75,
-                slide: function(event, ui) {
-                    self.model.set('curr_zoom', ui.value);
-                }
+            $("#zoom_slider").on("input", (event) => {
+                self.model.set('curr_zoom', event.target.value);
             });
+
+            // enable export (script is available)
+            if (EXPORT_ENABLED) {
+                $("button.export_pdf").removeAttr("disabled");
+            }
 
             // respond to zoom changes
             this.listenTo(this.model, 'change:curr_zoom', this.renderZoom);
@@ -126,7 +158,7 @@
         // If any modal is visible, we want to ignore keyboard events above
         // All those methods should use this
         modal_visible: function() {
-            return $("div.modal:visible").length > 0;
+            return $("div.modal.show").length > 0;
         },
 
         // choose an export option from the drop-down list
@@ -136,8 +168,8 @@
             var $target = $(event.target);
 
             // Only show check mark on the selected item.
-            $(".export_options .glyphicon-ok").css('visibility', 'hidden');
-            $(".glyphicon-ok", $target).css('visibility', 'visible');
+            $(".export_options .bi-check-lg").css('visibility', 'hidden');
+            $(".bi-check-lg", $target).css('visibility', 'visible');
 
             // Update text of main export_pdf button.
             var txt = $target.attr('data-export-option');
@@ -150,12 +182,12 @@
         paper_setup: function(event) {
             event.preventDefault();
 
-            $("#paperSetupModal").modal();
+            showModal("paperSetupModal");
         },
 
         show_about_dialog: function(event) {
             event.preventDefault();
-            $("#aboutModal").modal();
+            this.aboutModal.show();
         },
 
         // Editing name workflow...
@@ -192,6 +224,7 @@
         // Heavy lifting of PDF generation handled by OMERO.script...
         export_pdf: function(event){
 
+            console.log("Export pdf...");
             event.preventDefault();
 
             // Status is indicated by showing / hiding 3 buttons
@@ -208,7 +241,7 @@
             $pdf_inprogress.show();
 
             // Map from HTML to script options
-            opts = {"PDF": "PDF",
+            const opts = {"PDF": "PDF",
                 "PDF & images": "PDF_IMAGES",
                 "TIFF": "TIFF",
                 "TIFF & images": "TIFF_IMAGES",
@@ -285,7 +318,7 @@
                                 clearInterval(i);
                             }
 
-                        }).error(function() {
+                        }).fail(function() {
                             clearInterval(i);
                         });
 
@@ -358,14 +391,13 @@
 
         goto_newfigure: function(event) {
             if (event) event.preventDefault();
-            $(".modal").modal('hide');
 
             var self = this;
             var callback = function() {
                 self.model.clearFigure();
-                $('#addImagesModal').modal();
+                self.addImagesModal.modal.show();
                 // navigate will be ignored if we're already on /new
-                app.navigate("new/", {trigger: true});
+                self.app.navigate("new/", {trigger: true});
             };
 
             if (this.model.get("unsaved")) {
@@ -392,28 +424,36 @@
             event.preventDefault();
             var fileId = this.model.get('fileId'),
                 figName = this.model.get('figureName');
-            if(fileId) {
+            if (fileId) {
                 this.model.set("unsaved", false);   // prevent "Save?" dialog
-                this.figureFiles.deleteFile(fileId, figName);
+                // may not have fetched files...
+                var msg = "Delete '" + figName + "'?";
+                var self = this;
+                if (confirm(msg)) {
+                    $.post( BASE_WEBFIGURE_URL + "delete_web_figure/", { fileId: fileId })
+                        .done(function(){
+                            self.figureFiles.removeFile(fileId);
+                            self.app.navigate("", {trigger: true});
+                        });
+                }
             }
         },
 
         chgrp_figure: function (event) {
             event.preventDefault();
-            $(".modal").modal('hide');
-            $("#chgrpModal").modal('show');
+            hideModals();
+            showModal("chgrpModal");
         },
 
         open_figure: function(event) {
             event.preventDefault();
-            $(".modal").modal('hide');
 
-            var self = this,
-                currentFileId = self.model.get('fileId');
+            hideModals();
+
+            var self = this;
             var callback = function() {
                 // Opening modal will trigger fetch of files
-                // Handled in FileListView
-                $("#openFigureModal").modal();
+                self.fileListViewModal.modal.show();
             };
 
             if (this.model.get("unsaved")) {
@@ -442,7 +482,7 @@
             if (event) {
                 event.preventDefault();
             }
-            this.$saveBtn.tooltip('hide');
+            // this.$saveBtn.tooltip('hide');
             this.save_figure();
         },
 
@@ -484,7 +524,8 @@
             var figureName = prompt("Enter Figure Name", defaultName);
 
             var nav = function(data){
-                app.navigate("file/"+data);
+                console.log("nav", data, self.app);
+                self.app.navigate("file/"+data);
                 // in case you've Saved a copy of a file you can't edit
                 self.model.set('canEdit', true);
             };
@@ -506,23 +547,21 @@
         import_json: function(event) {
             event.preventDefault();
 
-            var showImport = function() {
-              $('#importJsonModal').modal('show');
-            };
-            
-            app.checkSaveAndClear(function() { showImport()} );
+            var allowCancel = true;
+            this.model.checkSaveAndClear(function() {
+                showModal('importJsonModal')
+            }, allowCancel);
         },
 
         import_json_form: function(event) {
-          event.preventDefault();
+            event.preventDefault();
           
-          var $form = $('.importJsonForm'),
-              figureJSON = $('.form-control', $form).val();
-          this.model.figure_fromJSON(figureJSON);
+            var figureJSON = $('.importJsonForm .form-control').val();
+            this.model.figure_fromJSON(figureJSON);
             
-          $('#importJsonModal').modal('hide');
-          $('#importJsonModal textarea').val('');
-          this.render();
+            hideModal('importJsonModal');
+            $('#importJsonModal textarea').val('');
+            this.render();
         },
         
         copy_selected_panels: function(event) {
@@ -632,8 +671,6 @@
         renderZoom: function() {
             var curr_zoom = this.model.get('curr_zoom'),
                 zoom = curr_zoom * 0.01,
-                newWidth = parseInt(this.orig_width * zoom, 10),
-                newHeight = parseInt(this.orig_height * zoom, 10),
                 scale = "scale("+zoom+", "+zoom+")";
 
             // We want to stay centered on the same spot...
@@ -730,7 +767,7 @@
             zm = (zm * 100) >> 0;
 
             m.set('curr_zoom', zm) ;
-            $("#zoom_slider").slider({ value: zm });
+            $("#zoom_slider").val(zm);
 
             // seems we sometimes need to wait to workaround bugs
             var self = this;
@@ -774,10 +811,10 @@
                 btnText = (canEdit || noFile) ? "Save" : "Can't Save";
             this.$saveBtn.text(btnText);
             if (this.model.get('unsaved') && (canEdit || noFile)) {
-                this.$saveBtn.addClass('btn-success').removeClass('btn-default').removeAttr('disabled');
+                this.$saveBtn.removeAttr('disabled');
                 this.$saveOption.removeClass('disabled');
             } else {
-                this.$saveBtn.addClass('btn-default').removeClass('btn-success').attr('disabled', 'disabled');
+                this.$saveBtn.attr('disabled', 'disabled');
                 this.$saveOption.addClass('disabled');
             }
             if (this.model.get('fileId')) {
@@ -952,3 +989,10 @@
             }
         }
     });
+
+function createFigView (config) {
+    const figView = new FigureView(config);
+    return figView;
+}
+
+export default createFigView;

@@ -1,0 +1,143 @@
+
+    <div class="pixel_size_form" style="position:relative">
+        <div class="pixel_size_div">
+            Pixel Size:
+            <input class="input-sm form-control pixel_size_input" placeholder="Pixel Size (<%= pixel_size_symbol %>)"
+                    style="width:100px; display:none" value="<%= pixel_size_x %>">
+            <span class="pixel_size_display">
+                <% if (!pixel_size_x)
+                    {print('<span style="color:red">NOT SET</span>')}
+                else if (typeof pixel_size_x === 'number')
+                    {print(pixel_size_x.toFixed(3) + " " + pixel_size_symbol)}
+                else
+                    {print(pixel_size_x + " " + pixel_size_symbol)} %>
+            </span>
+        </div>
+    </div>
+<form class="scalebar_form">
+    <div class="row gy-2 gx-3 align-items-center" style="--bs-gutter-x: 0.3rem;">
+        <div class="col-auto input-group-sm">
+            <label class="col-form-label col-form-label-sm" style="width:50px">Length</label>
+        </div>
+        <div class="col-auto input-group-sm">
+          <input type="number" class="scalebar-length input-sm form-control"
+            placeholder="Length" value="<%= length %>" style="width:52px"/>
+        </div>
+        <div class="col-auto form-group btn-group scalebar_unit">
+            <button type="button" class="scalebar-units btn btn-outline-secondary btn-sm dropdown-toggle"
+                    title="Units" data-bs-toggle="dropdown">
+                <span class="dropdown_icon" data-unit="<%= units %>"><%= units_symbol %></span>
+                <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" role="menu">
+                <% _.each(unit_symbols, function(u){ %>
+                    <li><a class='dropdown-item' href='#'>
+                        <%= u.unit %> (<span class="dropdown_icon" data-unit="<%= u.unit %>"><%= u.symbol %></span>)
+                    </a></li>
+                <% }); %>
+            </ul>
+        </div>
+        <div class="form-group col-sm-auto btn-group">
+            <button type="button" class="label-position btn btn-outline-secondary btn-sm dropdown-toggle" 
+                    title="Position" data-bs-toggle="dropdown">
+                <!-- e.g. position 'topleft' -> class 'bi-box-arrow-in-up-left' -->
+                <i data-position="<%= position %>" class="bi-box-arrow-in-<%= position.replace('bottom', 'down-').replace('top', 'up-') %> dropdown_icon"></i>
+                <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" role="menu">
+                <li role="presentation" class="dropdown-header">Inside Corners</li>
+                <li><a class="dropdown-item" href="#">
+                    <i data-position="topleft" class="bi-box-arrow-in-up-left dropdown_icon"></i>
+                    Top Left</a>
+                </li>
+                <li><a class="dropdown-item" href="#">
+                    <i data-position="topright" class="bi-box-arrow-in-up-right dropdown_icon"></i>
+                    Top Right</a>
+                </li>
+                <li><a class="dropdown-item" href="#">
+                    <i data-position="bottomleft" class="bi-box-arrow-in-down-left dropdown_icon"></i>
+                    Bottom Left</a>
+                </li>
+                <li><a class="dropdown-item" href="#">
+                    <i data-position="bottomright" class="bi-box-arrow-in-down-right dropdown_icon"></i>
+                    Bottom Right</a>
+                </li>
+            </ul>
+        </div>
+        <div class="form-group col-sm-auto btn-group">
+            <button type="button" class="label-color btn btn-outline-secondary btn-sm dropdown-toggle" title="Label Color"
+                data-bs-toggle="dropdown">
+                <span class="dropdown_icon" data-color="<%= color %>" style="background-color:#<%= color %>">&nbsp &nbsp &nbsp</span>
+                <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu colorpicker" role="menu">
+                <!-- NB: dropdown_icon is picked on choosing dropdown, replaces icon in button above -->
+                <li><a class="dropdown-item" href="#">
+                    <span class="dropdown_icon" data-color="000000" style="background-color:#000">&nbsp &nbsp &nbsp</span>&nbsp Black
+                </a></li>
+                <li><a class="dropdown-item" href="#">
+                    <span class="dropdown_icon" data-color="0000FF" style="background-color:#00f">&nbsp &nbsp &nbsp</span>&nbsp Blue
+                </a></li>
+                <li><a class="dropdown-item" href="#">
+                    <span class="dropdown_icon" data-color="00FF00" style="background-color:#0f0">&nbsp &nbsp &nbsp</span>&nbsp Green
+                </a></li>
+                <li><a class="dropdown-item" href="#">
+                    <span class="dropdown_icon" data-color="FF0000" style="background-color:#f00">&nbsp &nbsp &nbsp</span>&nbsp Red
+                </a></li>
+                <li><a class="dropdown-item" href="#">
+                    <span class="dropdown_icon" data-color="FFFF00" style="background-color:#ff0">&nbsp &nbsp &nbsp</span>&nbsp Yellow
+                </a></li>
+                <li><a class="dropdown-item" href="#">
+                    <span class="dropdown_icon" data-color="FFFFFF" style="background-color:#fff">&nbsp &nbsp &nbsp</span>&nbsp White
+                </a></li>
+                <li><a class="dropdown-item" href="#">
+                    <span class="dropdown_icon" data-color="FF00FF" style="background-color:#f0f">&nbsp &nbsp &nbsp</span>&nbsp Magenta
+                </a></li>
+                <li><a class="dropdown-item" href="#">
+                    <span class="dropdown_icon" data-color="00FFFF" style="background-color:#0ff">&nbsp &nbsp &nbsp</span>&nbsp Cyan
+                </a></li>
+            </ul>
+        </div>
+
+        <div class="col-auto input-group-sm" style="flex: 1 1 auto; padding-right: 0">
+            <% if (show){ %>
+                <button type="submit" class="show_scalebar btn btn-sm btn-success float-end">Show</button>
+            <% } else { %>
+                <button type="button" class="hide_scalebar btn btn-outline-secondary btn-sm float-end">Hide</button>
+            <% } %>
+        </div>
+    </div>
+    <div class="row gy-2 gx-3 align-items-center" style="--bs-gutter-x: 0.3rem;">
+        <div class="col-auto input-group-sm">
+            <label class="col-form-label col-form-label-sm" style="width:50px">Height</label>
+        </div>
+        <div class="form-group col-auto scalebar_length input-group-sm">
+            <input type="number" class="label-text scalebar-height form-control input-sm" 
+            placeholder="Height" value="<%= height %>" style="width:52px" />
+        </div>
+        <div class="col-auto input-group-sm" style="margin-right: 10px;">
+            <label class="col-form-label col-form-label-sm">px</label>
+        </div>
+
+        <div class="col-auto input-group-sm">
+            <label class="form-check-label">Label</label>
+            <input type="checkbox" class="scalebar_label form-check-input" <% if (show_label) print("checked") %> />
+        </div>
+
+        <div class="col-auto btn-group" style="padding: 0; width: 50px;">
+            <button type="button" class="scalebar_font_size btn btn-outline-secondary btn-sm dropdown-toggle" title="Font Size"
+            data-bs-toggle="dropdown" style="width:33px; <% if (!show_label) print("display:none") %>">
+                <span class='dropdown_icon'><%= font_size %></span>
+                <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" role="menu">
+            <% _.each([6,8,10,12,14,18,21,24,36,48],function(p){
+                print ("<li><a class='dropdown-item' href='#'><span class='dropdown_icon'>"+p+"</span></a></li>")
+            }); %>
+            </ul>
+        </div>
+        <div class="form-group col-auto scalebar_text" style="padding-left: 2px;">
+            <% if (show_label) print("pt") %>
+        </div>
+    </div>
+</form>

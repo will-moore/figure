@@ -1,0 +1,1891 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>OMERO.figure</title>
+
+    <script>
+      // For dev, use this server to load/save figures (needs CORS enabled)
+      const dev_omeroweb_url = "http://localhost:4080/";
+      // These are updated by views.py when serving this page...
+      const BASE_OMEROWEB_URL = dev_omeroweb_url;
+      const EXPORT_ENABLED = false;
+      const WEBINDEX_URL = BASE_OMEROWEB_URL + "webclient/";
+      const BASE_WEBFIGURE_URL = BASE_OMEROWEB_URL + "figure/";
+      const WEBGATEWAYINDEX = BASE_OMEROWEB_URL + "webgateway/";
+      const MAKE_WEBFIGURE_URL = BASE_WEBFIGURE_URL + "make_web_figure/";
+      const ACTIVITIES_JSON_URL = WEBINDEX_URL + "activities_json/";
+      const API_BASE_URL_V0 = BASE_OMEROWEB_URL + "api/v0/"
+      const STATIC_DIR = "";
+      const APP_ROOT_URL = "";
+      const USER_ID = 0;
+      const PING_URL = "";
+      const USER_FULL_NAME = "OME";
+      // hard-code some units for use with vite...
+      const LENGTHUNITS = {
+        ANGSTROM: { symbol: "\u00c5", microns: 0.0001 },
+        CENTIMETER: { symbol: "cm", microns: 10000.0 },
+        KILOMETER: { symbol: "km", microns: 1000000000.0 },
+        METER: { symbol: "m", microns: 1000000.0 },
+        MICROMETER: { symbol: "\u00b5m", microns: 1 },
+        MILLIMETER: { symbol: "mm", microns: 1000.0 },
+        NANOMETER: { symbol: "nm", microns: 0.001 },
+      };
+      // ...this line replaced with full list by views.py
+      const LENGTH_UNITS = LENGTHUNITS;
+      const IS_PUBLIC_USER = false;
+      // Images larger than this are 'big' tiled images
+      const MAX_PLANE_SIZE = 10188864;
+
+      const LOCAL_STORAGE_RECOVERED_FIGURE = "recoveredFigure" + USER_ID;
+
+      // Hack! Since the iviewer openwith.js evaluates in global scope and it
+      // checks for... if ($ && $.jstree)... without this it errors and causes
+      // the Info panel to fail! jQuery is imported into other scripts as $
+      const $ = undefined;
+    </script>
+
+    <!-- Use cdn for vite, but this is served from static by Django -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css"
+    />
+  </head>
+  <body id="body">
+    <!-- Welcome splash-screen Modal -->
+    <div
+      class="modal"
+      id="welcomeModal"
+      tabindex="-1"
+      role="dialog"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Welcome to OMERO.figure</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body" style="padding: 25px 25px 35px 25px">
+            <p>To get started...</p>
+            <div
+              style="
+                margin-left: auto;
+                margin-right: auto;
+                display: block;
+                width: 70%;
+              "
+            >
+              <!-- Two buttons - use different elements in different ways -->
+              <button type="button" class="new_figure btn btn-lg btn-primary">
+                Create New File
+              </button>
+              <button
+                type="button"
+                class="open_figure btn btn-lg btn-primary float-end"
+              >
+                Open File
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- About OMERO.figure Modal -->
+    <div
+      class="modal"
+      id="aboutModal"
+      tabindex="-1"
+      role="dialog"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header" style="padding: 15px; text-align: center">
+            <h5 class="modal-title">About OMERO.figure</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div
+            class="modal-body"
+            style="padding: 25px 25px 35px 25px; text-align: center"
+          >
+            <p>
+              <strong>Version</strong>:
+              <span id="release_version"></span>
+            </p>
+            <p>
+              For more information, visit the
+              <a
+                target="new"
+                href="https://www.openmicroscopy.org/omero/figure/"
+                >OMERO.figure Home Page</a
+              >
+            </p>
+            <p>
+              &copy; 2013-{% now "Y" %} University of Dundee &amp; Open
+              Microscopy Environment<br />
+              OMERO is distributed under the terms of the GNU GPL and
+              OMERO.figure under AGPL.<br />
+              See:
+              <a target="new" href="http://www.openmicroscopy.org"
+                >openmicroscopy.org</a
+              >
+            </p>
+          </div>
+          <div class="modal-footer" style="margin-top: 0">
+            <button
+              type="button"
+              class="btn btn-default"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- ROI editing modal dialog -->
+    <div
+      class="modal"
+      id="roiModal"
+      data-backdrop="static"
+      tabindex="-1"
+      role="dialog"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog" style="width: 920px; max-width: 920px;">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" style="float: left; padding-right: 20px">
+              Edit ROIs
+            </h5>
+            <p style="margin: 4px 0 0 0">
+              Draw & edit ROIs and load ROIs from OMERO
+            </p>
+          </div>
+          <form class="roiModalForm" role="form">
+            <div class="modal-body row">
+              <div class="col-8">
+                <div
+                  id="roi_toolbar"
+                  class="roi_toolbar btn-toolbar"
+                  role="toolbar"
+                  aria-label="..."
+                ></div>
+                <div id="roiViewer" class="roiViewer">
+                  <!-- Show / add ROIs on image -->
+                  <!-- <div id="roi_image" style="position: absolute"> -->
+                  <img class="roi_image" style="position: absolute" />
+                  <!-- </div> -->
+                  <div
+                    id="roi_paper"
+                    class="roi_paper"
+                    style="
+                      position: absolute;
+                      top: 0;
+                      left: 0;
+                      overflow: hidden;
+                    "
+                  >
+                    <!-- svg is added here by Raphael.js -->
+                  </div>
+
+                  <div
+                    id="roi_zt_buttons"
+                    style="position: absolute; top: 5px; left: 5px"
+                  ></div>
+                </div>
+              </div>
+              <div id="roiModalSidebar" class="col-4" style="padding: 0">
+                <span
+                  id="roiPageControls"
+                  style="color: #999; line-height: 30px"
+                >
+                </span>
+                <div style="clear: both; padding: 5px"></div>
+                <div style="padding: 0; height: 550px; overflow-y: auto; position: relative;">
+                  <div id="roiModalRoiList">
+                    <table
+                      style="width: 100%"
+                      class="table table-hover table-condensed"
+                    ></table>
+                  </div>
+                  <p id="roiModalTip" style="position: absolute; top: 0"></p>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer" style="margin-top: 0">
+              <button
+                type="button"
+                class="btn btn-default"
+                data-bs-dismiss="modal"
+              >
+                Cancel
+              </button>
+              <button type="submit" class="btn btn-primary">OK</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <!-- Confirm modal for custom messages -->
+    <div
+      class="modal"
+      id="confirmModal"
+      data-backdrop="static"
+      tabindex="-1"
+      role="dialog"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Save Changes to Figure?</h5>
+          </div>
+          <div class="modal-body" style="padding: 25px 25px 35px 25px">
+            <p>Your changes will be lost if you don't save them</p>
+          </div>
+          <div class="modal-footer" style="margin-top: 0">
+            <button
+              type="button"
+              class="btn btn-default"
+              data-bs-dismiss="modal"
+            >
+              Don't Save
+            </button>
+            <button
+              type="submit"
+              class="btn btn-primary"
+              data-bs-dismiss="modal"
+            >
+              Save
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Paper setup Modal -->
+    <div
+      class="modal"
+      id="paperSetupModal"
+      tabindex="-1"
+      role="dialog"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Paper Setup</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <form class="paperSetupForm" role="form">
+            <div class="modal-body">
+              <!-- Content added from paper_setup_modal_template -->
+            </div>
+            <div class="modal-footer" style="margin-top: 0">
+              <button
+                type="button"
+                class="btn btn-default"
+                data-bs-dismiss="modal"
+              >
+                Cancel
+              </button>
+              <button type="submit" class="btn btn-primary">OK</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <!-- chgrp Modal -->
+    <div
+      class="modal"
+      id="chgrpModal"
+      tabindex="-1"
+      role="dialog"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Move Figure to Group</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <form class="chgrpForm" role="form">
+            <div class="modal-body">
+              <!-- Content added -->
+            </div>
+            <div class="modal-footer" style="margin-top: 0">
+              <button
+                type="button"
+                class="btn btn-default"
+                data-bs-dismiss="modal"
+              >
+                Cancel
+              </button>
+              <button type="submit" class="btn btn-primary">OK</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <!-- dpi modal -->
+    <div
+      class="modal"
+      id="dpiModal"
+      tabindex="-1"
+      role="dialog"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Resample Panels</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <form class="dpiModalForm form-horizontal" role="form">
+            <div class="modal-body">
+              <p>
+                Set a resolution range for selected panels. When exported as
+                <strong>PDF</strong>, panel images outside this dpi range will
+                be resampled as necessary.
+              </p>
+              <div
+                class="form-group"
+                style="margin-top: 15px; margin-bottom: 0px"
+              >
+                <label class="col-sm-4 control-label">
+                  Minimum (optional)
+                </label>
+                <div class="row">
+                  <div class="form-group col-sm-11">
+                    <input
+                      type="number"
+                      class="form-control min_export_dpi"
+                      placeholder="min"
+                    />
+                  </div>
+                  <div class="form-group col-sm-1">
+                    <label style="margin-top:8px">dpi</label>
+                  </div>
+                </div>
+              </div>
+              <div
+                class="form-group"
+                style="margin-top: 15px; margin-bottom: 0px"
+              >
+                <label class="col-sm-4 control-label">
+                  Maximum (required)
+                </label>
+                <div class="row">
+                  <div class="form-group col-sm-11">
+                    <input
+                      type="number"
+                      class="form-control max_export_dpi"
+                      placeholder="max"
+                    />
+                  </div>
+                  <div class="form-group col-sm-1">
+                    <label style="margin-top:8px">dpi</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer" style="margin-top: 0">
+              <button
+                type="button"
+                class="btn btn-default"
+                data-bs-dismiss="modal"
+              >
+                Cancel
+              </button>
+              <button type="submit" class="btn btn-primary">OK</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <!-- Crop Modal -->
+    <div
+      class="modal"
+      id="cropModal"
+      tabindex="-1"
+      role="dialog"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog" style="width: 920px; max-width: 920px;">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Crop to Region</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <form class="cropModalForm" role="form">
+            <div
+              class="modal-body row"
+              style="height: 500px; max-height: 500px; padding-bottom: 0"
+            >
+              <div class="col-4" style="height: 485px; overflow: auto">
+                <p>
+                  Click and drag on the image to choose a crop region or pick an
+                  ROI from the list below.
+                </p>
+                <h4>ROIs:</h4>
+                <table class="roiPicker roisFromFigure table table-condensed">
+                  <thead>
+                    <td>
+                      <strong
+                        title="Crop to rectangles on this image in the figure"
+                        >from Figure</strong
+                      >
+                    </td>
+                    <td></td>
+                    <td></td>
+                  </thead>
+                  <tbody>
+                    <!-- ROIs loaded here... -->
+                  </tbody>
+                </table>
+                <table
+                  class="roiPicker roisFromClipboard table table-condensed"
+                >
+                  <thead>
+                    <td>
+                      <strong title="Crop to rectangles copied to clipboard"
+                        >from Clipboard</strong
+                      >
+                    </td>
+                    <td></td>
+                    <td></td>
+                  </thead>
+                  <tbody>
+                    <!-- ROIs loaded here... -->
+                  </tbody>
+                </table>
+                <table class="roiPicker roisFromOMERO table table-condensed">
+                  <thead>
+                    <td>
+                      <strong
+                        title="Crop to rectangles saved on this image on the OMERO server"
+                        >from OMERO</strong
+                      >
+                    </td>
+                    <td>Z-index</td>
+                    <td>T-index</td>
+                  </thead>
+                  <tbody>
+                    <!-- ROIs loaded here... -->
+                  </tbody>
+                </table>
+                <button
+                  style="float: right"
+                  class="btn btn-sm btn-default loadRoiRects"
+                >
+                  Load More...
+                </button>
+                <!-- Additional message/status -->
+                <p style="color: #999; margin: 10px" id="cropRoiMessage"></p>
+              </div>
+              <div class="col-8">
+                <div id="cropViewer">
+                  <!-- Show / add ROIs on image -->
+                  <div
+                    id="crop_paper"
+                    style="
+                      position: absolute;
+                      top: 0;
+                      left: 0;
+                      right: 10px;
+                      bottom: 10px;
+                      overflow: hidden;
+                    "
+                  >
+                    <!-- svg is added here by Raphael.js -->
+                  </div>
+                  <img
+                    class="crop_image"
+                    style="position: absolute; top: 0; left: 0"
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer" style="margin-top: 0">
+              <button
+                type="button"
+                class="btn btn-default"
+                data-bs-dismiss="modal"
+              >
+                Cancel
+              </button>
+              <button type="submit" class="btn btn-primary" disabled="disabled">
+                OK
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <!-- SetId Modal - behaviour handled by SetIdModalView -->
+    <div
+      class="modal"
+      id="setIdModal"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="setIdLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="setIdLabel">Edit Image ID</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <p>Choose a new Image ID for the selected panels</p>
+            <form class="setIdForm row g-3">
+              <div class="col-auto">
+                <input
+                  type="text"
+                  class="form-control imgId"
+                  placeholder="Image ID"
+                />
+              </div>
+              <div class="col-auto">
+                <button type="submit" class="btn btn-primary mb-3 preview">Preview</button>
+              </div>
+            </form>
+            <div class="previewIdChange"></div>
+          </div>
+          <div class="modal-footer" style="margin-top: 0">
+            <button
+              type="button"
+              class="btn btn-default"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+            <button
+              type="submit"
+              class="btn btn-primary doSetId"
+              data-bs-dismiss="modal"
+              disabled="disabled"
+            >
+              Update
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Color-picker Modal -->
+    <div
+      class="modal"
+      id="colorpickerModal"
+      tabindex="-1"
+      role="dialog"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Color Picker</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <form class="colorpickerForm" role="form">
+            <div class="modal-body" style="height: 300px">
+              <input class="color-input" type="color" />
+              <div
+                id="demo_cont"
+                class="demo demo-auto inl-bl"
+                data-container="#demo_cont"
+                data-color="#ff0000"
+                data-inline="true"
+              >
+              </div>
+              <ul class="list-group oldNewColors">
+                <li class="list-group-item"></li>
+                <li class="list-group-item" style="border-top-width: 0"></li>
+              </ul>
+
+              <div
+                id="pickedColors"
+                class="btn-toolbar pickedColors"
+                role="toolbar"
+              >
+                <!-- picked colors added here by render() -->
+              </div>
+            </div>
+            <div class="modal-footer" style="margin-top: 0">
+              <button
+                type="button"
+                class="btn btn-default"
+                data-bs-dismiss="modal"
+              >
+                Cancel
+              </button>
+              <button type="submit" class="btn btn-primary">OK</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <!-- LUT-picker Modal -->
+    <div
+      class="modal"
+      id="lutpickerModal"
+      tabindex="-1"
+      role="dialog"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Lookup Table Chooser</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body row" style="height: 500px">
+            <p>Loading Lookup Tables...</p>
+          </div>
+          <div class="lutPreview lutBg">&nbsp</div>
+          <div class="modal-footer" style="margin-top: 0">
+            <button
+              type="button"
+              class="btn btn-default"
+              data-bs-dismiss="modal"
+            >
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-primary" disabled="disabled">
+              OK
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Add-Images Modal - behaviour handled by AddImagesModalView -->
+    <div
+      class="modal"
+      id="addImagesModal"
+      tabindex="-1"
+      role="dialog"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Add Images</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <form class="addImagesForm" role="form">
+            <div class="modal-body">
+              <p>
+                Add images to the figure by entering their IDs, separated by
+                commas.<br />
+                Hint: You can also select images in the webclient, click the
+                link in right panel, copy the URL and paste it here:
+              </p>
+              <div
+                class="form-group"
+                style="margin-top: 15px; margin-bottom: 0px"
+              >
+                <input
+                  type="text"
+                  class="form-control imgIds"
+                  placeholder="Image IDs or URL"
+                />
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-default"
+                data-bs-dismiss="modal"
+              >
+                Close
+              </button>
+              <button
+                type="submit"
+                class="btn btn-primary"
+                data-bs-dismiss="modal"
+                disabled="disabled"
+              >
+                Add Images
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <!-- /.modal -->
+
+    <!-- Export json Modal -->
+    <div
+      class="modal"
+      id="exportJsonModal"
+      tabindex="-1"
+      role="dialog"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog" style="width: 800px">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Export as JSON</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <form class="addImagesForm" role="form">
+            <div class="modal-body">
+              <p>
+                The current Figure is entirely defined by the JSON data below.
+              </p>
+              <div
+                class="form-group"
+                style="margin-top: 15px; margin-bottom: 0px"
+              >
+                <textarea class="form-control" rows="15"></textarea>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-default"
+                data-bs-dismiss="modal"
+              >
+                Close
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <!-- Import json Modal -->
+    <div
+      class="modal"
+      id="importJsonModal"
+      tabindex="-1"
+      role="dialog"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog" style="width: 800px">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Import from JSON</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <form class="importJsonForm" role="form">
+            <div class="modal-body">
+              <p>Paste the JSON data for the Figure into the text box below.</p>
+              <div
+                class="form-group"
+                style="margin-top: 15px; margin-bottom: 0px"
+              >
+                <textarea class="form-control" rows="15"></textarea>
+              </div>
+            </div>
+            <div class="modal-footer" style="margin-top: 0">
+              <button
+                type="button"
+                class="btn btn-default"
+                data-bs-dismiss="modal"
+              >
+                Cancel
+              </button>
+              <button type="submit" class="btn btn-primary">OK</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <!-- Markdown Info Modal -->
+    <div
+      class="modal"
+      id="markdownInfoModal"
+      tabindex="-1"
+      role="dialog"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog" style="width: 800px">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Label Formatting</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body" style="max-height: 542px">
+            <h4>Markdown formatting</h4>
+            <p>
+              You can use "Markdown" syntax to add formatting to plain text. For
+              example, **this text will be bold** and this *word* will be italic. 
+            </p>
+            <p>
+                NB: Links are not supported for panel labels.
+            </p>
+            <p>
+                NB: You can escape a certain character to not be interpreted as Markdown by adding \ in front of the 
+                character. Ex: "my_string_" is interpreted as "my<i>string</i>" but "my\_string\_" is now interpreted as "my_string_"
+            </p>
+
+            <table class="table">
+              <tr>
+                <td></td>
+                <th>This text will be formatted to...</th>
+                <th>...this text</th>
+              </tr>
+              <tr>
+                <th>BOLD</th>
+                <td>Use 2 stars for **bold**.</td>
+                <td>Use 2 stars for <strong>bold</strong>.</td>
+              </tr>
+              <tr>
+                <th>ITALIC</th>
+                <td>Use 1 star for *italic*.</td>
+                <td>Use 1 star for <i>italic</i>.</td>
+              </tr>
+              <tr>
+                <th>LINKS</th>
+                <td>Add links with [Link text](http://link_url.com)</td>
+                <td>Add links with <a href="#">Link text</a></td>
+              </tr>
+              <!--  <tr><td>You need to use 2 line breaks between paragraphs</td><td></td></tr> -->
+            </table>
+            <h4>Dynamic properties</h4>
+            <p>
+              The drop-down menu in the 'Add Labels' form allows you to create
+              labels based on Image metadata. Labels created with square
+              brackets indicate dynamic properties. The properties within the
+              square brackets will be dynamically updated upon changes.
+              Additional text can be added outside the square brackets and will
+              not be affected when the labels are displayed.<br />
+              The following table shows some examples, including the use of
+              dynamic properties and markdown together.
+            </p>
+            <table class="table">
+              <tr>
+                <td></td>
+                <th>This text will be formatted to...</th>
+                <th>...this text</th>
+              </tr>
+              <tr></tr>
+              <tr>
+                <th>X and Y in pixels</th>
+                <td>X:[x.pixel] - Y:[y.pixel]</td>
+                <td>X:52 - Y:89</td>
+              </tr>
+              <tr>
+                <th>X and Y in units</th>
+                <td>X:[x.unit] - Y:[y.unit]</td>
+                <td>X:0.43 &#181;m - Y:0.23 &#181;m</td>
+              </tr>
+              <tr>
+                <th>Width</th>
+                <td>Width: [width.pixel]</td>
+                <td>Width: 400</td>
+              </tr>
+              <tr>
+                <th>Height (with markdown formatting)</th>
+                <td>*Height*: **[height.pixel]**</td>
+                <td><i>Height</i>: <strong>300</strong></td>
+              </tr>
+              <tr>
+                <th>Width with decimal precision of 3</th>
+                <td>Width: [width.unit; precision=3]</td>
+                <td>Width: 4.450 &#181;m</td>
+              </tr>
+              <tr>
+                <th>Time relative to the 3rd frame</th>
+                <td>Time: [time.milliseconds; offset=3]</td>
+                <td>Time: -58 ms</td>
+              </tr>
+              <tr>
+                <th>
+                  Time with decimal precision 2, <br />relative to the 3rd frame
+                </th>
+                <td>Time: [time.seconds; precision=2; offset=3]</td>
+                <td>Time: -0.06 s</td>
+              </tr>
+              <tr>
+                <th>Z index with units <br/> (first plane is Z: 0.00 &#181;m), <br/>offset by 3 times the Z pixel size</th>
+                <td>Z: [z.unit; offset=3]</td>
+                <td>Z: -3.00 &#181;m </td>
+              </tr>
+              <tr>
+                <th>Z index (first plane is Z: 1) <br/>offset by 3</th>
+                <td>Z: [z.pixel; offset=3]</td>
+                <td>Z: -2 </td>
+              </tr>
+              <tr>
+                <th>Image ID</th>
+                <td>Image ID: [image.id]</td>
+                <td>Image ID: 23556</td>
+              </tr>
+              <tr>
+                <th>Dataset ID</th>
+                <td>Dataset ID: [dataset.id]</td>
+                <td>Dataset ID: 1654</td>
+              </tr>
+              <tr>
+                <th>Zoom</th>
+                <td>[zoom]</td>
+                <td>100 %</td>
+              </tr>
+            </table>
+            <h4>Legend</h4>
+            <p>
+              The figure legend will be included in the PDF info page when the
+              figure is exported.
+            </p>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-default"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- File Open Modal -->
+    <div
+      class="modal"
+      id="openFigureModal"
+      tabindex="-1"
+      role="dialog"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Open</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+
+          <div class="modal-body" style="height: 450px">
+            <table class="table table-sm">
+              <thead>
+                <tr>
+                  <th style="width: 7%"></th>
+                  <th style="width: 45%">
+                    <form class="row" role="form">
+                      <div class="col-auto">
+                        <label class="col-sm-2 control-label">Name</label>
+                      </div>
+                      <button
+                        type="button"
+                        class="col-auto btn btn-link btn-sm sort-name muted table-sort-btn"
+                      >
+                        <i class="bi-chevron-up" style="font-size: 1rem"></i>
+                      </button>
+                      <button
+                        type="button"
+                        class="col-auto btn btn-link btn-sm sort-name-reverse muted table-sort-btn"
+                      >
+                        <i class="bi-chevron-down" style="font-size: 1rem"></i>
+                      </button>
+                      <div class="col-auto" style="width: 60%">
+                        <input
+                          class="form-control"
+                          id="file-filter"
+                          placeholder="Filter"
+                        />
+                      </div>
+                    </form>
+                  </th>
+                  <th style="width: 25%">
+                    <form class="row" role="form">
+                      <div class="col-auto">
+                        <label class="col-sm-2 control-label">Created</label>
+                      </div>
+                      <button
+                        type="button"
+                        class="col-auto btn btn-link btn-sm sort-created sort table-sort-btn"
+                      >
+                        <i class="bi-chevron-up" style="font-size: 1rem"></i>
+                      </button>
+                      <button
+                        type="button"
+                        class="col-auto btn btn-link btn-sm sort-created-reverse muted table-sort-btn"
+                      >
+                        <i class="bi-chevron-down" style="font-size: 1rem"></i>
+                      </button>
+                    </form>
+                  </th>
+                  <th style="width: 12%">
+                    <div class="btn-group" title="Filter files by owner">
+                      <button
+                        type="button"
+                        class="btn dropdown-toggle"
+                        data-bs-toggle="dropdown"
+                      >
+                        <b>Owner</b> <span class="caret"></span>
+                      </button>
+                      <ul
+                        id="owner-menu"
+                        class="dropdown-menu float-end"
+                        role="menu"
+                      >
+                        <!-- owners added here -->
+                      </ul>
+                    </div>
+                  </th>
+                  <th style="width: 12%">
+                    <div class="btn-group" title="Filter files by group">
+                      <button
+                        type="button"
+                        class="btn dropdown-toggle"
+                        data-bs-toggle="dropdown"
+                      >
+                        <b>Group</b> <span class="caret"></span>
+                      </button>
+                      <ul
+                        id="group-menu"
+                        class="dropdown-menu float-end"
+                        role="menu"
+                      >
+                        <!-- groups added here -->
+                      </ul>
+                    </div>
+                  </th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div class="modal-footer" style="margin-top: 0px">
+            <button
+              title="Refresh file list"
+              type="button"
+              class="btn btn-default refresh-files"
+            >
+              Refresh
+            </button>
+            <button type="button" class="btn btn-default" data-bs-dismiss="modal">
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Labels from Map Annotations Modal -->
+    <div
+      class="modal"
+      id="labelsFromMapAnns"
+      tabindex="-1"
+      role="dialog"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog" style="width: 400px">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Labels from Key-Value Pairs</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <form class="labelsFromMapAnnsForm" role="form">
+            <div class="modal-body">
+              <div>                                                    
+                <input type="radio" id="all-keys" name="kvpChoice" value="all-keys" />
+                <label for="all-keys">All Keys </label>
+
+                <input type="radio" id="single-key" name="kvpChoice" value="single-key" checked />
+                <label for="single-key">Choose Key <small class="text-muted">(shows numbers of images)</small>:</label>
+            </div>
+              <select></select>
+              <div>
+                <label>
+                  Include Key in Label
+                  <input name="includeKey" type="checkbox" checked />
+                </label>
+              </div>
+              <hr />
+              <h5>Example Label</h5>
+              <div
+                id="exampleLabelFromMap"
+                class="well"
+                style="background-color: transparent; margin: 0"
+              ></div>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-default"
+                data-bs-dismiss="modal"
+              >
+                Close
+              </button>
+              <button type="submit" class="btn btn-primary">OK</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- -- END OF MODAL DIALOGS -- -->
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div class="container-fluid">
+        <a class="navbar-brand text-white" href="#">OMERO</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav mb-2 mb-lg-0">
+            <li class="nav-item dropdown px-2">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                File
+              </a>
+              <ul class="dropdown-menu">
+                <li class="new_figure">
+                  <a class="dropdown-item" href="#"> New </a>
+                </li>
+                <li class="open_figure">
+                  <a class="dropdown-item" href="#">
+                    <span class="float-end">Ctrl+O</span>
+                    Open...
+                  </a>
+                </li>
+                <li class="save_figure disabled">
+                  <a class="dropdown-item" href="#">
+                    <span class="float-end">Ctrl+S</span>
+                    Save
+                  </a>
+                </li>
+                <li class="save_as">
+                  <a class="dropdown-item" href="#">Save a Copy...</a>
+                </li>
+                <li
+                  class="local_storage"
+                  title="Open or Clear recovered data from local storage"
+                >
+                  <a class="dropdown-item" href="#">Local storage...</a>
+                </li>
+                <li class="export_json">
+                  <a class="dropdown-item" href="#">Export as JSON...</a>
+                </li>
+                <li class="import_json">
+                  <a class="dropdown-item" href="#">Import from JSON...</a>
+                </li>
+                <li class="delete_figure">
+                  <a class="dropdown-item" href="#">Delete</a>
+                </li>
+                <li class="chgrp_figure">
+                  <a class="dropdown-item" href="#">Move Figure to Group...</a>
+                </li>
+                <li class="paper_setup">
+                  <a class="dropdown-item" href="#">Paper Setup...</a>
+                </li>
+                <!-- Handled by LegendView -->
+                <li class="edit-legend">
+                  <a class="dropdown-item" href="#">Add Figure Legend...</a>
+                </li>
+              </ul>
+            </li>
+            <li class="nav-item dropdown px-2" id="edit_actions">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                Edit
+              </a>
+              <ul class="dropdown-menu">
+                <li class="undo disabled">
+                  <a class="dropdown-item" href="#">
+                    <span class="float-end">Ctrl+Z</span>
+                    Undo
+                  </a>
+                </li>
+                <li class="redo disabled">
+                  <a class="dropdown-item" href="#">
+                    <span class="float-end">Ctrl+Y</span>
+                    Redo
+                  </a>
+                </li>
+                <li class="copy disabled">
+                  <a class="dropdown-item" href="#">
+                    <span class="float-end">Ctrl+C</span>
+                    Copy
+                  </a>
+                </li>
+                <li class="paste disabled">
+                  <a class="dropdown-item" href="#">
+                    <span class="float-end">Ctrl+V</span>
+                    Paste
+                  </a>
+                </li>
+              </ul>
+            </li>
+            <li class="nav-item dropdown px-2">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                Help
+              </a>
+              <ul class="dropdown-menu">
+                <li class="about_figure">
+                  <a class="dropdown-item" href="#">About OMERO.figure</a>
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="https://www.openmicroscopy.org/omero/figure/"
+                    target="new"
+                  >
+                    Home Page
+                  </a>
+                </li>
+              </ul>
+            </li>
+          </ul>
+
+          <form class="d-flex me-auto">
+            <div class="btn-group">
+              <button
+                class="save_figure btn btn-sm btn-success"
+                title="Save Figure to OMERO"
+              >
+                Save
+              </button>
+            </div>
+          </form>
+
+          <div
+            class="navbar-header figure-title"
+            title=""
+            data-original-title="Edit Name"
+          >
+          </div>
+
+          <form id="alignment-toolbars" class="d-flex">
+            <div class="btn-group" style="margin-right: 20px">
+              <button
+                type="button"
+                class="btn btn-sm btn-light add_panel"
+                data-bs-toggle="modal"
+                data-bs-target="#addImagesModal"
+                title="Add images to figure"
+              >
+                Add Image
+              </button>
+              <button
+                type="button"
+                class="btn btn-sm btn-light delete_panel"
+                title="Delete selected panels"
+              >
+                Delete
+              </button>
+            </div>
+
+            <!-- Align-left and Grid buttons in nav bar -->
+            <div class="btn-group alignment-buttons" style="margin-right: 10px">
+              <button
+                type="button"
+                class="aleft btn btn-sm btn-light"
+                title="Align Left"
+              >
+                <i class="bi-text-left"></i>
+              </button>
+              <button
+                type="button"
+                class="aright btn btn-sm btn-light"
+                title="Align Right"
+              >
+                <i class="bi-text-right"></i>
+              </button>
+              <button
+                type="button"
+                class="agrid btn btn-sm btn-light"
+                title="Align To Grid"
+              >
+                <i class="bi-grid-3x3-gap-fill"></i>
+              </button>
+              <button
+                type="button"
+                class="btn btn-sm btn-light dropdown-toggle dropdown-toggle-split"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                <span class="visually-hidden">Toggle Dropdown</span>
+              </button>
+              <ul class="dropdown-menu">
+                <li>
+                  <label
+                    ><input
+                      type="radio"
+                      value="auto"
+                      checked
+                      name="grid_gap"
+                    /><span><i class="bi-check-lg"></i></span> 5% of panel
+                    width</label
+                  >
+                </li>
+                <li>
+                  <label
+                    ><input type="radio" value="0" name="grid_gap" /><span>
+                      <i class="bi-check-lg"></i>
+                    </span>
+                    0 px (no gap)</label
+                  >
+                </li>
+                <li>
+                  <label
+                    ><input type="radio" value="1" name="grid_gap" /><span>
+                      <i class="bi-check-lg"></i>
+                    </span>
+                    1 px</label
+                  >
+                </li>
+                <li>
+                  <label
+                    ><input type="radio" value="2" name="grid_gap" /><span>
+                      <i class="bi-check-lg"></i>
+                    </span>
+                    2 px</label
+                  >
+                </li>
+                <li>
+                  <label
+                    ><input type="radio" value="5" name="grid_gap" /><span>
+                      <i class="bi-check-lg"></i>
+                    </span>
+                    5 px</label
+                  >
+                </li>
+                <li>
+                  <label
+                    ><input type="radio" value="10" name="grid_gap" /><span>
+                      <i class="bi-check-lg"></i>
+                    </span>
+                    10 px</label
+                  >
+                </li>
+                <li>
+                  <label
+                    ><input type="radio" value="15" name="grid_gap" /><span>
+                      <i class="bi-check-lg"></i>
+                    </span>
+                    15 px</label
+                  >
+                </li>
+                <li>
+                  <label
+                    ><input type="radio" value="20" name="grid_gap" /><span>
+                      <i class="bi-check-lg"></i>
+                    </span>
+                    20 px</label
+                  >
+                </li>
+                <li>
+                  <label
+                    ><input
+                      type="radio"
+                      id="custom_grid_gap"
+                      value=""
+                      name="grid_gap"
+                    /><span><i class="bi-check-lg"></i></span> custom
+                    <span id="custom_grid_gap_label"></span>
+                  </label>
+                </li>
+              </ul>
+            </div>
+
+            <div class="btn-group alignment-buttons" style="margin-right: 10px">
+              <button
+                type="button"
+                disabled
+                class="atop btn btn-sm btn-light"
+                title="Align Top"
+              >
+                <i class="bi-text-left"></i>
+              </button>
+              <button
+                type="button"
+                disabled
+                class="abottom btn btn-sm btn-light"
+                title="Align Bottom"
+              >
+                <i class="bi-text-left"></i>
+              </button>
+              <button
+                type="button"
+                class="btn btn-sm btn-light dropdown-toggle"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+                title="Align Sizes"
+              >
+                <i class="bi-arrows-fullscreen"></i>
+              </button>
+              <ul class="dropdown-menu">
+                <li>
+                  <a href="#" class="dropdown-item awidth">
+                    <i class="bi-justify"></i>
+                    Align Width</a
+                  >
+                </li>
+                <li>
+                  <a href="#" class="dropdown-item aheight">
+                    <i class="bi-justify"></i>
+                    Align Height</a
+                  >
+                </li>
+                <li>
+                  <a href="#" class="dropdown-item asize">
+                    <i class="bi-arrows-fullscreen"></i>
+                    Width &amp; Height</a
+                  >
+                </li>
+                <li>
+                  <a href="#" class="dropdown-item amagnification">
+                    <i class="bi-arrows-fullscreen"></i>
+                    Align Magnification</a
+                  >
+                </li>
+              </ul>
+            </div>
+
+            <!-- Download and Script export buttons -->
+            <button
+              id="pdf_inprogress"
+              type="button"
+              style="display: none; margin-right: 10px"
+              class="btn btn-primary btn-sm"
+            >
+              Exporting Figure
+              <i class="bi-arrow-repeat"></i>
+            </button>
+
+            <a
+              id="pdf_download"
+              style="display: none; margin-right: 10px"
+              href="#"
+              target="_blank"
+              class="btn btn-primary btn-sm"
+              title="Download Figure"
+              ><i class="bi-download"></i
+            ></a>
+
+            <a id="script_error" href="#" target="script_error"
+              style="padding: 4px 10px; margin-right: 10px; display: none"
+              class="btn btn-danger btn-sm script-result" title="Show Error">
+                <i class="bi-exclamation-triangle"></i>
+            </a>
+
+            <button
+              type="button"
+              style="display: none"
+              class="btn btn-danger btn-sm"
+            >
+              <i class="bi-exclamation-triangle"></i>
+            </button>
+
+            <div class="btn-group">
+              <!-- button enabled if EXPORT_ENABLED is true -->
+              <button
+                type="button"
+                disabled="true"
+                data-export-option="PDF"
+                class="btn btn-success btn-sm export_pdf"
+              >
+                Export PDF
+              </button>
+              <button
+                type="button"
+                class="btn btn-success btn-sm dropdown-toggle dropdown-toggle-split"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                <span class="visually-hidden">Toggle Dropdown</span>
+              </button>
+              <ul
+                class="dropdown-menu dropdown-menu-end export_options"
+                role="menu"
+              >
+                <!-- NB: data-export-option attr used to label export button & handled by js on click -->
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="#"
+                    data-export-option="PDF"
+                    title="Export figure as PDF"
+                  >
+                    <i class="bi-check-lg"></i>
+                    PDF</a
+                  >
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="#"
+                    data-export-option="PDF & images"
+                    title="Export as PDF, in zip with panel images"
+                  >
+                    <i class="bi-check-lg" style="visibility: hidden"></i>
+                    PDF with images</a
+                  >
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="#"
+                    data-export-option="TIFF"
+                    title="Export figure as a TIFF image per page"
+                  >
+                    <i class="bi-check-lg" style="visibility: hidden"></i>
+                    TIFF (300 dpi)</a
+                  >
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="#"
+                    data-export-option="TIFF & images"
+                    title="Export as TIFF, in zip with panel images"
+                  >
+                    <i class="bi-check-lg" style="visibility: hidden"></i>
+                    TIFF with images</a
+                  >
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="#"
+                    data-export-option="to OMERO"
+                    title="Export each page as an Image in OMERO"
+                  >
+                    <i class="bi-check-lg" style="visibility: hidden"></i>
+                    New OMERO Image</a
+                  >
+                </li>
+              </ul>
+            </div>
+          </form>
+        </div>
+      </div>
+    </nav>
+
+    <main>
+      <div id="canvas_wrapper" class="canvas_wrapper">
+        <!-- <div id="canvas_overlay"></div> -->
+        <article id="canvas">
+          <div id="figure">
+            <!-- All panels etc are appended to figure. -->
+            <!-- We also dynamically add <div class="paper"> -->
+          </div>
+        </article>
+      </div>
+    </main>
+
+    <div id="js-legend" class="legend-container" style="z-index: 100">
+      <div class="panel panel-default legend-expanded editing">
+        <button
+          type="button"
+          class="close collapse-legend"
+          title="Collapse legend"
+          style="margin-right: 3px"
+        >
+          <i class="bi-chevron-double-down"></i>
+        </button>
+        <button
+          type="button"
+          class="close expand-legend"
+          title="Collapse legend"
+          style="margin-right: 3px"
+        >
+        <i class="bi-chevron-double-up"></i>
+        </button>
+        <button
+          type="button"
+          class="btn btn-link float-end markdown-info"
+          title="Use Markdown formatting. Click for more info..."
+        >
+          Legend formatting
+        </button>
+        <div class="legend panel-body">
+          <textarea
+            class="form-control"
+            rows="9"
+            style="resize: none"
+          ></textarea>
+        </div>
+      </div>
+      <div class="legend-footer">
+        <button
+          type="button"
+          class="btn btn-light btn-sm cancel-legend"
+          title=""
+          style="margin: 3px"
+          data-original-title="Cancel editing legend"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          class="btn btn-success btn-sm save-legend"
+          title=""
+          style="margin: 3px"
+          data-original-title="Save figure legend"
+        >
+          Save
+        </button>
+        <button
+          type="button"
+          class="btn btn-light btn-sm edit-legend"
+          title=""
+          style="margin: 3px; display: none"
+          data-original-title="Add figure legend"
+        >
+          Add Figure Legend
+        </button>
+      </div>
+    </div>
+
+    <footer>
+      <input
+        id="zoom_slider"
+        type="range"
+        min="10"
+        max="400"
+        title="Zoom"
+      >
+      <input
+        id="zoom_input"
+        type="text"
+        size="3"
+        maxlength="3"
+        disabled="disabled"
+        title="zoom"
+      />
+        <button
+          type="button"
+          class="zoom-paper-to-fit btn btn-light btn-sm"
+          title=""
+          data-original-title="Zoom paper to fit"
+        >
+          <i class="bi bi-arrows-angle-expand"></i>
+        </button>
+    </footer>
+
+    <!-- Hacked Bootstrap's modal dialog to be non-modal non-modal-dialog -->
+    <div class="modal non-modal-dialog" style="display: block; left: auto">
+      <div class="modal-content">
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button
+              class="nav-link"
+              id="info-tab"
+              data-bs-toggle="tab"
+              data-bs-target="#info-tab-pane"
+              type="button"
+              role="tab"
+              aria-controls="info-tab-pane"
+              aria-selected="true"
+            >
+              Info
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button
+              class="nav-link active"
+              id="preview-tab"
+              data-bs-toggle="tab"
+              data-bs-target="#preview-tab-pane"
+              type="button"
+              role="tab"
+              aria-controls="preview-tab-pane"
+              aria-selected="false"
+            >
+              Preview
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button
+              class="nav-link"
+              id="contact-tab"
+              data-bs-toggle="tab"
+              data-bs-target="#labelsTab"
+              type="button"
+              role="tab"
+              aria-controls="labelsTab"
+              aria-selected="false"
+            >
+              Labels
+            </button>
+          </li>
+        </ul>
+        <div class="tab-content" id="myTabContent">
+          <div
+            class="tab-pane fade"
+            id="info-tab-pane"
+            role="tabpanel"
+            aria-labelledby="info-tab"
+            tabindex="0"
+          ></div>
+
+          <div
+            class="tab-pane fade show active container"
+            id="preview-tab-pane"
+            role="tabpanel"
+            aria-labelledby="preview-tab"
+            tabindex="0"
+          >
+            <div class="row">
+              <div class="col-2 no-padding" id="channelToggle"></div>
+              <div class="col-10 no-padding" id="viewportContainer">
+                
+              </div>
+            </div>
+            <div class="clearfix" style="padding-bottom: 13px"></div>
+            <div id="channel_sliders"></div>
+            <div class="clearfix"></div>
+            <div class="tab-footer row align-items-center">
+              <div class="col-auto" style="padding-left: 0">
+                <label>Zoom %</label>
+              </div>
+              <div class="col-auto" style="position: relative; padding-left: 0; flex: 1 1 auto">
+                <input min="100" max="1000" id="vp_zoom_slider" type="range" />
+              </div>
+              <div class="col-auto" style="padding-right: 0">
+                <input id="vp_zoom_value" type="number" size="4"/>
+              </div>
+              <div class="clearfix"></div>
+              <div
+                id="reset-zoom-view"
+                style="padding-left: 0; padding-right: 0"
+              >
+                <!-- button added by ZoomView render() -->
+              </div>
+            </div>
+          </div>
+
+          <!-- events for this pane handled by LabelsPanelView -->
+          <div
+            class="tab-pane fade"
+            id="labelsTab"
+            role="tabpanel"
+            aria-labelledby="contact-tab"
+            tabindex="0"
+          >
+            <div id="edit_rois_form"></div>
+
+            <div class="clearfix"></div>
+            <hr />
+
+            <h5>Scalebar</h5>
+            <div id="scalebar_form"></div>
+
+            <hr />
+
+            <h5 style="float: left; margin-top: 10px">Add Labels</h5>
+
+            <button
+              type="button"
+              class="btn btn-link markdown-info"
+              title="Show label formatting options..."
+            >
+              Tips
+            </button>
+            <div class="clearfix"></div>
+            <form class="new-label-form form-inline" role="form"></form>
+
+            <h5 style="margin-top: 15px">Edit Labels</h5>
+            <div id="selected_panels_labels"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="./js/main.js"></script>
+  </body>
+</html>

@@ -17,7 +17,14 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-var FigureFile = Backbone.Model.extend({
+import Backbone from "backbone";
+import _ from "underscore";
+import $ from "jquery";
+import * as bootstrap from 'bootstrap'
+
+import figure_file_item_template from '../../templates/files/figure_file_item.template.html?raw';
+
+export var FigureFile = Backbone.Model.extend({
 
     defaults: {
         disabled: false,
@@ -61,14 +68,11 @@ var FigureFile = Backbone.Model.extend({
 });
 
 
-var FileList = Backbone.Collection.extend({
+export var FigureFileList = Backbone.Collection.extend({
 
     model: FigureFile,
 
     comparator: 'creationDate',
-
-    initialize: function() {
-    },
 
     disable: function(fileId) {
         // enable all first
@@ -82,31 +86,23 @@ var FileList = Backbone.Collection.extend({
         }
     },
 
-    deleteFile: function(fileId, name) {
-        // may not have fetched files...
-        var f = this.get(fileId),   // might be undefined
-            msg = "Delete '" + name + "'?",
-            self = this;
-        if (confirm(msg)) {
-            $.post( DELETE_WEBFIGURE_URL, { fileId: fileId })
-                .done(function(){
-                    self.remove(f);
-                    app.navigate("", {trigger: true});
-                });
-        }
+    removeFile: function(fileId) {
+        var f = this.get(fileId)
+        this.remove(f);
     },
 
     url: function() {
-        return LIST_WEBFIGURES_URL;
+        return BASE_WEBFIGURE_URL + "list_web_figures/";
     }
 });
 
 
-var FileListView = Backbone.View.extend({
+export var FileListView = Backbone.View.extend({
 
     el: $("#openFigureModal"),
 
     initialize:function (options) {
+        this.modal = new bootstrap.Modal("#openFigureModal");
         this.$tbody = $('tbody', this.$el);
         this.$fileFilter = $('#file-filter');
         this.owner = USER_ID;
@@ -121,9 +117,8 @@ var FileListView = Backbone.View.extend({
         // we only need this to know the currently opened file
         this.figureModel = options.figureModel;
 
-        $("#openFigureModal").bind("show.bs.modal", function(){
+        document.getElementById('openFigureModal').addEventListener("show.bs.modal", function(){
             // When the dialog opens, we load files...
-            var currentFileId = self.figureModel.get('fileId');
             if (self.model.length === 0) {
                 self.refresh_files();
             } else {
@@ -145,9 +140,23 @@ var FileListView = Backbone.View.extend({
 
     refresh_files: function(event) {
         // will trigger sort & render()
-        var loadingHtml = "<tr><td colspan='4' style='text-align:center'><h1><small>Loading Files...</small></h1></td></tr>"
+        var loadingHtml = `<tr><td colspan='5' style='text-align:center'>
+            <h3 class='text-muted' style='opacity:0.7; margin:50px'><small>Loading Files...</small></h3>
+        </td></tr>`
         this.$tbody.html(loadingHtml);
-        this.model.fetch();
+        let load_url = this.model.url();
+        let cors_headers = { mode: 'cors', credentials: 'include' };
+        // Manual fetch instead of this.model.fetch() - works for cross-origin CORS
+        fetch(load_url, cors_headers)
+            .then(rsp => rsp.json())
+            .then(data => {
+                this.model.reset();
+                if (data.length == 0) {
+                    // if no data, need to trigger render for 'no figures' message
+                    this.render();
+                }
+                this.model.add(data);
+            });
     },
 
     filter_files: function(event) {
@@ -173,15 +182,19 @@ var FileListView = Backbone.View.extend({
 
     sort_name: function(event) {
         this.render_sort_btn(event);
-        this.model.comparator = 'name';
+        this.model.comparator = function(left, right) {
+            var l = left.get('name').toLowerCase(),
+                r = right.get('name').toLowerCase();
+            return l < r ? -1 : l > r ? 1 : 0;
+        };
         this.model.sort();
     },
 
     sort_name_reverse: function(event) {
         this.render_sort_btn(event);
         this.model.comparator = function(left, right) {
-            var l = left.get('name'),
-                r = right.get('name');
+            var l = left.get('name').toLowerCase(),
+                r = right.get('name').toLowerCase();
             return l < r ? 1 : l > r ? -1 : 0;
         };
         this.model.sort();
@@ -239,7 +252,7 @@ var FileListView = Backbone.View.extend({
             if (file.isVisible(filter)) {
                 var disabled = currentFileId === file.get('id') ? true: false;
                 file.set('disabled', disabled);
-                var e = new FileListItemView({model:file}).render().el;
+                var e = new FileListItemView({model:file, listview:self}).render().el;
                 self.$tbody.prepend(e);
             }
         });
@@ -258,10 +271,10 @@ var FileListView = Backbone.View.extend({
                 bN = bNames[bNames.length - 1];
             return aN > bN;
         });
-        var ownersHtml = "<li><a class='pick-owner' href='#' data-id='-1'> -- Show All -- </a></li>";
+        var ownersHtml = "<li><a class='dropdown-item pick-owner' href='#' data-id='-1'> -- Show All -- </a></li>";
             ownersHtml += "<li class='divider'></li>";
         _.each(ownersNames, function(name) {
-            ownersHtml += "<li><a class='pick-owner' data-id='" + ownersByName[name] + "' href='#'>" + _.escape(name) + "</a></li>";
+            ownersHtml += "<li><a class='dropdown-item pick-owner' data-id='" + ownersByName[name] + "' href='#'>" + _.escape(name) + "</a></li>";
         });
         $("#owner-menu").html(ownersHtml);
 
@@ -273,8 +286,8 @@ var FileListView = Backbone.View.extend({
         })
         var groupNames = Object.keys(groupsByName);
         groupNames.sort();
-        var groupsHtml = "<li><a class='pick-group' href='#' data-id='-1'> -- Show All -- </a></li><li class='divider'></li>";
-        groupsHtml += groupNames.map(function (name) { return "<li><a class='pick-group' data-id='" + groupsByName[name] + "' href='#'>" + _.escape(name) + "</a></li>"}).join('\n');
+        var groupsHtml = "<li><a class='dropdown-item pick-group' href='#' data-id='-1'> -- Show All -- </a></li><li class='divider'></li>";
+        groupsHtml += groupNames.map(function (name) { return "<li><a class='dropdown-item pick-group' data-id='" + groupsByName[name] + "' href='#'>" + _.escape(name) + "</a></li>"}).join('\n');
         $("#group-menu").html(groupsHtml);
         return this;
     }
@@ -284,11 +297,12 @@ var FileListItemView = Backbone.View.extend({
 
     tagName:"tr",
 
-    template: JST["src/templates/files/figure_file_item.html"],
+    template: _.template(figure_file_item_template),
 
-    initialize:function () {
+    initialize:function (opts) {
         this.model.bind("change", this.render, this);
         this.model.bind("destroy", this.close, this);
+        this.listview = opts.listview;
     },
 
     events: {
@@ -296,7 +310,7 @@ var FileListItemView = Backbone.View.extend({
     },
 
     hide_file_chooser: function() {
-        $("#openFigureModal").modal('hide');
+        this.listview.modal.hide();
     },
 
     formatDate: function(secs) {

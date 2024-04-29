@@ -1,13 +1,13 @@
 
     <table class="table" style="margin-bottom:0">
         <tbody>
-            <tr><td>
-                <div class="col-sm-3">Compare:</div>
-                <div class="col-sm-3">
+            <tr><td class="row">
+                <div class="col">Compare:</div>
+                <div class="col">
                     <img class="small-thumb" title="<%- selImg.name %>"
                         src="<%= selThumbSrc %>" />
                 </div>
-                <div class="col-sm-3">
+                <div class="col">
                     <% if(newImg.imageId) { %>
                         <img class="small-thumb" title="<%- newImg.name %>"
                             src="<%= newThumbSrc %>" />
@@ -15,41 +15,45 @@
                         <div style="width:40px; height:40px; background-color:#ddd"></div>
                     <% } %>
                 </div>
-                <div class="col-sm-3">Matching</div>
+                <div class="col">Matching</div>
             </td></tr>
             <tr><td>
-                <div class="col-sm-3"><small><strong>Dimensions (XY)</strong>:</small></div>
-                <div class="col-sm-3"><small><%= selImg.orig_width %> x <%= selImg.orig_height %></small></div>
-                <div class="col-sm-3"><small>
+              <div class="row">
+                <div class="col"><small><strong>Dimensions (XY)</strong>:</small></div>
+                <div class="col"><small><%= selImg.orig_width %> x <%= selImg.orig_height %></small></div>
+                <div class="col"><small>
                     <%= newImg.orig_width || "-" %> x <%= newImg.orig_height || "-"  %>
                 </small></div>
-                <div class="col-sm-3">
+                <div class="col">
                     <%= ok(comp.orig_width, comp.orig_height) %>
                 </div>
-
-                <div class="col-sm-3"><small><strong>Z-sections</strong>:</small></div>
-                <div class="col-sm-3"><small><%= selImg.sizeZ %></small></div>
-                <div class="col-sm-3"><small><%= newImg.sizeZ || "-" %></small></div>
-                <div class="col-sm-3"><%= ok(comp.sizeZ) %></div>
-
-                <div class="col-sm-3"><small><strong>Time-points</strong>:</small></div>
-                <div class="col-sm-3"><small><%= selImg.sizeT %></small></div>
-                <div class="col-sm-3"><small><%= newImg.sizeT || "-" %></small></div>
-                <div class="col-sm-3"><small><%= ok(comp.sizeT) %></small></div>
-
-                <div class="col-sm-3"><small><strong>Channels</strong>:</small></div>
-                <div class="col-sm-3"><small>
+              </div>
+              <div class="row">
+                <div class="col"><small><strong>Z-sections</strong>:</small></div>
+                <div class="col"><small><%= selImg.sizeZ %></small></div>
+                <div class="col"><small><%= newImg.sizeZ || "-" %></small></div>
+                <div class="col"><%= ok(comp.sizeZ) %></div>
+              </div>
+              <div class="row">
+                <div class="col"><small><strong>Time-points</strong>:</small></div>
+                <div class="col"><small><%= selImg.sizeT %></small></div>
+                <div class="col"><small><%= newImg.sizeT || "-" %></small></div>
+                <div class="col"><small><%= ok(comp.sizeT) %></small></div>
+              </div>
+              <div class="row">
+                <div class="col"><small><strong>Channels</strong>:</small></div>
+                <div class="col"><small>
                     <% _.each(selImg.channels, function(ch, i) { %>
                         <%- ch.label %><% if(i < selImg.channels.length-1){print(',')} %>
                     <% }); %>
                 </small></div>
-                <div class="col-sm-3"><small>
+                <div class="col"><small>
                     <% if(newImg.channels){ _.each(newImg.channels, function(ch, i) { %>
                         <%- ch.label %><% if(i < newImg.channels.length-1){print(',')} %>
                     <% }) } else { print("-") } %>
                 </small></div>
-                <div class="col-sm-3"><small><%= comp.channels || "-" %></small></div>
-
+                <div class="col"><small><%= comp.channels || "-" %></small></div>
+              </div>
             </td></tr>
         </tbody>
     </table>

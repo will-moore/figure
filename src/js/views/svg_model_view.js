@@ -1,6 +1,11 @@
 
     // -------------- Selection Overlay Views ----------------------
 
+    import Backbone from "backbone";
+    import $ from "jquery";
+    import Raphael from "raphael";
+
+    import RectView from "./raphael-rect";
 
     // SvgView uses ProxyRectModel to manage Svg Rects (raphael)
     // This converts between zoomed coordiantes of the html DOM panels
@@ -201,8 +206,8 @@
                 max_y = Math.max(max_y, y+h);
             });
 
-            min_x = selected.getMin('x');
-            min_y = selected.getMin('y');
+            const min_x = selected.getMin('x');
+            const min_y = selected.getMin('y');
 
 
 
@@ -432,3 +437,5 @@
             }
         }
     });
+
+    export default SvgView

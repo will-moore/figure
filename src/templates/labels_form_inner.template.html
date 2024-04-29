@@ -1,0 +1,172 @@
+
+    <div class="input-group input-group-sm float-start">
+        <input type="text" class="label-text form-control input-sm" 
+                placeholder="Label" value="<% print(_.escape(l.text)) %>" />
+        <% if (!edit){ %>
+            <div class="input-group-btn">
+                <button type="button" class="btn btn-sm dropdown-toggle dropdown-toggle-split"
+                        data-bs-toggle="dropdown" title="Label from data...">
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li role="presentation" class="dropdown-header">Create Label(s) From:</li>
+                    <li role="presentation" class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="#" data-label="[image.name]">Image Name</a></li>
+                    <li><a class="dropdown-item" href="#" data-label="[dataset.name]">Dataset Name</a></li>
+                    <li title="Create labels from active Channels on the selected panel">
+                        <a class="dropdown-item" href="#" data-label="[channels labels]">Channels (separate labels)</a>
+                    </li>
+                    <li title="Create labels from active Channels on the selected panel">
+                        <a class="dropdown-item" href="#" data-label="[channels]">Channels (single label)</a>
+                    </li>
+                    <li title="Create labels from Tags on this Image in OMERO">
+                        <a class="dropdown-item" href="#" data-label="[tags]">Tags</a>
+                    </li>
+                    <li title="Create labels from Map Annotations on this Image in OMERO">
+                        <a class="dropdown-item" href="#" data-label="[key-values]">Key-Value Pairs</a>
+                    </li>
+                    <li title="Add a label that shows the current T-index">
+                        <a class="dropdown-item" href="#" data-label="[time.index]">Time (T-index)</a>
+                    </li>
+                    <li class="add_time_label" title="Label shows time in milliseconds">
+                        <a class="dropdown-item" href="#" data-label="[time.milliseconds]">Time (milliseconds)</a>
+                    </li>
+                    <li class="add_time_label">
+                        <a class="dropdown-item" href="#" data-label="[time.secs]">Time (seconds)</a>
+                    </li>
+                    <li class="add_time_label">
+                        <a class="dropdown-item" href="#" data-label="[time.mins]">Time (mins)</a>
+                    </li>
+                    <li class="add_time_label" title="Label shows time in mins:secs">
+                        <a class="dropdown-item" href="#" data-label="[time.mins:secs]">Time (mins:secs)</a>
+                    </li>
+                    <li class="add_time_label">
+                        <a class="dropdown-item" href="#" data-label="[time.hrs:mins:secs]">Time (hrs:mins:secs)</a>
+                    </li>
+                    <li class="add_time_label">
+                        <a class="dropdown-item" href="#" data-label="[time.hrs:mins]">Time (hrs:mins)</a>
+                    </li>
+                    <li title="Add a label that shows the viewport X and Y in pixels">
+                        <a class="dropdown-item" href="#" data-label="X: [x.pixel] Y: [y.pixel]">X and Y (pixel or unit)</a>
+                    </li>
+                    <li  title="Add a label that shows the current Z-index">
+                        <a class="dropdown-item" href="#" data-label="Z: [z.pixel]">Z (pixel or unit)</a>
+                    </li>
+                    <li  title="Add a label that shows the current Zoom level">
+                        <a class="dropdown-item" href="#" data-label="[zoom]">Zoom level (%)</a>
+                    </li>
+                </ul>
+            </div>
+        <% } %>
+    </div>
+
+    <div class="btn-group">
+        <button type="button" class="font-size btn btn-outline-secondary btn-sm dropdown-toggle" title="Font Size"
+            data-bs-toggle="dropdown">
+            <span class='dropdown_icon'><%= l.size %></span>
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" role="menu">
+        <% _.each([6,8,10,12,14,18,21,24,36,48],function(p){
+            print ("<li><a class='dropdown-item' href='#'><span class='dropdown_icon'>"+p+"</span></a></li>")
+        }); %>
+        </ul>
+    </div>
+
+    <div class="btn-group">
+        <button type="button" class="label-position btn btn-outline-secondary btn-sm dropdown-toggle" 
+                title="Position" data-bs-toggle="dropdown">
+            <i data-position="<%= position %>" class="<%= position_icon_cls %> dropdown_icon"></i>
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" role="menu">
+            <li role="presentation" class="dropdown-header">Inside Corners</li>
+            <!-- NB: dropdown_icon is picked on choosing dropdown, replaces icon in button above -->
+            <li><a class="dropdown-item" href="#">
+                <i data-position="topleft" class="bi-box-arrow-in-up-left dropdown_icon"></i>
+                Top Left</a>
+            </li>
+            <li><a class="dropdown-item" href="#">
+                <i data-position="topright" class="bi-box-arrow-in-up-right dropdown_icon"></i>
+                Top Right</a>
+            </li>
+            <li><a class="dropdown-item" href="#">
+                <i data-position="bottomleft" class="bi-box-arrow-in-down-left dropdown_icon"></i>
+                Bottom Left</a>
+            </li>
+            <li><a class="dropdown-item" href="#">
+                <i data-position="bottomright" class="bi-box-arrow-in-down-right dropdown_icon"></i>
+                Bottom Right</a>
+            </li>
+
+            <li role="presentation" class="dropdown-divider"></li>
+            <li role="presentation" class="dropdown-header">Outside Edges</li>
+            <li><a class="dropdown-item" href="#">
+                <i data-position="left" class="bi-box-arrow-left dropdown_icon"></i> Left</a>
+            </li>
+            <li><a class="dropdown-item" href="#">
+                    <i data-position="leftvert" class="bi-box-arrow-left dropdown_icon"></i> 
+                    Left vertical
+                </a>
+            </li>
+            <li><a class="dropdown-item" href="#">
+                <i data-position="top" class="bi-box-arrow-up dropdown_icon"></i> Top</a>
+            </li>
+            <li><a class="dropdown-item" href="#">
+                <i data-position="right" class="bi-box-arrow-right dropdown_icon"></i> Right</a>
+            </li>
+            <li><a class="dropdown-item" href="#">
+                <i data-position="rightvert" class="bi-box-arrow-right dropdown_icon"></i> Right Vertical</a>
+            </li>
+            <li><a class="dropdown-item" href="#">
+                <i data-position="bottom" class="bi-box-arrow-down dropdown_icon"></i> Bottom</a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="btn-group">
+        <button type="button" class="label-color btn btn-outline-secondary btn-sm dropdown-toggle" title="Label Color"
+            data-bs-toggle="dropdown">
+            <span data-color="<%= l.color %>" style="background-color:#<%= l.color %>" class="dropdown_icon">&nbsp &nbsp &nbsp</span>
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu colorpicker" role="menu">
+            <!-- NB: dropdown_icon is picked on choosing dropdown, replaces icon in button above -->
+            <li><a class="dropdown-item" href="#">
+                <span class="dropdown_icon" data-color="000000" style="background-color:#000">&nbsp &nbsp &nbsp</span>&nbsp Black
+            </a></li>
+            <li><a class="dropdown-item" href="#">
+                <span class="dropdown_icon" data-color="0000FF" style="background-color:#00f">&nbsp &nbsp &nbsp</span>&nbsp Blue
+            </a></li>
+            <li><a class="dropdown-item" href="#">
+                <span class="dropdown_icon" data-color="00FF00" style="background-color:#0f0">&nbsp &nbsp &nbsp</span>&nbsp Green
+            </a></li>
+            <li><a class="dropdown-item" href="#">
+                <span class="dropdown_icon" data-color="FF0000" style="background-color:#f00">&nbsp &nbsp &nbsp</span>&nbsp Red
+            </a></li>
+            <li><a class="dropdown-item" href="#">
+                <span class="dropdown_icon" data-color="FFFF00" style="background-color:#ff0">&nbsp &nbsp &nbsp</span>&nbsp Yellow
+            </a></li>
+            <li><a class="dropdown-item" href="#">
+                <span class="dropdown_icon" data-color="FFFFFF" style="background-color:#fff">&nbsp &nbsp &nbsp</span>&nbsp White
+            </a></li>
+            <li><a class="dropdown-item" href="#">
+                <span class="dropdown_icon" data-color="FF00FF" style="background-color:#f0f">&nbsp &nbsp &nbsp</span>&nbsp Magenta
+            </a></li>
+            <li><a class="dropdown-item" href="#">
+                <span class="dropdown_icon" data-color="00FFFF" style="background-color:#0ff">&nbsp &nbsp &nbsp</span>&nbsp Cyan
+            </a></li>
+            <li class="dropdown-divider"></li>
+            <li><a class="dropdown-item" data-color="colorpicker" data-oldcolor="<%= l.color %>" href="#">
+                <span class="dropdown_icon colorpickerOption">&nbsp &nbsp &nbsp</span>&nbsp More Colors...
+            </a></li>
+        </ul>
+    </div>
+
+    <% if (edit){ %>
+        <button type="button" title="Delete Label" class="close btn btn-sm btn-light delete-label" aria-hidden="true">&times;</button>
+    <% } else { %>
+
+        <button type="submit" class="btn btn-sm btn-success float-end">Add</button>
+
+    <% } %>

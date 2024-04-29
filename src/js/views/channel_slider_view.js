@@ -1,10 +1,23 @@
 
+import Backbone from "backbone";
+import _ from "underscore";
+import $ from "jquery";
+
+import FigureLutPicker from "../views/lutpicker";
+import FigureColorPicker from "../views/colorpicker";
+
+import channel_slider_template from '../../templates/channel_slider.template.html?raw';
+
+import lutsPng from "../../images/luts_10.png";
+// Need to handle dev vv built (omero-web) paths
+const lutsPngUrl = STATIC_DIR + lutsPng;
+
 const SLIDER_INCR_CUTOFF = 100;
 // If the max value of a slider is below this, use smaller slider increments
 
 var ChannelSliderView = Backbone.View.extend({
 
-    template: JST["src/templates/channel_slider_template.html"],
+    template: _.template(channel_slider_template),
 
     initialize: function(opts) {
         // This View may apply to a single PanelModel or a list
@@ -20,6 +33,45 @@ var ChannelSliderView = Backbone.View.extend({
         "keyup .ch_end": "handle_channel_input",
         "click .channel-btn": "toggle_channel",
         "click .dropdown-menu a": "pick_color",
+        "input .ch_slider input": "channel_slider_slide",
+        "change .ch_slider input": "channel_slider_stop",
+        "mousemove .ch_start_slider": "start_slider_mousemove",
+        "mousemove .ch_end_slider": "end_slider_mousemove",
+    },
+
+    start_slider_mousemove: function(event) {
+        // To avoid clicking start-slider when the mouse is ABOVE the midpoint (between slider handles)
+        // On mouseover we add pointer events to end-slider (which is on top, so clicks will be handled by it)
+        let $target = $(event.target);
+        let fraction = event.offsetX/$target.width();
+        // value of the 'end' slider is stored on the start-slider
+        let slidemax = parseFloat($target.data('slidemax'));
+        let slideval = parseFloat($target.val());
+        let midfraction = this.get_midfraction(slideval, slidemax, $target);
+        if (fraction > midfraction) {
+            $(".ch_end_slider", $target.parent()).css("pointer-events", "all");
+        }
+    },
+
+    end_slider_mousemove: function(event) {
+        // To avoid clicking end-slider when the mouse is BELOW the midpoint (between slider handles)
+        // On mouseover we REMOVE pointer events from end-slider (so they fall to the start-slider underneath)
+        let $target = $(event.target);
+        let fraction = event.offsetX/$target.width();
+        // value of the 'start' slider is stored on the end-slider
+        let slidemin = parseFloat($target.data('slidemin'));
+        let slideval = parseFloat($target.val());
+        let midfraction = this.get_midfraction(slidemin, slideval, $target);
+        if (fraction < midfraction) {
+            $target.css("pointer-events", "none");
+        }
+    },
+
+    get_midfraction(start, end, $target) {
+        let midvalue = (start + end) / 2;
+        let minval = parseFloat($target.attr('min'));
+        let maxval = parseFloat($target.attr('max'));
+        return (midvalue - minval) / (maxval - minval);
     },
 
     pick_color: function(e) {
@@ -46,7 +98,7 @@ var ChannelSliderView = Backbone.View.extend({
                 }
             });
         } else if (color == 'reverse') {
-            var reverse = $('span', e.currentTarget).hasClass('glyphicon-check');
+            var reverse = $('i', e.currentTarget).length > 0;
             self.models.forEach(function(m){
                 m.save_channel(idx, 'reverseIntensity', !reverse);
             });
@@ -162,8 +214,55 @@ var ChannelSliderView = Backbone.View.extend({
         });
     },
 
+    channel_slider_slide: function(event) {
+        // Handle sliding action for start slider and end slider
+        let $target = $(event.target);
+        let value = parseFloat(event.target.value);
+        let max = $target.attr('max');
+        let chIndex = $target.data('idx');
+        value = (max > SLIDER_INCR_CUTOFF) ? value : value.toFixed(2);
+        // ensure that start < end
+        const start = $target.hasClass("ch_start_slider");
+        if (start) {
+            let slidemax = $target.data('slidemax');
+            if (value > slidemax) {
+                $target.val(slidemax);
+                return;
+            }
+        } else {
+            let slidemin = $target.data('slidemin');
+            if (value < slidemin) {
+                $target.val(slidemin);
+                return;
+            }
+        }
+        // simply update the correct text input...
+        if (start){
+            $(`.channel_slider_${chIndex} .ch_start input`).val(value);
+        } else {
+            $(`.channel_slider_${chIndex}  .ch_end input`).val(value);
+        }
+    },
+
+    channel_slider_stop: function(event) {
+        // Handle slide -> stop for start slider and end slider
+        let value = parseFloat(event.target.value);
+        let $target = $(event.target);
+        let chIndex = $target.data('idx');
+        let toUpdate = {};
+        // Save change to 'start' or 'end' value;
+        if ($target.hasClass("ch_start_slider")) {
+            toUpdate.start = value;
+        } else {
+            toUpdate.end = value;
+        }
+        this.models.forEach(function(m) {
+            m.save_channel_window(chIndex, toUpdate);
+        });
+    },
+
     clear: function() {
-        $(".ch_slider").slider("destroy");
+        // $(".ch_slider").slider("destroy");
         $("#channel_sliders").empty();
         return this;
     },
@@ -199,7 +298,7 @@ var ChannelSliderView = Backbone.View.extend({
             }
             var windowFn = function (idx, attr) {
                 return function (ch) {
-                    return ch[idx].window[attr];
+                    return parseFloat(ch[idx].window[attr]);
                 }
             };
             var allEqualFn = function(prev, value) {
@@ -224,7 +323,7 @@ var ChannelSliderView = Backbone.View.extend({
             if (!allSameCount) {
                 return this;
             }
-            $(".ch_slider").slider("destroy");
+            // $(".ch_slider").slider("destroy");
             this.$el.empty();
 
             chData[0].forEach(function(d, chIdx) {
@@ -259,16 +358,12 @@ var ChannelSliderView = Backbone.View.extend({
                 var reverse = reverses.reduce(allEqualFn, reverses[0]) ? true : false;
                 var active = actives.reduce(allEqualFn, actives[0]);
                 var style = {'background-position': '0 0'}
-                var sliderClass = '';
                 var lutBgPos = FigureLutPicker.getLutBackgroundPosition(color);
                 if (color.endsWith('.lut')) {
                     style['background-position'] = lutBgPos;
-                    sliderClass = 'lutBg';
+                    color = "ccc";
                 } else if (color.toUpperCase() === "FFFFFF") {
                     color = "ccc";  // white slider would be invisible
-                }
-                if (reverse) {
-                    style.transform = 'scaleX(-1)';
                 }
                 if (color == "FFFFFF") color = "ccc";  // white slider would be invisible
 
@@ -282,36 +377,21 @@ var ChannelSliderView = Backbone.View.extend({
                                                 'startsNotEqual': startsNotEqual,
                                                 'endAvg': endAvg,
                                                 'endsNotEqual': endsNotEqual,
+                                                'min': min,
+                                                'max': max,
+                                                'step': (max > SLIDER_INCR_CUTOFF) ? 1 : 0.01,
                                                 'active': active,
                                                 'lutBgPos': lutBgPos,
                                                 'reverse': reverse,
                                                 'color': color,
-                                                'isDark': this.isDark(color)});
-                var $div = $(sliderHtml).appendTo(this.$el);
-
-                $div.find('.ch_slider').slider({
-                    range: true,
-                    min: min,
-                    max: max,
-                    step: (max > SLIDER_INCR_CUTOFF) ? 1 : 0.01,
-                    values: [startAvg, endAvg],
-                    slide: function(event, ui) {
-                        let chStart = (max > SLIDER_INCR_CUTOFF) ? ui.values[0] : ui.values[0].toFixed(2);
-                        let chEnd = (max > SLIDER_INCR_CUTOFF) ? ui.values[1] : ui.values[1].toFixed(2);
-                        $('.ch_start input', $div).val(chStart);
-                        $('.ch_end input', $div).val(chEnd);
-                    },
-                    stop: function(event, ui) {
-                        self.models.forEach(function(m) {
-                            m.save_channel_window(chIdx, {'start': ui.values[0], 'end': ui.values[1]});
-                        });
-                    }
-                })
-                // Need to add background style to newly created div.ui-slider-range
-                .children('.ui-slider-range').css(style)
-                .addClass(sliderClass);
+                                                'isDark': this.isDark(color),
+                                                lutsPngUrl,
+                                            });
+                $(sliderHtml).appendTo(this.$el);
 
             }.bind(this));
         return this;
     }
 });
+
+export default ChannelSliderView

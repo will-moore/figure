@@ -1,4 +1,15 @@
     
+    import Backbone from "backbone";
+    import _ from 'underscore';
+    import $ from "jquery";
+
+    import {PanelList, Panel} from "./panel_model";
+    import { recoverFigureFromStorage,
+        clearFigureFromStorage,
+        figureConfirmDialog,
+        getJson,
+        saveFigureToStorage} from "../views/util";
+
     // Version of the json file we're saving.
     // This only needs to increment when we make breaking changes (not linked to release versions.)
     var VERSION = 7;
@@ -48,8 +59,7 @@
             var load_url = BASE_WEBFIGURE_URL + "load_web_figure/" + fileId + "/",
                 self = this;
 
-
-            $.getJSON(load_url, function(data){
+            getJson(load_url).then(data => {
                 data.fileId = fileId;
                 self.load_from_JSON(data);
                 self.set('unsaved', false);
@@ -232,7 +242,7 @@
                     }
                 });
                 if (iids.length > 0) {
-                    zUrl = BASE_WEBFIGURE_URL + 'z_scale/';
+                    let zUrl = BASE_WEBFIGURE_URL + 'z_scale/';
                     zUrl += '?image=' + iids.join('&image=');
                     $.getJSON(zUrl, function(data) {
                         // Update all panels
@@ -251,7 +261,7 @@
                 // Converting the time-labels to V6 syntax, all other special label were converted to text
                 _.each(json.panels, function(p) {
                     for (var i=0; i<p["labels"].length; i++){
-                        label = p["labels"][i];
+                        const label = p["labels"][i];
                         if (label["time"]) {
                             label["text"] = "[time."+label["time"]+"]";
                             delete label.time;
@@ -334,9 +344,9 @@
             var self = this,
                 figureJSON = this.figure_toJSON();
 
-            var url = window.SAVE_WEBFIGURE_URL,
+            var url = BASE_OMEROWEB_URL + "figure/save_web_figure/";
                 // fileId = self.get('fileId'),
-                data = {};
+            var data = {};
 
             if (options.fileId) {
                 data.fileId = options.fileId;
@@ -363,7 +373,7 @@
                         options.success(data);
                     }
                 })
-                .error(function(rsp){
+                .fail(function(rsp){
                     console.log('Save Error', rsp.responseText);
 
                     // Save to local storage to avoid data loss
@@ -380,7 +390,7 @@
                     var callback = function(btnText) {
                         if (btnText === "Reload in new Tab") {
                             var recoverUrl = BASE_WEBFIGURE_URL + 'recover/';
-                            window.open(WEBLOGIN_URL + '?url=' + recoverUrl, '_blank')
+                            window.open(recoverUrl, '_blank')
                         }
                     }
                     figureConfirmDialog(errorTitle, message, buttons, callback);
@@ -397,6 +407,52 @@
             figureModel.trigger('reset_undo_redo');
         },
 
+        checkSaveAndClear: function (callback, allowCancel) {
+            var self = this;
+            var doClear = function () {
+                self.clearFigure();
+                if (callback) {
+                    callback();
+                }
+            };
+            if (self.get("unsaved")) {
+                var saveBtnTxt = "Save",
+                    canEdit = self.get("canEdit");
+                if (!canEdit) saveBtnTxt = "Save a Copy";
+                // show the confirm dialog...
+                let buttons = ["Don't Save", saveBtnTxt];
+                if (allowCancel) {
+                    buttons = ["Canel"].concat(buttons);
+                }
+                figureConfirmDialog(
+                    "Save Changes to Figure?",
+                    "Your changes will be lost if you don't save them",
+                    buttons,
+                    function (btnTxt) {
+                        if (btnTxt === saveBtnTxt) {
+                            var options = {};
+                            // Save current figure or New figure...
+                            var fileId = self.get("fileId");
+                            if (fileId && canEdit) {
+                            options.fileId = fileId;
+                            } else {
+                            var defaultName = self.getDefaultFigureName();
+                            var figureName = prompt("Enter Figure Name", defaultName);
+                            options.figureName = figureName || defaultName;
+                            }
+                            options.success = doClear;
+                            self.save_to_OMERO(options);
+                        } else if (btnTxt === "Don't Save") {
+                            self.set("unsaved", false);
+                            doClear();
+                        }
+                    }
+                );
+            } else {
+                doClear();
+            }
+        },
+        
         addImages: function(iIds) {
             this.clearSelected();
 
@@ -453,20 +509,20 @@
             this.set('loading_count', this.get('loading_count') + 1);
 
             // Get the json data for the image...
-            $.ajax({
-                url: imgDataUrl,
-                jsonp: callback, // 'callback'
-                dataType: dataType,
-                // work with the response
-                success: function( data ) {
+            let cors_headers = { mode: 'cors', credentials: 'include', headers: {"Content-Type": "application/json"
+              }, };
+            fetch(imgDataUrl, cors_headers)
+                .then(rsp => rsp.json())
+                .then(data => {
+                    console.log("data", data);
+                    self.set('loading_count', self.get('loading_count') - 1);
+
                     if (data.Exception || data.ConcurrencyException) {
                         // If something went wrong, show error and don't add to figure
                         message = data.Exception || "ConcurrencyException"
                         alert(`Image loading from ${imgDataUrl} included an Error: ${message}`);
                         return;
                     }
-
-                    self.set('loading_count', self.get('loading_count') - 1);
 
                     coords.spacer = coords.spacer || data.size.width/20;
                     var full_width = (coords.colCount * (data.size.width + coords.spacer)) - coords.spacer,
@@ -525,14 +581,11 @@
                     // We do some additional processing in Panel.parse()
                     self.panels.create(n, {'parse': true}).set('selected', true);
                     self.notifySelectionChange();
-                },
-
-                error: function(event) {
-                    self.set('loading_count', self.get('loading_count') - 1);
+                })
+                .catch(err => {
                     alert("Image not found on the server, " +
                         "or you don't have permission to access it at " + imgDataUrl);
-                },
-            });
+                });
         },
 
         // Used to position the #figure within canvas and also to coordinate svg layout.
@@ -693,7 +746,7 @@
             for (var r=0; r<grid.length; r++) {
                 row = grid[r];
                 for (var c=0; c<row.length; c++) {
-                    panel = row[c];
+                    let panel = row[c];
                     panel.save({'x':new_x, 'y':new_y});
                     max_h = Math.max(max_h, panel.get('height'));
                     new_x = new_x + spacer + panel.get('width');
@@ -927,3 +980,5 @@
 
     });
 
+
+export default FigureModel

@@ -1,6 +1,13 @@
 
+import Backbone from "backbone";
+import $ from "jquery";
+import _ from "underscore";
 
-var ChgrpModalView = Backbone.View.extend({
+import FigureModel from "../models/figure_model";
+
+import {figureConfirmDialog, hideModal, getJson} from "./util";
+
+export const ChgrpModalView = Backbone.View.extend({
 
     el: $("#chgrpModal"),
 
@@ -14,16 +21,16 @@ var ChgrpModalView = Backbone.View.extend({
         var self = this;
 
         // Here we handle init of the dialog when it's shown...
-        $("#chgrpModal").bind("show.bs.modal", function () {
-            this.enableSubmit(false);
-            if (!this.model.get('fileId')) {
+        document.getElementById('chgrpModal').addEventListener('shown.bs.modal', () => {
+            self.enableSubmit(false);
+            if (!self.model.get('fileId')) {
                 $('#chgrpModal .modal-body').html("<p>Figure not saved. Please Save the Figure first.</p>");
             } else {
                 $('#chgrpModal .modal-body').html("");
                 self.loadGroups();
                 self.loadImageDetails();
             }
-        }.bind(this));
+        });
     },
 
     events: {
@@ -34,7 +41,7 @@ var ChgrpModalView = Backbone.View.extend({
     loadImageDetails: function() {
         var imgIds = this.model.panels.pluck('imageId');
         var url = `${BASE_WEBFIGURE_URL}images_details/?image=${_.uniq(imgIds).join(',')}`;
-        $.getJSON(url, function (data) {
+        getJson(url).then(data => {
             // Sort images by Group
             this.imagesByGroup = data.data.reduce(function(prev, img){
                 if (!prev[img.group.id]) {
@@ -44,16 +51,16 @@ var ChgrpModalView = Backbone.View.extend({
                 return prev;
             }, {});
             this.render();
-        }.bind(this));
+        });
     },
 
     loadGroups: function() {
         var url = `${API_BASE_URL_V0}m/experimenters/${USER_ID}/experimentergroups/`;
-        $.getJSON(url, function(data){
+        getJson(url).then(data => {
             this.omeroGroups = data.data.map(group => {return {id: group['@id'], name: group.Name}})
                 .filter(group => group.name != 'user');
             this.render();
-        }.bind(this));
+        });
     },
 
     inputClicked: function() {
@@ -84,7 +91,7 @@ var ChgrpModalView = Backbone.View.extend({
         }, 1000);
         $.post(url, { group_id: group_id, ann_id: fileId})
             .done(function (data) {
-                $("#chgrpModal").modal('hide');
+                hideModal("chgrpModal");
                 if (data.success) {
                     this.model.set({groupId: group_id});
                     figureConfirmDialog("Success", "Figure moved to Group: " + _.escape(group_name), ["OK"]);

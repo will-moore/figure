@@ -1,5 +1,13 @@
 
-var LabelFromMapsModal = Backbone.View.extend({
+import Backbone from "backbone";
+import $ from "jquery";
+import _ from "underscore";
+
+import FigureModel from "../models/figure_model";
+import { getJson, hideModal } from "./util";
+
+
+export var LabelFromMapsModal = Backbone.View.extend({
 
     el: $("#labelsFromMapAnns"),
 
@@ -13,11 +21,11 @@ var LabelFromMapsModal = Backbone.View.extend({
      */
     initialize: function() {
         // when dialog is shown, load map annotations for selected images
-        $("#labelsFromMapAnns").bind("show.bs.modal", function(event){
+        document.getElementById('labelsFromMapAnns').addEventListener('shown.bs.modal', (event) => {
             // event options from the label form: {position: 'top', size: '12', color: '0000'}
             this.options = event.relatedTarget;
             this.loadMapAnns();
-        }.bind(this));
+        });
     },
 
     events: {
@@ -37,25 +45,24 @@ var LabelFromMapsModal = Backbone.View.extend({
         var url = WEBINDEX_URL + "api/annotations/?type=map&parents=true&image=";
         url += imageIds.join("&image=");
 
-        $.getJSON(url, function(data) {
-                if (data.hasOwnProperty('parents')){
-                    data.parents.annotations.forEach(function(ann) {
-                        let class_ = ann.link.parent.class;
-                        let id_ = '' + ann.link.parent.id;
-                        let lineage = data.parents.lineage[class_][id_];
-                        for(j = 0; j < lineage.length; j++){
-                            // Unpacking the parent annoations for each image
-                            let clone_ann = JSON.parse(JSON.stringify(ann));
-                            clone_ann.link.parent.id = lineage[j].id;
-                            data.annotations.push(clone_ann);
-                        }
-                    });
-                }
-                this.isLoading = false;
-                this.annotations = data.annotations;
-                this.render();
-            }.bind(this)
-        );
+        getJson(url).then(data => {
+            if (data.hasOwnProperty('parents')){
+                data.parents.annotations.forEach(function(ann) {
+                    let class_ = ann.link.parent.class;
+                    let id_ = '' + ann.link.parent.id;
+                    let lineage = data.parents.lineage[class_][id_];
+                    for(let j = 0; j<lineage.length; j++){
+                        // Unpacking the parent annoations for each image
+                        let clone_ann = JSON.parse(JSON.stringify(ann));
+                        clone_ann.link.parent.id = lineage[j].id;
+                        data.annotations.push(clone_ann);
+                    }
+                });
+            }
+            this.isLoading = false;
+            this.annotations = data.annotations;
+            this.render();
+        });
     },
 
     /**
@@ -107,7 +114,7 @@ var LabelFromMapsModal = Backbone.View.extend({
                 p.add_labels(labels);
             }
         });
-        $("#labelsFromMapAnns").modal('hide');
+        hideModal("labelsFromMapAnns");
         return false;
     },
 

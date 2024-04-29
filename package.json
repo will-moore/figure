@@ -5,7 +5,10 @@
   "description": "OMERO figure creation app",
   "main": "index.js",
   "scripts": {
-    "test": "grunt test"
+    "start": "vite",
+    "build": "vite build --emptyOutDir && ./deploy_build.sh",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "watch 'npm run build' ./src"
   },
   "repository": {
     "type": "git",
@@ -23,16 +26,20 @@
   },
   "homepage": "https://github.com/ome/omero-figure",
   "devDependencies": {
-    "grunt": "~1.5.3",
-    "grunt-cli": "^1.3.2",
-    "grunt-contrib-concat": "^0.5.0",
-    "grunt-contrib-copy": "^0.8.1",
-    "grunt-contrib-jshint": "~3.2.0",
-    "grunt-contrib-jst": "^2.0.0",
-    "grunt-contrib-watch": "^1.1.0",
-    "grunt-replace": "^2.0.2"
+    "sass": "^1.54.1",
+    "vite": "^3.0.4",
+    "watch": "^1.0.2"
   },
   "dependencies": {
-    "@openmicroscopy/shape-editor": "^4.0.0"
+    "@popperjs/core": "^2.11.5",
+    "backbone": "^1.4.1",
+    "bootstrap": "^5.2.0",
+    "bootstrap-icons": "^1.9.1",
+    "dompurify": "^2.4.3",
+    "jquery": "^3.6.0",
+    "marked": "^4.2.12",
+    "mousetrap": "^1.6.5",
+    "raphael": "^2.3.0",
+    "underscore": "^1.13.4"
   }
 }
