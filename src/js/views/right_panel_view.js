@@ -7,7 +7,7 @@
     import _ from "underscore";
     import $ from "jquery";
 
-    import {figureConfirmDialog, showModal, getRandomId} from "./util";
+    import {figureConfirmDialog, showModal, rotatePoint, getRandomId} from "./util";
     import FigureColorPicker from "../views/colorpicker";
 
     import FigureModel from "../models/figure_model";

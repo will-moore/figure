@@ -182,7 +182,6 @@
                 'pixel_size_x_unit': data.pixel_size_x_unit,
                 'pixel_size_z_unit': data.pixel_size_z_unit,
                 'deltaT': data.deltaT,
-                'zoom':data.zoom,
             };
 
             // theT and theZ are not changed unless we have to...
