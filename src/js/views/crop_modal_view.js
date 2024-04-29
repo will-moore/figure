@@ -7,7 +7,7 @@ import Raphael from "raphael";
 import FigureModel from "../models/figure_model";
 import RectView from "./raphael-rect";
 
-import {figureConfirmDialog, hideModal, getJson} from "./util";
+import {figureConfirmDialog, hideModal, getJson, rotatePoint} from "./util";
 
 import crop_modal_roi_template from '../../templates/modal_dialogs/crop_modal_roi.template.html?raw';
 

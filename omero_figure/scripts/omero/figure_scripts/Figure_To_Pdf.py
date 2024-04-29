@@ -564,7 +564,7 @@ class ShapeToPilExport(ShapeExport):
             return
         r, g, b, a = self.get_rgba_int(shape['strokeColor'])
         # bump up alpha a bit to make text more readable
-        rgba = (r, g, b, 128 + a / 2)
+        rgba = (r, g, b, int(128 + a / 2))
         font_name = "FreeSans.ttf"
         from omero.gateway import THISPATH
         path_to_font = os.path.join(THISPATH, "pilfonts", font_name)
@@ -576,7 +576,7 @@ class ShapeToPilExport(ShapeExport):
         box = font.getbbox(text)
         width = box[2] - box[0]
         height = box[3] - box[1]
-        xy = (center[0] - width / 2.0, center[1] - height / 2.0)
+        xy = (int(center[0] - width / 2.0), int(center[1] - height / 2.0))
         self.draw.text(xy, text, fill=rgba, font=font)
 
     def draw_arrow(self, shape):
@@ -1539,12 +1539,12 @@ class FigureExport(object):
         # e.g. {0: 1.0, 1: 0.25, 2: 0.0625, 3: 0.03123, 4: 0.01440}
         # Pick zoom such that returned image is below MAX size
         max_level = len(zm_levels.keys()) - 1
-
-        # Maximum size that the rendering engine will render without OOM
-        max_plane = self.conn.getDownloadAsMaxSizeSetting()
+        # Maximum size that the rendering engine will render
+        max_sizes = self.conn.getMaxPlaneSize()
 
         # start big, and go until we reach target size
         zm = 0
+        max_plane = max_sizes[0] * max_sizes[1]
         while (zm < max_level and
                zm_levels[zm] * width > max_width or
                zm_levels[zm] * width * zm_levels[zm] * height > max_plane):
@@ -2277,7 +2277,7 @@ class TiffExport(FigureExport):
             box = font.getbbox(t['text'])
             txt_w = box[2] - box[0]
             txt_h = box[3] - box[1]
-            textdraw.text((w, 0), t['text'], font=font, fill=rgb)
+            textdraw.text((w, -box[1]), t['text'], font=font, fill=rgb)
             w += txt_w
         return temp_label
 
