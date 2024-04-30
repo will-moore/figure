@@ -212,12 +212,7 @@ Point.prototype.intersectRegion = function intersectRegion(region) {
     x = parseInt(this._x * f, 10),
     y = parseInt(this._y * f, 10);
 
-  if (Raphael.isPointInsidePath(path, x, y)) {
-    return true;
-  }
-  var path2 = this.getPath(),
-    i = Raphael.pathIntersection(path, path2);
-  return i.length > 0;
+  return Raphael.isPointInsidePath(path, x, y);
 };
 
 Point.prototype.getPath = function getPath() {
