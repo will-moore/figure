@@ -301,6 +301,22 @@ Rect.prototype.getHandleCoords = function getHandleCoords() {
   return handleIds;
 };
 
+function correct_rotation(dx, dy, rotation) {
+  if (dx === 0 && dy === 0) {
+      return {x: dx, y: dy};
+  }
+  var length = Math.sqrt(dx * dx + dy * dy),
+      ang1 = Math.atan(dy/dx);
+  if (dx < 0) {
+      ang1 = Math.PI + ang1;
+  }
+  var angr = rotation * (Math.PI/180),  // deg -> rad
+      ang2 = ang1 - angr;
+  dx = Math.cos(ang2) * length;
+  dy = Math.sin(ang2) * length;
+  return {x: dx, y: dy};
+}
+
 // ---- Create Handles -----
 Rect.prototype.createHandles = function createHandles() {
   var self = this,
@@ -320,6 +336,12 @@ Rect.prototype.createHandles = function createHandles() {
     return function (dx, dy, mouseX, mouseY, event) {
       dx = dx / self._zoomFraction;
       dy = dy / self._zoomFraction;
+      // need to handle rotation...
+      if (self._rotation != 0) {
+        let xy = correct_rotation(dx, dy, self._rotation);
+        dx = xy.x;
+        dy = xy.y;
+      }
 
       // If drag on corner handle, retain aspect ratio. dx/dy = aspect
       var keep_ratio = self.fixed_ratio || event.shiftKey;
