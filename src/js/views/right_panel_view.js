@@ -1124,8 +1124,13 @@
                 // Don't currently support Z_projection on Big images.
                 const z_projection_disabled = ((sum_sizeZ === this.models.length) || anyBig);
 
+                let sizeZ = this.models.getIfEqual('sizeZ');
+                let show_max_Zrange = sizeZ && z_projection && max_z_proj_planes < sizeZ;
+
                 html = this.template({
+                    max_projection_bytes: MAX_PROJECTION_BYTES,
                     zrange_max: max_z_proj_planes,
+                    show_max_Zrange: show_max_Zrange,
                     projectionIconUrl,
                     'z_projection_disabled': z_projection_disabled,
                     'rotation': rotation,

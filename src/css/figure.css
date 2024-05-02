@@ -646,11 +646,6 @@
     .z-projection {
         padding: 1px 5px 5px;
     }
-    .z-projection span{
-        background-image: url("../images/projection20.png");
-        width: 20px;
-        height: 20px;
-    }
     .crop-btn span{
         background-image: url("../images/crop20.png");
         width: 20px;

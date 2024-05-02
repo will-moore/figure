@@ -560,18 +560,16 @@
             }
         },
 
+        // The max number of Planes we can do Z-projection, based on
+        // sizeXY, pixelType and the number of currently active Channels
         getMaxZprojPlanes: function() {
-            const MAX_BYTES = 1024 * 1024 * 256;
             let bytes_per_pixel = 4;
             if (this.get("pixel_range")) {
                 bytes_per_pixel = Math.ceil(Math.log2(this.get("pixel_range")[1]) / 8.0);
             }
-            console.log('pixel_range', this.get("pixel_range"), 'bytes_per_pixel', bytes_per_pixel);
             let active_channels = this.get("channels").reduce((prev, channel) => channel.active ? prev + 1 : prev, 0);
-            console.log('active_channels', active_channels);
-            let max_planes = MAX_BYTES / bytes_per_pixel / (this.get('orig_width') * this.get('orig_height'));
+            let max_planes = MAX_PROJECTION_BYTES / bytes_per_pixel / (this.get('orig_width') * this.get('orig_height'));
             max_planes = Math.floor(max_planes / active_channels);
-            console.log("max_planes", max_planes);
             return max_planes;
         },
 
@@ -717,6 +715,17 @@
             return this.get('orig_width') * this.get('orig_height') > MAX_PLANE_SIZE;
         },
 
+        is_max_projection_exceeded: function() {
+            if (this.get('z_projection')) {
+                let maxProjPlanes = this.getMaxZprojPlanes();
+                let zRange = parseInt(this.get('z_end')) - parseInt(this.get('z_start'));
+                if (zRange > maxProjPlanes) {
+                    return true;
+                }
+            }
+            return false;
+        },
+
         get_img_src: function(force_no_padding) {
             var chs = this.get('channels');
             var cStrings = chs.map(function(c, i){
@@ -740,7 +749,11 @@
 
             // If BIG image, render scaled region
             var region = "";
-            if (this.is_big_image()) {
+            if (this.is_max_projection_exceeded()) {
+                // if we're trying to do Z-projection with too many planes,
+                // this figure URL renders a suitable error message
+                baseUrl = BASE_WEBFIGURE_URL + 'max_projection_range_exceeded/'
+            } else if (this.is_big_image()) {
                 baseUrl = BASE_WEBFIGURE_URL + 'render_scaled_region/';
                 var rect = this.getViewportAsRect();
                 // Render a region that is 1.5 x larger
@@ -784,6 +797,11 @@
         // used by the PanelView and ImageViewerView to get the size and
         // offset of the img within it's frame
         get_vp_img_css: function(zoom, frame_w, frame_h, x, y) {
+
+            if (this.is_max_projection_exceeded()) {
+                // We want the warning placeholder image shown full width, mid-height
+                return {'left':0, 'top':(frame_h - frame_w)/2, 'width':frame_w, 'height': frame_w}
+            }
 
             // For non-big images, we have the full plane in hand
             // css just shows the viewport region

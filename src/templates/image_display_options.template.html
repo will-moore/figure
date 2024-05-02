@@ -16,12 +16,15 @@
                 <% if(z_projection) { %>zp-btn-down<% } else if (typeof z_projection == 'boolean') { %><% } else { %>ch-btn-flat<% }%>"
                 <% if (z_projection_disabled) { %>disabled="disabled"<% } %>
                 >
-            <img src="<%= projectionIconUrl %>" />
-        </button>
-    </div>
 
-    <div style="font-size: 80%; line-height: 1.3;">
-        <button class="btn btn-sm btn-link" style="padding: 0; margin: 0; font-size: 0.8rem; text-align: left;;">
-            Z-range max: <%= zrange_max %>
+                <% if(show_max_Zrange) { %>
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                    title="Max Z-projection range with current channels active. MAX_PROJECTION_BYTES = <%= max_projection_bytes %>">
+                    Max <%= zrange_max %>
+                    <span class="visually-hidden">Maximum Z-projection range</span>
+                </span>
+                <% } %>
+
+            <img src="<%= projectionIconUrl %>" />
         </button>
     </div>
