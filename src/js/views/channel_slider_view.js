@@ -344,7 +344,7 @@ var ChannelSliderView = Backbone.View.extend({
                 var endsNotEqual = ends.reduce(allEqualFn, ends[0]) === undefined;
                 var min = mins.reduce(reduceFn(Math.min));
                 var max = maxs.reduce(reduceFn(Math.max));
-                if (max > SLIDER_INCR_CUTOFF) {
+                if (max - min > SLIDER_INCR_CUTOFF) {
                     // If we have a large range, use integers, otherwise format to 2dp
                     startAvg = parseInt(startAvg);
                     endAvg = parseInt(endAvg);
@@ -379,7 +379,7 @@ var ChannelSliderView = Backbone.View.extend({
                                                 'endsNotEqual': endsNotEqual,
                                                 'min': min,
                                                 'max': max,
-                                                'step': (max > SLIDER_INCR_CUTOFF) ? 1 : 0.01,
+                                                'step': (max - min > SLIDER_INCR_CUTOFF) ? 1 : 0.01,
                                                 'active': active,
                                                 'lutBgPos': lutBgPos,
                                                 'reverse': reverse,
