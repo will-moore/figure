@@ -219,8 +219,8 @@ var ChannelSliderView = Backbone.View.extend({
         let $target = $(event.target);
         let value = parseFloat(event.target.value);
         let max = $target.attr('max');
+        let min = $target.attr('min');
         let chIndex = $target.data('idx');
-        value = (max > SLIDER_INCR_CUTOFF) ? value : value.toFixed(2);
         // ensure that start < end
         const start = $target.hasClass("ch_start_slider");
         if (start) {
@@ -236,7 +236,8 @@ var ChannelSliderView = Backbone.View.extend({
                 return;
             }
         }
-        // simply update the correct text input...
+        // simply format and update the correct text input...
+        value = (max - min > SLIDER_INCR_CUTOFF) ? value : value.toFixed(2);
         if (start){
             $(`.channel_slider_${chIndex} .ch_start input`).val(value);
         } else {
