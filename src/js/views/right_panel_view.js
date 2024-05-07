@@ -151,6 +151,11 @@
                 // Create duplicate panels
                 let panelJson = panel.toJSON();
 
+                // want to make sure new panel is square
+                let maxSide = Math.min(panelJson.width, panelJson.height);
+                panelJson.width = maxSide;
+                panelJson.height = maxSide;
+
                 if (selWidth > selHeight) {
                     panelJson.y = panelJson.y + 1.1 * panelJson.height;
                 } else {
