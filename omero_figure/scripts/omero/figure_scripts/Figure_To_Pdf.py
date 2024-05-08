@@ -26,7 +26,7 @@ from datetime import datetime
 import os
 from os import path
 import zipfile
-from math import atan2, atan, sin, cos, sqrt, radians, floor, ceil
+from math import atan2, atan, sin, cos, sqrt, radians, floor, ceil, log2
 from copy import deepcopy
 import re
 
@@ -1681,8 +1681,23 @@ class FigureExport(object):
 
         if 'z_projection' in panel and panel['z_projection']:
             if 'z_start' in panel and 'z_end' in panel:
-                image.setProjection('intmax')
-                image.setProjectionRange(panel['z_start'], panel['z_end'])
+                # check max_projection_bytes
+                pixel_range = image.getPixelRange()
+                bytes_per_pixel = ceil(log2(pixel_range[1]) / 8.0)
+                channels = sum([1 if ch.isActive() else 0 for ch in image.getChannels()])
+                z_range = panel['z_end'] - panel['z_start']
+                proj_bytes = z_range * image.getSizeX() * image.getSizeY() * channels * bytes_per_pixel
+
+                cfg = self.conn.getConfigService()
+                max_bytes = int(cfg.getConfigValue('omero.pixeldata.max_projection_bytes'))
+
+                if proj_bytes <= max_bytes:
+                    image.setProjection('intmax')
+                    image.setProjectionRange(panel['z_start'], panel['z_end'])
+                else:
+                    print(f'projected_bytes {proj_bytes} exceeds MAX_PROJECTED_BYTES limit: {max_bytes}')
+                    # Turn off all channels to render a black panel
+                    image.setActiveChannels([])
 
         # If big image, we don't want to render the whole plane
         if self.is_big_image(image):
