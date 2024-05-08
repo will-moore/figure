@@ -1684,18 +1684,21 @@ class FigureExport(object):
                 # check max_projection_bytes
                 pixel_range = image.getPixelRange()
                 bytes_per_pixel = ceil(log2(pixel_range[1]) / 8.0)
-                channels = sum([1 if ch.isActive() else 0 for ch in image.getChannels()])
+                act_chs = [ch for ch in image.getChannels() if ch.isActive()]
                 z_range = panel['z_end'] - panel['z_start']
-                proj_bytes = z_range * image.getSizeX() * image.getSizeY() * channels * bytes_per_pixel
+                proj_bytes = (z_range * image.getSizeX() * image.getSizeY()
+                              * len(act_chs) * bytes_per_pixel)
 
                 cfg = self.conn.getConfigService()
-                max_bytes = int(cfg.getConfigValue('omero.pixeldata.max_projection_bytes'))
+                max_bytes = int(cfg.getConfigValue(
+                    'omero.pixeldata.max_projection_bytes'))
 
                 if proj_bytes <= max_bytes:
                     image.setProjection('intmax')
                     image.setProjectionRange(panel['z_start'], panel['z_end'])
                 else:
-                    print(f'projected_bytes {proj_bytes} exceeds MAX_PROJECTED_BYTES limit: {max_bytes}')
+                    print(f'projected_bytes {proj_bytes} exceeds '
+                          f'MAX_PROJECTED_BYTES limit: {max_bytes}')
                     # Turn off all channels to render a black panel
                     image.setActiveChannels([])
 
