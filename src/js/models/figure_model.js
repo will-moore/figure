@@ -599,7 +599,7 @@
                         'pixel_size_z_unit': data.pixel_size.unitZ,
                         'deltaT': data.deltaT,
                         'pixelsType': data.meta.pixelsType,
-                        'pixels_range': data.pixels_range,
+                        'pixel_range': data.pixel_range,
                     };
                     if (baseUrl) {
                         n.baseUrl = baseUrl;

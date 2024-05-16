@@ -1091,11 +1091,11 @@
                 sum_sizeZ = 0,
                 rotation,
                 z_projection,
-                max_z_proj_planes = Infinity,
+                projection_bytes_exceeded = [],
                 zp;
             if (this.models) {
                 this.models.forEach(function(m, i){
-                    max_z_proj_planes = Math.min(max_z_proj_planes, m.getMaxZprojPlanes());
+                    projection_bytes_exceeded.push(m.isMaxProjectionBytesExceeded())
                     rotation = m.get('rotation');
                     max_rotation = Math.max(max_rotation, rotation);
                     sum_rotation += rotation;
@@ -1110,6 +1110,7 @@
                         }
                     }
                 });
+                let proj_bytes_exceeded = projection_bytes_exceeded.some(b => b);
                 var avg_rotation = sum_rotation / this.models.length;
                 if (avg_rotation === max_rotation) {
                     rotation = avg_rotation;
@@ -1124,13 +1125,9 @@
                 // Don't currently support Z_projection on Big images.
                 const z_projection_disabled = ((sum_sizeZ === this.models.length) || anyBig);
 
-                let sizeZ = this.models.getIfEqual('sizeZ');
-                let show_max_Zrange = sizeZ && z_projection && max_z_proj_planes < sizeZ;
-
                 html = this.template({
                     max_projection_bytes: MAX_PROJECTION_BYTES,
-                    zrange_max: max_z_proj_planes,
-                    show_max_Zrange: show_max_Zrange,
+                    proj_bytes_exceeded: proj_bytes_exceeded,
                     projectionIconUrl,
                     'z_projection_disabled': z_projection_disabled,
                     'rotation': rotation,

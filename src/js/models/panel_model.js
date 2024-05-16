@@ -560,17 +560,20 @@
             }
         },
 
-        // The max number of Planes we can do Z-projection, based on
-        // sizeXY, pixelType and the number of currently active Channels
-        getMaxZprojPlanes: function() {
+        // Does sizeXYZ, pixelType and active Channels exceed MAX_PROJECTION_BYTES?
+        isMaxProjectionBytesExceeded: function() {
             let bytes_per_pixel = 4;
             if (this.get("pixel_range")) {
                 bytes_per_pixel = Math.ceil(Math.log2(this.get("pixel_range")[1]) / 8.0);
             }
             let active_channels = this.get("channels").reduce((prev, channel) => channel.active ? prev + 1 : prev, 0);
-            let max_planes = MAX_PROJECTION_BYTES / bytes_per_pixel / (this.get('orig_width') * this.get('orig_height'));
-            max_planes = Math.floor(max_planes / active_channels);
-            return max_planes;
+            let sizeXYZ = this.get('orig_width') * this.get('orig_height') * this.get('sizeZ');
+            let total_bytes = bytes_per_pixel * active_channels * sizeXYZ;
+            return total_bytes > MAX_PROJECTION_BYTES;
+        },
+
+        isMaxProjectionExceeded: function() {
+            return this.get('z_projection') && this.isMaxProjectionBytesExceeded();
         },
 
         // When a multi-select rectangle is drawn around several Panels
@@ -715,17 +718,6 @@
             return this.get('orig_width') * this.get('orig_height') > MAX_PLANE_SIZE;
         },
 
-        is_max_projection_exceeded: function() {
-            if (this.get('z_projection')) {
-                let maxProjPlanes = this.getMaxZprojPlanes();
-                let zRange = parseInt(this.get('z_end')) - parseInt(this.get('z_start'));
-                if (zRange > maxProjPlanes) {
-                    return true;
-                }
-            }
-            return false;
-        },
-
         get_img_src: function(force_no_padding) {
             var chs = this.get('channels');
             var cStrings = chs.map(function(c, i){
@@ -749,7 +741,7 @@
 
             // If BIG image, render scaled region
             var region = "";
-            if (this.is_max_projection_exceeded()) {
+            if (this.isMaxProjectionExceeded()) {
                 // if we're trying to do Z-projection with too many planes,
                 // this figure URL renders a suitable error message
                 baseUrl = BASE_WEBFIGURE_URL + 'max_projection_range_exceeded/'
@@ -798,7 +790,7 @@
         // offset of the img within it's frame
         get_vp_img_css: function(zoom, frame_w, frame_h, x, y) {
 
-            if (this.is_max_projection_exceeded()) {
+            if (this.isMaxProjectionExceeded()) {
                 // We want the warning placeholder image shown full width, mid-height
                 return {'left':0, 'top':(frame_h - frame_w)/2, 'width':frame_w, 'height': frame_w}
             }
