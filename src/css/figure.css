@@ -1320,3 +1320,8 @@
     #openFigureModal a {
         text-decoration: none;
     }
+
+    .form-inline{
+        border: 1px solid white;
+        cursor: move;
+    }

@@ -548,6 +548,53 @@
             return false;
         },
 
+        initializeSortable: function() {
+            var self = this;
+            var el = self.$el.find('.labels-container').get(0);
+    
+            // Check if the element exists   
+            if (!el) {         
+                console.warn('Sortable element not found.');         
+                return;       
+            }
+    
+            // Destroy existing Sortable instance if any
+            if (self.sortable) {        
+                self.sortable.destroy();        
+                self.sortable = null;      
+            }      
+                  
+            self.sortable = new Sortable(el, {         
+                animation: 150,         
+                fallbackOnBody: true, // Enable dragging elements outside the container
+                // handle: '.labels_container',
+                onMove: function(evt) {           
+                // Allow dragging outside the container
+                return evt.related === null || evt.related !== evt.from;         
+                },         
+                onEnd: function(evt) {           
+                    self.handleSort(evt);         
+                }       
+            });         
+        },
+
+        handleSort: function(evt) {
+            var container = this.$el.find('.labels-container').get(0);      
+            var forms = container.querySelectorAll('.edit-label-form');
+    
+            // Extract label keys in the new order
+            var reorderedKeys = Array.from(forms).map(form => form.getAttribute('data-key'));
+    
+            // Update the order of labels in each panel
+            this.models.forEach(function(panelModel) {        
+                var labels = panelModel.get('labels');        
+                var reorderedLabels = reorderedKeys.map(key => labels.find(label => panelModel.get_label_key(label) === key));        
+                panelModel.set('labels', reorderedLabels);      
+            });
+            this.labelOrder = reorderedKeys;    
+        },
+    
+
         render: function() {
 
             var self = this,
@@ -581,7 +628,7 @@
                 html += self.template(json);
             });
             self.$el.append(html);
-
+            this.initializeSortable();
             return this;
         }
     });
