@@ -157,9 +157,9 @@
                 panelJson.height = maxSide;
 
                 if (selWidth > selHeight) {
-                    panelJson.y = panelJson.y + 1.1 * panelJson.height;
+                    panelJson.y = panelJson.y + 1.1 * panel.get("height");
                 } else {
-                    panelJson.x = panelJson.x + 1.1 * panelJson.width;
+                    panelJson.x = panelJson.x + 1.1 * panel.get("width");
                 }
                 // cropped to match new Rectangle
                 let orig_width = panelJson.orig_width;
