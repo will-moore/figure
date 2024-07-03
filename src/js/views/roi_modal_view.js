@@ -360,7 +360,11 @@ export const RoiModalView = Backbone.View.extend({
                         $span.css({'background-color': newColor, 'background-image': 'none'});
                         // remove # from E.g. #ff00ff
                         newColor = newColor.replace("#", "");
-                        $span.attr('data-color', newColor);
+                        if($a.attr('data-color')){
+                            $span.attr('data-color', newColor);
+                        }else{
+                            $span.attr('data-fill-color', newColor);
+                        }
                         $('span:first', $button).replaceWith($span);
                         // can listen for this if we want to 'submit' etc
                         $button.trigger('change');
