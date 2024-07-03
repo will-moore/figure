@@ -548,52 +548,78 @@
             return false;
         },
 
-        initializeSortable: function() {
+        initialize_sortable: function() {
             var self = this;
-            var el = self.$el.find('.labels-container').get(0);
-    
-            // Check if the element exists   
-            if (!el) {         
-                console.warn('Sortable element not found.');         
-                return;       
+            var containers = self.$el.find('.labels-container');
+
+            // Check if there are any elements
+            if (containers.length === 0) {
+                return;
             }
-    
-            // Destroy existing Sortable instance if any
-            if (self.sortable) {        
-                self.sortable.destroy();        
-                self.sortable = null;      
-            }      
-                  
-            self.sortable = new Sortable(el, {         
-                animation: 150,         
-                fallbackOnBody: true, // Enable dragging elements outside the container
-                // handle: '.labels_container',
-                onMove: function(evt) {           
-                // Allow dragging outside the container
-                return evt.related === null || evt.related !== evt.from;         
-                },         
-                onEnd: function(evt) {           
-                    self.handleSort(evt);         
-                }       
-            });         
+
+            // Destroy existing Sortable instances if any
+            if (self.sortables) {
+                self.sortables.forEach(function(sortable) {
+                    sortable.destroy();
+                });
+            }
+            self.sortables = [];
+
+            // Initialize Sortable for each container
+            containers.each(function(index, el) {
+                var sortable = new Sortable(el, {
+                    animation: 150,
+                    fallbackOnBody: true,
+                    onMove: function(evt) {
+                        // Allow dragging outside the container
+                        return evt.related === null || evt.related !== evt.from;
+                    },
+                    onEnd: function(evt) {
+                        self.handle_sort(evt);
+                    }
+                });
+
+                // Store the sortable instance
+                self.sortables.push(sortable);
+            });
         },
 
-        handleSort: function(evt) {
-            var container = this.$el.find('.labels-container').get(0);      
+        handle_sort: function(evt) {
+            var container = evt.srcElement; // Get the object that triggered the event   
+
+            // Extract label keys in the new order of that position set
             var forms = container.querySelectorAll('.edit-label-form');
-    
-            // Extract label keys in the new order
-            var reorderedKeys = Array.from(forms).map(form => form.getAttribute('data-key'));
-    
+            var reordered_keys = Array.from(forms).map(form => form.getAttribute('data-key'));
+            var position = reordered_keys[0].split("_").pop();
+
             // Update the order of labels in each panel
-            this.models.forEach(function(panelModel) {        
-                var labels = panelModel.get('labels');        
-                var reorderedLabels = reorderedKeys.map(key => labels.find(label => panelModel.get_label_key(label) === key));        
-                panelModel.set('labels', reorderedLabels);      
+            this.models.forEach(function(panelModel) {
+                var labels = panelModel.get('labels');
+                var labels_dict = {};  // Labels for the current position set
+                var leftover_labels = [];  // The labels at other positions
+                for (let i = 0; i < labels.length; i++) {
+                    // Generate a list of labels matching reordered_keys format
+                    var l = labels[i];
+                    if (l["position"] == position) {
+                        var key = [l["text"], l["size"], l["color"], l["position"]].join("_");
+                        labels_dict[key] = l;
+                    } else {
+                        leftover_labels.push(l);
+                    }
+                }
+
+                var reordered_labels = [];
+                for (let i = 0; i < reordered_keys.length; i++) {
+                    // For each key in result after sorting, check if exist for the panel
+                    if(reordered_keys[i] in labels_dict) {
+                        reordered_labels.push(labels_dict[reordered_keys[i]]);
+                        delete labels_dict[reordered_keys[i]];
+                    }
+                }
+                reordered_labels.push(...leftover_labels);
+                panelModel.set('labels', reordered_labels);
             });
-            this.labelOrder = reorderedKeys;    
         },
-    
 
         render: function() {
 
@@ -628,7 +654,7 @@
                 html += self.template(json);
             });
             self.$el.append(html);
-            this.initializeSortable();
+            this.initialize_sortable();
             return this;
         }
     });
@@ -684,7 +710,6 @@
                 });
 
             this.$vp_zoom_value = $("#vp_zoom_value");
-            
 
             // We nest the ZoomView so we can update it on update_img_css
             this.zmView = new ZoomView({models: this.models,
@@ -748,7 +773,7 @@
                 return;     // Ignore keyups except 'Enter'
             }
 
-            // get the current entered value 
+            // get the current entered value
             var value = parseInt(event.target.value);
             if (isNaN(value)) {
                 return;
