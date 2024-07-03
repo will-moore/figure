@@ -54,7 +54,7 @@ var Rect = function Rect(options) {
   if(options.fillOpacity){
       this._fillOpacity = options.fillOpacity;
   }else{
-      this._fillOpacity = 0.01;
+      this._fillOpacity = 0;
   }
 
   this._strokeWidth = options.strokeWidth || 2;
