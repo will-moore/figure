@@ -6,6 +6,7 @@
     import Backbone from "backbone";
     import _ from "underscore";
     import $ from "jquery";
+    import Sortable from 'sortablejs';
 
     import {figureConfirmDialog, showModal, rotatePoint} from "./util";
     import FigureColorPicker from "../views/colorpicker";
