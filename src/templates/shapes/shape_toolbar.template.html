@@ -114,6 +114,19 @@
 </div>
 
 <div class="btn-group me-2">
+    <button type="button" class="fill-opacity btn btn-outline-secondary dropdown-toggle" title="Fill opacity: <%= opacity %>"
+        data-bs-toggle="dropdown">
+        <span data-fill-opacity="<%= opacity %>"><%= opacity %></span>
+        <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu dropdownSelect opacity" style="min-width: 0" role="menu">
+        <% _.each(opacities,function(p){ %>
+            <li><a class="dropdown-item" href='#'><span data-fill-opacity='<%= p %>'><%= p %></span></a></li>
+        <% }); %>
+    </ul>
+</div>
+
+<div class="btn-group me-2">
     <button type="button" class="line-width btn btn-outline-secondary dropdown-toggle" title="Delete, Copy, Paste etc"
         data-bs-toggle="dropdown">
         <span>Edit</span>

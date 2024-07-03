@@ -73,7 +73,6 @@ export const RoiModalView = Backbone.View.extend({
 
             // Here we handle init of the dialog when it's shown...
             document.getElementById('roiModal').addEventListener('shown.bs.modal', () => {
-                console.log("ROI modal shown...")
                 // Clone the 'first' selected panel as our reference for everything
                 self.m = self.model.getSelected().head().clone();
 
@@ -116,6 +115,7 @@ export const RoiModalView = Backbone.View.extend({
             "change .line-width": "changeLineWidth",
             "change .shape-color": "changeColor",
             "change .fill-color": "changeFillColor",
+            "change .fill-opacity": "changeFillOpacity",
             // shapeManager triggers on canvas element
             "change:selected .roi_paper": "shapeSelected",
             "new:shape .roi_paper": "shapeSelected",
@@ -262,6 +262,7 @@ export const RoiModalView = Backbone.View.extend({
                 // Need to create Rectangle with current color & line width
                 var color = $(".roi_toolbar .shape-color span:first", this.$el).attr('data-color'),
                     fillColor = $(".roi_toolbar .fill-color span:first", this.$el).attr('data-fill-color'),
+                    opacity = $(".roi_toolbar .fill-opacity span:first", this.$el).attr('data-fill-opacity'),
                     width = $(".roi_toolbar .line-width span:first", this.$el).attr('data-line-width'),
                     rect = roiJson.CROP;
                 roiJson = [{type: "Rectangle",
@@ -271,6 +272,7 @@ export const RoiModalView = Backbone.View.extend({
                             height: rect.height,
                             strokeColor: "#" + color,
                             fillColor: "#" + fillColor,
+                            fillOpacity: opacity,
                             lineWidth: width}];
             } else {
                 return;
@@ -330,6 +332,12 @@ export const RoiModalView = Backbone.View.extend({
         changeFillColor: function(event) {
             var color = $("span:first", event.target).attr('data-fill-color');
             this.shapeManager.setFillColor("#" + color);
+        },
+
+        changeFillOpacity: function(event) {
+            var opacity = $("span:first", event.target).attr('data-fill-opacity');
+            opacity = parseFloat(opacity, 10);
+            this.shapeManager.setFillOpacity(opacity);
         },
 
         // Handles all the various drop-down menus in the toolbar
@@ -402,11 +410,13 @@ export const RoiModalView = Backbone.View.extend({
                 lineW = this.shapeManager.getStrokeWidth(),
                 color = this.shapeManager.getStrokeColor(),
                 fillColor = this.shapeManager.getFillColor(),
+                opacity = this.shapeManager.getFillOpacity(),
                 scale = this.zoom,
                 sel = this.shapeManager.getSelectedShapes().length > 0,
                 toPaste = this.model.get('clipboard'),
                 windows = navigator.platform.toUpperCase().indexOf('WIN') > -1,
-                lineWidths = [0.25, 0.5, 0.75, 1, 2, 3, 4, 5, 7, 10, 15, 20, 30];
+                lineWidths = [0.25, 0.5, 0.75, 1, 2, 3, 4, 5, 7, 10, 15, 20, 30],
+                opacities = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0];
             color = color ? color.replace("#", "") : 'FFFFFF';
             fillColor = fillColor ? fillColor.replace("#", "") : 'FFFFFF';
             toPaste = (toPaste && (toPaste.SHAPES || toPaste.CROP));
@@ -416,6 +426,8 @@ export const RoiModalView = Backbone.View.extend({
                         'lineWidth': lineW,
                         'color': color,
                         'fillColor': fillColor,
+                        'opacities': opacities,
+                        'opacity': opacity,
                         'sel': sel,
                         'cmdKey': windows ? "Ctrl+" : "⌘",
                         'toPaste': toPaste,
