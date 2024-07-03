@@ -33,6 +33,18 @@ var Polygon = function Polygon(options) {
   );
 
   this._strokeColor = options.strokeColor;
+
+  if(options.fillColor){
+    this._fillColor = options.fillColor;
+  }else{
+      this._fillColor = "#ffffff";
+  }
+  if(options.fillOpacity){
+      this._fillOpacity = options.fillOpacity;
+  }else{
+      this._fillOpacity = 0;
+  }
+
   this._strokeWidth = options.strokeWidth || 2;
   this._selected = false;
   this._zoomFraction = 1;
@@ -42,7 +54,7 @@ var Polygon = function Polygon(options) {
   this.handle_wh = 6;
 
   this.element = this.paper.path("");
-  this.element.attr({ "fill-opacity": 0.01, fill: "#fff", cursor: "pointer" });
+  this.element.attr({ "fill-opacity": this._fillOpacity, fill: this._fillColor, cursor: "pointer" });
 
   if (this.manager.canEdit) {
     // Drag handling of element
@@ -112,6 +124,8 @@ Polygon.prototype.toJson = function toJson() {
     area: this._area,
     strokeWidth: this._strokeWidth,
     strokeColor: this._strokeColor,
+    fillColor: this._fillColor,
+    fillOpacity:this._fillOpacity
   };
   if (this._id) {
     rv.id = this._id;
@@ -193,8 +207,22 @@ Polygon.prototype.getStrokeWidth = function getStrokeWidth() {
   return this._strokeWidth;
 };
 
+Polygon.prototype.setFillColor = function setFillColor(fillColor) {
+  this._fillColor = fillColor;
+  this.drawShape();
+};
+
 Polygon.prototype.getFillColor = function getFillColor() {
   return this._fillColor;
+};
+
+Polygon.prototype.setFillOpacity = function setFillOpacity(fillOpacity) {
+  this._fillOpacity = fillOpacity;
+  this.drawShape();
+};
+
+Polygon.prototype.getFillOpacity = function getFillOpacity() {
+  return this._fillOpacity;
 };
 
 Polygon.prototype.destroy = function destroy() {
@@ -292,7 +320,9 @@ Polygon.prototype.updateHandle = function updateHandle(
 
 Polygon.prototype.drawShape = function drawShape() {
   var strokeColor = this._strokeColor,
-    strokeW = this._strokeWidth;
+    strokeW = this._strokeWidth,
+    fillColor = this._fillColor,
+    fillOpacity = this._fillOpacity;
 
   var f = this._zoomFraction;
   var path = this.getPath();
@@ -301,6 +331,8 @@ Polygon.prototype.drawShape = function drawShape() {
     path: path,
     stroke: strokeColor,
     "stroke-width": strokeW,
+    fill: fillColor,
+    'fill-opacity': fillOpacity
   });
 
   if (this.isSelected()) {
