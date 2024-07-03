@@ -189,6 +189,10 @@ Line.prototype.getStrokeWidth = function getStrokeWidth() {
   return this._strokeWidth;
 };
 
+Line.prototype.getFillColor = function getFillColor() {
+  return this._fillColor;
+};
+
 Line.prototype.destroy = function destroy() {
   this.element.remove();
   this.handles.remove();

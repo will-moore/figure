@@ -45,6 +45,18 @@ var Rect = function Rect(options) {
     this._area = this._width * this._height;
   }
   this._strokeColor = options.strokeColor;
+
+  if(options.fillColor){
+    this._fillColor = options.fillColor;
+  }else{
+      this._fillColor = "#ffffff";
+  }
+  if(options.fillOpacity){
+      this._fillOpacity = options.fillOpacity;
+  }else{
+      this._fillOpacity = 0.01;
+  }
+
   this._strokeWidth = options.strokeWidth || 2;
   this._selected = false;
   this._zoomFraction = 1;
@@ -54,7 +66,7 @@ var Rect = function Rect(options) {
   this.handle_wh = 6;
 
   this.element = this.paper.rect();
-  this.element.attr({ "fill-opacity": 0.01, fill: "#fff", cursor: "pointer" });
+  this.element.attr({ "fill-opacity": this._fillOpacity, fill: this._fillColor, cursor: "pointer" });
 
   if (this.manager.canEdit) {
     // Drag handling of element
@@ -104,6 +116,8 @@ Rect.prototype.toJson = function toJson() {
     'area': this._width * this._height,
     strokeWidth: this._strokeWidth,
     strokeColor: this._strokeColor,
+    fillColor: this._fillColor,
+    fillOpacity: this._fillOpacity
   };
   if (this._id) {
     rv.id = this._id;
@@ -225,6 +239,24 @@ Rect.prototype.getStrokeColor = function getStrokeColor() {
   return this._strokeColor;
 };
 
+Rect.prototype.setFillColor = function setFillColor(fillColor) {
+  this._fillColor = fillColor;
+  this.drawShape();
+};
+
+Rect.prototype.getFillColor = function getFillColor() {
+  return this._fillColor;
+};
+
+Rect.prototype.setFillOpacity = function setFillOpacity(fillOpacity) {
+  this._fillOpacity = fillOpacity;
+  this.drawShape();
+};
+
+Rect.prototype.getFillOpacity = function getFillOpacity() {
+  return this._fillOpacity;
+};
+
 Rect.prototype.setStrokeWidth = function setStrokeWidth(strokeWidth) {
   this._strokeWidth = strokeWidth;
   this.drawShape();
@@ -241,7 +273,9 @@ Rect.prototype.destroy = function destroy() {
 
 Rect.prototype.drawShape = function drawShape() {
   var strokeColor = this._strokeColor,
-    lineW = this._strokeWidth;
+    lineW = this._strokeWidth,
+    fillColor = this._fillColor,
+    fillOpacity = this._fillOpacity;
 
   var f = this._zoomFraction,
     x = this._x * f,
@@ -256,6 +290,8 @@ Rect.prototype.drawShape = function drawShape() {
     height: h,
     stroke: strokeColor,
     "stroke-width": lineW,
+    fill: fillColor,
+    "fill-opacity": fillOpacity
   });
 
   if (this.isSelected()) {
@@ -430,6 +466,8 @@ var CreateRect = function CreateRect(options) {
 CreateRect.prototype.startDrag = function startDrag(startX, startY) {
   var strokeColor = this.manager.getStrokeColor(),
     strokeWidth = this.manager.getStrokeWidth(),
+    fillColor = this.manager.getFillColor(),
+    fillOpacity = this.manager.getFillOpacity(),
     zoom = this.manager.getZoom();
   // Also need to get strokeWidth and zoom/size etc.
 
@@ -447,6 +485,8 @@ CreateRect.prototype.startDrag = function startDrag(startX, startY) {
     strokeWidth: strokeWidth,
     zoom: zoom,
     strokeColor: strokeColor,
+    fillColor: fillColor,
+    fillOpacity: fillOpacity
   });
 };
 

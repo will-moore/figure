@@ -193,6 +193,10 @@ Polygon.prototype.getStrokeWidth = function getStrokeWidth() {
   return this._strokeWidth;
 };
 
+Polygon.prototype.getFillColor = function getFillColor() {
+  return this._fillColor;
+};
+
 Polygon.prototype.destroy = function destroy() {
   this.element.remove();
   this.handles.remove();

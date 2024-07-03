@@ -204,6 +204,10 @@ Ellipse.prototype.getStrokeWidth = function getStrokeWidth() {
   return this._strokeWidth;
 };
 
+Ellipse.prototype.getFillColor = function getFillColor() {
+  return this._fillColor;
+};
+
 Ellipse.prototype.destroy = function destroy() {
   this.element.remove();
   this.handles.remove();

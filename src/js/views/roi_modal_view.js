@@ -104,6 +104,7 @@ export const RoiModalView = Backbone.View.extend({
 
             this.shapeManager = new ShapeManager("roi_paper", 1, 1);
             self.shapeManager.setStrokeColor('#FFFFFF');
+            self.shapeManager.setFillColor('#FFFFFF');
 
             this.$roiImg = $('.roi_image', this.$el);
         },
@@ -114,6 +115,7 @@ export const RoiModalView = Backbone.View.extend({
             "click .dropdownSelect a": "select_dropdown_option",
             "change .line-width": "changeLineWidth",
             "change .shape-color": "changeColor",
+            "change .fill-color": "changeFillColor",
             // shapeManager triggers on canvas element
             "change:selected .roi_paper": "shapeSelected",
             "new:shape .roi_paper": "shapeSelected",
@@ -259,6 +261,7 @@ export const RoiModalView = Backbone.View.extend({
             } else if (roiJson.CROP) {
                 // Need to create Rectangle with current color & line width
                 var color = $(".roi_toolbar .shape-color span:first", this.$el).attr('data-color'),
+                    fillColor = $(".roi_toolbar .fill-color span:first", this.$el).attr('data-fill-color'),
                     width = $(".roi_toolbar .line-width span:first", this.$el).attr('data-line-width'),
                     rect = roiJson.CROP;
                 roiJson = [{type: "Rectangle",
@@ -267,6 +270,7 @@ export const RoiModalView = Backbone.View.extend({
                             width: rect.width,
                             height: rect.height,
                             strokeColor: "#" + color,
+                            fillColor: "#" + fillColor,
                             lineWidth: width}];
             } else {
                 return;
@@ -321,6 +325,11 @@ export const RoiModalView = Backbone.View.extend({
         changeColor: function(event) {
             var color = $("span:first", event.target).attr('data-color');
             this.shapeManager.setStrokeColor("#" + color);
+        },
+
+        changeFillColor: function(event) {
+            var color = $("span:first", event.target).attr('data-fill-color');
+            this.shapeManager.setFillColor("#" + color);
         },
 
         // Handles all the various drop-down menus in the toolbar
@@ -392,18 +401,21 @@ export const RoiModalView = Backbone.View.extend({
             var state = this.shapeManager.getState(),
                 lineW = this.shapeManager.getStrokeWidth(),
                 color = this.shapeManager.getStrokeColor(),
+                fillColor = this.shapeManager.getFillColor(),
                 scale = this.zoom,
                 sel = this.shapeManager.getSelectedShapes().length > 0,
                 toPaste = this.model.get('clipboard'),
                 windows = navigator.platform.toUpperCase().indexOf('WIN') > -1,
                 lineWidths = [0.25, 0.5, 0.75, 1, 2, 3, 4, 5, 7, 10, 15, 20, 30];
             color = color ? color.replace("#", "") : 'FFFFFF';
+            fillColor = fillColor ? fillColor.replace("#", "") : 'FFFFFF';
             toPaste = (toPaste && (toPaste.SHAPES || toPaste.CROP));
 
             var json = {'state': state,
                         'lineWidths': lineWidths,
                         'lineWidth': lineW,
                         'color': color,
+                        'fillColor': fillColor,
                         'sel': sel,
                         'cmdKey': windows ? "Ctrl+" : "⌘",
                         'toPaste': toPaste,
