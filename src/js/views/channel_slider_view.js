@@ -15,6 +15,15 @@ const lutsPngUrl = STATIC_DIR + lutsPng;
 const SLIDER_INCR_CUTOFF = 100;
 // If the max value of a slider is below this, use smaller slider increments
 
+function debounce(func, wait) {
+    let timeout;
+    return function() {
+        const context = this, args = arguments;
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(context, args), wait);
+    };
+}
+
 var ChannelSliderView = Backbone.View.extend({
 
     template: _.template(channel_slider_template),
@@ -22,6 +31,7 @@ var ChannelSliderView = Backbone.View.extend({
     initialize: function(opts) {
         // This View may apply to a single PanelModel or a list
         this.models = opts.models;
+        this.checkboxChecked = false;
         var self = this;
         this.models.forEach(function(m){
             self.listenTo(m, 'change:channels', self.render);
@@ -37,6 +47,7 @@ var ChannelSliderView = Backbone.View.extend({
         "change .ch_slider input": "channel_slider_stop",
         "mousemove .ch_start_slider": "start_slider_mousemove",
         "mousemove .ch_end_slider": "end_slider_mousemove",
+        "change #hilo-checkbox": "handle_hilo_checkbox", // Add the change event
     },
 
     start_slider_mousemove: function(event) {
@@ -268,6 +279,38 @@ var ChannelSliderView = Backbone.View.extend({
         return this;
     },
 
+    handle_hilo_checkbox: debounce(function(event) {
+        var self = this;
+    
+        // Check if the checkbox is checked
+        this.checkboxChecked = event.target.checked;
+    
+        if (this.checkboxChecked) {
+            // Save the current state of all channels
+            this.originalColors = this.models.map(function(m) {
+                return m.get('channels').map(function(channel) {
+                    return channel.color;
+                });
+            });
+    
+            // Batch update to set the color to "hilo.lut" for all channels
+            this.models.forEach(function(m) {
+                m.get('channels').forEach(function(channel, idx) {
+                    m.save_channel(idx, 'color', 'hilo.lut');
+                });
+            });
+        } else {
+            // Batch update to restore the original colors
+            this.models.forEach(function(m, modelIdx) {
+                m.get('channels').forEach(function(channel, channelIdx) {
+                    m.save_channel(channelIdx, 'color', self.originalColors[modelIdx][channelIdx]);
+                });
+            });
+            // Uncheck the checkbox
+            $('#hilo-checkbox').prop('checked', false);
+        }
+    }, 100),  
+
     render: function() {
         var json,
             self = this;
@@ -391,6 +434,18 @@ var ChannelSliderView = Backbone.View.extend({
                 $(sliderHtml).appendTo(this.$el);
 
             }.bind(this));
+
+            var checkboxHtml = '<div class="checkbox-container">' +
+                       '<input type="checkbox" id="hilo-checkbox" name="hilo-checkbox">' +
+                       '<label for="hilo-checkbox">  Hilo</label>' +
+                       '</div>';
+            this.$el.append(checkboxHtml);
+
+            // Check if the checkbox should be checked based on the current state
+            if (this.checkboxChecked) {
+                $('#hilo-checkbox').prop('checked', true);
+            }
+
         return this;
     }
 });
