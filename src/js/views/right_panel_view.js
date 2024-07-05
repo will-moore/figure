@@ -454,7 +454,7 @@
                 $("#selected_panels_labels").empty().append(this.sel_labels_panel.$el);
             }
             if (old) {
-                old.remove();
+                old.clear().remove();
             }
 
             // show scalebar form for selected panels
@@ -583,6 +583,17 @@
                 // Store the sortable instance
                 self.sortables.push(sortable);
             });
+        },
+
+        clear: function() {
+            // clean up the sortable
+            if (this.sortables) {
+                this.sortables.forEach(function(sortable) {
+                    sortable.destroy();
+                });
+            }
+            this.sortables = [];
+            return this;
         },
 
         handle_sort: function(evt) {
