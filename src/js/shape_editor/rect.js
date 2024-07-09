@@ -494,4 +494,4 @@ CreateRect.prototype.stopDrag = function stopDrag() {
   this.manager.addShape(this.rect);
 };
 
-export { CreateRect, Rect };
+export { CreateRect, Rect};

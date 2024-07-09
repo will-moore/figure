@@ -73,7 +73,6 @@ export const RoiModalView = Backbone.View.extend({
 
             // Here we handle init of the dialog when it's shown...
             document.getElementById('roiModal').addEventListener('shown.bs.modal', () => {
-                console.log("ROI modal shown...")
                 // Clone the 'first' selected panel as our reference for everything
                 self.m = self.model.getSelected().head().clone();
 
@@ -127,6 +126,7 @@ export const RoiModalView = Backbone.View.extend({
             "click .roisJumpPage": "roisJumpPage",
             "click .revert_theZ": "revertTheZ",
             "click .revert_theT": "revertTheT",
+            "click .outline":"outlineView"
         },
 
         revertTheZ: function() {
@@ -139,6 +139,10 @@ export const RoiModalView = Backbone.View.extend({
             var orig_model = this.model.getSelected().head();
             this.m.set('theT', orig_model.get('theT'));
             this.renderImagePlane();
+        },
+
+        outlineView: function(){
+            this.shapeManager.createOutline()
         },
 
         checkForRois: function() {

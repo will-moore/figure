@@ -1265,6 +1265,9 @@
     .polyline-icon{
         background-image: url("../images/polyline-icon-16.png");
     }
+    .outline-icon {
+        background-image: url("../images/outline-icon-16.png");
+    }
     .roiModalRoiItem {
         cursor: pointer;
     }
