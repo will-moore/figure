@@ -7,6 +7,7 @@ import FigureLutPicker from "../views/lutpicker";
 import FigureColorPicker from "../views/colorpicker";
 
 import channel_slider_template from '../../templates/channel_slider.template.html?raw';
+import checkbox_template from '../../templates/checkbox_template.html?raw';
 
 import lutsPng from "../../images/luts_10.png";
 // Need to handle dev vv built (omero-web) paths
@@ -27,11 +28,12 @@ function debounce(func, wait) {
 var ChannelSliderView = Backbone.View.extend({
 
     template: _.template(channel_slider_template),
+    checkboxTemplate: _.template(checkbox_template),
 
     initialize: function(opts) {
         // This View may apply to a single PanelModel or a list
         this.models = opts.models;
-        this.checkboxChecked = false;
+        // this.checkboxChecked = false;
         var self = this;
         this.models.forEach(function(m){
             self.listenTo(m, 'change:channels', self.render);
@@ -47,7 +49,7 @@ var ChannelSliderView = Backbone.View.extend({
         "change .ch_slider input": "channel_slider_stop",
         "mousemove .ch_start_slider": "start_slider_mousemove",
         "mousemove .ch_end_slider": "end_slider_mousemove",
-        "change #hilo-checkbox": "handle_hilo_checkbox", // Add the change event
+        "change #hiloCheckbox": "handle_hilo_checkbox", // Add the change event
     },
 
     start_slider_mousemove: function(event) {
@@ -279,7 +281,7 @@ var ChannelSliderView = Backbone.View.extend({
         return this;
     },
 
-    handle_hilo_checkbox: debounce(function(event) {
+    handle_hilo_checkbox: function(event) {
         var self = this;
     
         // Check if the checkbox is checked
@@ -306,10 +308,8 @@ var ChannelSliderView = Backbone.View.extend({
                     m.save_channel(channelIdx, 'color', self.originalColors[modelIdx][channelIdx]);
                 });
             });
-            // Uncheck the checkbox
-            $('#hilo-checkbox').prop('checked', false);
         }
-    }, 100),  
+    }, 
 
     render: function() {
         var json,
@@ -435,15 +435,13 @@ var ChannelSliderView = Backbone.View.extend({
 
             }.bind(this));
 
-            var checkboxHtml = '<div class="checkbox-container">' +
-                       '<input type="checkbox" id="hilo-checkbox" name="hilo-checkbox">' +
-                       '<label for="hilo-checkbox">  Hilo</label>' +
-                       '</div>';
+            // Append the checkbox template
+            var checkboxHtml = this.checkboxTemplate();
             this.$el.append(checkboxHtml);
 
             // Check if the checkbox should be checked based on the current state
             if (this.checkboxChecked) {
-                $('#hilo-checkbox').prop('checked', true);
+                $('#hiloCheckbox').prop('checked', true);
             }
 
         return this;
