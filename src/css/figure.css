@@ -25,7 +25,7 @@
     /* copied these from previous figure (Bootstrap 3.0.0) */
     .btn-default {
         /* only used for default buttons. Overridden for other buttons */
-        /* .btn-default class is still on lots of buttons (legacy from bootstrap 3.0.0) 
+        /* .btn-default class is still on lots of buttons (legacy from bootstrap 3.0.0)
          but now has no effect */
         --bs-btn-border-color: #cccccc;;
     }
@@ -84,7 +84,7 @@
     }
 
     .pixelated {
-        /* Try to show images in their original pixelated form Although 'pixelated' isn't 
+        /* Try to show images in their original pixelated form Although 'pixelated' isn't
         supported yet: https://developer.mozilla.org/en-US/docs/Web/CSS/image-rendering
         Code from http://phrogz.net/tmp/canvas_image_zoom.html */
         image-rendering:optimizeSpeed;             /* Legal fallback */
@@ -767,7 +767,7 @@
           /*Edge starts the margin from the thumb, not the track as other browsers do*/
         }
       }
-    
+
     #vp_z_slider input[type="range"], #vp_t_slider input[type="range"] {
         background-color: #bbbbbb;
         margin: 0;
@@ -1319,4 +1319,8 @@
 
     #openFigureModal a {
         text-decoration: none;
+    }
+
+    .form-inline{
+        cursor: move;
     }
