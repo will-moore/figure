@@ -85,7 +85,12 @@ var ColorPickerView = Backbone.View.extend({
     show: function(options) {
         showModal("colorpickerModal");
 
-        $(".color-input", this.$el);
+        if(this.pickedColors.length == 0){
+            $(".color-input", this.$el).trigger("click");
+        }else{
+            $(".color-input", this.$el);
+        }
+        
         if (options.color) {
             // compare old and new colors - init with old color
             $('.oldNewColors li').css('background-color', "#" + options.color);
