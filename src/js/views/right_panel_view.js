@@ -902,6 +902,11 @@
             // Current zoom may be larger due to small crop region
             $("#vp_zoom_slider").attr({'max': max_zoom}).val(this.zoom_avg);
 
+            var to_save = {'zoom': this.zoom_avg};
+            this.models.forEach(function(m){
+                m.save(to_save);
+            });
+
             return this;
         }
     });
