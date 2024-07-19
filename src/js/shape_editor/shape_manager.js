@@ -284,7 +284,7 @@ ShapeManager.prototype.createOutline = function createOutline(viewport) {
     y: viewport.y,
     width: viewport.width,
     height: viewport.height,
-    area: 0,
+    area: viewport.width * viewport.height,
     strokeWidth: this._strokeWidth,
     zoom: this._zoom,
     strokeColor: this._strokeColor,
