@@ -103,10 +103,6 @@ ShapeManager.prototype.startDrag = function startDrag(x, y, event) {
     startX = x - offset.left,
     startY = y - offset.top;
 
-  console.log("x:" +x)
-  console.log("y:" +y)
-  console.log("startX:" +startX)
-  console.log("startY:" +startY)
   if (this.getState() === "SELECT") {
     this._dragStart = { x: startX, y: startY };
 
@@ -280,22 +276,14 @@ ShapeManager.prototype.setShapesJson = function setShapesJson(jsonShapes) {
   });
 };
 
-ShapeManager.prototype.createOutline = function createOutline() {
-  console.log(this.paper)
-  console.log(this._zoom)
-  console.log(this._strokeWidth)
-  console.log(this._strokeColor)
-  console.log(this.selectRegion.attr())
-  console.log(this.$el.offset())
-  console.log(this._orig_width)
-  console.log(this._orig_height)
+ShapeManager.prototype.createOutline = function createOutline(viewport) {
   var outline = new Rect({
     manager: this,
     paper: this.paper,
-    x: 0,
-    y: 0,
-    width: this._orig_width,
-    height: this._orig_height,
+    x: viewport.x,
+    y: viewport.y,
+    width: viewport.width,
+    height: viewport.height,
     area: 0,
     strokeWidth: this._strokeWidth,
     zoom: this._zoom,

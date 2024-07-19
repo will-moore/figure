@@ -142,7 +142,8 @@ export const RoiModalView = Backbone.View.extend({
         },
 
         outlineView: function(){
-            this.shapeManager.createOutline()
+            var viewport = this.m.getViewportAsRect()
+            this.shapeManager.createOutline(viewport)
         },
 
         checkForRois: function() {
