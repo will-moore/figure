@@ -357,7 +357,7 @@
         },
 
         get_zoom_label_text: function() {
-            var text = "" + this.get('zoom') + " %"
+            var text = "" + parseInt(this.get('zoom')) + " %"
             return text;
         },
 
