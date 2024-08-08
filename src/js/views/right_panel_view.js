@@ -617,12 +617,12 @@
             $("#vp_zoom_slider")
                 .attr({"max": 1000})
                 .on("input", (event) => {
-                    let val = parseFloat(event.target.value);
+                    let val = Math.round(parseFloat(event.target.value));
                     this.update_img_css(val, 0, 0);
                     $('#vp_zoom_value').val(val);
                 })
                 .on("change", (event) => {
-                    let val = parseFloat(event.target.value);
+                    let val = Math.round(parseFloat(event.target.value));
                     this.zoom_avg = val;
                     var to_save = {'zoom': val};
                     if (val === 100) {
@@ -702,7 +702,7 @@
             }
 
             // get the current entered value 
-            var value = parseInt(event.target.value);
+            var value = Math.round(parseFloat(event.target.value));
             if (isNaN(value)) {
                 return;
             }
@@ -865,7 +865,7 @@
             // only show viewport if original w / h ratio is same for all models
             // get average viewport frame w/h & zoom
             var wh = this.models.getAverageWH(),
-                zoom = this.models.getAverage('zoom');
+                zoom = Math.round(this.models.getAverage('zoom'));
 
             if (wh <= 1) {
                 var frame_h = this.full_size;
@@ -961,11 +961,7 @@
 
             this.models.forEach(function(m){
                 m.cropToRoi(rect);
-                $("#vp_zoom_slider").val(parseInt(m.get('zoom')));
-                $("#vp_zoom_value").val(parseInt(m.get('zoom')));
             });
-
-            
         },
 
         show_crop_dialog: function(event) {

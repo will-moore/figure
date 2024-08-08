@@ -357,7 +357,7 @@
         },
 
         get_zoom_label_text: function() {
-            var text = "" + parseInt(this.get('zoom')) + " %"
+            var text = "" + Math.round(this.get('zoom')) + " %"
             return text;
         },
 
