@@ -1003,11 +1003,11 @@
                 }
             });
             var json = {
-                x: (x !== "-" ? parseInt(x, 10) : x),
-                y: (y !== "-" ? parseInt(y, 10) : y),
-                width: (w !== "-" ? parseInt(w, 10) : w),
-                height: (h !== "-" ? parseInt(h, 10) : h),
-                rotation: (rotation !== "-" ? parseInt(rotation, 10) : "-"),
+                x: (x !== "-" ? parseFloat(x, 10) : x),
+                y: (y !== "-" ? parseFloat(y, 10) : y),
+                width: (w !== "-" ? parseFloat(w, 10) : w),
+                height: (h !== "-" ? parseFloat(h, 10) : h),
+                rotation: (rotation !== "-" ? parseFloat(rotation, 10) : "-"),
             }
             return json;
         },
@@ -1020,8 +1020,14 @@
             json.canCopyRect = true;
             json.canPasteRect = (clipboard && ('CROP' in clipboard || 'SHAPES' in clipboard));
 
-            if ([json.x, json.y, json.w, json.h].indexOf("-") > -1) {
+            if ([json.x, json.y, json.width, json.height].indexOf("-") > -1) {
                 json.canCopyRect = false;
+            }else{
+                json.x = Math.round(json.x)
+                json.y = Math.round(json.y)
+                json.width = Math.round(json.width)
+                json.height = Math.round(json.height)
+                json.rotation = Math.round(json.rotation)
             }
             this.$el.html(this.template(json));
         },
