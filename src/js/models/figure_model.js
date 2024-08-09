@@ -356,6 +356,7 @@
                 figureJSON.figureName = options.figureName;
             }
             data.figureJSON = JSON.stringify(figureJSON);
+            data.baseUrl = BASE_WEBFIGURE_URL;
 
             // Save
             $.post( url, data)
