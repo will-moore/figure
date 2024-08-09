@@ -285,12 +285,13 @@ ShapeManager.prototype.createOutline = function createOutline(viewport) {
     width: viewport.width,
     height: viewport.height,
     area: viewport.width * viewport.height,
-    strokeWidth: this._strokeWidth,
+    strokeWidth: 1,
     zoom: this._zoom,
     strokeColor: this._strokeColor,
   });
   outline.setSelected(true);
   this.addShape(outline);
+  outline.setStrokeWidth(this._strokeWidth)
 }
 
 ShapeManager.prototype.regionToPath = function regionToPath(region, zoom) {
