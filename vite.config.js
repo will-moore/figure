@@ -9,7 +9,10 @@ export default {
   },
   server: {
     port: 8080,
-    hot: true
+    hot: true,
+    watch: {
+        usePolling: true
+    }
   },
   build: {
     sourcemap: true,
