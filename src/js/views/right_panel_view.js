@@ -6,6 +6,7 @@
     import Backbone from "backbone";
     import _ from "underscore";
     import $ from "jquery";
+    import Sortable from 'sortablejs';
 
     import {figureConfirmDialog, showModal, rotatePoint} from "./util";
     import FigureColorPicker from "../views/colorpicker";
@@ -453,7 +454,7 @@
                 $("#selected_panels_labels").empty().append(this.sel_labels_panel.$el);
             }
             if (old) {
-                old.remove();
+                old.clear().remove();
             }
 
             // show scalebar form for selected panels
@@ -548,6 +549,90 @@
             return false;
         },
 
+        initialize_sortable: function() {
+            var self = this;
+            var containers = self.$el.find('.labels-container');
+
+            // Check if there are any elements
+            if (containers.length === 0) {
+                return;
+            }
+
+            // Destroy existing Sortable instances if any
+            if (self.sortables) {
+                self.sortables.forEach(function(sortable) {
+                    sortable.destroy();
+                });
+            }
+            self.sortables = [];
+
+            // Initialize Sortable for each container
+            containers.each(function(index, el) {
+                var sortable = new Sortable(el, {
+                    animation: 150,
+                    fallbackOnBody: true,
+                    onMove: function(evt) {
+                        // Allow dragging outside the container
+                        return evt.related === null || evt.related !== evt.from;
+                    },
+                    onEnd: function(evt) {
+                        self.handle_sort(evt);
+                    }
+                });
+
+                // Store the sortable instance
+                self.sortables.push(sortable);
+            });
+        },
+
+        clear: function() {
+            // clean up the sortable
+            if (this.sortables) {
+                this.sortables.forEach(function(sortable) {
+                    sortable.destroy();
+                });
+            }
+            this.sortables = [];
+            return this;
+        },
+
+        handle_sort: function(evt) {
+            var container = evt.srcElement; // Get the object that triggered the event   
+
+            // Extract label keys in the new order of that position set
+            var forms = container.querySelectorAll('.edit-label-form');
+            var reordered_keys = Array.from(forms).map(form => form.getAttribute('data-key'));
+            var position = reordered_keys[0].split("_").pop();
+
+            // Update the order of labels in each panel
+            this.models.forEach(function(panelModel) {
+                var labels = panelModel.get('labels');
+                var labels_dict = {};  // Labels for the current position set
+                var leftover_labels = [];  // The labels at other positions
+                for (let i = 0; i < labels.length; i++) {
+                    // Generate a list of labels matching reordered_keys format
+                    var l = labels[i];
+                    if (l["position"] == position) {
+                        var key = [l["text"], l["size"], l["color"], l["position"]].join("_");
+                        labels_dict[key] = l;
+                    } else {
+                        leftover_labels.push(l);
+                    }
+                }
+
+                var reordered_labels = [];
+                for (let i = 0; i < reordered_keys.length; i++) {
+                    // For each key in result after sorting, check if exist for the panel
+                    if(reordered_keys[i] in labels_dict) {
+                        reordered_labels.push(labels_dict[reordered_keys[i]]);
+                        delete labels_dict[reordered_keys[i]];
+                    }
+                }
+                reordered_labels.push(...leftover_labels);
+                panelModel.set('labels', reordered_labels);
+            });
+        },
+
         render: function() {
 
             var self = this,
@@ -581,7 +666,7 @@
                 html += self.template(json);
             });
             self.$el.append(html);
-
+            this.initialize_sortable();
             return this;
         }
     });
@@ -637,7 +722,6 @@
                 });
 
             this.$vp_zoom_value = $("#vp_zoom_value");
-            
 
             // We nest the ZoomView so we can update it on update_img_css
             this.zmView = new ZoomView({models: this.models,
@@ -701,7 +785,7 @@
                 return;     // Ignore keyups except 'Enter'
             }
 
-            // get the current entered value 
+            // get the current entered value
             var value = parseInt(event.target.value);
             if (isNaN(value)) {
                 return;
