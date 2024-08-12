@@ -790,7 +790,7 @@
             // Used for static rendering, as well as during zoom, panning, panel resizing
             // and panel re-shaping (stretch/squash).
 
-            var zooming = zoom !== this.get('zoom');
+            var zooming = Math.abs(zoom - this.get('zoom')) > 1;
             var panning = (x !== undefined && y!== undefined);
 
             // Need to know what the original offsets are...
