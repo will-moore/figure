@@ -1686,7 +1686,6 @@ class FigureExport(object):
                 # check max_projection_bytes
                 pixel_range = image.getPixelRange()
                 bytes_per_pixel = ceil(log2(pixel_range[1]) / 8.0)
-                act_chs = [ch for ch in image.getChannels() if ch.isActive()]
                 proj_bytes = (size_z * size_x * size_y
                               * size_c * bytes_per_pixel)
 
