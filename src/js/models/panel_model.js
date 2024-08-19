@@ -560,15 +560,15 @@
             }
         },
 
-        // Does sizeXYZ, pixelType and active Channels exceed MAX_PROJECTION_BYTES?
+        // Does sizeXYZ, pixelType and Channels exceed MAX_PROJECTION_BYTES?
         isMaxProjectionBytesExceeded: function() {
             let bytes_per_pixel = 4;
             if (this.get("pixel_range")) {
                 bytes_per_pixel = Math.ceil(Math.log2(this.get("pixel_range")[1]) / 8.0);
             }
-            let active_channels = this.get("channels").reduce((prev, channel) => channel.active ? prev + 1 : prev, 0);
+            let sizeC = this.get("channels").length;
             let sizeXYZ = this.get('orig_width') * this.get('orig_height') * this.get('sizeZ');
-            let total_bytes = bytes_per_pixel * active_channels * sizeXYZ;
+            let total_bytes = bytes_per_pixel * sizeC * sizeXYZ;
             return total_bytes > MAX_PROJECTION_BYTES;
         },
 
