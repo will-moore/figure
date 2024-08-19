@@ -1679,6 +1679,7 @@ class FigureExport(object):
         size_x = image.getSizeX()
         size_y = image.getSizeY()
         size_z = image.getSizeZ()
+        size_c = image.getSizeC()
 
         if 'z_projection' in panel and panel['z_projection']:
             if 'z_start' in panel and 'z_end' in panel:
@@ -1687,7 +1688,7 @@ class FigureExport(object):
                 bytes_per_pixel = ceil(log2(pixel_range[1]) / 8.0)
                 act_chs = [ch for ch in image.getChannels() if ch.isActive()]
                 proj_bytes = (size_z * size_x * size_y
-                              * len(act_chs) * bytes_per_pixel)
+                              * size_c * bytes_per_pixel)
 
                 cfg = self.conn.getConfigService()
                 max_bytes = int(cfg.getConfigValue(
