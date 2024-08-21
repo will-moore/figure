@@ -357,7 +357,7 @@
         },
 
         get_zoom_label_text: function() {
-            var text = "" + this.get('zoom') + " %"
+            var text = "" + Math.round(this.get('zoom')) + " %"
             return text;
         },
 
@@ -593,8 +593,8 @@
             var targetWH = coords.width/coords.height,
                 currentWH = this.get('width')/this.get('height'),
                 newW, newH,
-                targetCx = Math.round(coords.x + (coords.width/2)),
-                targetCy = Math.round(coords.y + (coords.height/2)),
+                targetCx = coords.x + (coords.width/2),
+                targetCy = coords.y + (coords.height/2),
                 // centre panel at centre of ROI
                 dx = (this.get('orig_width')/2) - targetCx,
                 dy = (this.get('orig_height')/2) - targetCy;
