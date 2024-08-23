@@ -17,7 +17,7 @@ const SLIDER_INCR_CUTOFF = 100;
 // If the max value of a slider is below this, use smaller slider increments
 
 var ChannelSliderView = Backbone.View.extend({
-    
+
     template: _.template(channel_slider_template),
     checkboxTemplate: _.template(checkbox_template),
 
