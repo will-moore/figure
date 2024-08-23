@@ -1166,6 +1166,9 @@
         position: absolute;
         top: 15px;
         right: 15px;
+        text-align: center;
+        font-weight: normal;
+        font-size: 14px;
     }
 
     .oldNewColors li {
