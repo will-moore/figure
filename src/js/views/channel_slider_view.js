@@ -308,6 +308,9 @@ var ChannelSliderView = Backbone.View.extend({
     loadCheckboxState: function() {
         var checkbox = this.$("#hiloCheckbox")[0];
         this.models.forEach(function(m) {
+            if(m.get('hilo_enabled') === undefined ){
+                m.set('hilo_enabled', false);
+            }
             checkbox.checked = m.get('hilo_enabled');
         });
     },
