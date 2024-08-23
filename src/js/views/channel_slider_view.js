@@ -311,7 +311,7 @@ var ChannelSliderView = Backbone.View.extend({
             if(m.get('hilo_enabled') === undefined ){
                 m.set('hilo_enabled', false);
             }
-            checkbox.checked = m.get('hilo_enabled');
+            checkbox.checked = m.get('hilo_enabled') || checkbox.checked;
         });
     },
 
