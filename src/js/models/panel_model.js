@@ -27,6 +27,8 @@
             pixel_size_x_unit: 'MICROMETER',
             rotation_symbol: '\xB0',
             max_export_dpi: 1000,
+            hilo_enabled: false,
+            hilo_original_colors: [],
 
             // 'export_dpi' optional value to resample panel on export
             // model includes 'scalebar' object, e.g:
