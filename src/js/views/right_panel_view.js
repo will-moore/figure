@@ -134,8 +134,9 @@
                 let minSide = Math.min(vp.width, vp.height);
                 // Square is 1/3 size of the viewport
                 let rectSize = minSide / 3;
-                var color = $('button.shape-color span:first', this.$el).attr('data-color');
-                var strokeWidth = parseFloat($('button.line-width span:first', this.$el).attr('data-line-width'));
+                var color = $('.inset-color span:first', this.$el).attr('data-color');
+                var position = $('.label-position i:first', this.$el).attr('data-position');
+                var strokeWidth = parseFloat($('button.inset-width span:first', this.$el).attr('data-line-width'));
                 let rect = {
                     type: "Rectangle",
                     strokeWidth,
@@ -156,8 +157,12 @@
                 panelJson.width = maxSide;
                 panelJson.height = maxSide;
 
-                if (selWidth > selHeight) {
+                if (position == "bottom") {
                     panelJson.y = panelJson.y + 1.1 * panel.get("height");
+                } else if (position == "left") {
+                    panelJson.x = panelJson.x - (1.1 * panelJson.width);
+                } else if (position == "top") {
+                    panelJson.y = panelJson.y - (1.1 * panelJson.height);
                 } else {
                     panelJson.x = panelJson.x + 1.1 * panel.get("width");
                 }
