@@ -16,15 +16,6 @@ const lutsPngUrl = STATIC_DIR + lutsPng;
 const SLIDER_INCR_CUTOFF = 100;
 // If the max value of a slider is below this, use smaller slider increments
 
-function debounce(func, wait) {
-    let timeout;
-    return function() {
-        const context = this, args = arguments;
-        clearTimeout(timeout);
-        timeout = setTimeout(() => func.apply(context, args), wait);
-    };
-}
-
 var ChannelSliderView = Backbone.View.extend({
     
     template: _.template(channel_slider_template),
@@ -33,12 +24,10 @@ var ChannelSliderView = Backbone.View.extend({
     initialize: function(opts) {
         // This View may apply to a single PanelModel or a list
         this.models = opts.models;
-        // this.checkboxChecked = false;
         var self = this;
         this.models.forEach(function(m){
             self.listenTo(m, 'change:channels', self.render);
         });
-        //this.loadCheckboxState();
     },
 
     events: {
@@ -283,25 +272,24 @@ var ChannelSliderView = Backbone.View.extend({
     },
 
     handle_hilo_checkbox: function(event) {
-        var checkbox = event.target;
-        var checkboxState = checkbox.checked;
+        var checkboxState = event.target.checked;
         this.models.forEach(function(m) {
             if (checkboxState && !m.get("hilo_enabled")){
                 // enable Hilo for Panel
                 m.set("hilo_enabled", true);
                 m.set("hilo_original_colors", m.get('channels').map(function(channel) {
                     return channel.color;
-                }));
+                }));                
                 m.get('channels').forEach(function(channel, idx) {
                     m.save_channel(idx, 'color', 'hilo.lut');
-                });                
+                });                           
             } else if (!checkboxState && m.get("hilo_enabled")){
                 // remove hilo state
                 m.set("hilo_enabled", false);
                 m.get('channels').forEach(function(channel, idx) {
                     m.save_channel(idx, 'color', m.get("hilo_original_colors")[idx]);
                 });   
-            } 
+            }
         })
     },  
 
@@ -357,7 +345,6 @@ var ChannelSliderView = Backbone.View.extend({
                     return fn(prev, curr);
                 }
             }
-
             // Comare channels from each Panel Model to see if they are
             // compatible, and compile a summary json.
             var chData = this.models.map(function(m){
@@ -367,13 +354,11 @@ var ChannelSliderView = Backbone.View.extend({
             var allSameCount = chData.reduce(function(prev, channels){
                 return channels.length === prev ? prev : false;
             }, chData[0].length);
-
             if (!allSameCount) {
                 return this;
             }
             // $(".ch_slider").slider("destroy");
             this.$el.empty();
-
             chData[0].forEach(function(d, chIdx) {
                 // For each channel, summarise all selected images:
                 // Make list of various channel attributes:
@@ -438,11 +423,9 @@ var ChannelSliderView = Backbone.View.extend({
                 $(sliderHtml).appendTo(this.$el);
 
             }.bind(this));
-
             // Append the checkbox template
             var checkboxHtml = this.checkboxTemplate();
             this.$el.append(checkboxHtml);
-
             // Load checkbox state after rendering
             this.loadCheckboxState();
         return this;
