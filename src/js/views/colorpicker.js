@@ -50,7 +50,13 @@ var ColorPickerView = Backbone.View.extend({
     // 'Recent colors' buttons have color as their title
     pickRecentColor: function(event) {
         var color = $(event.target).prop('title');
-        $('.color-input').val(color).trigger("click");
+        $('.color-input').val(color);
+
+        // Only show color picker if not Firefox
+        if(!navigator.userAgent.includes("Firefox")){
+            $(".color-input").trigger("click");
+        }
+        $('.oldNewColors li:first-child').css('background-color', color);
         // enable submit
         this.$submit_btn.prop('disabled', false);
     },
@@ -84,7 +90,11 @@ var ColorPickerView = Backbone.View.extend({
     show: function(options) {
         showModal("colorpickerModal");
 
-        $(".color-input", this.$el).trigger("click");
+        // Only show color picker if not Firefox
+        if(!navigator.userAgent.includes("Firefox") || this.pickedColors.length == 0){
+            $(".color-input", this.$el).trigger("click");
+        }
+        
         if (options.color) {
             // compare old and new colors - init with old color
             $('.oldNewColors li').css('background-color', "#" + options.color);
