@@ -193,7 +193,8 @@ export const UndoManager = Backbone.Model.extend({
         // into undo / redo operations to go into our Edit below
         var createUndo = function(callList) {
             var undos = [];
-            for (var u=0; u<callList.length; u++) {
+            // add in reverse order
+            for (var u=(callList.length - 1); u>=0; u--) {
                 undos.push(callList[u]);
             }
             // get the currently selected panels
