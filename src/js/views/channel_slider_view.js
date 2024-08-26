@@ -275,30 +275,29 @@ var ChannelSliderView = Backbone.View.extend({
         var checkboxState = event.target.checked;
         this.models.forEach(function(m) {
             if (checkboxState && !m.get("hilo_enabled")){
-                // enable Hilo for Panel
-                m.set("hilo_enabled", true);
-                m.set("hilo_original_colors", m.get('channels').map(function(channel) {
-                    return channel.color;
-                }));                
-                m.get('channels').forEach(function(channel, idx) {
-                    m.save_channel(idx, 'color', 'hilo.lut');
-                });                           
+                m.save({
+                    "hilo_enabled": true,
+                    "hilo_original_colors": m.get('channels').map(function(channel) {
+                        return channel.color;
+                    })
+                });
+                let newChs = m.get('channels').map(function(channel, idx) {
+                    return {'color': 'hilo.lut'};
+                });
+                m.save_channels(newChs);
             } else if (!checkboxState && m.get("hilo_enabled")){
-                // remove hilo state
-                m.set("hilo_enabled", false);
-                m.get('channels').forEach(function(channel, idx) {
-                    m.save_channel(idx, 'color', m.get("hilo_original_colors")[idx]);
-                });   
+                m.save("hilo_enabled", false);
+                let newChs = m.get('channels').map(function(channel, idx) {
+                    return {'color': m.get("hilo_original_colors")[idx]};
+                });
+                m.save_channels(newChs);
             }
         })
-    },  
+    },
 
     loadCheckboxState: function() {
         var checkbox = this.$("#hiloCheckbox")[0];
         this.models.forEach(function(m) {
-            if(m.get('hilo_enabled') === undefined ){
-                m.set('hilo_enabled', false);
-            }
             checkbox.checked = m.get('hilo_enabled') || checkbox.checked;
         });
     },

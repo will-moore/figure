@@ -505,6 +505,16 @@
             this.save('channels', chs);
         },
 
+        save_channels: function(channels) {
+            // channels should be a list of objects [{key:value}, {}..]
+            var oldChs = this.get('channels');
+            // Clone channels, applying changes
+            var chs = this.get('channels').map((oldCh, idx) => {
+                return $.extend(true, {}, oldCh, channels[idx]);
+            });
+            this.save('channels', chs);
+        },
+
         toggle_channel: function(cIndex, active ) {
 
             if (typeof active == "undefined") {
