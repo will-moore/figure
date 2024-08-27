@@ -158,6 +158,19 @@
             this.save('scalebar', sb);
         },
 
+        show_outline: function(color, strokewidth){
+            var outline = {
+                'color': '#'+color,
+                'strokewidth': strokewidth
+            }
+            this.save('outline', outline);
+        },
+
+        remove_outline: function(){
+            this.save('outline', undefined);
+        },
+
+
         // Simple checking whether shape is in viewport (x, y, width, height)
         // Return true if any of the points in shape are within viewport.
         is_shape_in_viewport: function(shape, viewport) {

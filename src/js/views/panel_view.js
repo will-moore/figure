@@ -40,7 +40,7 @@
                 'change:channels change:zoom change:dx change:dy change:width change:height change:rotation change:labels change:theT change:deltaT change:theZ change:deltaZ change:z_projection change:z_start change:z_end',
                 this.render_labels);
             this.listenTo(this.model, 'change:shapes', this.render_shapes);
-
+            this.listenTo(this.model, 'change:outline', this.show_outline);
             // During drag or resize, model isn't updated, but we trigger 'drag'
             this.model.on('drag_resize', this.drag_resize, this);
 
@@ -69,6 +69,15 @@
                 this.render_shapes();
             }
             this.$el.addClass('dragging');
+        },
+
+        show_outline: function(){
+            var outline = this.model.get('outline')
+            if(outline != undefined){
+                this.$el.css({'border': 'solid ' +outline.strokewidth+'px '+outline.color})
+            }else{
+                this.$el.css({'border': '', 'outline-offset':''})
+            }
         },
 
         render_layout: function() {

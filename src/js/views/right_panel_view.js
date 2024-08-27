@@ -108,6 +108,8 @@
 
         events: {
             "click .edit_rois": "editRois",
+            "click .show_outline": "showOutline",
+            "click .remove_outline": "removeOutline",
             "click .copyROIs": "copyROIs",
             "click .pasteROIs": "pasteROIs",
             "click .deleteROIs": "deleteROIs",
@@ -152,6 +154,24 @@
                 this.model.set('clipboard', {'SHAPES': roiJson});
             }
             this.render();
+        },
+
+        showOutline: function(event){
+            var width = $('button.outline-width span:first', this.$el).attr('data-line-width');
+            var color = $('button.outline-color span:first', this.$el).attr('data-color');
+            width = parseFloat(width, 10);
+
+            this.model.getSelected().forEach(panel => {
+                panel.show_outline(color, width)
+            })
+            event.preventDefault();
+        },
+
+        removeOutline: function(event){
+            this.model.getSelected().forEach(panel => {
+                panel.remove_outline()
+            })
+            event.preventDefault();
         },
 
         rectToPolygon: function(rect, rotation) {
@@ -268,6 +288,11 @@
                             }
                         }
                     });
+                }
+
+                var outline = panel.get("outline")
+                if(outline){
+                    panel.show_outline(outline.color.replace('#',''), parseFloat(outline.strokewidth, 10))
                 }
             });
 

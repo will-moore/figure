@@ -91,4 +91,73 @@
     </div>
 
 </form>
+
+<form class="form-inline clearfix" role="form" style="margin-top: 60px;">
+    <h5>Outline Panel</h5>
+
+    <div class="btn-group">
+        <button type="button" class="outline-color btn btn-outline-secondary btn-sm dropdown-toggle" title="Outline Color"
+            data-bs-toggle="dropdown">
+            <span data-color="FFFFFF" style="background-color:#FFFFFF" class="dropdown_icon">&nbsp &nbsp &nbsp</span>
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu colorpicker" role="menu">
+            <!-- NB: dropdown_icon is picked on choosing dropdown, replaces icon in button above -->
+            <li><a class="dropdown-item" href="#">
+                <span class="dropdown_icon" data-color="000000" style="background-color:#000">&nbsp &nbsp &nbsp</span>&nbsp Black
+            </a></li>
+            <li><a class="dropdown-item" href="#">
+                <span class="dropdown_icon" data-color="0000FF" style="background-color:#00f">&nbsp &nbsp &nbsp</span>&nbsp Blue
+            </a></li>
+            <li><a class="dropdown-item" href="#">
+                <span class="dropdown_icon" data-color="00FF00" style="background-color:#0f0">&nbsp &nbsp &nbsp</span>&nbsp Green
+            </a></li>
+            <li><a class="dropdown-item" href="#">
+                <span class="dropdown_icon" data-color="FF0000" style="background-color:#f00">&nbsp &nbsp &nbsp</span>&nbsp Red
+            </a></li>
+            <li><a class="dropdown-item" href="#">
+                <span class="dropdown_icon" data-color="FFFF00" style="background-color:#ff0">&nbsp &nbsp &nbsp</span>&nbsp Yellow
+            </a></li>
+            <li><a class="dropdown-item" href="#">
+                <span class="dropdown_icon" data-color="FFFFFF" style="background-color:#fff">&nbsp &nbsp &nbsp</span>&nbsp White
+            </a></li>
+            <li><a class="dropdown-item" href="#">
+                <span class="dropdown_icon" data-color="FF00FF" style="background-color:#f0f">&nbsp &nbsp &nbsp</span>&nbsp Magenta
+            </a></li>
+            <li><a class="dropdown-item" href="#">
+                <span class="dropdown_icon" data-color="00FFFF" style="background-color:#0ff">&nbsp &nbsp &nbsp</span>&nbsp Cyan
+            </a></li>
+            <li class="dropdown-divider"></li>
+            <li><a class="dropdown-item" data-color="colorpicker" data-oldcolor="FFFFFF" href="#">
+                <span class="dropdown_icon colorpickerOption">&nbsp &nbsp &nbsp</span>&nbsp More Colors...
+            </a></li>
+        </ul>
+    </div>
+
+    <div class="btn-group">
+        <button type="button" class="outline-width btn btn-outline-secondary btn-sm dropdown-toggle" title="Line Width: <%= lineWidth %>"
+            data-bs-toggle="dropdown">
+            <span class='dropdown_icon' data-line-width="<%= lineWidth %>"><%= lineWidth %> pt</span>
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu dropdownSelect lineWidth" role="menu">
+
+            <% _.each([0.25, 0.5, 0.75, 1, 2, 3, 4, 5, 7, 10, 15, 20, 30],function(p){ %>
+                <li><a class='dropdown-item' href='#'><span data-line-width='<%= p %>'><%= p %> pt</span></a></li>
+            <% }); %>
+
+        </ul>
+    </div>
+
+    <div class="btn-group">
+        <button type="button" class="btn btn-sm btn-outline-secondary remove_outline" title="Remove all outlines">
+            Remove
+        </button>
+    </div>
+
+    <button class="show_outline btn btn-sm btn-success float-end">
+        Show
+    </button>
+</form>
+
 <% } %>
