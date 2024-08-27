@@ -98,7 +98,11 @@
     <div class="btn-group">
         <button type="button" class="outline-color btn btn-outline-secondary btn-sm dropdown-toggle" title="Outline Color"
             data-bs-toggle="dropdown">
-            <span data-color="FFFFFF" style="background-color:#FFFFFF" class="dropdown_icon">&nbsp &nbsp &nbsp</span>
+            <% if (!outline) { %>
+            <span  data-color="<%= color %>" style="background-color:#<%= color %>" class="dropdown_icon">&nbsp &nbsp &nbsp</span>
+            <% } else { %>
+            <span  data-color="<%= outline.color.replace('#','') %>" style="background-color:#<%= outline.color.replace('#','') %>" class="dropdown_icon">&nbsp &nbsp &nbsp</span>
+            <% } %>
             <span class="caret"></span>
         </button>
         <ul class="dropdown-menu colorpicker" role="menu">
@@ -135,9 +139,18 @@
     </div>
 
     <div class="btn-group">
-        <button type="button" class="outline-width btn btn-outline-secondary btn-sm dropdown-toggle" title="Line Width: <%= lineWidth %>"
+        <button type="button" class="outline-width btn btn-outline-secondary btn-sm dropdown-toggle" 
+        <% if (!outline) { %> 
+            title="Line Width: <%= lineWidth %>"
+        <% } else { %>
+            title="Line Width: <%= outline.strokewidth %>"
+        <% } %>
             data-bs-toggle="dropdown">
+            <% if (!outline) { %>
             <span class='dropdown_icon' data-line-width="<%= lineWidth %>"><%= lineWidth %> pt</span>
+            <% } else { %>
+            <span class='dropdown_icon' data-line-width="<%= outline.strokewidth %>"><%= outline.strokewidth %> pt</span>
+            <% } %>
             <span class="caret"></span>
         </button>
         <ul class="dropdown-menu dropdownSelect lineWidth" role="menu">

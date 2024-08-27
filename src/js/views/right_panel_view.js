@@ -110,6 +110,8 @@
             "click .edit_rois": "editRois",
             "click .show_outline": "showOutline",
             "click .remove_outline": "removeOutline",
+            "change .outline-color": "changeOutlineColor",
+            "change .outline-width": "changeOutlineStrokeWidth",
             "click .copyROIs": "copyROIs",
             "click .pasteROIs": "pasteROIs",
             "click .deleteROIs": "deleteROIs",
@@ -134,6 +136,25 @@
 
             sel.forEach(function(panel){
                 panel.setROIColor(color);
+            });
+        },
+
+        changeOutlineColor: function() {
+            var color = $('button.outline-color span:first', this.$el).attr('data-color'),
+                sel = this.model.getSelected();
+
+            sel.forEach(function(panel){
+                panel.setOutlineColor(color);
+            });
+        },
+
+        changeOutlineStrokeWidth: function() {
+            var width = $('button.outline-width span:first', this.$el).attr('data-line-width'),
+                sel = this.model.getSelected();
+            width = parseFloat(width, 10);
+
+            sel.forEach(function(panel){
+                panel.setOutlineStrokeWidth(width);
             });
         },
 
@@ -265,7 +286,8 @@
                 clipboard_data = this.model.get('clipboard'),
                 canPaste = clipboard_data && ('SHAPES' in clipboard_data || 'CROP' in clipboard_data),
                 color,
-                width;
+                width,
+                outline;
 
             sel.forEach(function(panel){
                 var rois = panel.get('shapes');
@@ -290,7 +312,7 @@
                     });
                 }
 
-                var outline = panel.get("outline")
+                outline = panel.get("outline")
                 if(outline){
                     panel.show_outline(outline.color.replace('#',''), parseFloat(outline.strokewidth, 10))
                 }
@@ -302,6 +324,7 @@
                 'lineWidth': width || 2,
                 'roiCount': roiCount,
                 'canPaste': canPaste,
+                'outline': outline,
             }
             $('#edit_rois_form').html(this.roisTemplate(json));
         },

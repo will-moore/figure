@@ -166,6 +166,26 @@
             this.save('outline', outline);
         },
 
+        setOutlineColor: function(color){
+            var outline =  this.get('outline');
+            if(outline != undefined){
+                var xtra = {};
+                xtra['color'] = '#'+color;
+                var new_outline = $.extend(true, {}, outline, xtra);
+                this.save('outline', new_outline);
+            }
+        },
+
+        setOutlineStrokeWidth: function(strokewidth){
+            var outline =  this.get('outline');
+            if(outline != undefined){
+                var xtra = {};
+                xtra['strokewidth'] = strokewidth;
+                var new_outline = $.extend(true, {}, outline, xtra);
+                this.save('outline', new_outline);
+            }
+        },
+
         remove_outline: function(){
             this.save('outline', undefined);
         },
