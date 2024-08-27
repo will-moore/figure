@@ -126,7 +126,6 @@ export const RoiModalView = Backbone.View.extend({
             "click .roisJumpPage": "roisJumpPage",
             "click .revert_theZ": "revertTheZ",
             "click .revert_theT": "revertTheT",
-            "click .outline":"outlineView"
         },
 
         revertTheZ: function() {
@@ -141,10 +140,10 @@ export const RoiModalView = Backbone.View.extend({
             this.renderImagePlane();
         },
 
-        outlineView: function(){
+       /* outlineView: function(){
             var viewport = this.m.getViewportAsRect()
             this.shapeManager.createOutline(viewport)
-        },
+        },*/
 
         checkForRois: function() {
             var url = BASE_WEBFIGURE_URL + 'roiCount/' + this.m.get('imageId') + '/';

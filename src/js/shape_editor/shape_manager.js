@@ -276,24 +276,6 @@ ShapeManager.prototype.setShapesJson = function setShapesJson(jsonShapes) {
   });
 };
 
-ShapeManager.prototype.createOutline = function createOutline(viewport) {
-  var outline = new Rect({
-    manager: this,
-    paper: this.paper,
-    x: viewport.x,
-    y: viewport.y,
-    width: viewport.width,
-    height: viewport.height,
-    area: viewport.width * viewport.height,
-    strokeWidth: 1,
-    zoom: this._zoom,
-    strokeColor: this._strokeColor,
-  });
-  outline.setSelected(true);
-  this.addShape(outline);
-  outline.setStrokeWidth(this._strokeWidth)
-}
-
 ShapeManager.prototype.regionToPath = function regionToPath(region, zoom) {
   var f = zoom ? zoom / 100 : this._zoom / 100,
     x = parseInt(region.x * f, 10),
