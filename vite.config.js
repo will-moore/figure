@@ -16,7 +16,6 @@ export default {
   },
   build: {
     sourcemap: true,
-	chunkSizeWarningLimit: 1600,
     // output into Django's static dir
     outDir: "../omero_figure/static/omero_figure/"
   },

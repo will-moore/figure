@@ -140,11 +140,6 @@ export const RoiModalView = Backbone.View.extend({
             this.renderImagePlane();
         },
 
-       /* outlineView: function(){
-            var viewport = this.m.getViewportAsRect()
-            this.shapeManager.createOutline(viewport)
-        },*/
-
         checkForRois: function() {
             var url = BASE_WEBFIGURE_URL + 'roiCount/' + this.m.get('imageId') + '/';
 
