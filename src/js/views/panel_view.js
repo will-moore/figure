@@ -65,7 +65,7 @@
                 // If we're only dragging - simply update position
                 var border = this.model.get('border');
                 if (border != undefined) {
-                    let sw = border.strokewidth;
+                    let sw = border.strokeWidth;
                     x = x - sw
                     y = y - sw
                 }
@@ -95,8 +95,8 @@
             var border = this.model.get('border');
             var page_w = w;
             var page_h = h;
-            if (border != undefined) {
-                let sw = border.strokewidth;
+            if (border != undefined && !border.showBorder) {
+                let sw = border.strokeWidth;
                 this.$el.css({'border': `solid ${sw}px ${border.color}`})
                 x = x - sw;
                 y = y - sw;
@@ -115,17 +115,6 @@
             // container needs to be square for rotation to vertical
             $('.left_vlabels', this.$el).css('width', 3 * page_h + 'px');
             $('.right_vlabels', this.$el).css('width', 3 * page_h + 'px');
-
-           /* if(border != undefined){
-                var margin =  5 + border.strokewidth
-                console.log(margin)
-                $('.left_vlabels>div', this.$el).css('margin-bottom', margin + 'px');
-                $('.right_vlabels>div', this.$el).css('margin-bootom',margin + 'px');
-            }else{
-                $('.left_vlabels>div', this.$el).css('margin-bottom',  '5px');
-                $('.right_vlabels>div', this.$el).css('margin-bootom', '5px');
-            }*/
-
 
             // update the img within the panel
             var zoom = this.model.get('zoom'),
@@ -318,12 +307,12 @@
 
             var border = this.model.get('border')
             if(border != undefined){
-                var margin =  5 + border.strokewidth
+                var margin =  5 + border.strokeWidth
                 $('.left_vlabels>div', self.$el).css('margin-bottom', margin + 'px');
                 $('.right_vlabels>div', self.$el).css('margin-bottom', margin + 'px');
-                margin =  3 + border.strokewidth
+                margin =  3 + border.strokeWidth
                 $('.label_top', self.$el).css('margin-bottom', margin + 'px');
-                margin =  border.strokewidth
+                margin =  border.strokeWidth
                 $('.label_bottom', self.$el).css('margin-top', margin + 'px');
                 $('.label_left', self.$el).css('margin-right', margin + 'px');
                 $('.label_right', self.$el).css('margin-left', margin + 'px');

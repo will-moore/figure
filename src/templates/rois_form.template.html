@@ -96,13 +96,9 @@
     <h5>Outline Panel</h5>
 
     <div class="btn-group">
-        <button type="button" class="border-color btn btn-outline-secondary btn-sm dropdown-toggle" title="Outline Color"
+        <button type="button" class="border-color btn btn-outline-secondary btn-sm dropdown-toggle" title="Border Color"
             data-bs-toggle="dropdown">
-            <% if (!border) { %>
-            <span  data-color="<%= color %>" style="background-color:#<%= color %>" class="dropdown_icon">&nbsp &nbsp &nbsp</span>
-            <% } else { %>
-            <span  data-color="<%= border.color.replace('#','') %>" style="background-color:#<%= border.color.replace('#','') %>" class="dropdown_icon">&nbsp &nbsp &nbsp</span>
-            <% } %>
+            <span  data-color="<%= borderColor %>" style="background-color:#<%= borderColor %>" class="dropdown_icon">&nbsp &nbsp &nbsp</span>
             <span class="caret"></span>
         </button>
         <ul class="dropdown-menu colorpicker" role="menu">
@@ -139,18 +135,8 @@
     </div>
 
     <div class="btn-group">
-        <button type="button" class="border-width btn btn-outline-secondary btn-sm dropdown-toggle" 
-        <% if (!border) { %> 
-            title="Line Width: <%= lineWidth %>"
-        <% } else { %>
-            title="Line Width: <%= border.strokewidth %>"
-        <% } %>
-            data-bs-toggle="dropdown">
-            <% if (!border) { %>
-            <span class='dropdown_icon' data-line-width="<%= lineWidth %>"><%= lineWidth %> pt</span>
-            <% } else { %>
-            <span class='dropdown_icon' data-line-width="<%= border.strokewidth %>"><%= border.strokewidth %> pt</span>
-            <% } %>
+        <button type="button" class="border-width btn btn-outline-secondary btn-sm dropdown-toggle" title ="Line Width: <%= borderWidth %>" data-bs-toggle="dropdown">
+            <span class='dropdown_icon' data-line-width="<%= borderWidth %>"><%= borderWidth %> pt</span>
             <span class="caret"></span>
         </button>
         <ul class="dropdown-menu dropdownSelect lineWidth" role="menu">
@@ -161,16 +147,14 @@
 
         </ul>
     </div>
-
-    <div class="btn-group">
-        <button type="button" class="btn btn-sm btn-outline-secondary remove_border" title="Remove all borders">
-            Remove
-        </button>
+    
+    <div class="float-end" style="flex: 1 1 auto; padding-right: 0">
+        <% if (showBorder){ %>
+            <button type="button" class="show_border btn btn-sm btn-success ">Show</button>
+        <% } else { %>
+            <button type="button" class="remove_border btn btn-outline-secondary btn-sm">Hide</button>
+        <% } %>
     </div>
-
-    <button class="show_border btn btn-sm btn-success float-end">
-        Show
-    </button>
 </form>
 
 <% } %>

@@ -158,38 +158,36 @@
             this.save('scalebar', sb);
         },
 
-        show_border: function(color, strokewidth){
+        show_border: function(color, strokeWidth){
             var border = {
                 'color': '#'+color,
-                'strokewidth': strokewidth
+                'strokeWidth': strokeWidth,
+                'showBorder':false
             }
             this.save('border', border);
         },
 
-        setBorderColor: function(color){
-            var border =  this.get('border');
-            if(border != undefined){
-                var xtra = {};
-                xtra['color'] = '#'+color;
-                var new_border = $.extend(true, {}, border, xtra);
-                this.save('border', new_border);
-            }
-        },
-
-        setBorderStrokeWidth: function(strokewidth){
-            var border =  this.get('border');
-            if(border != undefined){
-                var xtra = {};
-                xtra['strokewidth'] = strokewidth;
-                var new_border = $.extend(true, {}, border, xtra);
-                this.save('border', new_border);
-            }
-        },
-
         remove_border: function(){
-            this.save('border', undefined);
+            this.setBorderAttr('showBorder', true)
         },
 
+        setBorderColor: function(color){
+            this.setBorderAttr('color', '#'+color)
+        },
+
+        setBorderStrokeWidth: function(strokeWidth){
+            this.setBorderAttr('strokeWidth', strokeWidth)
+        },
+
+        setBorderAttr: function(attr, value){
+            var border =  this.get('border');
+            if(border != undefined){
+                var xtra = {};
+                xtra[attr] = value;
+                var new_border = $.extend(true, {}, border, xtra);
+                this.save('border', new_border);
+            }
+        },
 
         // Simple checking whether shape is in viewport (x, y, width, height)
         // Return true if any of the points in shape are within viewport.

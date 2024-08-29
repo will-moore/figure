@@ -103,6 +103,7 @@
             var self = this;
             this.model.getSelected().forEach(function(m){
                 self.listenTo(m, 'change:shapes', self.render);
+                self.listenTo(m, 'change:border', self.render);
             });
         },
 
@@ -287,7 +288,8 @@
                 canPaste = clipboard_data && ('SHAPES' in clipboard_data || 'CROP' in clipboard_data),
                 color,
                 width,
-                border;
+                border,
+                show_border = false;
 
             sel.forEach(function(panel){
                 var rois = panel.get('shapes');
@@ -313,8 +315,10 @@
                 }
 
                 border = panel.get("border")
-                if(border){
-                    panel.show_border(border.color.replace('#',''), parseFloat(border.strokewidth, 10))
+                if(border != undefined && !border.showBorder){
+                    panel.show_border(border.color.replace('#',''), parseFloat(border.strokeWidth, 10))
+                }else{
+                    show_border = true;
                 }
             });
 
@@ -324,7 +328,9 @@
                 'lineWidth': width || 2,
                 'roiCount': roiCount,
                 'canPaste': canPaste,
-                'border': border,
+                'borderWidth': border ? border.strokeWidth : 2,
+                'borderColor': border ? border.color.replace('#', '') : 'FFFFFF',
+                'showBorder': show_border,
             }
             $('#edit_rois_form').html(this.roisTemplate(json));
         },
