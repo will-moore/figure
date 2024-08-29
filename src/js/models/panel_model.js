@@ -158,36 +158,36 @@
             this.save('scalebar', sb);
         },
 
-        show_outline: function(color, strokewidth){
-            var outline = {
+        show_border: function(color, strokewidth){
+            var border = {
                 'color': '#'+color,
                 'strokewidth': strokewidth
             }
-            this.save('outline', outline);
+            this.save('border', border);
         },
 
-        setOutlineColor: function(color){
-            var outline =  this.get('outline');
-            if(outline != undefined){
+        setBorderColor: function(color){
+            var border =  this.get('border');
+            if(border != undefined){
                 var xtra = {};
                 xtra['color'] = '#'+color;
-                var new_outline = $.extend(true, {}, outline, xtra);
-                this.save('outline', new_outline);
+                var new_border = $.extend(true, {}, border, xtra);
+                this.save('border', new_border);
             }
         },
 
-        setOutlineStrokeWidth: function(strokewidth){
-            var outline =  this.get('outline');
-            if(outline != undefined){
+        setBorderStrokeWidth: function(strokewidth){
+            var border =  this.get('border');
+            if(border != undefined){
                 var xtra = {};
                 xtra['strokewidth'] = strokewidth;
-                var new_outline = $.extend(true, {}, outline, xtra);
-                this.save('outline', new_outline);
+                var new_border = $.extend(true, {}, border, xtra);
+                this.save('border', new_border);
             }
         },
 
-        remove_outline: function(){
-            this.save('outline', undefined);
+        remove_border: function(){
+            this.save('border', undefined);
         },
 
 

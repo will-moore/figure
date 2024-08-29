@@ -96,12 +96,12 @@
     <h5>Outline Panel</h5>
 
     <div class="btn-group">
-        <button type="button" class="outline-color btn btn-outline-secondary btn-sm dropdown-toggle" title="Outline Color"
+        <button type="button" class="border-color btn btn-outline-secondary btn-sm dropdown-toggle" title="Outline Color"
             data-bs-toggle="dropdown">
-            <% if (!outline) { %>
+            <% if (!border) { %>
             <span  data-color="<%= color %>" style="background-color:#<%= color %>" class="dropdown_icon">&nbsp &nbsp &nbsp</span>
             <% } else { %>
-            <span  data-color="<%= outline.color.replace('#','') %>" style="background-color:#<%= outline.color.replace('#','') %>" class="dropdown_icon">&nbsp &nbsp &nbsp</span>
+            <span  data-color="<%= border.color.replace('#','') %>" style="background-color:#<%= border.color.replace('#','') %>" class="dropdown_icon">&nbsp &nbsp &nbsp</span>
             <% } %>
             <span class="caret"></span>
         </button>
@@ -139,17 +139,17 @@
     </div>
 
     <div class="btn-group">
-        <button type="button" class="outline-width btn btn-outline-secondary btn-sm dropdown-toggle" 
-        <% if (!outline) { %> 
+        <button type="button" class="border-width btn btn-outline-secondary btn-sm dropdown-toggle" 
+        <% if (!border) { %> 
             title="Line Width: <%= lineWidth %>"
         <% } else { %>
-            title="Line Width: <%= outline.strokewidth %>"
+            title="Line Width: <%= border.strokewidth %>"
         <% } %>
             data-bs-toggle="dropdown">
-            <% if (!outline) { %>
+            <% if (!border) { %>
             <span class='dropdown_icon' data-line-width="<%= lineWidth %>"><%= lineWidth %> pt</span>
             <% } else { %>
-            <span class='dropdown_icon' data-line-width="<%= outline.strokewidth %>"><%= outline.strokewidth %> pt</span>
+            <span class='dropdown_icon' data-line-width="<%= border.strokewidth %>"><%= border.strokewidth %> pt</span>
             <% } %>
             <span class="caret"></span>
         </button>
@@ -163,12 +163,12 @@
     </div>
 
     <div class="btn-group">
-        <button type="button" class="btn btn-sm btn-outline-secondary remove_outline" title="Remove all outlines">
+        <button type="button" class="btn btn-sm btn-outline-secondary remove_border" title="Remove all borders">
             Remove
         </button>
     </div>
 
-    <button class="show_outline btn btn-sm btn-success float-end">
+    <button class="show_border btn btn-sm btn-success float-end">
         Show
     </button>
 </form>

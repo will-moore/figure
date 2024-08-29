@@ -40,7 +40,7 @@
                 'change:channels change:zoom change:dx change:dy change:width change:height change:rotation change:labels change:theT change:deltaT change:theZ change:deltaZ change:z_projection change:z_start change:z_end',
                 this.render_labels);
             this.listenTo(this.model, 'change:shapes', this.render_shapes);
-            this.listenTo(this.model, 'change:outline', this.show_outline);
+            this.listenTo(this.model, 'change:border', this.render_layout);
             // During drag or resize, model isn't updated, but we trigger 'drag'
             this.model.on('drag_resize', this.drag_resize, this);
 
@@ -63,21 +63,18 @@
                 h = xywh[3];
             if (w == this.model.get('width') && h == this.model.get('height')) {
                 // If we're only dragging - simply update position
+                var border = this.model.get('border');
+                if (border != undefined) {
+                    let sw = border.strokewidth;
+                    x = x - sw
+                    y = y - sw
+                }
                 this.$el.css({'top': y +'px', 'left': x +'px'});
             } else {
                 this.update_resize(x, y, w, h);
                 this.render_shapes();
             }
             this.$el.addClass('dragging');
-        },
-
-        show_outline: function(){
-            var outline = this.model.get('outline')
-            if(outline != undefined){
-                this.$el.css({'border': 'solid ' +outline.strokewidth+'px '+outline.color})
-            }else{
-                this.$el.css({'border': '', 'outline-offset':''})
-            }
         },
 
         render_layout: function() {
@@ -92,15 +89,31 @@
 
         update_resize: function(x, y, w, h) {
 
+            // If we have a panel border, need to adjust x,y,w,h on the page
+            // but NOT the w & h we use for img_css below.
+            var border = this.model.get('border');
+            var page_w = w;
+            var page_h = h;
+            if (border != undefined) {
+                let sw = border.strokewidth;
+                this.$el.css({'border': `solid ${sw}px ${border.color}`})
+                x = x - sw;
+                y = y - sw;
+                page_w = w + (sw * 2);
+               page_h = h + (sw * 2);
+            } else {
+                this.$el.css({'border': ''})
+            }
+
             // update layout of panel on the canvas
             this.$el.css({'top': y +'px',
                         'left': x +'px',
-                        'width': w +'px',
-                        'height': h +'px'});
+                        'width': page_w +'px',
+                        'height': page_h +'px'});
 
             // container needs to be square for rotation to vertical
-            $('.left_vlabels', this.$el).css('width', 3 * h + 'px');
-            $('.right_vlabels', this.$el).css('width', 3 * h + 'px');
+            $('.left_vlabels', this.$el).css('width', 3 * page_h + 'px');
+            $('.right_vlabels', this.$el).css('width', 3 * page_h + 'px');
 
             // update the img within the panel
             var zoom = this.model.get('zoom'),
