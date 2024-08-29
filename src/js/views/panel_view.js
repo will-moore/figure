@@ -84,6 +84,7 @@
                 h = this.model.get('height');
 
             this.update_resize(x, y, w, h);
+            this.render_labels();
             this.$el.removeClass('dragging');
         },
 
@@ -114,6 +115,17 @@
             // container needs to be square for rotation to vertical
             $('.left_vlabels', this.$el).css('width', 3 * page_h + 'px');
             $('.right_vlabels', this.$el).css('width', 3 * page_h + 'px');
+
+           /* if(border != undefined){
+                var margin =  5 + border.strokewidth
+                console.log(margin)
+                $('.left_vlabels>div', this.$el).css('margin-bottom', margin + 'px');
+                $('.right_vlabels>div', this.$el).css('margin-bootom',margin + 'px');
+            }else{
+                $('.left_vlabels>div', this.$el).css('margin-bottom',  '5px');
+                $('.right_vlabels>div', this.$el).css('margin-bootom', '5px');
+            }*/
+
 
             // update the img within the panel
             var zoom = this.model.get('zoom'),
@@ -303,6 +315,26 @@
             // need to force update of vertical labels layout
             $('.left_vlabels', self.$el).css('width', 3 * self.$el.height() + 'px');
             $('.right_vlabels', self.$el).css('width', 3 * self.$el.height() + 'px');
+
+            var border = this.model.get('border')
+            if(border != undefined){
+                var margin =  5 + border.strokewidth
+                $('.left_vlabels>div', self.$el).css('margin-bottom', margin + 'px');
+                $('.right_vlabels>div', self.$el).css('margin-bottom', margin + 'px');
+                margin =  3 + border.strokewidth
+                $('.label_top', self.$el).css('margin-bottom', margin + 'px');
+                margin =  border.strokewidth
+                $('.label_bottom', self.$el).css('margin-top', margin + 'px');
+                $('.label_left', self.$el).css('margin-right', margin + 'px');
+                $('.label_right', self.$el).css('margin-left', margin + 'px');
+            }else{
+                $('.left_vlabels>div', self.$el).css('mSargin-bottom', '5px');
+                $('.right_vlabels>div', self.$el).css('margin-bottom', '5px');
+                $('.label_top', self.$el).css('margin-bottom', '3px');
+                $('.label_bottom', self.$el).css('margin-top', '');
+                $('.label_left', self.$el).css('margin-right', '');
+                $('.label_right', self.$el).css('margin-left', '');
+            }
 
             return this;
         },
