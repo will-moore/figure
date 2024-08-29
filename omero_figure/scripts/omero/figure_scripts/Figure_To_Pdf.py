@@ -648,7 +648,7 @@ class ShapeToPilExport(ShapeExport):
 
         # if fill, draw filled polygon without outline, then add line later
         # with correct stroke width
-        r,g,b,a = self.get_rgba_int(shape.get('fillColor', '#00000000'))
+        r, g, b, a = self.get_rgba_int(shape.get('fillColor', '#00000000'))
         alpha = int(float(shape['fillOpacity'])*255)
         rgba = (r, g, b, alpha)
 
@@ -706,7 +706,7 @@ class ShapeToPilExport(ShapeExport):
 
         # if fill, draw filled polygon without outline, then add line later
         # with correct stroke width
-        r,g,b,a = self.get_rgba_int(shape.get('fillColor', '#00000000'))
+        r, g, b, a = self.get_rgba_int(shape.get('fillColor', '#00000000'))
         alpha = int(float(shape['fillOpacity'])*255)
         rgba = (r, g, b, alpha)
 
@@ -777,7 +777,7 @@ class ShapeToPilExport(ShapeExport):
         # Draw outer ellipse, then remove inner ellipse with full opacity
         rgba = ShapeToPdfExport.get_rgba_int(shape['strokeColor'])
         ellipse_draw.ellipse((0, 0, width, height), fill=rgba)
-        r,g,b,a = self.get_rgba_int(shape.get('fillColor', '#00000000'))
+        r, g, b, a = self.get_rgba_int(shape.get('fillColor', '#00000000'))
         alpha = int(float(shape['fillOpacity'])*255)
         rgba = (r, g, b, alpha)
         ellipse_draw.ellipse((w, w, width - w, height - w), fill=rgba)
