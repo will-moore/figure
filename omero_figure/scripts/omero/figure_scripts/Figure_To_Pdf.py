@@ -523,6 +523,24 @@ class ShapeToPilExport(ShapeExport):
         self.scale = pil_img.size[0] / crop['width']
         self.draw = ImageDraw.Draw(pil_img)
 
+        if 'border' in panel and panel['border'].get('showBorder'):
+            sw = panel['border'].get('strokeWidth') 
+            shift_pos = sw / (float(panel['zoom'])/100)
+
+            shape = {}
+            shape['strokeColor'] = panel['border'].get('color')
+            shape['strokeWidth'] = sw
+            shape['x'] = crop['x'] - shift_pos
+            shape['y'] = crop['y'] - shift_pos
+            shape['width'] = crop['width'] + 2*shift_pos
+            shape['height'] = crop['height'] + 2*shift_pos
+            shape['type'] = "outline"
+
+            if "shapes" not in panel:
+                panel['shapes'] = [shape]
+            else:
+                panel['shapes'].append(shape)
+
         super(ShapeToPilExport, self).__init__(panel)
 
     def get_panel_coords(self, shape_x, shape_y):
@@ -628,7 +646,7 @@ class ShapeToPilExport(ShapeExport):
 
     # Override to not just call draw_polygon, because we want square corners
     # for rectangles and not the rounded corners draw_polygon creates
-    def draw_rectangle(self, shape):
+    def draw_rectangle(self, shape, inPanelCheck=True):
         points = [
             (shape['x'], shape['y']),
             (shape['x'] + shape['width'], shape['y']),
@@ -646,7 +664,6 @@ class ShapeToPilExport(ShapeExport):
 
         stroke_width = scale_to_export_dpi(float(shape.get('strokeWidth', 2)))
         buffer = int(ceil(stroke_width) * 1.5)
-
         # if fill, draw filled polygon without outline, then add line later
         # with correct stroke width
         rgba = self.get_rgba_int(shape.get('fillColor', '#00000000'))
