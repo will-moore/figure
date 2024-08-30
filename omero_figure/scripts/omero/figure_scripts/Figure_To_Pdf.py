@@ -216,7 +216,10 @@ class ShapeExport(object):
             point[0] * tf['A10'] + point[1] * tf['A11'] + tf['A12'],
         ] if tf else point
 
-    def draw_rectangle(self, shape):
+    def draw_outline(self, shape):
+        self.draw_rectangle(shape, False)
+
+    def draw_rectangle(self, shape, inPanelCheck=True):
         # to support rotation/transforms, convert rectangle to a simple
         # four point polygon and draw that instead
         s = deepcopy(shape)
@@ -229,7 +232,7 @@ class ShapeExport(object):
         ]
         s['points'] = ' '.join(','.join(
             map(str, self.apply_transform(t, point))) for point in points)
-        self.draw_polygon(s)
+        self.draw_polygon(s, closed=True, inPanelCheck=inPanelCheck)
 
     def draw_point(self, shape):
         s = deepcopy(shape)
@@ -407,8 +410,8 @@ class ShapeToPdfExport(ShapeExport):
 
         self.draw_shape_label(shape, Bounds((x1, y1), (x2, y2)))
 
-    def draw_polygon(self, shape, closed=True):
-        polygon_in_viewport = False
+    def draw_polygon(self, shape, closed=True, inPanelCheck=True):
+        polygon_in_viewport = not inPanelCheck
         points = []
         for point in shape['points'].split(" "):
             # Older polygons/polylines may be 'x,y,'
@@ -451,7 +454,7 @@ class ShapeToPdfExport(ShapeExport):
         self.draw_shape_label(shape, Bounds(*points))
 
     def draw_polyline(self, shape):
-        self.draw_polygon(shape, False)
+        self.draw_polygon(shape, closed=False)
 
     def draw_ellipse(self, shape):
         stroke_width = float(shape.get('strokeWidth', 1))
@@ -1126,6 +1129,25 @@ class FigureExport(object):
         """
         Add any Shapes
         """
+        if 'border' in panel and not panel['border'].get('showBorder'):
+            crop = self.get_crop_region(panel)
+            sw = panel['border'].get('strokeWidth') 
+            shift_pos = sw / (float(panel['zoom'])/100)
+
+            shape = {}
+            shape['strokeColor'] = panel['border'].get('color')
+            shape['strokeWidth'] = sw
+            shape['x'] = crop['x'] - shift_pos
+            shape['y'] = crop['y'] - shift_pos
+            shape['width'] = crop['width'] + 2*shift_pos
+            shape['height'] = crop['height'] + 2*shift_pos
+            shape['type'] = "outline"
+
+            if "shapes" not in panel:
+                panel['shapes'] = [shape]
+            else:
+                panel['shapes'].append(shape)
+
         if "shapes" not in panel:
             return
 
