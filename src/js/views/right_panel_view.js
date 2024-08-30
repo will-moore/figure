@@ -119,14 +119,6 @@
         createInset: function() {
             let selected = this.model.getSelected();
 
-            // get bounding box of selected panels...
-            let minX = selected.reduce((prev, panel) => Math.min(panel.get('x'), prev), Infinity);
-            let maxX = selected.reduce((prev, panel) => Math.max(panel.get('x') + panel.get('width'), prev), -Infinity);
-            let minY = selected.reduce((prev, panel) => Math.min(panel.get('y'), prev), Infinity);
-            let maxY = selected.reduce((prev, panel) => Math.max(panel.get('y') + panel.get('height'), prev), -Infinity);
-            let selWidth = maxX - minX;
-            let selHeight = maxY - minY;
-
             selected.forEach(panel => {
                 let randomId = getRandomId();
                 // Add Rectangle (square) in centre of viewport
@@ -146,6 +138,7 @@
                     width: rectSize,
                     height: rectSize,
                     id: randomId,
+                    rotation: vp.rotation || 0,
                 }
                 panel.add_shapes([rect]);
 
