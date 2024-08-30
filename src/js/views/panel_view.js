@@ -64,7 +64,7 @@
             if (w == this.model.get('width') && h == this.model.get('height')) {
                 // If we're only dragging - simply update position
                 var border = this.model.get('border');
-                if (border != undefined) {
+                if (border?.showBorder) {
                     let sw = border.strokeWidth;
                     x = x - sw
                     y = y - sw
@@ -95,7 +95,7 @@
             var border = this.model.get('border');
             var page_w = w;
             var page_h = h;
-            if (border != undefined && !border.showBorder) {
+            if (border?.showBorder) {
                 let sw = border.strokeWidth;
                 this.$el.css({'border': `solid ${sw}px ${border.color}`})
                 x = x - sw;

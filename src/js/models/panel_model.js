@@ -162,13 +162,13 @@
             var border = {
                 'color': '#'+color,
                 'strokeWidth': strokeWidth,
-                'showBorder':false
+                'showBorder':true
             }
             this.save('border', border);
         },
 
         remove_border: function(){
-            this.setBorderAttr('showBorder', true)
+            this.setBorderAttr('showBorder', false)
         },
 
         setBorderColor: function(color){

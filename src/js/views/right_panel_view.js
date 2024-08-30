@@ -289,7 +289,7 @@
                 color,
                 width,
                 border,
-                show_border = false;
+                show_btn_state = false;
 
             sel.forEach(function(panel){
                 var rois = panel.get('shapes');
@@ -315,10 +315,10 @@
                 }
 
                 border = panel.get("border")
-                if(border != undefined && !border.showBorder){
+                if(border?.showBorder){
                     panel.show_border(border.color.replace('#',''), parseFloat(border.strokeWidth, 10))
                 }else{
-                    show_border = true;
+                    show_btn_state = true;
                 }
             });
 
@@ -330,7 +330,7 @@
                 'canPaste': canPaste,
                 'borderWidth': border ? border.strokeWidth : 2,
                 'borderColor': border ? border.color.replace('#', '') : 'FFFFFF',
-                'showBorder': show_border,
+                'showState': show_btn_state,
             }
             $('#edit_rois_form').html(this.roisTemplate(json));
         },
