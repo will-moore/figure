@@ -430,8 +430,9 @@ class ShapeToPdfExport(ShapeExport):
 
         if 'fillColor' in shape:
             r, g, b, a = self.get_rgba(shape['fillColor'])
-            alpha = float(shape['fillOpacity'])
-            self.canvas.setFillColorRGB(r, g, b, alpha=alpha)
+            if 'fillOpacity' in shape:
+                a = float(shape['fillOpacity'])
+            self.canvas.setFillColorRGB(r, g, b, alpha=a)
             fill = 1 if closed else 0
         else:
             fill = 0
@@ -472,8 +473,9 @@ class ShapeToPdfExport(ShapeExport):
 
         if 'fillColor' in shape:
             r, g, b, a = self.get_rgba(shape['fillColor'])
-            alpha = float(shape['fillOpacity'])
-            self.canvas.setFillColorRGB(r, g, b, alpha=alpha)
+            if 'fillOpacity' in shape:
+                a = float(shape['fillOpacity'])
+            self.canvas.setFillColorRGB(r, g, b, alpha=a)
             fill = 1
         else:
             fill = 0
@@ -649,8 +651,9 @@ class ShapeToPilExport(ShapeExport):
         # if fill, draw filled polygon without outline, then add line later
         # with correct stroke width
         r, g, b, a = self.get_rgba_int(shape.get('fillColor', '#00000000'))
-        alpha = int(float(shape['fillOpacity'])*255)
-        rgba = (r, g, b, alpha)
+        if 'fillOpacity' in shape:
+            a = int(float(shape['fillOpacity'])*255)
+        rgba = (r, g, b, a)
 
         # need to draw on separate image and then paste on to get transparency
         bounds = Bounds(*points).round()
@@ -707,8 +710,9 @@ class ShapeToPilExport(ShapeExport):
         # if fill, draw filled polygon without outline, then add line later
         # with correct stroke width
         r, g, b, a = self.get_rgba_int(shape.get('fillColor', '#00000000'))
-        alpha = int(float(shape['fillOpacity'])*255)
-        rgba = (r, g, b, alpha)
+        if 'fillOpacity' in shape:
+            a = int(float(shape['fillOpacity'])*255)
+        rgba = (r, g, b, a)
 
         # need to draw on separate image and then paste on to get transparency
         bounds = Bounds(*points).round()
@@ -777,9 +781,12 @@ class ShapeToPilExport(ShapeExport):
         # Draw outer ellipse, then remove inner ellipse with full opacity
         rgba = ShapeToPdfExport.get_rgba_int(shape['strokeColor'])
         ellipse_draw.ellipse((0, 0, width, height), fill=rgba)
+
         r, g, b, a = self.get_rgba_int(shape.get('fillColor', '#00000000'))
-        alpha = int(float(shape['fillOpacity'])*255)
-        rgba = (r, g, b, alpha)
+        if 'fillOpacity' in shape:
+            a = int(float(shape['fillOpacity'])*255)
+        rgba = (r, g, b, a)
+
         ellipse_draw.ellipse((w, w, width - w, height - w), fill=rgba)
         temp_ellipse = temp_ellipse.rotate(rotation, resample=Image.BICUBIC,
                                            expand=True)
