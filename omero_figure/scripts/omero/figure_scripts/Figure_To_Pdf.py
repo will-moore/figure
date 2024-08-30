@@ -1129,7 +1129,7 @@ class FigureExport(object):
         """
         Add any Shapes
         """
-        if 'border' in panel and not panel['border'].get('showBorder'):
+        if 'border' in panel and panel['border'].get('showBorder'):
             crop = self.get_crop_region(panel)
             sw = panel['border'].get('strokeWidth') 
             shift_pos = sw / (float(panel['zoom'])/100)
