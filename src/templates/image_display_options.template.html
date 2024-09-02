@@ -11,11 +11,13 @@
 
 
     <div class="btn-group image-display-options"
-         title="Maximum intensity Z-projection (choose range with 2 handles on Z-slider)">
+         title="Maximum intensity Z-projection <% if (proj_bytes_exceeded) { print('exceeds MAX_PROJECTION_BYTES: ' + max_projection_bytes ) }
+         else { %>(choose range with 2 handles on Z-slider)<% } %>">
         <button type="button" class="btn btn-outline-secondary btn-sm z-projection
                 <% if(z_projection) { %>zp-btn-down<% } else if (typeof z_projection == 'boolean') { %><% } else { %>ch-btn-flat<% }%>"
-                <% if (z_projection_disabled) { %>disabled="disabled"<% } %>
+                <% if ((!z_projection && proj_bytes_exceeded) || z_projection_disabled) { %>disabled="disabled"<% } %>
                 >
+
             <img src="<%= projectionIconUrl %>" />
         </button>
     </div>

@@ -244,7 +244,8 @@ var InfoPanelView = Backbone.View.extend({
             } else {
                 json.name = title;
                 // compare json summary so far with this Panel
-                var attrs = ["imageId", "orig_width", "orig_height", "sizeT", "sizeZ", "x", "y", "width", "height", "dpi", "min_export_dpi", "max_export_dpi"];
+                var attrs = ["imageId", "orig_width", "orig_height", "sizeT", "sizeZ", "x", "y",
+                             "width", "height", "dpi", "min_export_dpi", "max_export_dpi", "pixelsType"];
                 _.each(attrs, function(a){
                     if (json[a] != this_json[a]) {
                         if (a === 'x' || a === 'y' || a === 'width' || a === 'height') {
