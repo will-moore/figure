@@ -93,6 +93,8 @@
             // we replace these attributes...
             var newData = {'imageId': data.imageId,
                 'name': data.name,
+                'pixelsType': data.pixelsType,
+                'pixel_range': data.pixel_range,
                 'sizeZ': data.sizeZ,
                 'sizeT': data.sizeT,
                 'orig_width': data.orig_width,
@@ -558,6 +560,22 @@
             }
         },
 
+        // Does sizeXYZ, pixelType and Channels exceed MAX_PROJECTION_BYTES?
+        isMaxProjectionBytesExceeded: function() {
+            let bytes_per_pixel = 4;
+            if (this.get("pixel_range")) {
+                bytes_per_pixel = Math.ceil(Math.log2(this.get("pixel_range")[1]) / 8.0);
+            }
+            let sizeC = this.get("channels").length;
+            let sizeXYZ = this.get('orig_width') * this.get('orig_height') * this.get('sizeZ');
+            let total_bytes = bytes_per_pixel * sizeC * sizeXYZ;
+            return total_bytes > MAX_PROJECTION_BYTES;
+        },
+
+        isMaxProjectionExceeded: function() {
+            return this.get('z_projection') && this.isMaxProjectionBytesExceeded();
+        },
+
         // When a multi-select rectangle is drawn around several Panels
         // a resize of the rectangle x1, y1, w1, h1 => x2, y2, w2, h2
         // will resize the Panels within it in proportion.
@@ -723,7 +741,11 @@
 
             // If BIG image, render scaled region
             var region = "";
-            if (this.is_big_image()) {
+            if (this.isMaxProjectionExceeded()) {
+                // if we're trying to do Z-projection with too many planes,
+                // this figure URL renders a suitable error message
+                baseUrl = BASE_WEBFIGURE_URL + 'max_projection_range_exceeded/'
+            } else if (this.is_big_image()) {
                 baseUrl = BASE_WEBFIGURE_URL + 'render_scaled_region/';
                 var rect = this.getViewportAsRect();
                 // Render a region that is 1.5 x larger
@@ -767,6 +789,11 @@
         // used by the PanelView and ImageViewerView to get the size and
         // offset of the img within it's frame
         get_vp_img_css: function(zoom, frame_w, frame_h, x, y) {
+
+            if (this.isMaxProjectionExceeded()) {
+                // We want the warning placeholder image shown full width, mid-height
+                return {'left':0, 'top':(frame_h - frame_w)/2, 'width':frame_w, 'height': frame_w}
+            }
 
             // For non-big images, we have the full plane in hand
             // css just shows the viewport region
