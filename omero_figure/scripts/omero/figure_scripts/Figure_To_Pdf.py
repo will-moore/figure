@@ -219,7 +219,7 @@ class ShapeExport(object):
     def draw_outline(self, shape):
         self.draw_rectangle(shape, False)
 
-    def draw_rectangle(self, shape, inPanelCheck=True):
+    def draw_rectangle(self, shape, in_panel_check=True):
         # to support rotation/transforms, convert rectangle to a simple
         # four point polygon and draw that instead
         s = deepcopy(shape)
@@ -232,7 +232,7 @@ class ShapeExport(object):
         ]
         s['points'] = ' '.join(','.join(
             map(str, self.apply_transform(t, point))) for point in points)
-        self.draw_polygon(s, closed=True, inPanelCheck=inPanelCheck)
+        self.draw_polygon(s, closed=True, in_panel_check=in_panel_check)
 
     def draw_point(self, shape):
         s = deepcopy(shape)
@@ -410,8 +410,8 @@ class ShapeToPdfExport(ShapeExport):
 
         self.draw_shape_label(shape, Bounds((x1, y1), (x2, y2)))
 
-    def draw_polygon(self, shape, closed=True, inPanelCheck=True):
-        polygon_in_viewport = not inPanelCheck
+    def draw_polygon(self, shape, closed=True, in_panel_check=True):
+        polygon_in_viewport = not in_panel_check
         points = []
         for point in shape['points'].split(" "):
             # Older polygons/polylines may be 'x,y,'
@@ -524,7 +524,7 @@ class ShapeToPilExport(ShapeExport):
         self.draw = ImageDraw.Draw(pil_img)
 
         if 'border' in panel and panel['border'].get('showBorder'):
-            sw = panel['border'].get('strokeWidth') 
+            sw = panel['border'].get('strokeWidth')
             shift_pos = sw / (float(panel['zoom'])/100)
 
             shape = {}
@@ -646,7 +646,7 @@ class ShapeToPilExport(ShapeExport):
 
     # Override to not just call draw_polygon, because we want square corners
     # for rectangles and not the rounded corners draw_polygon creates
-    def draw_rectangle(self, shape, inPanelCheck=True):
+    def draw_rectangle(self, shape, in_panel_check=True):
         points = [
             (shape['x'], shape['y']),
             (shape['x'] + shape['width'], shape['y']),
@@ -1148,7 +1148,7 @@ class FigureExport(object):
         """
         if 'border' in panel and panel['border'].get('showBorder'):
             crop = self.get_crop_region(panel)
-            sw = panel['border'].get('strokeWidth') 
+            sw = panel['border'].get('strokeWidth')
             shift_pos = sw / (float(panel['zoom'])/100)
 
             shape = {}
