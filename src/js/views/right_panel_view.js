@@ -1235,9 +1235,11 @@
                 sum_sizeZ = 0,
                 rotation,
                 z_projection,
+                projection_bytes_exceeded = [],
                 zp;
             if (this.models) {
                 this.models.forEach(function(m, i){
+                    projection_bytes_exceeded.push(m.isMaxProjectionBytesExceeded())
                     rotation = m.get('rotation');
                     max_rotation = Math.max(max_rotation, rotation);
                     sum_rotation += rotation;
@@ -1252,6 +1254,7 @@
                         }
                     }
                 });
+                let proj_bytes_exceeded = projection_bytes_exceeded.some(b => b);
                 var avg_rotation = sum_rotation / this.models.length;
                 if (avg_rotation === max_rotation) {
                     rotation = avg_rotation;
@@ -1267,6 +1270,8 @@
                 const z_projection_disabled = ((sum_sizeZ === this.models.length) || anyBig);
 
                 html = this.template({
+                    max_projection_bytes: MAX_PROJECTION_BYTES,
+                    proj_bytes_exceeded: proj_bytes_exceeded,
                     projectionIconUrl,
                     'z_projection_disabled': z_projection_disabled,
                     'rotation': rotation,

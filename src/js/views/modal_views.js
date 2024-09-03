@@ -298,6 +298,8 @@ import { hideModal } from "./util";
                 var newImg = {
                     'imageId': data.id,
                     'name': data.meta.imageName,
+                    'pixelsType': data.meta.pixelsType,
+                    'pixel_range': data.pixel_range,
                     // 'width': data.size.width,
                     // 'height': data.size.height,
                     'sizeZ': data.size.z,
