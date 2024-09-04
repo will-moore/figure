@@ -76,7 +76,6 @@
             this.silenceTriggers = true;
 
             // find Rectangle from panel that corresponds to this panel
-            // TODO: use shape.insetRoiId for storing the ID, instead of the shape's actual id
             let rect = (panel.get("shapes") || []).find(shape => shape.id == insetRoiId);
             if (rect) {
                 this.cropToRoi(rect);

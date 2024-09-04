@@ -281,6 +281,7 @@ export function updateRoiIds(panelsJson) {
     // And if we ONLY copy/paste an inset panel, keep the insetRoiId so that it stays
     // in sync with corresponding Rect
 
+    // Find the insetRoiIds that are in BOTH panels and shapes
     let insetIdsFromPanels = panelsJson.map(panel => panel.insetRoiId).filter(Boolean);
     let insetIdsFromShapes = [];
     panelsJson.forEach(panel => {
@@ -292,12 +293,9 @@ export function updateRoiIds(panelsJson) {
             });
         }
     });
-    console.log('insetIdsFromPanels', insetIdsFromPanels);
-    console.log('insetIdsFromShapes', insetIdsFromShapes);
-
     let idsToUpdate = insetIdsFromPanels.filter(roiId => insetIdsFromShapes.includes(roiId));
 
-
+    // Update the IDs
     let updatedPanels = panelsJson.map(panelJson => {
         if (idsToUpdate.includes(panelJson.insetRoiId)) {
             panelJson.insetRoiId = newIdFromRandomId(panelJson.insetRoiId);
