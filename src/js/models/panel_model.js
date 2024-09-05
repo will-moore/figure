@@ -755,8 +755,6 @@
             var vertical_flip = this.get('vertical_flip') ? -1 : 1;
             var horizontal_flip = this.get('horizontal_flip') ? -1 : 1;
 
-            console.log(vertical_flip);
-
             var css = {'left':img_x,
                        'top':img_y,
                        'width':img_w,

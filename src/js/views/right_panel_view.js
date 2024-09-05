@@ -884,6 +884,7 @@
                     offset_y = dy;
                 }
                 this.$vp_img.css( this.models.head().get_vp_img_css(zoom, frame_w, frame_h, offset_x, offset_y) );
+                // this.$('.imgContainer').css(this.models.head().get_vp_img_css(zoom, frame_w, frame_h, offset_x, offset_y));
                 this.$vp_zoom_value.val(zoom);
 
                 if (save) {
@@ -1132,6 +1133,7 @@
             var self = this;
             this.models.forEach(function(m){
                 self.listenTo(m, 'change:channels change:z_projection', self.render);
+                self.listenTo(m, 'change:vertical_flip change:horizontal_flip', self.loadButtonState);
             });
         },
 
@@ -1180,6 +1182,28 @@
             });
         },
 
+        loadButtonState: function() {
+            const $verticalButton = this.$(".flipping_vertical");
+            const $horizontalButton = this.$(".flipping_horizontal");
+        
+            // Ensure the buttons reflect the model state
+            this.models.forEach(function(m) {
+                // Set vertical button state
+                if (m.get('vertical_flip')) {
+                    $verticalButton.addClass('active');
+                } else {
+                    $verticalButton.removeClass('active');
+                }
+        
+                // Set horizontal button state
+                if (m.get('horizontal_flip')) {
+                    $horizontalButton.addClass('active');
+                } else {
+                    $horizontalButton.removeClass('active');
+                }
+            });
+        },
+        
         z_projection:function(e) {
             // 'flat' means that some panels have z_projection on, some off
             var flat = $(e.currentTarget).hasClass('ch-btn-flat');
@@ -1243,6 +1267,7 @@
                     'z_projection': z_projection});
                 this.$el.html(html);
             }
+            this.loadButtonState();
             return this;
         }
     });
