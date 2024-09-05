@@ -752,8 +752,8 @@
             if (rotation == undefined) {
                 rotation = this.get('rotation') || 0;
             }
-            var vertical_flip = this.get('vertical_flip');
-            var horizontal_flip = this.get('horizontal_flip');
+            var vertical_flip = this.get('vertical_flip') ? -1 : 1;
+            var horizontal_flip = this.get('horizontal_flip') ? -1 : 1;
 
             console.log(vertical_flip);
 
@@ -763,12 +763,8 @@
                        'height':img_h,
                        '-webkit-transform-origin': transform_x + '% ' + transform_y + '%',
                        'transform-origin': transform_x + '% ' + transform_y + '%',
-                       '-webkit-transform': 'scaleY(-1)',
-                       'transform': 'scaleY(-1)',
-                       '-webkit-transform': 'scaleX(' + (horizontal_flip ? -1 : 1) + ')',
-                       'transform': 'scaleX(' + (horizontal_flip ? -1 : 1) + ')',
-                       '-webkit-transform': 'rotate(' + rotation + 'deg)',
-                       'transform': 'rotate(' + rotation + 'deg)'
+                       '-webkit-transform': 'scaleX(' + horizontal_flip + ') ' + 'scaleY(' + vertical_flip + ') ' + 'rotate(' + rotation + 'deg)',
+                       'transform': 'scaleX(' + horizontal_flip + ') ' + 'scaleY(' + vertical_flip + ') ' + 'rotate(' + rotation + 'deg)'
                    };
             return css;
         },
