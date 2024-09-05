@@ -692,7 +692,7 @@
 
             this.models.forEach(function(m){
                 self.listenTo(m,
-                    'change:width change:height change:rotation change:z_projection change:z_start change:z_end change:min_export_dpi',
+                    'change:width change:height change:rotation change:z_projection change:z_start change:z_end change:min_export_dpi change:vertical_flip change:horizontal_flip',
                     self.render);
                 self.listenTo(m,
                     'change:channels change:theZ change:theT',
@@ -1138,6 +1138,8 @@
         events: {
             "click .show-rotation": "show_rotation",
             "click .z-projection": "z_projection",
+            "click .flipping_vertical": "flipping_vertical",
+            "click .flipping_horizontal": "flipping_horizontal",
             "input .rotation-slider": "rotation_input",
             "change .rotation-slider": "rotation_change",
         },
@@ -1153,6 +1155,28 @@
             this.rotation = val;
             this.models.forEach(function(m){
                 m.save('rotation', val);
+            });
+        },
+
+        flipping_vertical: function(event) {
+            const $button = $(event.currentTarget);
+            $button.toggleClass('active'); 
+
+            const isVerticalFlipped = $button.hasClass('active');
+
+            this.models.forEach(function(m) {
+                m.save('vertical_flip', isVerticalFlipped);
+            });
+        },
+    
+        flipping_horizontal: function(event) {
+            const $button = $(event.currentTarget);
+            $button.toggleClass('active'); 
+
+            const ishorizontalFlipped = $button.hasClass('active');
+
+            this.models.forEach(function(m) {
+                m.save('horizontal_flip', ishorizontalFlipped);
             });
         },
 

@@ -1,9 +1,16 @@
 
+    <div class="">
+        <button type="button" class="btn btn-outline-secondary btn-sm flipping_vertical" title="Flipping Vertical">
+            <i class="fas fa-arrows-alt-v"  style='font-size:16px'></i>
+        </button>
+        <button type="button" class="btn btn-outline-secondary btn-sm flipping_horizontal" title="Flipping Horizontal">
+            <i class="fas fa-arrows-alt-h"  style='font-size:16px'></i>
+        </button>
+    </div>
     <div class="image-display-options rotation-controls">
         <button type="button" class="btn btn-outline-secondary btn-sm show-rotation" title="Rotate image">
             <span class="glyphicon glyphicon-repeat"></span>
             <i class="bi-arrow-clockwise" style="font-size: 1rem"></i>
-            <span class="rotation_value"><%= rotation %></span> &deg;
         </button>
 
         <input type="range" class="rotation-slider" max="360" value="<%= rotation %>"></input>
