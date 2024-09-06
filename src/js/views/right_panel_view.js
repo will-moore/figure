@@ -1058,11 +1058,13 @@
         resetZoomShape: function(event) {
             event.preventDefault();
             this.models.forEach(function(m){
+                m.set('vertical_flip', false);
+                m.set('horizontal_flip', false);
                 m.cropToRoi({
                     'x': 0,
                     'y': 0,
                     'width': m.get('orig_width'),
-                    'height': m.get('orig_height')
+                    'height': m.get('orig_height'),                    
                 });
             });
         },
