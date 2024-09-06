@@ -10,10 +10,10 @@
 // 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following
 // disclaimer in the documentation // and/or other materials provided with the distribution.
 //
-// 3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived 
+// 3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived
 // from this software without specific prior written permission.
 
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, 
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
 // BUT NOT LIMITED TO,
 // THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
 // THE COPYRIGHT HOLDER OR CONTRIBUTORS
@@ -46,6 +46,9 @@ var Rect = function Rect(options) {
   }
   this._strokeColor = options.strokeColor;
   this._strokeWidth = options.strokeWidth || 2;
+  this._text = options.text;
+  this._fontSize = options.fontSize || 10;
+  this._textPosition = options.textPosition || "topleft";
   this._selected = false;
   this._zoomFraction = 1;
   if (options.zoom) {
@@ -104,6 +107,9 @@ Rect.prototype.toJson = function toJson() {
     'area': this._width * this._height,
     strokeWidth: this._strokeWidth,
     strokeColor: this._strokeColor,
+    text: this._text,
+    fontSize: this._fontSize,
+    textPosition: this._textPosition
   };
   if (this._id) {
     rv.id = this._id;
@@ -225,6 +231,33 @@ Rect.prototype.getStrokeColor = function getStrokeColor() {
   return this._strokeColor;
 };
 
+Rect.prototype.setText = function setText(text) {
+  this._text = text;
+  this.drawShape();
+};
+
+Rect.prototype.geText = function geText() {
+  return this._text;
+};
+
+Rect.prototype.setTextPosition = function setTextPosition(textPosition) {
+  this._textPosition = textPosition;
+  this.drawShape();
+};
+
+Rect.prototype.geTextPosition = function geTextPosition() {
+  return this._textPosition;
+};
+
+Rect.prototype.setFontSize = function setFontSize(fontSize) {
+  this._fontSize = fontSize;
+  this.drawShape();
+};
+
+Rect.prototype.geFontSize = function geFontSize() {
+  return this._fontSize;
+};
+
 Rect.prototype.setStrokeWidth = function setStrokeWidth(strokeWidth) {
   this._strokeWidth = strokeWidth;
   this.drawShape();
@@ -241,7 +274,10 @@ Rect.prototype.destroy = function destroy() {
 
 Rect.prototype.drawShape = function drawShape() {
   var strokeColor = this._strokeColor,
-    lineW = this._strokeWidth;
+    lineW = this._strokeWidth,
+    text = this._text,
+    textPosition = this._textPosition,
+    fontSize = this._fontSize;
 
   var f = this._zoomFraction,
     x = this._x * f,
@@ -256,6 +292,9 @@ Rect.prototype.drawShape = function drawShape() {
     height: h,
     stroke: strokeColor,
     "stroke-width": lineW,
+    text: text,
+    textPosition: textPosition,
+    fontSize: fontSize,
   });
 
   if (this.isSelected()) {
@@ -274,6 +313,11 @@ Rect.prototype.drawShape = function drawShape() {
     hy = handleIds[h_id][1];
     hnd.attr({ x: hx - this.handle_wh / 2, y: hy - this.handle_wh / 2 });
   }
+
+  // update label
+
+
+
 };
 
 Rect.prototype.getHandleCoords = function getHandleCoords() {
@@ -430,7 +474,10 @@ var CreateRect = function CreateRect(options) {
 CreateRect.prototype.startDrag = function startDrag(startX, startY) {
   var strokeColor = this.manager.getStrokeColor(),
     strokeWidth = this.manager.getStrokeWidth(),
-    zoom = this.manager.getZoom();
+    zoom = this.manager.getZoom(),
+    text = this.manager.getText(),
+    textPosition = this.manager.getTextPosition(),
+    fontSize = this.manager.getFontSize();
   // Also need to get strokeWidth and zoom/size etc.
 
   this.startX = startX;
@@ -447,6 +494,9 @@ CreateRect.prototype.startDrag = function startDrag(startX, startY) {
     strokeWidth: strokeWidth,
     zoom: zoom,
     strokeColor: strokeColor,
+    text: text,
+    textPosition: textPosition,
+    fontSize: fontSize,
   });
 };
 
