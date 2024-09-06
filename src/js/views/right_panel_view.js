@@ -884,7 +884,6 @@
                     offset_y = dy;
                 }
                 this.$vp_img.css( this.models.head().get_vp_img_css(zoom, frame_w, frame_h, offset_x, offset_y) );
-                // this.$('.imgContainer').css(this.models.head().get_vp_img_css(zoom, frame_w, frame_h, offset_x, offset_y));
                 this.$vp_zoom_value.val(zoom);
 
                 if (save) {
@@ -1064,7 +1063,7 @@
                     'x': 0,
                     'y': 0,
                     'width': m.get('orig_width'),
-                    'height': m.get('orig_height'),                    
+                    'height': m.get('orig_height'),                 
                 });
             });
         },
