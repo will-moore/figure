@@ -50,6 +50,14 @@
         font-size: 1.0rem;
     }
 
+    /* e.g. Inset form */
+    .form-inline h5 {
+        display: inline-flex;
+        margin-right: 10px;
+        vertical-align: middle;
+        margin-bottom: 0;
+    }
+
     header {
         background: gray;
         height: 30px;
@@ -999,6 +1007,7 @@
     }
 
     .colorpicker span,
+    .inset-color span:first-child,
     .label-color span:first-child,
     .shape-color span:first-child {
         border: solid 1px #bbb;
