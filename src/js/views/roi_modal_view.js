@@ -77,9 +77,11 @@ export const RoiModalView = Backbone.View.extend({
                 // Clone the 'first' selected panel as our reference for everything
                 self.m = self.model.getSelected().head().clone();
 
-                // We don't support Shape editing when rotated!
-                self.rotated = self.m.get('rotation') !== 0;
+                // We don't support Shape editing when rotated or flipped!
+                self.rotated = self.m.get('rotation') !== 0 || self.m.get('vertical_flip') || self.m.get('horizontal_flip');
                 self.m.set('rotation', 0);
+                self.m.set('vertical_flip', false);
+                self.m.set('horizontal_flip', false);
 
                 self.shapeManager.setState("SELECT");
                 self.shapeManager.deleteAllShapes();
@@ -427,8 +429,8 @@ export const RoiModalView = Backbone.View.extend({
                 tip;
             if (this.rotated) {
                 tip = "<span class='badge text-bg-primary'>Warning</span> " +
-                      "This image panel is rotated in the figure, but this ROI editor can't work with rotated images. " +
-                      "The image is displayed here <b>without</b> rotation, but the ROIs you add will be applied " +
+                      "This image panel is rotated or flipped in the figure, but this ROI editor can't work with rotated/flipped images. " +
+                      "The image is displayed here <b>without</b> rotation/flipping, but the ROIs you add will be applied " +
                       "correctly to the image panel in the figure.";
             } else {
                 tip = "<span class='badge text-bg-primary'>Tip</span> " + tips[parseInt(Math.random() * tips.length, 10)];
