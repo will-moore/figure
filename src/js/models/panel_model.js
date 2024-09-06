@@ -51,7 +51,6 @@
             // listen for changes to shapes...
             this.on("change:shapes", (panel) => {
                 // notify all other panels via the figureModel...
-                console.log("trigger shapesUpdated...");
                 if (!this.silenceTriggers && this.figureModel) {
                     this.figureModel.trigger('shapesUpdated', panel);
                 }
@@ -62,6 +61,10 @@
             this.figureModel = figureModel;
             // listen for *other* panels zooming - might need to update "inset" ROI...
             this.listenTo(figureModel, 'zoomPanUpdated', this.handleZoomPanChange);
+            // listen for *other* panels being deleted - delete corresponding inset ROI...
+            this.listenTo(figureModel.panels, 'remove', (panel) => {
+                this.handleZoomPanChange(panel, true)
+            });
             // listen for *other* panels shape updates - might need to update zoom/pan...
             this.listenTo(figureModel, 'shapesUpdated', this.handleShapesChange);
         },
@@ -84,29 +87,31 @@
             this.silenceTriggers = false;
         },
 
-        handleZoomPanChange(panel) {
-            // An inset panel has zoomed/panned. If we have corresponding inset Rectangle
-            // then update it accordingly...
+        handleZoomPanChange(panel, panelDeleted) {
+            // An inset panel has zoomed/panned or deleted. If we have corresponding inset
+            // Rectangle then update or delete it accordingly...
             var insetRoiId = panel.get('insetRoiId');
             if (!insetRoiId) return;
             // find Rectangles that have insetRoiId...
             let insetShapes = this.get('shapes');
             if (insetShapes) {
-                insetShapes = insetShapes.filter(sh => sh.type == 'Rectangle');
-
+                insetShapes = insetShapes.filter(sh => (sh.type == 'Rectangle' && sh.id == insetRoiId));
                 if (insetShapes.length > 0) {
                     this.silenceTriggers = true;
-
-                    let rect = panel.getViewportAsRect();
-                    // update the "inset" Rectangle
-                    let updated = this.get('shapes').map(shape => {
-                        if (shape.type == 'Rectangle' && shape.id == insetRoiId) {
-                            return {...shape, ...rect}
-                        }
-                        return shape;
-                    });
+                    // delete or update the "inset" Rectangle
+                    let updated = this.get('shapes');
+                    if (panelDeleted) {
+                        updated = updated.filter(shape => shape.id != insetRoiId);
+                    } else {
+                        let rect = panel.getViewportAsRect();
+                        updated = updated.map(shape => {
+                            if (shape.type == 'Rectangle' && shape.id == insetRoiId) {
+                                return {...shape, ...rect}
+                            }
+                            return shape;
+                        });
+                    }
                     this.save('shapes', updated);
-
                     this.silenceTriggers = false;
                 }
             }
