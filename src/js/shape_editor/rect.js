@@ -51,6 +51,7 @@ var Rect = function Rect(options) {
   if (options.zoom) {
     this._zoomFraction = options.zoom / 100;
   }
+  this._rotation = options.rotation || 0;
   this.handle_wh = 6;
 
   this.element = this.paper.rect();
@@ -104,6 +105,7 @@ Rect.prototype.toJson = function toJson() {
     'area': this._width * this._height,
     strokeWidth: this._strokeWidth,
     strokeColor: this._strokeColor,
+    rotation: this._rotation,
   };
   if (this._id) {
     rv.id = this._id;
@@ -258,6 +260,8 @@ Rect.prototype.drawShape = function drawShape() {
     "stroke-width": lineW,
   });
 
+  this.element.transform("r" + this._rotation + "," + (x + (w/2)) + "," + (y + (h/2)));
+
   if (this.isSelected()) {
     this.handles.show().toFront();
   } else {
@@ -273,6 +277,7 @@ Rect.prototype.drawShape = function drawShape() {
     hx = handleIds[h_id][0];
     hy = handleIds[h_id][1];
     hnd.attr({ x: hx - this.handle_wh / 2, y: hy - this.handle_wh / 2 });
+    hnd.transform("r" + this._rotation + "," + (x + (w/2)) + "," + (y + (h/2)));
   }
 };
 
@@ -296,6 +301,22 @@ Rect.prototype.getHandleCoords = function getHandleCoords() {
   return handleIds;
 };
 
+function correct_rotation(dx, dy, rotation) {
+  if (dx === 0 && dy === 0) {
+      return {x: dx, y: dy};
+  }
+  var length = Math.sqrt(dx * dx + dy * dy),
+      ang1 = Math.atan(dy/dx);
+  if (dx < 0) {
+      ang1 = Math.PI + ang1;
+  }
+  var angr = rotation * (Math.PI/180),  // deg -> rad
+      ang2 = ang1 - angr;
+  dx = Math.cos(ang2) * length;
+  dy = Math.sin(ang2) * length;
+  return {x: dx, y: dy};
+}
+
 // ---- Create Handles -----
 Rect.prototype.createHandles = function createHandles() {
   var self = this,
@@ -315,6 +336,12 @@ Rect.prototype.createHandles = function createHandles() {
     return function (dx, dy, mouseX, mouseY, event) {
       dx = dx / self._zoomFraction;
       dy = dy / self._zoomFraction;
+      // need to handle rotation...
+      if (self._rotation != 0) {
+        let xy = correct_rotation(dx, dy, self._rotation);
+        dx = xy.x;
+        dy = xy.y;
+      }
 
       // If drag on corner handle, retain aspect ratio. dx/dy = aspect
       var keep_ratio = self.fixed_ratio || event.shiftKey;
@@ -397,6 +424,9 @@ Rect.prototype.createHandles = function createHandles() {
   // var _stop_event_propagation = function(e) {
   //     e.stopImmediatePropagation();
   // }
+  let cx = handleIds['n'][0];
+  let cy = handleIds['e'][1];
+
   for (var key in handleIds) {
     var hx = handleIds[key][0];
     var hy = handleIds[key][1];
@@ -407,7 +437,8 @@ Rect.prototype.createHandles = function createHandles() {
         self.handle_wh,
         self.handle_wh
       )
-      .attr(handle_attrs);
+      .attr(handle_attrs)
+      .rotate(self._rotation, cx, cy);
     handle.attr({ cursor: key + "-resize" }); // css, E.g. ne-resize
     handle.h_id = key;
     handle.rect = self;
