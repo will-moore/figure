@@ -11,6 +11,9 @@
     // Attributes can be added as we need them.
     export var Panel = Backbone.Model.extend({
 
+        // see setFigureModel() below
+        figureModel: undefined,
+
         defaults: {
             x: 100,     // coordinates on the 'paper'
             y: 100,
@@ -35,7 +38,83 @@
         },
 
         initialize: function() {
+            // listen for changes to the viewport...
+            this.on("change:zoom change:dx change:dy change:width change:height change:rotation", (panel) => {
+                // if this panel has 'insetRoiId' it is an "inset" panel so we need to
+                // notify other panels that contain the corresponding ROI (rectangle)
+                if (this.get('insetRoiId') && this.figureModel) {
+                    if (!this.silenceTriggers) {
+                        this.figureModel.trigger('zoomPanUpdated', panel);
+                    }
+                }
+            });
+            // listen for changes to shapes...
+            this.on("change:shapes", (panel) => {
+                // notify all other panels via the figureModel...
+                if (!this.silenceTriggers && this.figureModel) {
+                    this.figureModel.trigger('shapesUpdated', panel);
+                }
+            });
+        },
 
+        setFigureModel(figureModel) {
+            this.figureModel = figureModel;
+            // listen for *other* panels zooming - might need to update "inset" ROI...
+            this.listenTo(figureModel, 'zoomPanUpdated', this.handleZoomPanChange);
+            // listen for *other* panels being deleted - delete corresponding inset ROI...
+            this.listenTo(figureModel.panels, 'remove', (panel) => {
+                this.handleZoomPanChange(panel, true)
+            });
+            // listen for *other* panels shape updates - might need to update zoom/pan...
+            this.listenTo(figureModel, 'shapesUpdated', this.handleShapesChange);
+        },
+
+        handleShapesChange(panel) {
+            // The ROI rectangle has been updated on another panel - update viewport to match...
+            // Update zoom/panel but don't trigger zoomPanUpdated or we could get
+            // recursive feedback
+            var insetRoiId = this.get('insetRoiId');
+            if (!insetRoiId) return;
+
+            this.silenceTriggers = true;
+
+            // find Rectangle from panel that corresponds to this panel
+            let rect = (panel.get("shapes") || []).find(shape => shape.id == insetRoiId);
+            if (rect) {
+                this.cropToRoi(rect);
+            }
+
+            this.silenceTriggers = false;
+        },
+
+        handleZoomPanChange(panel, panelDeleted) {
+            // An inset panel has zoomed/panned or deleted. If we have corresponding inset
+            // Rectangle then update or delete it accordingly...
+            var insetRoiId = panel.get('insetRoiId');
+            if (!insetRoiId) return;
+            // find Rectangles that have insetRoiId...
+            let insetShapes = this.get('shapes');
+            if (insetShapes) {
+                insetShapes = insetShapes.filter(sh => (sh.type == 'Rectangle' && sh.id == insetRoiId));
+                if (insetShapes.length > 0) {
+                    this.silenceTriggers = true;
+                    // delete or update the "inset" Rectangle
+                    let updated = this.get('shapes');
+                    if (panelDeleted) {
+                        updated = updated.filter(shape => shape.id != insetRoiId);
+                    } else {
+                        let rect = panel.getViewportAsRect();
+                        updated = updated.map(shape => {
+                            if (shape.type == 'Rectangle' && shape.id == insetRoiId) {
+                                return {...shape, ...rect}
+                            }
+                            return shape;
+                        });
+                    }
+                    this.save('shapes', updated);
+                    this.silenceTriggers = false;
+                }
+            }
         },
 
         // When we're creating a Panel, we process the data a little here:
@@ -663,7 +742,10 @@
 
             var toSet = { 'width': newW, 'height': newH, 'dx': dx, 'dy': dy, 'zoom': zoom };
             var rotation = coords.rotation || 0;
+            // if the rectangle/viewport is rotated clockwise, the image within the
+            // viewport is rotated anti-clockwise
             if (!isNaN(rotation)) {
+                rotation = -(rotation - 360);
                 toSet.rotation = rotation;
             }
             this.save(toSet);
@@ -675,6 +757,12 @@
             dx = dx !== undefined ? dx : this.get('dx');
             dy = dy !== undefined ? dy : this.get('dy');
             var rotation = this.get('rotation');
+            if (isNaN(rotation)) {
+                rotation = 0;
+            };
+            // if we have rotated the panel clockwise within the viewport 
+            // it's as if the viewport rectangle has rotated anti-clockwise
+            rotation = 360 - rotation;
 
             var width = this.get('width'),
                 height = this.get('height'),
