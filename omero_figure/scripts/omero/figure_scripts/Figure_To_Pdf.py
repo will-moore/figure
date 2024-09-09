@@ -523,25 +523,6 @@ class ShapeToPilExport(ShapeExport):
         self.crop = crop
         self.scale = pil_img.size[0] / crop['width']
         self.draw = ImageDraw.Draw(pil_img)
-
-        if 'border' in panel and panel['border'].get('showBorder'):
-            sw = panel['border'].get('strokeWidth')
-            shift_pos = sw / (float(panel['zoom'])/100)
-
-            shape = {}
-            shape['strokeColor'] = panel['border'].get('color')
-            shape['strokeWidth'] = sw
-            shape['x'] = crop['x'] - shift_pos
-            shape['y'] = crop['y'] - shift_pos
-            shape['width'] = crop['width'] + 2*shift_pos
-            shape['height'] = crop['height'] + 2*shift_pos
-            shape['type'] = "outline"
-
-            if "shapes" not in panel:
-                panel['shapes'] = [shape]
-            else:
-                panel['shapes'].append(shape)
-
         super(ShapeToPilExport, self).__init__(panel)
 
     def get_panel_coords(self, shape_x, shape_y):
@@ -665,6 +646,7 @@ class ShapeToPilExport(ShapeExport):
 
         stroke_width = scale_to_export_dpi(float(shape.get('strokeWidth', 2)))
         buffer = int(ceil(stroke_width) * 1.5)
+
         # if fill, draw filled polygon without outline, then add line later
         # with correct stroke width
         rgba = self.get_rgba_int(shape.get('fillColor', '#00000000'))
@@ -2288,10 +2270,24 @@ class TiffExport(FigureExport):
 
         # Now at full figure resolution - Good time to add shapes...
         crop = self.get_crop_region(panel)
-        ShapeToPilExport(pil_img, panel, crop)
+        exporter = ShapeToPilExport(pil_img, panel, crop)
 
         width, height = pil_img.size
-        box = (x, y, x + width, y + height)
+
+         # Add border if needed - Rectangle around the whole panel
+        if 'border' in panel and panel['border'].get('showBorder'):
+            sw = panel['border'].get('strokeWidth')
+            border_width = scale_to_export_dpi(sw)
+            border_color = panel['border'].get('color')
+            padding = border_width * 2
+
+            canvas = Image.new("RGB", (width + padding, height + padding), exporter.get_rgb(border_color))
+            canvas.paste(pil_img, (border_width, border_width))
+            pil_img = canvas
+            box = (x - border_width, y - border_width, x + width + border_width, y + height + border_width)
+        else:
+            box = (x, y, x + width, y + height)
+
         self.tiff_figure.paste(pil_img, box)
 
     def draw_scalebar_line(self, x, y, x2, y2, width, rgb):
