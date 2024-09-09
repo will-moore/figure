@@ -218,21 +218,66 @@ class ShapeExport(object):
             point[0] * tf['A10'] + point[1] * tf['A11'] + tf['A12'],
         ] if tf else point
 
+    @staticmethod
+    def apply_rotation(point, centre, rotation):
+        cx = centre[0]
+        cy = centre[1]
+        x = point[0]
+        y = point[1]
+
+        dx = cx - x
+        dy = cy - y
+        # distance of point from centre of rotation
+        h = sqrt(dx * dx + dy * dy)
+        # and the angle
+        angle1 = atan2(dx, dy)
+
+        # Add the rotation to the angle and calculate new
+        # opposite and adjacent lengths from centre of rotation
+        angle2 = angle1 - radians(rotation)
+        newo = sin(angle2) * h
+        newa = cos(angle2) * h
+        # to give correct x and y within cropped panel
+        x = cx - newo
+        y = cy - newa
+        return x, y
+
     def draw_border(self, shape):
         # to support panel border drawing
-        self.draw_rectangle(shape, False)
-
-    def draw_rectangle(self, shape, in_panel_check=True):
-        # to support rotation/transforms, convert rectangle to a simple
-        # four point polygon and draw that instead
         s = deepcopy(shape)
-        t = shape.get('transform')
         points = [
             (shape['x'], shape['y']),
             (shape['x'] + shape['width'], shape['y']),
             (shape['x'] + shape['width'], shape['y'] + shape['height']),
             (shape['x'], shape['y'] + shape['height']),
         ]
+
+        if shape.get('rotation', 0) != 0:
+            rotation = shape.get('rotation')
+            # rotate around centre of rectangle
+            cx = shape['x'] + shape['width'] / 2
+            cy = shape['y'] + shape['height'] / 2
+            s['points'] = [
+                self.apply_rotation(point, [cx, cy], rotation)
+                for point in points
+            ]
+        self.draw_rectangle(s, False)
+
+    def draw_rectangle(self, shape, in_panel_check=True):
+        # to support rotation/transforms, convert rectangle to a simple
+        # four point polygon and draw that instead
+        s = deepcopy(shape)
+        t = shape.get('transform')
+
+        if shape.get('points', None) != None:
+            points = shape['points']
+        else:
+            points = [
+                (shape['x'], shape['y']),
+                (shape['x'] + shape['width'], shape['y']),
+                (shape['x'] + shape['width'], shape['y'] + shape['height']),
+                (shape['x'], shape['y'] + shape['height']),
+            ]
         s['points'] = ' '.join(','.join(
             map(str, self.apply_transform(t, point))) for point in points)
         self.draw_polygon(s, closed=True, in_panel_check=in_panel_check)
@@ -1143,6 +1188,9 @@ class FigureExport(object):
             shape['width'] = crop['width'] + 2 * shift_pos
             shape['height'] = crop['height'] + 2 * shift_pos
             shape['type'] = "border"
+            rotation = panel['rotation']
+            if rotation != 0:
+                shape['rotation'] = 360 - rotation
 
             if "shapes" not in panel:
                 panel['shapes'] = [shape]
