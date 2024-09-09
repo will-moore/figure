@@ -216,7 +216,8 @@ class ShapeExport(object):
             point[0] * tf['A10'] + point[1] * tf['A11'] + tf['A12'],
         ] if tf else point
 
-    def draw_outline(self, shape):
+    def draw_border(self, shape):
+        # to support panel border drawing
         self.draw_rectangle(shape, False)
 
     def draw_rectangle(self, shape, in_panel_check=True):
@@ -1158,7 +1159,7 @@ class FigureExport(object):
             shape['y'] = crop['y'] - shift_pos
             shape['width'] = crop['width'] + 2*shift_pos
             shape['height'] = crop['height'] + 2*shift_pos
-            shape['type'] = "outline"
+            shape['type'] = "border"
 
             if "shapes" not in panel:
                 panel['shapes'] = [shape]
