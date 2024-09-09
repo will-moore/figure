@@ -1541,8 +1541,8 @@ class FigureExport(object):
 
             self.draw_text(
                 label, (lx + lx_end) / 2,
-                       ly + ((-1 if position in ["bottomleft", "bottomright"]
-                              else 1) * half_height),
+                ly + ((-1 if position in ["bottomleft", "bottomright"]
+                       else 1) * half_height),
                 font_size, (red, green, blue),
                 align="center")
 
