@@ -450,6 +450,7 @@ ShapeManager.prototype.createShapeJson = function createShapeJson(jsonShape) {
     options.width = s.width;
     options.height = s.height;
     options.area = s.width * s.height;
+    options.rotation = s.rotation;
     newShape = new Rect(options);
   } else if (s.type === "Line") {
     options.x1 = s.x1;
