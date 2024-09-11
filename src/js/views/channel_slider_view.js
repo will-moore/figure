@@ -281,8 +281,16 @@ var ChannelSliderView = Backbone.View.extend({
                         return channel.color;
                     })
                 });
+                let foundActive = false;
                 let newChs = m.get('channels').map(function(channel, idx) {
-                    return {'color': 'hilo.lut'};
+                    // Switch LUT to HiLo for all channels
+                    // Keep only the first active channel active
+                    let new_state = {
+                        'color': 'hilo.lut',
+                        'active': (!foundActive && channel.active)
+                    }
+                    foundActive = (foundActive || channel.active);
+                    return new_state;
                 });
                 m.save_channels(newChs);
             } else if (!checkboxState && m.get("hilo_enabled")){
