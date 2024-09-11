@@ -2325,7 +2325,7 @@ class TiffExport(FigureExport):
         # Add border if needed - Rectangle around the whole panel
         if 'border' in panel and panel['border'].get('showBorder'):
             sw = panel['border'].get('strokeWidth')
-            border_width = scale_to_export_dpi(sw)
+            border_width = int(round(scale_to_export_dpi(sw)))
             border_color = panel['border'].get('color')
             padding = border_width * 2
 
