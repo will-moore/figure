@@ -262,6 +262,13 @@ class ShapeToPdfExport(ShapeExport):
         Also includes 'inPanel' key - True if point within
         the cropped panel region
         """
+
+         # Apply flip transformations to the shape coordinates
+        if self.panel['horizontal_flip']:
+            shape_x = self.crop['width'] - (shape_x - self.crop['x']) + self.crop['x']
+        if self.panel['vertical_flip']:
+            shape_y = self.crop['height'] - (shape_y - self.crop['y']) + self.crop['y']
+
         rotation = self.panel['rotation']
         if rotation != 0:
             # img coords: centre of rotation
@@ -529,6 +536,13 @@ class ShapeToPilExport(ShapeExport):
         x, y point around the centre of the cropped region
         and scaling appropriately
         """
+
+         # Apply flip transformations to the shape coordinates
+        if self.panel['horizontal_flip']:
+            shape_x = self.crop['width'] - (shape_x - self.crop['x']) + self.crop['x']
+        if self.panel['vertical_flip']:
+            shape_y = self.crop['height'] - (shape_y - self.crop['y']) + self.crop['y']
+
         rotation = self.panel['rotation']
         if rotation != 0:
             # img coords: centre of rotation
@@ -2097,6 +2111,12 @@ class FigureExport(object):
     def paste_image(self, pil_img, img_name, panel, page, dpi):
         """ Adds the PIL image to the PDF figure. Overwritten for TIFFs """
 
+        # Apply flip transformations before drawing the image
+        if panel['horizontal_flip']:
+            pil_img = pil_img.transpose(Image.FLIP_LEFT_RIGHT)
+        if panel['vertical_flip']:
+            pil_img = pil_img.transpose(Image.FLIP_TOP_BOTTOM)
+
         x = panel['x']
         y = panel['y']
         width = panel['width']
@@ -2195,6 +2215,12 @@ class TiffExport(FigureExport):
 
     def paste_image(self, pil_img, img_name, panel, page, dpi=None):
         """ Add the PIL image to the current figure page """
+
+        # Apply flip transformations before drawing the image
+        if panel['horizontal_flip']:
+            pil_img = pil_img.transpose(Image.FLIP_LEFT_RIGHT)
+        if panel['vertical_flip']:
+            pil_img = pil_img.transpose(Image.FLIP_TOP_BOTTOM)
 
         x = panel['x']
         y = panel['y']
