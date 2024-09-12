@@ -277,8 +277,11 @@ var ChannelSliderView = Backbone.View.extend({
             if (checkboxState && !m.get("hilo_enabled")){
                 m.save({
                     "hilo_enabled": true,
-                    "hilo_original_colors": m.get('channels').map(function(channel) {
-                        return channel.color;
+                    "hilo_channels_state": m.get('channels').map(function(channel) {
+                        return {
+                            "color": channel.color,
+                            "active": channel.active
+                        };
                     })
                 });
                 let foundActive = false;
@@ -296,7 +299,7 @@ var ChannelSliderView = Backbone.View.extend({
             } else if (!checkboxState && m.get("hilo_enabled")){
                 m.save("hilo_enabled", false);
                 let newChs = m.get('channels').map(function(channel, idx) {
-                    return {'color': m.get("hilo_original_colors")[idx]};
+                    return m.get("hilo_channels_state")[idx];
                 });
                 m.save_channels(newChs);
             }
