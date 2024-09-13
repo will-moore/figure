@@ -1177,7 +1177,7 @@ class FigureExport(object):
         if 'border' in panel and panel['border'].get('showBorder'):
             crop = self.get_crop_region(panel)
             sw = panel['border'].get('strokeWidth')
-            shift_pos = sw / (float(panel['zoom']) / 100)
+            shift_pos = 1.5*sw
 
             shape = {}
             shape['strokeColor'] = panel['border'].get('color')
