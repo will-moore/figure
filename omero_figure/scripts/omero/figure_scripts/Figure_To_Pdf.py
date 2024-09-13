@@ -263,13 +263,15 @@ class ShapeToPdfExport(ShapeExport):
         the cropped panel region
         """
 
-         # Apply flip transformations to the shape coordinates
+        # Apply flip transformations to the shape coordinates
         if self.panel['horizontal_flip']:
             shape_x = self.crop['width'] - (shape_x - self.crop['x']) + self.crop['x']
         if self.panel['vertical_flip']:
             shape_y = self.crop['height'] - (shape_y - self.crop['y']) + self.crop['y']
 
         rotation = self.panel['rotation']
+        if self.panel['vertical_flip'] != self.panel['horizontal_flip']:
+            rotation = -rotation
         if rotation != 0:
             # img coords: centre of rotation
             cx = self.crop['x'] + (self.crop['width']/2)
@@ -472,7 +474,18 @@ class ShapeToPdfExport(ShapeExport):
         cy = self.page_height - c['y']
         rx = shape['radiusX'] * self.scale
         ry = shape['radiusY'] * self.scale
-        rotation = (shape['rotation'] + self.panel['rotation']) * -1
+
+        rotation = shape['rotation']
+        if self.panel['vertical_flip']:
+            rotation = - rotation
+        if self.panel['horizontal_flip']:
+            rotation = 180 - rotation
+
+        if self.panel['vertical_flip'] != self.panel['horizontal_flip']:
+            rotation = (rotation - self.panel['rotation']) * -1
+        else:
+            rotation = (rotation + self.panel['rotation']) * -1
+
         r, g, b, a = self.get_rgba(shape['strokeColor'])
         self.canvas.setStrokeColorRGB(r, g, b, alpha=a)
 
@@ -537,7 +550,7 @@ class ShapeToPilExport(ShapeExport):
         and scaling appropriately
         """
 
-         # Apply flip transformations to the shape coordinates
+        # Apply flip transformations to the shape coordinates
         if self.panel['horizontal_flip']:
             shape_x = self.crop['width'] - (shape_x - self.crop['x']) + self.crop['x']
         if self.panel['vertical_flip']:
@@ -775,7 +788,17 @@ class ShapeToPilExport(ShapeExport):
         cy = ctr['y']
         rx = self.scale * shape['radiusX']
         ry = self.scale * shape['radiusY']
-        rotation = (shape['rotation'] + self.panel['rotation']) * -1
+
+        rotation = shape['rotation']
+        if self.panel['vertical_flip']:
+            rotation = - rotation
+        if self.panel['horizontal_flip']:
+            rotation = 180 - rotation
+
+        if self.panel['vertical_flip'] != self.panel['horizontal_flip']:
+            rotation = (rotation - self.panel['rotation']) * -1
+        else:
+            rotation = (rotation + self.panel['rotation']) * -1
 
         width = int((rx * 2) + w)
         height = int((ry * 2) + w)
