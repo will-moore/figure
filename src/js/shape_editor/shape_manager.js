@@ -28,7 +28,8 @@ import $ from "jquery";
 
 import { CreateRect, Rect } from "./rect";
 import { CreateLine, Line, CreateArrow, Arrow } from "./line";
-import { CreatePoint, Point, CreateEllipse, Ellipse } from "./ellipse";
+import { CreateEllipse, Ellipse } from "./ellipse";
+import { CreatePoint, Point } from "./point";
 import { Polygon, Polyline } from "./polygon";
 
 var ShapeManager = function ShapeManager(elementId, width, height, options) {
