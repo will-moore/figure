@@ -855,6 +855,18 @@
         // TODO: Update each panel separately.
         update_img_css: function(zoom, dx, dy, save) {
 
+            const vertical_flip = this.models.some(m => m.get('vertical_flip'));
+            const horizontal_flip = this.models.some(m => m.get('horizontal_flip'));
+            // Check if vertical rotation is enabled, then invert dy
+            if (vertical_flip) {
+                dy = -dy;
+            }
+
+            // Check if horizontal rotation is enabled, then invert dx
+            if (horizontal_flip){
+                dx = -dx;
+            }
+
             var scaled_dx = dx / (zoom/100);
             var scaled_dy = dy / (zoom/100);
 
