@@ -260,3 +260,55 @@ export async function getJson (url) {
     let cors_headers = { mode: 'cors', credentials: 'include' };
     return fetch(url, cors_headers).then(rsp => rsp.json());
 }
+
+export const RANDOM_NUMBER_RANGE = 100000000;
+
+export function getRandomId() {
+    return parseInt(Math.random() * RANDOM_NUMBER_RANGE);
+}
+
+export function newIdFromRandomId(oldId) {
+    return parseInt((oldId * Math.PI) % RANDOM_NUMBER_RANGE);
+}
+
+export function updateRoiIds(panelsJson) {
+    // If we copy and paste an inset panel AND it's corresponding panel with Rect,
+    // we don't want changes in viewport/Rect to trigger changes in the panels they
+    // were copied from - so we update IDs...
+
+    // But, if we ONLY copy/paste a panel containing an Inset Rect, keep the insetRoiId
+    // so that it continues to sync with the inset panel.
+    // And if we ONLY copy/paste an inset panel, keep the insetRoiId so that it stays
+    // in sync with corresponding Rect
+
+    // Find the insetRoiIds that are in BOTH panels and shapes
+    let insetIdsFromPanels = panelsJson.map(panel => panel.insetRoiId).filter(Boolean);
+    let insetIdsFromShapes = [];
+    panelsJson.forEach(panel => {
+        if (panel.shapes) {
+            panel.shapes.forEach(shape => {
+                if (shape.id) {
+                    insetIdsFromShapes.push(shape.id);
+                }
+            });
+        }
+    });
+    let idsToUpdate = insetIdsFromPanels.filter(roiId => insetIdsFromShapes.includes(roiId));
+
+    // Update the IDs
+    let updatedPanels = panelsJson.map(panelJson => {
+        if (idsToUpdate.includes(panelJson.insetRoiId)) {
+            panelJson.insetRoiId = newIdFromRandomId(panelJson.insetRoiId);
+        }
+        if (panelJson.shapes) {
+            panelJson.shapes.forEach(shape => {
+                if (idsToUpdate.includes(shape.id)) {
+                    shape.id = newIdFromRandomId(shape.id);
+                }
+            });
+        }
+        return panelJson;
+    });
+
+    return updatedPanels;
+}
