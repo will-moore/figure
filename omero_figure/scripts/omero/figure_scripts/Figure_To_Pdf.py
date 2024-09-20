@@ -265,9 +265,9 @@ class ShapeToPdfExport(ShapeExport):
 
         # Apply flip transformations to the shape coordinates
         if self.panel['horizontal_flip']:
-            shape_x = self.crop['width'] - (shape_x - self.crop['x']) + self.crop['x']
+            shape_x = self.crop['width'] - shape_x + 2*self.crop['x']
         if self.panel['vertical_flip']:
-            shape_y = self.crop['height'] - (shape_y - self.crop['y']) + self.crop['y']
+            shape_y = self.crop['height'] - shape_y + 2*self.crop['y']
 
         rotation = self.panel['rotation']
         if self.panel['vertical_flip'] != self.panel['horizontal_flip']:
@@ -552,9 +552,9 @@ class ShapeToPilExport(ShapeExport):
 
         # Apply flip transformations to the shape coordinates
         if self.panel['horizontal_flip']:
-            shape_x = self.crop['width'] - (shape_x - self.crop['x']) + self.crop['x']
+            shape_x = self.crop['width'] - shape_x + 2*self.crop['x']
         if self.panel['vertical_flip']:
-            shape_y = self.crop['height'] - (shape_y - self.crop['y']) + self.crop['y']
+            shape_y = self.crop['height'] - shape_y + 2*self.crop['y']
 
         rotation = self.panel['rotation']
         if rotation != 0:
