@@ -12,7 +12,7 @@
 
     // Version of the json file we're saving.
     // This only needs to increment when we make breaking changes (not linked to release versions.)
-    var VERSION = 8;
+    var VERSION = 9;
 
 
     // ------------------------- Figure Model -----------------------------------
@@ -310,7 +310,12 @@
                     });
                 }
             }
-
+            if (v < 9) {
+                _.each(json.panels, function(p){
+                    p.horizontal_flip = false;
+                    p.verticalal_flip = false;
+                });
+            }
             return json;
         },
 
@@ -606,6 +611,8 @@
                         'deltaT': data.deltaT,
                         'pixelsType': data.meta.pixelsType,
                         'pixel_range': data.pixel_range,
+                        'horizontal_flip': false,
+                        'vertical_flip': false
                     };
                     if (baseUrl) {
                         n.baseUrl = baseUrl;
