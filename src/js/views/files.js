@@ -248,15 +248,18 @@ export var FileListView = Backbone.View.extend({
                 "</td></tr>";
             self.$tbody.html(msg);
         }
-        _.each(this.model.models, function (file) {
-            if (file.isVisible(filter)) {
-                var disabled = currentFileId === file.get('id') ? true: false;
-                file.set('disabled', disabled);
-                var e = new FileListItemView({model:file, listview:self}).render().el;
-                self.$tbody.prepend(e);
-            }
+        let visibleFiles = this.model.models.filter(file => file.isVisible(filter));
+        _.each(visibleFiles, function (file) {
+            var disabled = currentFileId === file.get('id') ? true: false;
+            file.set('disabled', disabled);
+            var e = new FileListItemView({model:file, listview:self}).render().el;
+            self.$tbody.prepend(e);
         });
         var owners = this.model.pluck("owner");
+        if (filter.group) {
+            let ownerIds = this.model.models.filter(f => f.get('group').id == filter.group).map(f => f.get('owner').id);
+            owners = owners.filter(o => ownerIds.includes(o.id));
+        }
         var ownersByName = {};
         owners.forEach(function(o){
             let name = o.firstName + " " + o.lastName;
@@ -274,12 +277,20 @@ export var FileListView = Backbone.View.extend({
         var ownersHtml = "<li><a class='dropdown-item pick-owner' href='#' data-id='-1'> -- Show All -- </a></li>";
             ownersHtml += "<li class='divider'></li>";
         _.each(ownersNames, function(name) {
-            ownersHtml += "<li><a class='dropdown-item pick-owner' data-id='" + ownersByName[name] + "' href='#'>" + _.escape(name) + "</a></li>";
+            ownersHtml += `<li>
+                <a class='dropdown-item pick-owner' data-id='${ownersByName[name]}' href='#'>
+                    <i class='bi-check-lg' style='visibility: ${ownersByName[name] === filter.owner ? "visible" : "hidden"}'></i>
+                    ${_.escape(name)}
+                </a></li>`;
         });
         $("#owner-menu").html(ownersHtml);
 
         // render groups chooser
         var groups = this.model.pluck("group");
+        if (filter.owner) {
+            let groupIds = this.model.models.filter(f => f.get('owner').id == filter.owner).map(f => f.get('group').id);
+            groups = groups.filter(g => groupIds.includes(g.id));
+        }
         var groupsByName = {};
         groups.forEach(function (g) {
             groupsByName[g.name] = g.id;
@@ -287,7 +298,11 @@ export var FileListView = Backbone.View.extend({
         var groupNames = Object.keys(groupsByName);
         groupNames.sort();
         var groupsHtml = "<li><a class='dropdown-item pick-group' href='#' data-id='-1'> -- Show All -- </a></li><li class='divider'></li>";
-        groupsHtml += groupNames.map(function (name) { return "<li><a class='dropdown-item pick-group' data-id='" + groupsByName[name] + "' href='#'>" + _.escape(name) + "</a></li>"}).join('\n');
+        groupsHtml += groupNames.map(name => `<li>
+            <a class='dropdown-item pick-group' data-id='${groupsByName[name]}' href='#'>
+                <i class='bi-check-lg' style='visibility: ${groupsByName[name] === filter.group ? "visible" : "hidden"}'></i>
+                ${_.escape(name)}
+            </a></li>`).join('\n');
         $("#group-menu").html(groupsHtml);
         return this;
     }
