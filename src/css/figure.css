@@ -1332,6 +1332,10 @@
         cursor: move;
     }
 
+    .flipping button{
+        margin: 2px;
+    }
+
     .flipping .btn.active {
         background-color: #007bff;
         color: white;
