@@ -70,7 +70,7 @@
                 this.ctv.remove();
             }
             if (selected.length > 0) {
-                this.ctv = new ImageDisplayOptionsView({models: selected});
+                this.ctv = new ImageDisplayOptionsView({models: selected, figureModel: this.model});
                 $("#channelToggle").empty().append(this.ctv.render().el);
             }
             if (this.csv) {
@@ -785,7 +785,7 @@
                 return;     // Ignore keyups except 'Enter'
             }
 
-            // get the current entered value 
+            // get the current entered value
             var value = Math.round(parseFloat(event.target.value));
             if (isNaN(value)) {
                 return;
@@ -1129,6 +1129,7 @@
         initialize: function(opts) {
             // This View may apply to a single PanelModel or a list
             this.models = opts.models;
+            this.figureModel = opts.figureModel;
             var self = this;
             this.models.forEach(function(m){
                 self.listenTo(m, 'change:channels change:z_projection', self.render);
@@ -1140,6 +1141,7 @@
             "click .z-projection": "z_projection",
             "input .rotation-slider": "rotation_input",
             "change .rotation-slider": "rotation_change",
+            "click .panel-rotation": "rotate_panel",
         },
 
         rotation_input: function(event) {
@@ -1154,6 +1156,14 @@
             this.models.forEach(function(m){
                 m.save('rotation', val);
             });
+        },
+
+        rotate_panel: function(event){
+            event.preventDefault()
+            this.models.forEach(function(m){
+                m.setPanelRotation()
+            });
+
         },
 
         z_projection:function(e) {

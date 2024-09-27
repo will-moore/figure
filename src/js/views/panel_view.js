@@ -12,7 +12,7 @@
     import label_right_vertical_template from '../../templates/labels/label_right_vertical.template.html?raw';
     import label_table_template from '../../templates/labels/label_table.template.html?raw';
     import scalebar_panel_template from '../../templates/scalebar_panel.template.html?raw';
-    
+
     // -------------------------Panel View -----------------------------------
     // A Panel is a <div>, added to the #paper by the FigureView below.
     var PanelView = Backbone.View.extend({
@@ -40,6 +40,7 @@
                 'change:channels change:zoom change:dx change:dy change:width change:height change:rotation change:labels change:theT change:deltaT change:theZ change:deltaZ change:z_projection change:z_start change:z_end',
                 this.render_labels);
             this.listenTo(this.model, 'change:shapes', this.render_shapes);
+            this.listenTo(this.model, 'change:panelRotationAngle', this.render_panel);
 
             // During drag or resize, model isn't updated, but we trigger 'drag'
             this.model.on('drag_resize', this.drag_resize, this);
@@ -133,6 +134,19 @@
             }
         },
 
+        render_panel: function(){
+            var panelRotationAngle = this.model.get('panelRotationAngle')
+
+            // update layout of panel on the canvas
+            this.$el.css({
+                '-webkit-transform-origin': '50% 50%',
+                'transform-origin': '50% 50%',
+                '-webkit-transform': 'rotate(' + panelRotationAngle + 'deg)',
+                'transform': 'rotate(' + panelRotationAngle + 'deg)'});
+
+            update_resize()
+        },
+
         render_shapes: function() {
             var shapes = this.model.get('shapes'),
                 w = this.model.get('orig_width'),
@@ -207,7 +221,7 @@
                     }
                 }
                 const matches = [...ljson.text.matchAll(/\[.+?\]/g)]; // Non greedy regex capturing expressions in []
-                if (matches.length>0){ 
+                if (matches.length>0){
                     var new_text = "";
                     var last_idx = 0;
                     for (const match of matches) {// Loops on the match to replace in the ljson.text the expression by their values
@@ -241,7 +255,7 @@
                         } else if (['x', 'y', 'z', 'width', 'height', 'w', 'h', 'rotation', 'rot'].includes(prop_nf[0])){
                             format = prop_nf[1] ? prop_nf[1] : "pixel";
                             precision = param_dict["precision"] !== undefined ? param_dict["precision"] : 2; // decimal places default to 2
-                            label_value = self.model.get_view_label_text(prop_nf[0], format, param_dict["offset"], precision);  
+                            label_value = self.model.get_view_label_text(prop_nf[0], format, param_dict["offset"], precision);
                         } else if (['channels', 'c'].includes(prop_nf[0])) {
                             label_value = self.model.get_channels_label_text();
                         } else if (['zoom'].includes(prop_nf[0])) {

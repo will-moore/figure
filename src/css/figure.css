@@ -636,6 +636,20 @@
         transform-origin: left;
         pointer-events: all;
     }
+
+    .panel-rotation {
+        display: none;
+    }
+
+    .rotation-controls-shown .panel-rotation {
+        margin-top: 170px;
+        padding: 2px;
+        min-width: 50px;
+        display: block;
+        position: absolute;
+        pointer-events: all;
+    }
+
     .show-rotation {
         padding: 2px;
         min-width: 45px;

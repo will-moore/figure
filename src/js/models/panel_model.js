@@ -220,6 +220,21 @@
             this.save('shapes', rois);
         },
 
+        setPanelRotation(){
+            var panelRotationAngle = this.get('panelRotationAngle')
+            if(!panelRotationAngle){
+                panelRotationAngle = 0
+            }
+
+            panelRotationAngle =  parseInt(panelRotationAngle) + 90
+
+            if(panelRotationAngle == 360){
+                panelRotationAngle = 0
+            }
+
+            this.save('panelRotationAngle', panelRotationAngle);
+        },
+
         // Adds list of shapes to panel (same logic as for labels below)
         add_shapes: function(shapes) {
             var old = this.get('shapes'),
@@ -459,7 +474,7 @@
         // labels_map is {labelKey: {size:s, text:t, position:p, color:c}} or {labelKey: false} to delete
         // where labelKey specifies the label to edit. "l.text + '_' + l.size + '_' + l.color + '_' + l.position"
         edit_labels: function(labels_map) {
-            
+
             var oldLabs = this.get('labels');
             // Need to clone the list of labels...
             var labs = [],
@@ -485,7 +500,7 @@
             // Extract all the keys (even duplicates)
             var keys = labs.map(lbl => this.get_label_key(lbl));
 
-            // get all unique labels based on filtering keys 
+            // get all unique labels based on filtering keys
             //(i.e removing duplicate keys based on the index of the first occurrence of the value)
             var filtered_lbls = labs.filter((lbl, index) => index == keys.indexOf(this.get_label_key(lbl)));
 
@@ -818,7 +833,7 @@
             // and panel re-shaping (stretch/squash).
 
             var zooming = Math.abs(zoom - this.get('zoom')) > 1;
-            var panning = (x !== undefined && y!== undefined);
+            var panning = (x !== undefined && y !== undefined);
 
             // Need to know what the original offsets are...
             // We know that the image is 1.5 * bigger than viewport
