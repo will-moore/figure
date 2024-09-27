@@ -143,8 +143,6 @@
                 'transform-origin': '50% 50%',
                 '-webkit-transform': 'rotate(' + panelRotationAngle + 'deg)',
                 'transform': 'rotate(' + panelRotationAngle + 'deg)'});
-
-            update_resize()
         },
 
         render_shapes: function() {
