@@ -647,8 +647,12 @@
 
             var toSet = { 'width': newW, 'height': newH, 'dx': dx, 'dy': dy, 'zoom': zoom };
             var rotation = coords.rotation || 0;
+            var panelRotationAngle = coords.panelRotationAngle || 0;
             if (!isNaN(rotation)) {
                 toSet.rotation = rotation;
+            }
+            if (!isNaN(panelRotationAngle)) {
+                toSet.panelRotationAngle = panelRotationAngle;
             }
             this.save(toSet);
         },
