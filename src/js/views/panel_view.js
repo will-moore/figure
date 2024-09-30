@@ -137,12 +137,6 @@
         render_panel: function(){
             var panelRotationAngle = this.model.get('panelRotationAngle')
 
-            // update layout of panel on the canvas
-           /* this.$el.css({
-                '-webkit-transform-origin': '50% 50%',
-                'transform-origin': '50% 50%',
-                '-webkit-transform': 'rotate(' + panelRotationAngle + 'deg)',
-                'transform': 'rotate(' + panelRotationAngle + 'deg)'});*/
         },
 
         render_shapes: function() {

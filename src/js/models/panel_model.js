@@ -2,6 +2,7 @@
     import Backbone from "backbone";
     import _ from "underscore";
     import $ from "jquery";
+import { rollupVersion } from "vite";
 
     // Corresponds to css - allows us to calculate size of labels
     var LINE_HEIGHT = 1.43;
@@ -232,25 +233,35 @@
                 panelRotationAngle = 0
             }
 
-            var orig_height = this.get('orig_height')
-            var orig_width = this.get('orig_width')
+            var viewport = this.getViewportAsRect()
             var width = this.get('width')
             var height = this.get('height')
-            var dx = this.get('dx')
+            var offset = (height - width)/2
+            var offset_x = viewport.x-offset
+            var offset_y = viewport.y+offset
+           // this.save('is90degRotated', true)
+            //',
+            this.save('rotation', panelRotationAngle);
+            this.cropToRoi({'x': offset_x, 'y': offset_y, 'width': viewport.height, 'height': viewport.width, 'rotation': panelRotationAngle})
+
+          /*  var orig_height = this.get('orig_height')
+            var orig_width = this.get('orig_width')*/
+
+          /*  var dx = this.get('dx')
             var dy = this.get('dy')
             var x = this.get('x')
             var y = this.get('y')
-            console.log(this)
-           this.save('rotation', panelRotationAngle);
+            console.log(this)*/
 
 
-            this.save('width', height);
+
+           /* this.save('width', height);
             this.save('height', width);
             this.save('orig_width', orig_height);
             this.save('orig_height', orig_width);
            // this.save({'rotation': panelRotationAngle, 'orig_height': orig_width, 'orig_width': orig_height, 'height': width, 'width': height});
             this.save('x', x-dy);
-            this.save('y', y+dx);
+            this.save('y', y+dx);*/
 
 
 
@@ -683,12 +694,17 @@
             zoom = zoom !== undefined ? zoom : this.get('zoom');
             dx = dx !== undefined ? dx : this.get('dx');
             dy = dy !== undefined ? dy : this.get('dy');
+        //    dx = this.get('is90degRotated',0) ? -dy :  dx;
+       //     dy = this.get('is90degRotated',0) ? dx :  dy;
             var rotation = this.get('rotation');
 
             var width = this.get('width'),
                 height = this.get('height'),
                 orig_width = this.get('orig_width'),
                 orig_height = this.get('orig_height');
+
+          //  orig_width = this.get('is90degRotated',0) ? orig_height:  orig_width,
+           // orig_height = this.get('is90degRotated',0) ? orig_width : orig_height;
 
             // find if scaling is limited by width OR height
             var xPercent = width / orig_width,
@@ -712,10 +728,12 @@
 
             // Use offset from image centre to calculate ROI position
             var cX = orig_width/2 - dx,
-                cY = orig_height    /2 - dy,
+                cY = orig_height/2 - dy,
                 roiX = cX - (roiW / 2),
                 roiY = cY - (roiH / 2);
-
+           // console.log("view port as rectangle")
+           // console.log({'x': roiX, 'y': roiY, 'width': roiW,
+           //     'height': roiH, 'rotation': rotation})
             return {'x': roiX, 'y': roiY, 'width': roiW,
                 'height': roiH, 'rotation': rotation};
         },
@@ -823,7 +841,6 @@
                        '-webkit-transform': 'rotate(' + rotation + 'deg)',
                        'transform': 'rotate(' + rotation + 'deg)'
                    };
-                   console.log(css)
             return css;
         },
 
@@ -911,9 +928,14 @@
 
             var dx = x;
             var dy = y;
-
+        //    console.log("frame_w "+frame_w)
+         //   console.log("frame_h "+frame_h)
             var orig_w = this.get('orig_width'),
                 orig_h = this.get('orig_height');
+            //orig_w = this.get('is90degRotated',0) ? orig_h :  orig_w;
+           // orig_h = this.get('is90degRotated',0) ? orig_w :  orig_h;
+           // console.log("orig_w"+orig_w)
+          //  console.log("orig_h"+orig_h)
             if (typeof dx == 'undefined') dx = this.get('dx');
             if (typeof dy == 'undefined') dy = this.get('dy');
             zoom = zoom || 100;
@@ -924,6 +946,8 @@
                 img_h = frame_h * (zoom/100),
                 orig_ratio = orig_w / orig_h,
                 vp_ratio = frame_w / frame_h;
+         //   console.log("Math.abs(orig_ratio - vp_ratio) "+Math.abs(orig_ratio - vp_ratio))
+          //  console.log("vp_ratio) "+vp_ratio)
             if (Math.abs(orig_ratio - vp_ratio) < 0.01) {
                 // ignore...
             // if viewport is wider than orig, offset y
@@ -945,7 +969,7 @@
             dy = dy * (zoom/100);
             img_x = (dx * vp_scale) - img_x;
             img_y = (dy * vp_scale) - img_y;
-
+          //  console.log(this._viewport_css(img_x, img_y, img_w, img_h, frame_w, frame_h))
             return this._viewport_css(img_x, img_y, img_w, img_h, frame_w, frame_h);
         },
 
