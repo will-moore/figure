@@ -1163,7 +1163,6 @@
             this.models.forEach(function(m){
                 m.setPanelRotation()
             });
-
         },
 
         z_projection:function(e) {

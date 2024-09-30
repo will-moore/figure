@@ -221,7 +221,7 @@
         },
 
         setPanelRotation(){
-            var panelRotationAngle = this.get('panelRotationAngle')
+            var panelRotationAngle = this.get('rotation')
             if(!panelRotationAngle){
                 panelRotationAngle = 0
             }
@@ -232,7 +232,28 @@
                 panelRotationAngle = 0
             }
 
-            this.save('panelRotationAngle', panelRotationAngle);
+            var orig_height = this.get('orig_height')
+            var orig_width = this.get('orig_width')
+            var width = this.get('width')
+            var height = this.get('height')
+            var dx = this.get('dx')
+            var dy = this.get('dy')
+            var x = this.get('x')
+            var y = this.get('y')
+            console.log(this)
+           this.save('rotation', panelRotationAngle);
+
+
+            this.save('width', height);
+            this.save('height', width);
+            this.save('orig_width', orig_height);
+            this.save('orig_height', orig_width);
+           // this.save({'rotation': panelRotationAngle, 'orig_height': orig_width, 'orig_width': orig_height, 'height': width, 'width': height});
+            this.save('x', x-dy);
+            this.save('y', y+dx);
+
+
+
         },
 
         // Adds list of shapes to panel (same logic as for labels below)
@@ -802,6 +823,7 @@
                        '-webkit-transform': 'rotate(' + rotation + 'deg)',
                        'transform': 'rotate(' + rotation + 'deg)'
                    };
+                   console.log(css)
             return css;
         },
 
