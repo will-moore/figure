@@ -2,7 +2,6 @@
     import Backbone from "backbone";
     import _ from "underscore";
     import $ from "jquery";
-import { rollupVersion } from "vite";
 
     // Corresponds to css - allows us to calculate size of labels
     var LINE_HEIGHT = 1.43;
@@ -301,49 +300,20 @@ import { rollupVersion } from "vite";
         },
 
         setPanelRotation(){
-            var panelRotationAngle = this.get('rotation')
-            if(!panelRotationAngle){
-                panelRotationAngle = 0
-            }
-
-            panelRotationAngle =  parseInt(panelRotationAngle) + 90
-
-            if(panelRotationAngle == 360){
-                panelRotationAngle = 0
-            }
+            var rotation = this.get('rotation') || "0"
+            var panelRotationAngle =  (parseInt(rotation) + 90) % 360
 
             var viewport = this.getViewportAsRect()
             var width = this.get('width')
             var height = this.get('height')
-            var offset = (height - width)/2
+            var offset = (viewport.height - viewport.width)/2
             var offset_x = viewport.x-offset
             var offset_y = viewport.y+offset
-           // this.save('is90degRotated', true)
-            //',
-            this.save('rotation', panelRotationAngle);
+
             this.cropToRoi({'x': offset_x, 'y': offset_y, 'width': viewport.height, 'height': viewport.width, 'rotation': panelRotationAngle})
+            this.save({'rotation': panelRotationAngle, 'height': width, 'width': height});
 
-          /*  var orig_height = this.get('orig_height')
-            var orig_width = this.get('orig_width')*/
-
-          /*  var dx = this.get('dx')
-            var dy = this.get('dy')
-            var x = this.get('x')
-            var y = this.get('y')
-            console.log(this)*/
-
-
-
-           /* this.save('width', height);
-            this.save('height', width);
-            this.save('orig_width', orig_height);
-            this.save('orig_height', orig_width);
-           // this.save({'rotation': panelRotationAngle, 'orig_height': orig_width, 'orig_width': orig_height, 'height': width, 'width': height});
-            this.save('x', x-dy);
-            this.save('y', y+dx);*/
-
-
-
+            return panelRotationAngle
         },
 
         // Adds list of shapes to panel (same logic as for labels below)

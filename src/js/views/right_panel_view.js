@@ -1229,7 +1229,11 @@
         rotate_panel: function(event){
             event.preventDefault()
             this.models.forEach(function(m){
-                m.setPanelRotation()
+                var rotation = m.setPanelRotation()
+                console.log(rotation)
+                $(".vp_img").css({'transform':'rotate(' + rotation + 'deg)'});
+                $(".rotation_value").text(rotation);
+                $(".rotation-slider").val(rotation);
             });
         },
 
