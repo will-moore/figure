@@ -40,7 +40,6 @@
                 'change:channels change:zoom change:dx change:dy change:width change:height change:rotation change:labels change:theT change:deltaT change:theZ change:deltaZ change:z_projection change:z_start change:z_end',
                 this.render_labels);
             this.listenTo(this.model, 'change:shapes', this.render_shapes);
-            this.listenTo(this.model, 'change:panelRotationAngle', this.render_panel);
 
             // During drag or resize, model isn't updated, but we trigger 'drag'
             this.model.on('drag_resize', this.drag_resize, this);
@@ -132,11 +131,6 @@
                 var sb_width = panel_scale * sb_pixels;
                 this.$scalebar.css('width', sb_width);
             }
-        },
-
-        render_panel: function(){
-            var panelRotationAngle = this.model.get('panelRotationAngle')
-
         },
 
         render_shapes: function() {

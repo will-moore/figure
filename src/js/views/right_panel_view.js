@@ -70,7 +70,7 @@
                 this.ctv.remove();
             }
             if (selected.length > 0) {
-                this.ctv = new ImageDisplayOptionsView({models: selected, figureModel: this.model});
+                this.ctv = new ImageDisplayOptionsView({models: selected});
                 $("#channelToggle").empty().append(this.ctv.render().el);
             }
             if (this.csv) {
@@ -1197,7 +1197,6 @@
         initialize: function(opts) {
             // This View may apply to a single PanelModel or a list
             this.models = opts.models;
-            this.figureModel = opts.figureModel;
             var self = this;
             this.models.forEach(function(m){
                 self.listenTo(m, 'change:channels change:z_projection', self.render);

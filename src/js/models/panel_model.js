@@ -730,13 +730,9 @@
             var rotation = coords.rotation || 0;
             // if the rectangle/viewport is rotated clockwise, the image within the
             // viewport is rotated anti-clockwise
-            var panelRotationAngle = coords.panelRotationAngle || 0;
             if (!isNaN(rotation)) {
                 rotation = -(rotation - 360);
                 toSet.rotation = rotation;
-            }
-            if (!isNaN(panelRotationAngle)) {
-                toSet.panelRotationAngle = panelRotationAngle;
             }
             this.save(toSet);
         },
@@ -746,8 +742,6 @@
             zoom = zoom !== undefined ? zoom : this.get('zoom');
             dx = dx !== undefined ? dx : this.get('dx');
             dy = dy !== undefined ? dy : this.get('dy');
-        //    dx = this.get('is90degRotated',0) ? -dy :  dx;
-       //     dy = this.get('is90degRotated',0) ? dx :  dy;
             var rotation = this.get('rotation');
             if (isNaN(rotation)) {
                 rotation = 0;
@@ -760,9 +754,6 @@
                 height = this.get('height'),
                 orig_width = this.get('orig_width'),
                 orig_height = this.get('orig_height');
-
-          //  orig_width = this.get('is90degRotated',0) ? orig_height:  orig_width,
-           // orig_height = this.get('is90degRotated',0) ? orig_width : orig_height;
 
             // find if scaling is limited by width OR height
             var xPercent = width / orig_width,
@@ -789,9 +780,7 @@
                 cY = orig_height/2 - dy,
                 roiX = cX - (roiW / 2),
                 roiY = cY - (roiH / 2);
-           // console.log("view port as rectangle")
-           // console.log({'x': roiX, 'y': roiY, 'width': roiW,
-           //     'height': roiH, 'rotation': rotation})
+
             return {'x': roiX, 'y': roiY, 'width': roiW,
                 'height': roiH, 'rotation': rotation};
         },
@@ -986,14 +975,9 @@
 
             var dx = x;
             var dy = y;
-        //    console.log("frame_w "+frame_w)
-         //   console.log("frame_h "+frame_h)
+
             var orig_w = this.get('orig_width'),
                 orig_h = this.get('orig_height');
-            //orig_w = this.get('is90degRotated',0) ? orig_h :  orig_w;
-           // orig_h = this.get('is90degRotated',0) ? orig_w :  orig_h;
-           // console.log("orig_w"+orig_w)
-          //  console.log("orig_h"+orig_h)
             if (typeof dx == 'undefined') dx = this.get('dx');
             if (typeof dy == 'undefined') dy = this.get('dy');
             zoom = zoom || 100;
@@ -1004,8 +988,6 @@
                 img_h = frame_h * (zoom/100),
                 orig_ratio = orig_w / orig_h,
                 vp_ratio = frame_w / frame_h;
-         //   console.log("Math.abs(orig_ratio - vp_ratio) "+Math.abs(orig_ratio - vp_ratio))
-          //  console.log("vp_ratio) "+vp_ratio)
             if (Math.abs(orig_ratio - vp_ratio) < 0.01) {
                 // ignore...
             // if viewport is wider than orig, offset y
@@ -1027,7 +1009,7 @@
             dy = dy * (zoom/100);
             img_x = (dx * vp_scale) - img_x;
             img_y = (dy * vp_scale) - img_y;
-          //  console.log(this._viewport_css(img_x, img_y, img_w, img_h, frame_w, frame_h))
+
             return this._viewport_css(img_x, img_y, img_w, img_h, frame_w, frame_h);
         },
 
