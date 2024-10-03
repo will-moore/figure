@@ -431,7 +431,7 @@
                 var msg = "Delete '" + figName + "'?";
                 var self = this;
                 if (confirm(msg)) {
-                    $.post( BASE_WEBFIGURE_URL + "delete_web_figure/", { fileId: fileId, figName: figName })
+                    $.post( BASE_WEBFIGURE_URL + "delete_web_figure/", { fileId: fileId})
                         .done(function(){
                             self.figureFiles.removeFile(fileId);
                             self.app.navigate("", {trigger: true});
