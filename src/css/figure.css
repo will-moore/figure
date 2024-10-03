@@ -650,11 +650,9 @@
     }
 
     .rotation-controls-shown .panel-rotation {
-        margin-top: 170px;
+        margin-top: 160px;
         padding: 2px;
-        min-width: 50px;
         display: block;
-        position: absolute;
         pointer-events: all;
     }
 
@@ -884,7 +882,6 @@
         background-color: #FAFAFA;
         border: 1px solid #CCCCCC;
         border-radius: 3px;
-        height: 200px;
         padding: 2px;
         position: absolute;
         z-index: 100;
