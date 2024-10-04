@@ -251,7 +251,7 @@
                 return true;
             }
             var points;
-            if (shape.type === "Ellipse") {
+            if (shape.type === "Ellipse" || shape.type === "Point") {
                 points = [[shape.cx, shape.cy]];
             } else if (shape.type === "Rectangle") {
                 points = [[shape.x, shape.y],
