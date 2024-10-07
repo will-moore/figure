@@ -264,13 +264,15 @@ class ShapeToPdfExport(ShapeExport):
         """
 
         # Apply flip transformations to the shape coordinates
-        if self.panel['horizontal_flip']:
+        h_flip = self.panel.get('horizontal_flip', False)
+        v_flip = self.panel.get('vertical_flip', False)
+        if h_flip:
             shape_x = self.crop['width'] - shape_x + 2*self.crop['x']
-        if self.panel['vertical_flip']:
+        if v_flip:
             shape_y = self.crop['height'] - shape_y + 2*self.crop['y']
 
         rotation = self.panel['rotation']
-        if self.panel['vertical_flip'] != self.panel['horizontal_flip']:
+        if v_flip != h_flip:
             rotation = -rotation
         if rotation != 0:
             # img coords: centre of rotation
@@ -476,12 +478,15 @@ class ShapeToPdfExport(ShapeExport):
         ry = shape['radiusY'] * self.scale
 
         rotation = shape['rotation']
-        if self.panel['vertical_flip']:
+        h_flip = self.panel.get('horizontal_flip', False)
+        v_flip = self.panel.get('vertical_flip', False)
+
+        if v_flip:
             rotation = - rotation
-        if self.panel['horizontal_flip']:
+        if h_flip:
             rotation = 180 - rotation
 
-        if self.panel['vertical_flip'] != self.panel['horizontal_flip']:
+        if v_flip != h_flip:
             rotation = (rotation - self.panel['rotation']) * -1
         else:
             rotation = (rotation + self.panel['rotation']) * -1
@@ -549,14 +554,18 @@ class ShapeToPilExport(ShapeExport):
         x, y point around the centre of the cropped region
         and scaling appropriately
         """
+        h_flip = self.panel.get('horizontal_flip', False)
+        v_flip = self.panel.get('vertical_flip', False)
 
         # Apply flip transformations to the shape coordinates
-        if self.panel['horizontal_flip']:
+        if h_flip:
             shape_x = self.crop['width'] - shape_x + 2*self.crop['x']
-        if self.panel['vertical_flip']:
+        if v_flip:
             shape_y = self.crop['height'] - shape_y + 2*self.crop['y']
 
         rotation = self.panel['rotation']
+        if v_flip != h_flip:
+            rotation = -rotation
         if rotation != 0:
             # img coords: centre of rotation
             cx = self.crop['x'] + (self.crop['width']/2)
@@ -790,12 +799,15 @@ class ShapeToPilExport(ShapeExport):
         ry = self.scale * shape['radiusY']
 
         rotation = shape['rotation']
-        if self.panel['vertical_flip']:
+        h_flip = self.panel.get('horizontal_flip', False)
+        v_flip = self.panel.get('vertical_flip', False)
+
+        if v_flip:
             rotation = - rotation
-        if self.panel['horizontal_flip']:
+        if h_flip:
             rotation = 180 - rotation
 
-        if self.panel['vertical_flip'] != self.panel['horizontal_flip']:
+        if v_flip != h_flip:
             rotation = (rotation - self.panel['rotation']) * -1
         else:
             rotation = (rotation + self.panel['rotation']) * -1
