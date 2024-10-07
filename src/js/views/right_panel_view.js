@@ -1143,7 +1143,7 @@
                     'x': 0,
                     'y': 0,
                     'width': m.get('orig_width'),
-                    'height': m.get('orig_height'),                 
+                    'height': m.get('orig_height'),
                 });
             });
         },
@@ -1229,7 +1229,14 @@
 
         rotation_input: function(event) {
             let val = parseInt(event.target.value);
-            $(".vp_img").css({'transform':'rotate(' + val + 'deg)'});
+            this.models.forEach(function(m) {
+                const verticalFlip = m.get('vertical_flip') ? -1 : 1;
+                const horizontalFlip = m.get('horizontal_flip') ? -1 : 1;
+                // Update the CSS transform property for each image
+                $(".vp_img").css({
+                    'transform': 'scaleX(' + horizontalFlip + ') scaleY(' + verticalFlip + ') rotate(' + val + 'deg)'
+                });
+            });
             $(".rotation_value").text(val);
         },
 
