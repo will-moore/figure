@@ -306,12 +306,10 @@
             var viewport = this.getViewportAsRect()
             var width = this.get('width')
             var height = this.get('height')
-            var offset = (viewport.height - viewport.width)/2
-            var offset_x = viewport.x-offset
-            var offset_y = viewport.y+offset
-
-            this.cropToRoi({'x': offset_x, 'y': offset_y, 'width': viewport.height, 'height': viewport.width, 'rotation': panelRotationAngle})
-            this.save({'rotation': panelRotationAngle, 'height': width, 'width': height});
+            var xPercent = this.get('orig_width') / viewport.height;
+            var yPercent = this.get('orig_height') / viewport.width;
+            var zoom = Math.min(xPercent, yPercent) * 100;
+            this.save({'rotation': panelRotationAngle, 'height': width, 'width': height, 'zoom': zoom});
 
             return panelRotationAngle
         },
