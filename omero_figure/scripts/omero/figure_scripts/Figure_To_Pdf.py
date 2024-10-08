@@ -2167,8 +2167,8 @@ class FigureExport(object):
         """ Adds the PIL image to the PDF figure. Overwritten for TIFFs """
 
         # Apply flip transformations before drawing the image
-        h_flip = self.panel.get('horizontal_flip', False)
-        v_flip = self.panel.get('vertical_flip', False)
+        h_flip = panel.get('horizontal_flip', False)
+        v_flip = panel.get('vertical_flip', False)
 
         if h_flip:
             pil_img = pil_img.transpose(Image.FLIP_LEFT_RIGHT)
@@ -2275,8 +2275,8 @@ class TiffExport(FigureExport):
         """ Add the PIL image to the current figure page """
 
         # Apply flip transformations before drawing the image
-        h_flip = self.panel.get('horizontal_flip', False)
-        v_flip = self.panel.get('vertical_flip', False)
+        h_flip = panel.get('horizontal_flip', False)
+        v_flip = panel.get('vertical_flip', False)
 
         if h_flip:
             pil_img = pil_img.transpose(Image.FLIP_LEFT_RIGHT)
