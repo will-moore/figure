@@ -8,9 +8,12 @@ import FigureColorPicker from "../views/colorpicker";
 
 import channel_slider_template from '../../templates/channel_slider.template.html?raw';
 
-import lutsPng from "../../images/luts_10.png";
-// Need to handle dev vv built (omero-web) paths
-const lutsPngUrl = STATIC_DIR + lutsPng;
+var lutsPngUrl;
+fetch('/get_lut_url/')
+    .then(response => response.json())  // Parse the response as JSON
+    .then(data => {
+        lutsPngUrl = STATIC_DIR + data.lut_url;  // Get the URL from the response
+    });
 
 const SLIDER_INCR_CUTOFF = 100;
 // If the max value of a slider is below this, use smaller slider increments

@@ -25,9 +25,12 @@ import * as bootstrap from "bootstrap"
 import lut_picker_template from '../../templates/lut_picker.template.html?raw';
 import { showModal } from "./util";
 
-import lutsPng from "../../images/luts_10.png";
-// Need to handle dev vv built (omero-web) paths
-const lutsPngUrl = STATIC_DIR + lutsPng;
+var lutsPngUrl;
+fetch('/get_lut_url/')
+    .then(response => response.json())  // Parse the response as JSON
+    .then(data => {
+        lutsPngUrl = STATIC_DIR + data.lut_url;  // Get the URL from the response
+    });
 
 // Should only ever have a singleton on this
 var LutPickerView = Backbone.View.extend({
@@ -36,51 +39,11 @@ var LutPickerView = Backbone.View.extend({
 
     template: _.template(lut_picker_template),
 
-    LUT_NAMES: ["16_colors.lut",
-                "3-3-2_rgb.lut",
-                "5_ramps.lut",
-                "6_shades.lut",
-                "blue_orange_icb.lut",
-                "brgbcmyw.lut",
-                "cool.lut",
-                "cyan_hot.lut",
-                "edges.lut",
-                "fire.lut",
-                "gem.lut",
-                "glasbey.lut",
-                "glasbey_inverted.lut",
-                "glow.lut",
-                "grays.lut",
-                "green_fire_blue.lut",
-                "hilo.lut",
-                "ica.lut",
-                "ica2.lut",
-                "ica3.lut",
-                "ice.lut",
-                "magenta_hot.lut",
-                "orange_hot.lut",
-                "phase.lut",
-                "physics.lut",
-                "pup_br.lut",
-                "pup_nr.lut",
-                "rainbow_rgb.lut",
-                "red-green.lut",
-                "red_hot.lut",
-                "royal.lut",
-                "sepia.lut",
-                "smart.lut",
-                "spectrum.lut",
-                "thal.lut",
-                "thallium.lut",
-                "thermal.lut",
-                "unionjack.lut",
-                "yellow_hot.lut"],
-
     initialize:function () {
         this.lutModal = new bootstrap.Modal('#lutpickerModal');
     },
 
-    
+
     events: {
         "click button[type='submit']": "handleSubmit",
         "click .lutOption": "pickLut",
@@ -110,7 +73,7 @@ var LutPickerView = Backbone.View.extend({
     },
 
     getLutBackgroundPosition: function(lutName) {
-        var lutIndex = this.LUT_NAMES.indexOf(lutName);
+        var lutIndex = this.lut_names.indexOf(lutName);
         if (lutIndex > -1) {
             return '0px -' + ((lutIndex * 50) +2) + 'px';
         } else {
@@ -138,12 +101,21 @@ var LutPickerView = Backbone.View.extend({
         this.loadLuts().then((data) => {
             console.log('data', data);
             this.luts = data.luts;
+            this.lut_names = data.png_luts;
+            var is_dynamic_lut = ("png_luts_new" in this.data);
+            if (is_dynamic_lut){
+                this.luts = this.luts.map(function(lut) {
+                    lut.png_index = lut.png_index_new;
+                    return lut;
+                });
+                this.lut_names = data.png_luts_new;
+            }
+
             this.render();
         });
     },
 
     render:function() {
-        
         var html = "",
             luts;
         if (!this.luts) {
