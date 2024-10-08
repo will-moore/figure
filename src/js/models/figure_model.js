@@ -1,4 +1,4 @@
-    
+
     import Backbone from "backbone";
     import _ from 'underscore';
     import $ from "jquery";
@@ -12,7 +12,7 @@
 
     // Version of the json file we're saving.
     // This only needs to increment when we make breaking changes (not linked to release versions.)
-    var VERSION = 9;
+    var VERSION = 8;
 
 
     // ------------------------- Figure Model -----------------------------------
@@ -52,7 +52,7 @@
             });
 
             // wrap selection notification in a 'debounce', so that many rapid
-            // selection changes only trigger a single re-rendering 
+            // selection changes only trigger a single re-rendering
             this.notifySelectionChange = _.debounce( this.notifySelectionChange, 10);
         },
 
@@ -237,7 +237,7 @@
                     });
                 }
             }
-            
+
             if (v < 6) {
                 console.log("Transforming to VERSION 6");
                 // Adding the Z scale to the model
@@ -310,12 +310,7 @@
                     });
                 }
             }
-            if (v < 9) {
-                _.each(json.panels, function(p){
-                    p.horizontal_flip = false;
-                    p.verticalal_flip = false;
-                });
-            }
+
             return json;
         },
 
@@ -488,7 +483,7 @@
                 doClear();
             }
         },
-        
+
         addImages: function(iIds) {
             this.clearSelected();
 
@@ -611,8 +606,6 @@
                         'deltaT': data.deltaT,
                         'pixelsType': data.meta.pixelsType,
                         'pixel_range': data.pixel_range,
-                        'horizontal_flip': false,
-                        'vertical_flip': false
                     };
                     if (baseUrl) {
                         n.baseUrl = baseUrl;
@@ -709,7 +702,7 @@
             });
         },
 
-        
+
         align_right: function() {
             var selected = this.getSelected(),
                 x_vals = [];
