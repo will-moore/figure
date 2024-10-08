@@ -477,7 +477,7 @@ class ShapeToPdfExport(ShapeExport):
         rx = shape['radiusX'] * self.scale
         ry = shape['radiusY'] * self.scale
 
-        rotation = shape['rotation']
+        rotation = shape.get('rotation', 0)
         h_flip = self.panel.get('horizontal_flip', False)
         v_flip = self.panel.get('vertical_flip', False)
 
@@ -798,7 +798,7 @@ class ShapeToPilExport(ShapeExport):
         rx = self.scale * shape['radiusX']
         ry = self.scale * shape['radiusY']
 
-        rotation = shape['rotation']
+        rotation = shape.get('rotation', 0)
         h_flip = self.panel.get('horizontal_flip', False)
         v_flip = self.panel.get('vertical_flip', False)
 
@@ -821,7 +821,9 @@ class ShapeToPilExport(ShapeExport):
         rgba = ShapeToPdfExport.get_rgba_int(shape['strokeColor'])
         ellipse_draw.ellipse((0, 0, width, height), fill=rgba)
         rgba = self.get_rgba_int(shape.get('fillColor', '#00000000'))
-        ellipse_draw.ellipse((w, w, width - w, height - w), fill=rgba)
+        # when rx is ~zero (for a Point, scaled down) don't need inner ellipse
+        if (width - w) >= w:
+            ellipse_draw.ellipse((w, w, width - w, height - w), fill=rgba)
         temp_ellipse = temp_ellipse.rotate(rotation, resample=Image.BICUBIC,
                                            expand=True)
         # Use ellipse as mask, so transparent part is not pasted
