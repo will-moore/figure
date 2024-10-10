@@ -1267,6 +1267,10 @@
     .ellipse-icon{
         background-image: url("../images/ellipse-icon-16.png");
     }
+    .point-icon{
+        background-image: url("../images/point-icon-24.png");
+        background-position: center;
+    }
     .polygon-icon{
         background-image: url("../images/polygon-icon-16.png");
     }

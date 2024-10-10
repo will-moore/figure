@@ -467,7 +467,7 @@ class ShapeToPdfExport(ShapeExport):
         cy = self.page_height - c['y']
         rx = shape['radiusX'] * self.scale
         ry = shape['radiusY'] * self.scale
-        rotation = (shape['rotation'] + self.panel['rotation']) * -1
+        rotation = (shape.get('rotation', 0) + self.panel['rotation']) * -1
         r, g, b, a = self.get_rgba(shape['strokeColor'])
         self.canvas.setStrokeColorRGB(r, g, b, alpha=a)
 
@@ -771,7 +771,7 @@ class ShapeToPilExport(ShapeExport):
         cy = ctr['y']
         rx = self.scale * shape['radiusX']
         ry = self.scale * shape['radiusY']
-        rotation = (shape['rotation'] + self.panel['rotation']) * -1
+        rotation = (shape.get('rotation', 0) + self.panel['rotation']) * -1
 
         width = int((rx * 2) + w)
         height = int((ry * 2) + w)
@@ -787,7 +787,9 @@ class ShapeToPilExport(ShapeExport):
             a = int(float(shape['fillOpacity'])*255)
         rgba = (r, g, b, a)
 
-        ellipse_draw.ellipse((w, w, width - w, height - w), fill=rgba)
+        # when rx is ~zero (for a Point, scaled down) don't need inner ellipse
+        if (width - w) >= w:
+            ellipse_draw.ellipse((w, w, width - w, height - w), fill=rgba)
         temp_ellipse = temp_ellipse.rotate(rotation, resample=Image.BICUBIC,
                                            expand=True)
         # Use ellipse as mask, so transparent part is not pasted
