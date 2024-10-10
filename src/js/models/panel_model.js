@@ -251,7 +251,7 @@
                 return true;
             }
             var points;
-            if (shape.type === "Ellipse") {
+            if (shape.type === "Ellipse" || shape.type === "Point") {
                 points = [[shape.cx, shape.cy]];
             } else if (shape.type === "Rectangle") {
                 points = [[shape.x, shape.y],
@@ -538,7 +538,7 @@
         // labels_map is {labelKey: {size:s, text:t, position:p, color:c}} or {labelKey: false} to delete
         // where labelKey specifies the label to edit. "l.text + '_' + l.size + '_' + l.color + '_' + l.position"
         edit_labels: function(labels_map) {
-            
+
             var oldLabs = this.get('labels');
             // Need to clone the list of labels...
             var labs = [],
@@ -564,7 +564,7 @@
             // Extract all the keys (even duplicates)
             var keys = labs.map(lbl => this.get_label_key(lbl));
 
-            // get all unique labels based on filtering keys 
+            // get all unique labels based on filtering keys
             //(i.e removing duplicate keys based on the index of the first occurrence of the value)
             var filtered_lbls = labs.filter((lbl, index) => index == keys.indexOf(this.get_label_key(lbl)));
 
@@ -586,12 +586,29 @@
             this.save('channels', chs);
         },
 
-        toggle_channel: function(cIndex, active ) {
+        save_channels: function(channels) {
+            // channels should be a list of objects [{key:value}, {}..]
+            var oldChs = this.get('channels');
+            // Clone channels, applying changes
+            var chs = this.get('channels').map((oldCh, idx) => {
+                return $.extend(true, {}, oldCh, channels[idx]);
+            });
+            this.save('channels', chs);
+        },
 
+        toggle_channel: function(cIndex, active) {
             if (typeof active == "undefined") {
                 active = !this.get('channels')[cIndex].active;
             }
-            this.save_channel(cIndex, 'active', active);
+
+            if (this.get("hilo_enabled") && active) {
+                let newChs = this.get('channels').map(function(channel, idx) {
+                    return {'active': idx == cIndex};
+                });
+                this.save_channels(newChs);
+            } else {
+                this.save_channel(cIndex, 'active', active);
+            }
         },
 
         save_channel_window: function(cIndex, new_w) {
