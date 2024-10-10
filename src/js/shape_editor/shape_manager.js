@@ -29,6 +29,7 @@ import $ from "jquery";
 import { CreateRect, Rect } from "./rect";
 import { CreateLine, Line, CreateArrow, Arrow } from "./line";
 import { CreateEllipse, Ellipse } from "./ellipse";
+import { CreatePoint, Point } from "./point";
 import { Polygon, Polyline } from "./polygon";
 
 var ShapeManager = function ShapeManager(elementId, width, height, options) {
@@ -36,7 +37,7 @@ var ShapeManager = function ShapeManager(elementId, width, height, options) {
   options = options || {};
 
   // Keep track of state, strokeColor etc
-  this.STATES = ["SELECT", "RECT", "LINE", "ARROW", "ELLIPSE", "POLYGON"];
+  this.STATES = ["SELECT", "RECT", "LINE", "ARROW", "ELLIPSE", "POLYGON", "POINT"];
   this._state = "SELECT";
   this._strokeColor = "#ff0000";
   this._strokeWidth = 2;
@@ -87,6 +88,7 @@ var ShapeManager = function ShapeManager(elementId, width, height, options) {
       ELLIPSE: new CreateEllipse({ manager: this, paper: this.paper }),
       LINE: new CreateLine({ manager: this, paper: this.paper }),
       ARROW: new CreateArrow({ manager: this, paper: this.paper }),
+      POINT: new CreatePoint({ manager: this, paper: this.paper }),
     };
 
     this.createShape = this.shapeFactories.LINE;
@@ -172,7 +174,7 @@ ShapeManager.prototype.setState = function setState(state) {
     return;
   }
   // When creating shapes, cover existing shapes with newShapeBg
-  var shapes = ["RECT", "LINE", "ARROW", "ELLIPSE", "POLYGON"];
+  var shapes = ["RECT", "LINE", "ARROW", "ELLIPSE", "POLYGON", "POINT"];
   if (shapes.indexOf(state) > -1) {
     this.newShapeBg.toFront();
     this.newShapeBg.attr({ cursor: "crosshair" });
@@ -412,6 +414,11 @@ ShapeManager.prototype.createShapeJson = function createShapeJson(jsonShape) {
     options.transform = s.transform;
     options.area = s.radiusX * s.radiusY * Math.PI;
     newShape = new Ellipse(options);
+  } else if (s.type === "Point") {
+    options.x = s.x;
+    options.y = s.y;
+    options.area = 0;
+    newShape = new Point(options);
   } else if (s.type === "Rectangle") {
     options.x = s.x;
     options.y = s.y;
