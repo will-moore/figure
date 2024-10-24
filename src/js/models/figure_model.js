@@ -1,4 +1,4 @@
-    
+
     import Backbone from "backbone";
     import _ from 'underscore';
     import $ from "jquery";
@@ -52,7 +52,7 @@
             });
 
             // wrap selection notification in a 'debounce', so that many rapid
-            // selection changes only trigger a single re-rendering 
+            // selection changes only trigger a single re-rendering
             this.notifySelectionChange = _.debounce( this.notifySelectionChange, 10);
         },
 
@@ -237,7 +237,7 @@
                     });
                 }
             }
-            
+
             if (v < 6) {
                 console.log("Transforming to VERSION 6");
                 // Adding the Z scale to the model
@@ -483,7 +483,7 @@
                 doClear();
             }
         },
-        
+
         addImages: function(iIds) {
             this.clearSelected();
 
@@ -702,7 +702,7 @@
             });
         },
 
-        
+
         align_right: function() {
             var selected = this.getSelected(),
                 x_vals = [];
