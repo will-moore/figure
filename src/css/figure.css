@@ -1321,10 +1321,6 @@
         text-decoration: none;
     }
 
-    .form-inline{
-        cursor: move;
-    }
-
     /* Center the drag label icon */
     .bi-arrow-down-up {
         vertical-align: middle;
@@ -1333,4 +1329,6 @@
         font-size: 16px;
         transform: scale(1.2);
         transform-origin: center;
+        opacity: 0.7;
+        cursor: grab;
     }
