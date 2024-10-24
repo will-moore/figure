@@ -431,7 +431,7 @@
                 var msg = "Delete '" + figName + "'?";
                 var self = this;
                 if (confirm(msg)) {
-                    $.post( BASE_WEBFIGURE_URL + "delete_web_figure/", { fileId: fileId })
+                    $.post( BASE_WEBFIGURE_URL + "delete_web_figure/", { fileId: fileId})
                         .done(function(){
                             self.figureFiles.removeFile(fileId);
                             self.app.navigate("", {trigger: true});
@@ -544,7 +544,7 @@
             event.preventDefault();
             showExportAsJsonModal(this.model.figure_toJSON());
         },
-        
+
         import_json: function(event) {
             event.preventDefault();
 
@@ -556,15 +556,15 @@
 
         import_json_form: function(event) {
             event.preventDefault();
-          
+
             var figureJSON = $('.importJsonForm .form-control').val();
             this.model.figure_fromJSON(figureJSON);
-            
+
             hideModal('importJsonModal');
             $('#importJsonModal textarea').val('');
             this.render();
         },
-        
+
         copy_selected_panels: function(event) {
             event.preventDefault();
             if (this.modal_visible()) return true;
