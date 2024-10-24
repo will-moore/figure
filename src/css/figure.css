@@ -1324,3 +1324,13 @@
     .form-inline{
         cursor: move;
     }
+
+    /* Center the drag label icon */
+    .bi-arrow-down-up {
+        vertical-align: middle;
+        margin-left: 12px;
+        display: inline-block;
+        font-size: 16px;
+        transform: scale(1.2);
+        transform-origin: center;
+    }

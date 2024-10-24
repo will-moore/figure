@@ -1,6 +1,6 @@
 
     <div class="input-group input-group-sm float-start">
-        <input type="text" class="label-text form-control input-sm" 
+        <input type="text" class="label-text form-control input-sm"
                 placeholder="Label" value="<% print(_.escape(l.text)) %>" />
         <% if (!edit){ %>
             <div class="input-group-btn">
@@ -74,7 +74,7 @@
     </div>
 
     <div class="btn-group">
-        <button type="button" class="label-position btn btn-outline-secondary btn-sm dropdown-toggle" 
+        <button type="button" class="label-position btn btn-outline-secondary btn-sm dropdown-toggle"
                 title="Position" data-bs-toggle="dropdown">
             <i data-position="<%= position %>" class="<%= position_icon_cls %> dropdown_icon"></i>
             <span class="caret"></span>
@@ -105,7 +105,7 @@
                 <i data-position="left" class="bi-box-arrow-left dropdown_icon"></i> Left</a>
             </li>
             <li><a class="dropdown-item" href="#">
-                    <i data-position="leftvert" class="bi-box-arrow-left dropdown_icon"></i> 
+                    <i data-position="leftvert" class="bi-box-arrow-left dropdown_icon"></i>
                     Left vertical
                 </a>
             </li>
@@ -164,6 +164,7 @@
     </div>
 
     <% if (edit){ %>
+        <i class="bi-arrow-down-up"></i>
         <button type="button" title="Delete Label" class="close btn btn-sm btn-light delete-label" aria-hidden="true">&times;</button>
     <% } else { %>
 
