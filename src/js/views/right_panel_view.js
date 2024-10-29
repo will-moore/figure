@@ -8,7 +8,7 @@
     import $ from "jquery";
     import Sortable from 'sortablejs';
 
-    import {figureConfirmDialog, showModal, rotatePoint} from "./util";
+    import {figureConfirmDialog, showModal, rotatePoint, getRandomId} from "./util";
     import FigureColorPicker from "../views/colorpicker";
 
     import FigureModel from "../models/figure_model";
@@ -111,9 +111,73 @@
             "click .copyROIs": "copyROIs",
             "click .pasteROIs": "pasteROIs",
             "click .deleteROIs": "deleteROIs",
+            "click .create_inset": "createInset",
             // triggered by select_dropdown_option below
             "change .shape-color": "changeROIColor",
             "change .line-width": "changeLineWidth",
+        },
+
+        createInset: function() {
+            let selected = this.model.getSelected();
+
+            selected.forEach(panel => {
+                let randomId = getRandomId();
+                // Add Rectangle (square) in centre of viewport
+                let vp = panel.getViewportAsRect();
+                let minSide = Math.min(vp.width, vp.height);
+                // Square is 1/3 size of the viewport
+                let rectSize = minSide / 3;
+                var color = $('.inset-color span:first', this.$el).attr('data-color');
+                var position = $('.label-position i:first', this.$el).attr('data-position');
+                var strokeWidth = parseFloat($('button.inset-width span:first', this.$el).attr('data-line-width'));
+                let rect = {
+                    type: "Rectangle",
+                    strokeWidth,
+                    strokeColor: "#" + color,
+                    x: vp.x + ((vp.width - rectSize) / 2),
+                    y: vp.y + ((vp.height - rectSize) / 2),
+                    width: rectSize,
+                    height: rectSize,
+                    id: randomId,
+                    rotation: vp.rotation || 0,
+                }
+                panel.add_shapes([rect]);
+
+                // Create duplicate panels
+                let panelJson = panel.toJSON();
+
+                // want to make sure new panel is square
+                let maxSide = Math.min(panelJson.width, panelJson.height);
+                panelJson.width = maxSide;
+                panelJson.height = maxSide;
+
+                if (position == "bottom") {
+                    panelJson.y = panelJson.y + 1.1 * panel.get("height");
+                } else if (position == "left") {
+                    panelJson.x = panelJson.x - (1.1 * panelJson.width);
+                } else if (position == "top") {
+                    panelJson.y = panelJson.y - (1.1 * panelJson.height);
+                } else {
+                    panelJson.x = panelJson.x + 1.1 * panel.get("width");
+                }
+                // cropped to match new Rectangle
+                let orig_width = panelJson.orig_width;
+                let orig_height = panelJson.orig_height;
+                let targetCx = Math.round(rect.x + (rect.width/2));
+                let targetCy = Math.round(rect.y + (rect.height/2));
+
+                panelJson.dx = (orig_width/2) - targetCx;
+                panelJson.dy = (orig_height/2) - targetCy;
+                // zoom to correct percentage
+                var xPercent = orig_width / rect.width;
+                var yPercent = orig_height / rect.height;
+                panelJson.zoom = Math.min(xPercent, yPercent) * 100;
+                panelJson.selected = false;
+                panelJson.shapes = [];
+                panelJson.insetRoiId = randomId;
+
+                this.model.panels.create(panelJson);
+            });
         },
 
         changeLineWidth: function() {
@@ -704,12 +768,12 @@
             $("#vp_zoom_slider")
                 .attr({"max": 1000})
                 .on("input", (event) => {
-                    let val = parseFloat(event.target.value);
+                    let val = Math.round(parseFloat(event.target.value));
                     this.update_img_css(val, 0, 0);
                     $('#vp_zoom_value').val(val);
                 })
                 .on("change", (event) => {
-                    let val = parseFloat(event.target.value);
+                    let val = Math.round(parseFloat(event.target.value));
                     this.zoom_avg = val;
                     var to_save = {'zoom': val};
                     if (val === 100) {
@@ -787,8 +851,8 @@
                 return;     // Ignore keyups except 'Enter'
             }
 
-            // get the current entered value
-            var value = parseInt(event.target.value);
+            // get the current entered value 
+            var value = Math.round(parseFloat(event.target.value));
             if (isNaN(value)) {
                 return;
             }
@@ -951,7 +1015,7 @@
             // only show viewport if original w / h ratio is same for all models
             // get average viewport frame w/h & zoom
             var wh = this.models.getAverageWH(),
-                zoom = this.models.getAverage('zoom');
+                zoom = Math.round(this.models.getAverage('zoom'));
 
             if (wh <= 1) {
                 var frame_h = this.full_size;
@@ -1036,7 +1100,11 @@
                 var shapeJson = clipboard_data.SHAPES;
                 shapeJson.forEach(function(shape) {
                     if (!rect && shape.type === "Rectangle") {
-                        rect = {x: shape.x, y: shape.y, width: shape.width, height: shape.height};
+                        rect = {
+                            x: shape.x, y: shape.y,
+                            width: shape.width, height: shape.height,
+                            rotation: shape.rotation
+                        };
                     }
                 });
                 if (!rect) {
@@ -1089,11 +1157,11 @@
                 }
             });
             var json = {
-                x: (x !== "-" ? parseInt(x, 10) : x),
-                y: (y !== "-" ? parseInt(y, 10) : y),
-                width: (w !== "-" ? parseInt(w, 10) : w),
-                height: (h !== "-" ? parseInt(h, 10) : h),
-                rotation: (rotation !== "-" ? parseInt(rotation, 10) : "-"),
+                x: (x !== "-" ? parseFloat(x, 10) : x),
+                y: (y !== "-" ? parseFloat(y, 10) : y),
+                width: (w !== "-" ? parseFloat(w, 10) : w),
+                height: (h !== "-" ? parseFloat(h, 10) : h),
+                rotation: (rotation !== "-" ? parseFloat(rotation, 10) : "-"),
             }
             return json;
         },
@@ -1106,8 +1174,14 @@
             json.canCopyRect = true;
             json.canPasteRect = (clipboard && ('CROP' in clipboard || 'SHAPES' in clipboard));
 
-            if ([json.x, json.y, json.w, json.h].indexOf("-") > -1) {
+            if ([json.x, json.y, json.width, json.height].indexOf("-") > -1) {
                 json.canCopyRect = false;
+            }else{
+                json.x = Math.round(json.x)
+                json.y = Math.round(json.y)
+                json.width = Math.round(json.width)
+                json.height = Math.round(json.height)
+                json.rotation = Math.round(json.rotation)
             }
             this.$el.html(this.template(json));
         },
@@ -1177,9 +1251,11 @@
                 sum_sizeZ = 0,
                 rotation,
                 z_projection,
+                projection_bytes_exceeded = [],
                 zp;
             if (this.models) {
                 this.models.forEach(function(m, i){
+                    projection_bytes_exceeded.push(m.isMaxProjectionBytesExceeded())
                     rotation = m.get('rotation');
                     max_rotation = Math.max(max_rotation, rotation);
                     sum_rotation += rotation;
@@ -1194,6 +1270,7 @@
                         }
                     }
                 });
+                let proj_bytes_exceeded = projection_bytes_exceeded.some(b => b);
                 var avg_rotation = sum_rotation / this.models.length;
                 if (avg_rotation === max_rotation) {
                     rotation = avg_rotation;
@@ -1209,6 +1286,8 @@
                 const z_projection_disabled = ((sum_sizeZ === this.models.length) || anyBig);
 
                 html = this.template({
+                    max_projection_bytes: MAX_PROJECTION_BYTES,
+                    proj_bytes_exceeded: proj_bytes_exceeded,
                     projectionIconUrl,
                     'z_projection_disabled': z_projection_disabled,
                     'rotation': rotation,

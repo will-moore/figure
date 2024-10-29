@@ -11,6 +11,9 @@
     // Attributes can be added as we need them.
     export var Panel = Backbone.Model.extend({
 
+        // see setFigureModel() below
+        figureModel: undefined,
+
         defaults: {
             x: 100,     // coordinates on the 'paper'
             y: 100,
@@ -35,7 +38,83 @@
         },
 
         initialize: function() {
+            // listen for changes to the viewport...
+            this.on("change:zoom change:dx change:dy change:width change:height change:rotation", (panel) => {
+                // if this panel has 'insetRoiId' it is an "inset" panel so we need to
+                // notify other panels that contain the corresponding ROI (rectangle)
+                if (this.get('insetRoiId') && this.figureModel) {
+                    if (!this.silenceTriggers) {
+                        this.figureModel.trigger('zoomPanUpdated', panel);
+                    }
+                }
+            });
+            // listen for changes to shapes...
+            this.on("change:shapes", (panel) => {
+                // notify all other panels via the figureModel...
+                if (!this.silenceTriggers && this.figureModel) {
+                    this.figureModel.trigger('shapesUpdated', panel);
+                }
+            });
+        },
 
+        setFigureModel(figureModel) {
+            this.figureModel = figureModel;
+            // listen for *other* panels zooming - might need to update "inset" ROI...
+            this.listenTo(figureModel, 'zoomPanUpdated', this.handleZoomPanChange);
+            // listen for *other* panels being deleted - delete corresponding inset ROI...
+            this.listenTo(figureModel.panels, 'remove', (panel) => {
+                this.handleZoomPanChange(panel, true)
+            });
+            // listen for *other* panels shape updates - might need to update zoom/pan...
+            this.listenTo(figureModel, 'shapesUpdated', this.handleShapesChange);
+        },
+
+        handleShapesChange(panel) {
+            // The ROI rectangle has been updated on another panel - update viewport to match...
+            // Update zoom/panel but don't trigger zoomPanUpdated or we could get
+            // recursive feedback
+            var insetRoiId = this.get('insetRoiId');
+            if (!insetRoiId) return;
+
+            this.silenceTriggers = true;
+
+            // find Rectangle from panel that corresponds to this panel
+            let rect = (panel.get("shapes") || []).find(shape => shape.id == insetRoiId);
+            if (rect) {
+                this.cropToRoi(rect);
+            }
+
+            this.silenceTriggers = false;
+        },
+
+        handleZoomPanChange(panel, panelDeleted) {
+            // An inset panel has zoomed/panned or deleted. If we have corresponding inset
+            // Rectangle then update or delete it accordingly...
+            var insetRoiId = panel.get('insetRoiId');
+            if (!insetRoiId) return;
+            // find Rectangles that have insetRoiId...
+            let insetShapes = this.get('shapes');
+            if (insetShapes) {
+                insetShapes = insetShapes.filter(sh => (sh.type == 'Rectangle' && sh.id == insetRoiId));
+                if (insetShapes.length > 0) {
+                    this.silenceTriggers = true;
+                    // delete or update the "inset" Rectangle
+                    let updated = this.get('shapes');
+                    if (panelDeleted) {
+                        updated = updated.filter(shape => shape.id != insetRoiId);
+                    } else {
+                        let rect = panel.getViewportAsRect();
+                        updated = updated.map(shape => {
+                            if (shape.type == 'Rectangle' && shape.id == insetRoiId) {
+                                return {...shape, ...rect}
+                            }
+                            return shape;
+                        });
+                    }
+                    this.save('shapes', updated);
+                    this.silenceTriggers = false;
+                }
+            }
         },
 
         // When we're creating a Panel, we process the data a little here:
@@ -93,6 +172,8 @@
             // we replace these attributes...
             var newData = {'imageId': data.imageId,
                 'name': data.name,
+                'pixelsType': data.pixelsType,
+                'pixel_range': data.pixel_range,
                 'sizeZ': data.sizeZ,
                 'sizeT': data.sizeT,
                 'orig_width': data.orig_width,
@@ -170,7 +251,7 @@
                 return true;
             }
             var points;
-            if (shape.type === "Ellipse") {
+            if (shape.type === "Ellipse" || shape.type === "Point") {
                 points = [[shape.cx, shape.cy]];
             } else if (shape.type === "Rectangle") {
                 points = [[shape.x, shape.y],
@@ -357,7 +438,7 @@
         },
 
         get_zoom_label_text: function() {
-            var text = "" + this.get('zoom') + " %"
+            var text = "" + Math.round(this.get('zoom')) + " %"
             return text;
         },
 
@@ -457,7 +538,7 @@
         // labels_map is {labelKey: {size:s, text:t, position:p, color:c}} or {labelKey: false} to delete
         // where labelKey specifies the label to edit. "l.text + '_' + l.size + '_' + l.color + '_' + l.position"
         edit_labels: function(labels_map) {
-            
+
             var oldLabs = this.get('labels');
             // Need to clone the list of labels...
             var labs = [],
@@ -483,7 +564,7 @@
             // Extract all the keys (even duplicates)
             var keys = labs.map(lbl => this.get_label_key(lbl));
 
-            // get all unique labels based on filtering keys 
+            // get all unique labels based on filtering keys
             //(i.e removing duplicate keys based on the index of the first occurrence of the value)
             var filtered_lbls = labs.filter((lbl, index) => index == keys.indexOf(this.get_label_key(lbl)));
 
@@ -505,12 +586,29 @@
             this.save('channels', chs);
         },
 
-        toggle_channel: function(cIndex, active ) {
+        save_channels: function(channels) {
+            // channels should be a list of objects [{key:value}, {}..]
+            var oldChs = this.get('channels');
+            // Clone channels, applying changes
+            var chs = this.get('channels').map((oldCh, idx) => {
+                return $.extend(true, {}, oldCh, channels[idx]);
+            });
+            this.save('channels', chs);
+        },
 
+        toggle_channel: function(cIndex, active) {
             if (typeof active == "undefined") {
                 active = !this.get('channels')[cIndex].active;
             }
-            this.save_channel(cIndex, 'active', active);
+
+            if (this.get("hilo_enabled") && active) {
+                let newChs = this.get('channels').map(function(channel, idx) {
+                    return {'active': idx == cIndex};
+                });
+                this.save_channels(newChs);
+            } else {
+                this.save_channel(cIndex, 'active', active);
+            }
         },
 
         save_channel_window: function(cIndex, new_w) {
@@ -558,6 +656,22 @@
             }
         },
 
+        // Does sizeXYZ, pixelType and Channels exceed MAX_PROJECTION_BYTES?
+        isMaxProjectionBytesExceeded: function() {
+            let bytes_per_pixel = 4;
+            if (this.get("pixel_range")) {
+                bytes_per_pixel = Math.ceil(Math.log2(this.get("pixel_range")[1]) / 8.0);
+            }
+            let sizeC = this.get("channels").length;
+            let sizeXYZ = this.get('orig_width') * this.get('orig_height') * this.get('sizeZ');
+            let total_bytes = bytes_per_pixel * sizeC * sizeXYZ;
+            return total_bytes > MAX_PROJECTION_BYTES;
+        },
+
+        isMaxProjectionExceeded: function() {
+            return this.get('z_projection') && this.isMaxProjectionBytesExceeded();
+        },
+
         // When a multi-select rectangle is drawn around several Panels
         // a resize of the rectangle x1, y1, w1, h1 => x2, y2, w2, h2
         // will resize the Panels within it in proportion.
@@ -593,8 +707,8 @@
             var targetWH = coords.width/coords.height,
                 currentWH = this.get('width')/this.get('height'),
                 newW, newH,
-                targetCx = Math.round(coords.x + (coords.width/2)),
-                targetCy = Math.round(coords.y + (coords.height/2)),
+                targetCx = coords.x + (coords.width/2),
+                targetCy = coords.y + (coords.height/2),
                 // centre panel at centre of ROI
                 dx = (this.get('orig_width')/2) - targetCx,
                 dy = (this.get('orig_height')/2) - targetCy;
@@ -614,7 +728,10 @@
 
             var toSet = { 'width': newW, 'height': newH, 'dx': dx, 'dy': dy, 'zoom': zoom };
             var rotation = coords.rotation || 0;
+            // if the rectangle/viewport is rotated clockwise, the image within the
+            // viewport is rotated anti-clockwise
             if (!isNaN(rotation)) {
+                rotation = -(rotation - 360);
                 toSet.rotation = rotation;
             }
             this.save(toSet);
@@ -626,6 +743,12 @@
             dx = dx !== undefined ? dx : this.get('dx');
             dy = dy !== undefined ? dy : this.get('dy');
             var rotation = this.get('rotation');
+            if (isNaN(rotation)) {
+                rotation = 0;
+            };
+            // if we have rotated the panel clockwise within the viewport 
+            // it's as if the viewport rectangle has rotated anti-clockwise
+            rotation = 360 - rotation;
 
             var width = this.get('width'),
                 height = this.get('height'),
@@ -723,7 +846,11 @@
 
             // If BIG image, render scaled region
             var region = "";
-            if (this.is_big_image()) {
+            if (this.isMaxProjectionExceeded()) {
+                // if we're trying to do Z-projection with too many planes,
+                // this figure URL renders a suitable error message
+                baseUrl = BASE_WEBFIGURE_URL + 'max_projection_range_exceeded/'
+            } else if (this.is_big_image()) {
                 baseUrl = BASE_WEBFIGURE_URL + 'render_scaled_region/';
                 var rect = this.getViewportAsRect();
                 // Render a region that is 1.5 x larger
@@ -768,6 +895,11 @@
         // offset of the img within it's frame
         get_vp_img_css: function(zoom, frame_w, frame_h, x, y) {
 
+            if (this.isMaxProjectionExceeded()) {
+                // We want the warning placeholder image shown full width, mid-height
+                return {'left':0, 'top':(frame_h - frame_w)/2, 'width':frame_w, 'height': frame_w}
+            }
+
             // For non-big images, we have the full plane in hand
             // css just shows the viewport region
             if (!this.is_big_image()) {
@@ -790,7 +922,7 @@
             // Used for static rendering, as well as during zoom, panning, panel resizing
             // and panel re-shaping (stretch/squash).
 
-            var zooming = zoom !== this.get('zoom');
+            var zooming = Math.abs(zoom - this.get('zoom')) > 1;
             var panning = (x !== undefined && y!== undefined);
 
             // Need to know what the original offsets are...

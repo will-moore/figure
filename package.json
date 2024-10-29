@@ -27,7 +27,7 @@
   "homepage": "https://github.com/ome/omero-figure",
   "devDependencies": {
     "sass": "^1.54.1",
-    "vite": "^3.2.10",
+    "vite": "^5.4.8",
     "watch": "^1.0.2"
   },
   "dependencies": {
@@ -35,7 +35,7 @@
     "backbone": "^1.4.1",
     "bootstrap": "^5.2.0",
     "bootstrap-icons": "^1.11.0",
-    "dompurify": "^2.4.3",
+    "dompurify": "^2.5.4",
     "jquery": "^3.6.0",
     "marked": "^4.2.12",
     "mousetrap": "^1.6.5",

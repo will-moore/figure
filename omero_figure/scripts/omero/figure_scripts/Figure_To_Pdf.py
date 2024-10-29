@@ -26,7 +26,7 @@ from datetime import datetime
 import os
 from os import path
 import zipfile
-from math import atan2, atan, sin, cos, sqrt, radians, floor, ceil
+from math import atan2, atan, sin, cos, sqrt, radians, floor, ceil, log2
 from copy import deepcopy
 import re
 
@@ -465,7 +465,7 @@ class ShapeToPdfExport(ShapeExport):
         cy = self.page_height - c['y']
         rx = shape['radiusX'] * self.scale
         ry = shape['radiusY'] * self.scale
-        rotation = (shape['rotation'] + self.panel['rotation']) * -1
+        rotation = (shape.get('rotation', 0) + self.panel['rotation']) * -1
         r, g, b, a = self.get_rgba(shape['strokeColor'])
         self.canvas.setStrokeColorRGB(r, g, b, alpha=a)
 
@@ -761,7 +761,7 @@ class ShapeToPilExport(ShapeExport):
         cy = ctr['y']
         rx = self.scale * shape['radiusX']
         ry = self.scale * shape['radiusY']
-        rotation = (shape['rotation'] + self.panel['rotation']) * -1
+        rotation = (shape.get('rotation', 0) + self.panel['rotation']) * -1
 
         width = int((rx * 2) + w)
         height = int((ry * 2) + w)
@@ -772,7 +772,9 @@ class ShapeToPilExport(ShapeExport):
         rgba = ShapeToPdfExport.get_rgba_int(shape['strokeColor'])
         ellipse_draw.ellipse((0, 0, width, height), fill=rgba)
         rgba = self.get_rgba_int(shape.get('fillColor', '#00000000'))
-        ellipse_draw.ellipse((w, w, width - w, height - w), fill=rgba)
+        # when rx is ~zero (for a Point, scaled down) don't need inner ellipse
+        if (width - w) >= w:
+            ellipse_draw.ellipse((w, w, width - w, height - w), fill=rgba)
         temp_ellipse = temp_ellipse.rotate(rotation, resample=Image.BICUBIC,
                                            expand=True)
         # Use ellipse as mask, so transparent part is not pasted
@@ -1678,11 +1680,29 @@ class FigureExport(object):
         t = panel['theT']
         size_x = image.getSizeX()
         size_y = image.getSizeY()
+        size_z = image.getSizeZ()
+        size_c = image.getSizeC()
 
         if 'z_projection' in panel and panel['z_projection']:
             if 'z_start' in panel and 'z_end' in panel:
-                image.setProjection('intmax')
-                image.setProjectionRange(panel['z_start'], panel['z_end'])
+                # check max_projection_bytes
+                pixel_range = image.getPixelRange()
+                bytes_per_pixel = ceil(log2(pixel_range[1]) / 8.0)
+                proj_bytes = (size_z * size_x * size_y
+                              * size_c * bytes_per_pixel)
+
+                cfg = self.conn.getConfigService()
+                max_bytes = int(cfg.getConfigValue(
+                    'omero.pixeldata.max_projection_bytes'))
+
+                if proj_bytes <= max_bytes:
+                    image.setProjection('intmax')
+                    image.setProjectionRange(panel['z_start'], panel['z_end'])
+                else:
+                    print(f'projected_bytes {proj_bytes} exceeds '
+                          f'MAX_PROJECTED_BYTES limit: {max_bytes}')
+                    # Turn off all channels to render a black panel
+                    image.setActiveChannels([])
 
         # If big image, we don't want to render the whole plane
         if self.is_big_image(image):

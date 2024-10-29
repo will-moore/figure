@@ -200,11 +200,18 @@ $(function() {
                                "strokeWidth": 4});
 
     shapeManager.addShapeJson({"id": 1234,
+                               "rotation": 45,
                                "type": "Rectangle",
                                "strokeColor": "#ff00ff",
                                "strokeWidth": 6,
                                "x": 200, "y": 150,
                                "width": 125, "height": 150});
+
+    shapeManager.addShapeJson({"type": "Rectangle",
+                               "strokeColor": "#ffffff",
+                               "strokeWidth": 3,
+                               "x": 50, "y": 300,
+                               "width": 50, "height": 100});
 
     shapeManager.addShapeJson({"type": "Ellipse",
                                "x": 200, "y": 150,
@@ -246,6 +253,11 @@ $(function() {
                           "strokeWidth": 2,
                           "y": 260.5,
                           "x": 419});
+
+    shapeManager.addShapeJson({"type": "Point",
+                          "strokeWidth": 2,
+                          "y": 30,
+                          "x": 30});
 
     var s = shapeManager.addShapeJson({"type": "Line",
                                "strokeColor": "#00ff00",

@@ -34,7 +34,7 @@
                 this.render_layout);
             this.listenTo(this.model, 'change:scalebar change:pixel_size_x', this.render_scalebar);
             this.listenTo(this.model,
-                'change:zoom change:dx change:dy change:width change:height change:channels change:theZ change:theT change:z_start change:z_end change:z_projection change:min_export_dpi',
+                'change:zoom change:dx change:dy change:width change:height change:channels change:theZ change:theT change:z_start change:z_end change:z_projection change:min_export_dpi change:pixel_range',
                 this.render_image);
             this.listenTo(this.model,
                 'change:channels change:zoom change:dx change:dy change:width change:height change:rotation change:labels change:theT change:deltaT change:theZ change:deltaZ change:z_projection change:z_start change:z_end',

@@ -50,6 +50,14 @@
         font-size: 1.0rem;
     }
 
+    /* e.g. Inset form */
+    .form-inline h5 {
+        display: inline-flex;
+        margin-right: 10px;
+        vertical-align: middle;
+        margin-bottom: 0;
+    }
+
     header {
         background: gray;
         height: 30px;
@@ -646,11 +654,6 @@
     .z-projection {
         padding: 1px 5px 5px;
     }
-    .z-projection span{
-        background-image: url("../images/projection20.png");
-        width: 20px;
-        height: 20px;
-    }
     .crop-btn span{
         background-image: url("../images/crop20.png");
         width: 20px;
@@ -1004,6 +1007,7 @@
     }
 
     .colorpicker span,
+    .inset-color span:first-child,
     .label-color span:first-child,
     .shape-color span:first-child {
         border: solid 1px #bbb;
@@ -1166,6 +1170,9 @@
         position: absolute;
         top: 15px;
         right: 15px;
+        text-align: center;
+        font-weight: normal;
+        font-size: 14px;
     }
 
     .oldNewColors li {
@@ -1258,6 +1265,10 @@
     }
     .ellipse-icon{
         background-image: url("../images/ellipse-icon-16.png");
+    }
+    .point-icon{
+        background-image: url("../images/point-icon-24.png");
+        background-position: center;
     }
     .polygon-icon{
         background-image: url("../images/polygon-icon-16.png");
