@@ -421,7 +421,7 @@ ShapeManager.prototype.createShapeJson = function createShapeJson(jsonShape) {
     newShape,
     strokeColor = s.strokeColor || this.getStrokeColor(),
     fillColor = s.fillColor || this.getFillColor(),
-    fillOpacity = s.fillOpacity || this.getFillOpacity(),
+    fillOpacity = s.fillOpacity == undefined ? this.getFillOpacity() : s.fillOpacity,
     strokeWidth = s.strokeWidth || this.getStrokeWidth(),
     zoom = this.getZoom(),
     options = {
