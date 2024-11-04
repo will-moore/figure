@@ -242,10 +242,7 @@ class ShapeExport(object):
         y = cy - newa
         return x, y
 
-    def draw_border(self, shape):
-        self.draw_rectangle(shape, False)
-
-    def draw_rectangle(self, shape, in_panel_check=True):
+    def draw_rectangle(self, shape):
         # to support rotation/transforms, convert rectangle to a simple
         # four point polygon and draw that instead
         s = deepcopy(shape)
@@ -270,7 +267,7 @@ class ShapeExport(object):
 
         s['points'] = ' '.join(','.join(
             map(str, self.apply_transform(t, point))) for point in points)
-        self.draw_polygon(s, closed=True, in_panel_check=in_panel_check)
+        self.draw_polygon(s, True)
 
     def draw_point(self, shape):
         s = deepcopy(shape)
@@ -447,8 +444,8 @@ class ShapeToPdfExport(ShapeExport):
 
         self.draw_shape_label(shape, Bounds((x1, y1), (x2, y2)))
 
-    def draw_polygon(self, shape, closed=True, in_panel_check=True):
-        polygon_in_viewport = not in_panel_check
+    def draw_polygon(self, shape, closed=True):
+        polygon_in_viewport = False
         points = []
         for point in shape['points'].split(" "):
             # Older polygons/polylines may be 'x,y,'
@@ -491,7 +488,7 @@ class ShapeToPdfExport(ShapeExport):
         self.draw_shape_label(shape, Bounds(*points))
 
     def draw_polyline(self, shape):
-        self.draw_polygon(shape, closed=False)
+        self.draw_polygon(shape, False)
 
     def draw_ellipse(self, shape):
         stroke_width = float(shape.get('strokeWidth', 1))
@@ -664,7 +661,7 @@ class ShapeToPilExport(ShapeExport):
 
     # Override to not just call draw_polygon, because we want square corners
     # for rectangles and not the rounded corners draw_polygon creates
-    def draw_rectangle(self, shape, in_panel_check=True):
+    def draw_rectangle(self, shape):
         points = [
             (shape['x'], shape['y']),
             (shape['x'] + shape['width'], shape['y']),
@@ -1177,26 +1174,40 @@ class FigureExport(object):
         Add any Shapes
         """
         if 'border' in panel and panel['border'].get('showBorder'):
-            crop = self.get_crop_region(panel)
-            sw = panel['border'].get('strokeWidth')
-            shift_pos = 1.5*sw
+            stroke_width = panel['border'].get('strokeWidth')
+            r, g, b, a = ShapeExport.get_rgba(panel['border'].get('color'))
+            canvas = self.figure_canvas
+            canvas.setStrokeColorRGB(r, g, b, alpha=a)
+            canvas.setLineWidth(stroke_width)
 
-            shape = {}
-            shape['strokeColor'] = panel['border'].get('color')
-            shape['strokeWidth'] = sw
-            shape['x'] = crop['x'] - shift_pos
-            shape['y'] = crop['y'] - shift_pos
-            shape['width'] = crop['width'] + 2 * shift_pos
-            shape['height'] = crop['height'] + 2 * shift_pos
-            shape['type'] = "border"
-            rotation = panel['rotation']
-            if rotation != 0:
-                shape['rotation'] = 360 - rotation
+            # by default, line is drawn in the middle of the path
+            # we want it to be on the outside of the xywh coords
+            shift_pos = stroke_width / 2
 
-            if "shapes" not in panel:
-                panel['shapes'] = [shape]
-            else:
-                panel['shapes'].append(shape)
+            p = canvas.beginPath()
+            x = panel['x'] - shift_pos
+            y = panel['y'] - shift_pos
+            width = panel['width'] + (shift_pos * 2)
+            height = panel['height'] + (shift_pos * 2)
+
+            # Handle page offsets
+            x = x - page['x']
+            y = y - page['y']
+
+            # rectangle around the panel
+            points = [[x, y], [x + width, y], [x + width, y + height], [x, y + height]]
+
+            # flip the y coordinate
+            for point in points:
+                point[1] = self.page_height - point[1]
+
+            # same logic as draw_polygon()
+            p.moveTo(points[0][0], points[0][1])
+            for point in points[1:]:
+                p.lineTo(point[0], point[1])
+            for point in points[0:2]:
+                p.lineTo(point[0], point[1])
+            canvas.drawPath(p, fill=0, stroke=1)
 
         if "shapes" not in panel:
             return
@@ -2182,7 +2193,7 @@ class FigureExport(object):
         c = self.figure_canvas
         c.setLineWidth(width)
         c.setStrokeColorRGB(red, green, blue, 1)
-        c.line(x, y, x2, y2, )
+        c.line(x, y, x2, y2)
 
     def paste_image(self, pil_img, img_name, panel, page, dpi):
         """ Adds the PIL image to the PDF figure. Overwritten for TIFFs """
