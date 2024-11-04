@@ -1239,7 +1239,8 @@
 
     .roi_toolbar {
         overflow: visible;
-        padding-bottom: 10px;
+        margin: 15px;
+        margin-bottom: 5px;
     }
 
     .roi_toolbar .pressed {

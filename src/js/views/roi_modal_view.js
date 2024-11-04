@@ -336,7 +336,7 @@ export const RoiModalView = Backbone.View.extend({
 
         changeFillOpacity: function(event) {
             var opacity = $("span:first", event.target).attr('data-fill-opacity');
-            opacity = parseFloat(opacity, 10).toFixed(2);
+            opacity = parseFloat(opacity, 10).toFixed(1);
             this.shapeManager.setFillOpacity(opacity);
         },
 
