@@ -1195,7 +1195,10 @@ class FigureExport(object):
             y = y - page['y']
 
             # rectangle around the panel
-            points = [[x, y], [x + width, y], [x + width, y + height], [x, y + height]]
+            points = [[x, y],
+                      [x + width, y],
+                      [x + width, y + height],
+                      [x, y + height]]
 
             # flip the y coordinate
             for point in points:
@@ -1833,7 +1836,7 @@ class FigureExport(object):
         pil_img = pil_img.crop((crop_left, crop_top, crop_right, crop_bottom))
 
         # Optional rotation
-        if ('rotation' in panel and panel['rotation'] > 0):
+        if 'rotation' in panel and panel['rotation'] > 0:
             rotation = -int(panel['rotation'])
             pil_img = pil_img.rotate(rotation, Image.BICUBIC)
 
