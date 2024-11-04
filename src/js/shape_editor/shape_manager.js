@@ -281,7 +281,7 @@ ShapeManager.prototype.getFillOpacity = function getFillOpacity() {
 };
 
 ShapeManager.prototype.setFillOpacity = function setFillOpacity(fillOpacity) {
-  var fillOpacity = parseFloat(fillOpacity, 10).toFixed(2);
+  var fillOpacity = parseFloat(fillOpacity, 10).toFixed(1);
   if(fillOpacity == 0) fillOpacity = 0.01;
   this._fillOpacity = fillOpacity;
     var selected = this.getSelectedShapes();
@@ -431,7 +431,7 @@ ShapeManager.prototype.createShapeJson = function createShapeJson(jsonShape) {
       zoom: zoom,
       strokeColor: strokeColor,
       fillColor: fillColor,
-      fillOpacity: parseFloat(fillOpacity).toFixed(2)
+      fillOpacity: parseFloat(fillOpacity).toFixed(1)
     };
   if (jsonShape.id) {
     options.id = jsonShape.id;
