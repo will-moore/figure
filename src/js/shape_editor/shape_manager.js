@@ -41,6 +41,7 @@ var ShapeManager = function ShapeManager(elementId, width, height, options) {
   this._state = "SELECT";
   this._strokeColor = "#ff0000";
   this._strokeWidth = 2;
+  this._text = "";
   this._orig_width = width;
   this._orig_height = height;
   this._zoom = 100;
@@ -262,11 +263,27 @@ ShapeManager.prototype.getStrokeWidth = function getStrokeWidth() {
   return this._strokeWidth;
 };
 
+ShapeManager.prototype.getText = function getText() {
+  return this._text;
+};
 
-ShapeManager.prototype.setShapesText = function setShapesText(text) {
+ShapeManager.prototype.setText = function setText(text) {
+  this._text = text;
   var selected = this.getSelectedShapes();
   for (var s = 0; s < selected.length; s++) {
     selected[s].setText(text);
+  }
+};
+
+ShapeManager.prototype.getTextFontSize = function getTextFontSize() {
+  return this._textFontSize;
+};
+
+ShapeManager.prototype.setTextFontSize = function setTextFontSize(fontSize) {
+  this._textFontSize = fontSize;
+  var selected = this.getSelectedShapes();
+  for (var s = 0; s < selected.length; s++) {
+    selected[s].setFontSize(fontSize);
   }
 };
 

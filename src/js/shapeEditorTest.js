@@ -78,6 +78,11 @@ $(function() {
         shapeManager.setFillOpacity(fillOpacity);
     });
 
+    $("select[name='fontSize']").change(function(){
+        var fontSize = $(this).val();
+        shapeManager.setTextFontSize(fontSize);
+    });
+
     var updateZoom = function updateZoom() {
         $("#zoomDisplay").text(zoomPercent + " %");
         shapeManager.setZoom(zoomPercent);
@@ -112,11 +117,11 @@ $(function() {
     });
 
     $("button[name='setText']").click(function(){
-        shapeManager.setShapesText("New text");
+        shapeManager.setText("New text");
     });
 
     $("button[name='clearText']").click(function(){
-        shapeManager.setShapesText("");
+        shapeManager.setText("");
     });
 
     $("button[name='pasteShapes']").click(function(){
