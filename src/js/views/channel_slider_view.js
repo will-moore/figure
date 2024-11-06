@@ -7,6 +7,7 @@ import FigureLutPicker from "../views/lutpicker";
 import FigureColorPicker from "../views/colorpicker";
 
 import channel_slider_template from '../../templates/channel_slider.template.html?raw';
+import checkbox_template from '../../templates/checkbox_template.html?raw';
 
 import lutsPng from "../../images/luts_10.png";
 // Need to handle dev vv built (omero-web) paths
@@ -18,6 +19,7 @@ const SLIDER_INCR_CUTOFF = 100;
 var ChannelSliderView = Backbone.View.extend({
 
     template: _.template(channel_slider_template),
+    checkboxTemplate: _.template(checkbox_template),
 
     initialize: function(opts) {
         // This View may apply to a single PanelModel or a list
@@ -37,6 +39,7 @@ var ChannelSliderView = Backbone.View.extend({
         "change .ch_slider input": "channel_slider_stop",
         "mousemove .ch_start_slider": "start_slider_mousemove",
         "mousemove .ch_end_slider": "end_slider_mousemove",
+        "change #hiloCheckbox": "handle_hilo_checkbox",
     },
 
     start_slider_mousemove: function(event) {
@@ -268,6 +271,48 @@ var ChannelSliderView = Backbone.View.extend({
         return this;
     },
 
+    handle_hilo_checkbox: function(event) {
+        var checkboxState = event.target.checked;
+        this.models.forEach(function(m) {
+            if (checkboxState && !m.get("hilo_enabled")){
+                m.save({
+                    "hilo_enabled": true,
+                    "hilo_channels_state": m.get('channels').map(function(channel) {
+                        return {
+                            "color": channel.color,
+                            "active": channel.active
+                        };
+                    })
+                });
+                let foundActive = false;
+                let newChs = m.get('channels').map(function(channel, idx) {
+                    // Switch LUT to HiLo for all channels
+                    // Keep only the first active channel active
+                    let new_state = {
+                        'color': 'hilo.lut',
+                        'active': (!foundActive && channel.active)
+                    }
+                    foundActive = (foundActive || channel.active);
+                    return new_state;
+                });
+                m.save_channels(newChs);
+            } else if (!checkboxState && m.get("hilo_enabled")){
+                m.save("hilo_enabled", false);
+                let newChs = m.get('channels').map(function(channel, idx) {
+                    return m.get("hilo_channels_state")[idx];
+                });
+                m.save_channels(newChs);
+            }
+        })
+    },
+
+    loadCheckboxState: function() {
+        var checkbox = this.$("#hiloCheckbox")[0];
+        this.models.forEach(function(m) {
+            checkbox.checked = m.get('hilo_enabled') || checkbox.checked;
+        });
+    },
+
     render: function() {
         var json,
             self = this;
@@ -310,7 +355,6 @@ var ChannelSliderView = Backbone.View.extend({
                     return fn(prev, curr);
                 }
             }
-
             // Comare channels from each Panel Model to see if they are
             // compatible, and compile a summary json.
             var chData = this.models.map(function(m){
@@ -320,13 +364,11 @@ var ChannelSliderView = Backbone.View.extend({
             var allSameCount = chData.reduce(function(prev, channels){
                 return channels.length === prev ? prev : false;
             }, chData[0].length);
-
             if (!allSameCount) {
                 return this;
             }
             // $(".ch_slider").slider("destroy");
             this.$el.empty();
-
             chData[0].forEach(function(d, chIdx) {
                 // For each channel, summarise all selected images:
                 // Make list of various channel attributes:
@@ -391,6 +433,11 @@ var ChannelSliderView = Backbone.View.extend({
                 $(sliderHtml).appendTo(this.$el);
 
             }.bind(this));
+            // Append the checkbox template
+            var checkboxHtml = this.checkboxTemplate();
+            this.$el.append(checkboxHtml);
+            // Load checkbox state after rendering
+            this.loadCheckboxState();
         return this;
     }
 });
