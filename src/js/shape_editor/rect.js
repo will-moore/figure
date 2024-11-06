@@ -48,7 +48,7 @@ var Rect = function Rect(options) {
   }
   this._strokeColor = options.strokeColor;
   this._strokeWidth = options.strokeWidth || 2;
-  this._text = options.text || "Mytestttt";
+  this._text = options.text || "";
   this._fontSize = options.fontSize || 10;
   this._textPosition = options.textPosition || "top";
   this._selected = false;
@@ -62,42 +62,19 @@ var Rect = function Rect(options) {
   this.element = this.paper.rect();
   this.element.attr({ "fill-opacity": 0.01, fill: "#fff", cursor: "pointer" });
 
-  if(this._text != ""){
-
-    var dx = 0, dy = 0;
-    switch(this._textPosition){
-      case "bottom":
-          dx = Math.cos(this._rotation)*this._width/2;
-          dy =this._height + textOffset;
-          break;
-      case "right":
-          dx = -textOffset;
-          dy = this._height/2;
-          break;
-      case "left":
-          dx = this._width + textOffset;
-          dy = this._height/2;
-          break;
-      case "top":
-          dx = this._width/2;
-          dy = -textOffset;
-    }
-
-    var attributes = {
-      manager: this.manager,
-      paper: this.paper,
-      text: this._text,
-      x: this._x + dx,
-      y: this._y + dy,
-      zoom: this._zoomFraction * 100,
-      color: this._strokeColor,
-      fontSize: this._fontSize,
-      text: this._text,
-    }
-
-    this._textShape = new Text(attributes)
+  var attributes = {
+    manager: this.manager,
+    paper: this.paper,
+    text: this._text,
+    x: this._x,
+    y: this._y,
+    zoom: this._zoomFraction * 100,
+    color: this._strokeColor,
+    fontSize: this._fontSize,
+    text: "",
   }
 
+  this._textShape = new Text(attributes)
 
   if (this.manager.canEdit) {
     // Drag handling of element
@@ -360,28 +337,36 @@ Rect.prototype.drawShape = function drawShape() {
     this._textShape.setText(this._text)
     this._textShape.setFontSize(this._fontSize)
 
-    var dx = 0, dy = 0, textAnchor = "middle"
+    var dx = 0,
+        dy = 0,
+        textAnchor = "middle",
+        bbox = this.element.getBBox(),
+        sWidth = bbox.width / this._zoomFraction,
+        sHeight = bbox.height / this._zoomFraction,
+        sx = bbox.x / this._zoomFraction,
+        sy = bbox.y / this._zoomFraction;
+
     switch(this._textPosition){
       case "bottom":
-          dx = this._width/2;
-          dy = this._height + textOffset;
+          dx = sWidth/2;
+          dy = sHeight + textOffset;
           break;
       case "right":
           dx = -textOffset;
-          dy = this._height/2;
+          dy = sHeight/2;
           textAnchor = "end"
           break;
       case "left":
-          dx = this._width + textOffset;
-          dy = this._height/2;
+          dx = sWidth + textOffset;
+          dy = sHeight/2;
           textAnchor = "start"
           break;
       case "top":
-          dx = this._width/2;
+          dx = sWidth/2;
           dy = -textOffset;
     }
 
-    this._textShape.setTextPosition(this._x + dx, this._y + dy, textAnchor)
+    this._textShape.setTextPosition(sx + dx, sy + dy, textAnchor)
   }
 };
 
