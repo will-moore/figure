@@ -287,6 +287,18 @@ ShapeManager.prototype.setTextFontSize = function setTextFontSize(fontSize) {
   }
 };
 
+ShapeManager.prototype.getTextPosition = function getTextPosition() {
+  return this._textPosition;
+};
+
+ShapeManager.prototype.setTextPosition = function setTextPosition(position) {
+  this._textPosition = position;
+  var selected = this.getSelectedShapes();
+  for (var s = 0; s < selected.length; s++) {
+    selected[s].setTextPosition(position);
+  }
+};
+
 ShapeManager.prototype.getShapesJson = function getShapesJson() {
   var data = [];
   this.getShapes().forEach(function (s) {

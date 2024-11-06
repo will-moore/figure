@@ -83,6 +83,11 @@ $(function() {
         shapeManager.setTextFontSize(fontSize);
     });
 
+    $("select[name='textPosition']").change(function(){
+        var textPosition = $(this).val();
+        shapeManager.setTextPosition(textPosition);
+    });
+
     var updateZoom = function updateZoom() {
         $("#zoomDisplay").text(zoomPercent + " %");
         shapeManager.setZoom(zoomPercent);

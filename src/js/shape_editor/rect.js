@@ -26,6 +26,7 @@
 import Raphael from "raphael";
 import { Text } from "./text";
 
+const textOffset = 10;
 var Rect = function Rect(options) {
   var self = this;
   this.paper = options.paper;
@@ -62,17 +63,38 @@ var Rect = function Rect(options) {
   this.element.attr({ "fill-opacity": 0.01, fill: "#fff", cursor: "pointer" });
 
   if(this._text != ""){
+
+    var dx = 0, dy = 0;
+    switch(this._textPosition){
+      case "bottom":
+          dx = Math.cos(this._rotation)*this._width/2;
+          dy =this._height + textOffset;
+          break;
+      case "right":
+          dx = -textOffset;
+          dy = this._height/2;
+          break;
+      case "left":
+          dx = this._width + textOffset;
+          dy = this._height/2;
+          break;
+      case "top":
+          dx = this._width/2;
+          dy = -textOffset;
+    }
+
     var attributes = {
       manager: this.manager,
       paper: this.paper,
       text: this._text,
-      x: this._x,
-      y: this._y,
+      x: this._x + dx,
+      y: this._y + dy,
       zoom: this._zoomFraction * 100,
       color: this._strokeColor,
       fontSize: this._fontSize,
-      text: this._text
+      text: this._text,
     }
+
     this._textShape = new Text(attributes)
   }
 
@@ -337,7 +359,29 @@ Rect.prototype.drawShape = function drawShape() {
   if(this._textShape){
     this._textShape.setText(this._text)
     this._textShape.setFontSize(this._fontSize)
-    this._textShape.setCoords(this._x, this._y)
+
+    var dx = 0, dy = 0, textAnchor = "middle"
+    switch(this._textPosition){
+      case "bottom":
+          dx = this._width/2;
+          dy = this._height + textOffset;
+          break;
+      case "right":
+          dx = -textOffset;
+          dy = this._height/2;
+          textAnchor = "end"
+          break;
+      case "left":
+          dx = this._width + textOffset;
+          dy = this._height/2;
+          textAnchor = "start"
+          break;
+      case "top":
+          dx = this._width/2;
+          dy = -textOffset;
+    }
+
+    this._textShape.setTextPosition(this._x + dx, this._y + dy, textAnchor)
   }
 };
 

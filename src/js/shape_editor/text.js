@@ -24,6 +24,7 @@
 */
 
 
+
 var Text = function Text(options) {
   //var self = this;
   this.manager = options.manager;
@@ -40,7 +41,8 @@ var Text = function Text(options) {
 
   this._color = options.color;
   this._fontSize = options.fontSize || 10;
-  this._text = options.text || "MyTestext";
+  this._text = options.text || "";
+  this._textAnchor = "start"
 
   this._zoomFraction = 1;
   if (options.zoom) {
@@ -137,12 +139,6 @@ Text.prototype.toJson = function toJson() {
   return json;
 };*/
 
-// Shift this shape by dx and dy
-Text.prototype.setCoords = function setCoords(x, y) {
-  this._x = x;
-  this._y = y;
-  this.drawShape();
-};
 
 // handle start of drag by selecting this shape
 // if not already selected
@@ -179,6 +175,14 @@ Text.prototype.getText = function getText() {
   return this._text;
 };
 
+Text.prototype.setTextPosition = function setTextPosition(x, y, textAnchor) {
+    this._x = x;
+    this._y = y;
+    this._textAnchor = textAnchor;
+    this.drawShape();
+};
+
+
 Text.prototype.setZoom = function setZoom(zoom) {
     this._zoomFraction = zoom / 100;
     this.drawShape();
@@ -186,7 +190,6 @@ Text.prototype.setZoom = function setZoom(zoom) {
 
 Text.prototype.destroy = function destroy() {
   this.element.remove();
- // this.handles.remove();
 };
 
 /*Text.prototype.intersectRegion = function intersectRegion(region) {
@@ -326,7 +329,8 @@ Text.prototype.updateShapeFromHandles = function updateShapeFromHandles(
 Text.prototype.drawShape = function drawShape() {
   var color = this._color,
     fontSize = this._fontSize,
-    text = this._text;
+    text = this._text,
+    textAnchor = this._textAnchor;
 
   var f = this._zoomFraction,
     x = this._x * f,
@@ -339,7 +343,8 @@ Text.prototype.drawShape = function drawShape() {
     fill: color,
     "fill-opacity": 1,
     "font-size": fontSize,
-    "text": text
+    "text": text,
+    "text-anchor": textAnchor
   });
   //this.element.transform("r" + this._rotation);
 
