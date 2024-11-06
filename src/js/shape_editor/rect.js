@@ -24,6 +24,7 @@
 */
 
 import Raphael from "raphael";
+import { Text } from "./text";
 
 var Rect = function Rect(options) {
   var self = this;
@@ -46,9 +47,9 @@ var Rect = function Rect(options) {
   }
   this._strokeColor = options.strokeColor;
   this._strokeWidth = options.strokeWidth || 2;
-  this._text = options.text;
+  this._text = options.text || "Mytestttt";
   this._fontSize = options.fontSize || 10;
-  this._textPosition = options.textPosition || "topleft";
+  this._textPosition = options.textPosition || "top";
   this._selected = false;
   this._zoomFraction = 1;
   if (options.zoom) {
@@ -59,6 +60,22 @@ var Rect = function Rect(options) {
 
   this.element = this.paper.rect();
   this.element.attr({ "fill-opacity": 0.01, fill: "#fff", cursor: "pointer" });
+
+  if(this._text != ""){
+    var attributes = {
+      manager: this.manager,
+      paper: this.paper,
+      text: this._text,
+      x: this._x,
+      y: this._y,
+      zoom: this._zoomFraction * 100,
+      strokeColor: this._strokeColor,
+      fontSize: this._fontSize,
+      text: this._text
+    }
+    this._textShape = new Text(attributes)
+  }
+
 
   if (this.manager.canEdit) {
     // Drag handling of element
@@ -272,14 +289,14 @@ Rect.prototype.getStrokeWidth = function getStrokeWidth() {
 Rect.prototype.destroy = function destroy() {
   this.element.remove();
   this.handles.remove();
+  if(this._textShape){
+    this._textShape.destroy()
+  }
 };
 
 Rect.prototype.drawShape = function drawShape() {
   var strokeColor = this._strokeColor,
-    lineW = this._strokeWidth,
-    text = this._text,
-    textPosition = this._textPosition,
-    fontSize = this._fontSize;
+    lineW = this._strokeWidth;
 
   var f = this._zoomFraction,
     x = this._x * f,
@@ -294,9 +311,6 @@ Rect.prototype.drawShape = function drawShape() {
     height: h,
     stroke: strokeColor,
     "stroke-width": lineW,
-    text: text,
-    textPosition: textPosition,
-    fontSize: fontSize,
   });
 
   this.element.transform("r" + this._rotation + "," + (x + (w/2)) + "," + (y + (h/2)));
@@ -320,9 +334,11 @@ Rect.prototype.drawShape = function drawShape() {
   }
 
   // update label
-
-
-
+  if(this._textShape){
+    this._textShape.setText(this._text)
+    this._textShape.setFontSize(this._fontSize)
+    this._textShape.setCoords(this._x, this._y)
+  }
 };
 
 Rect.prototype.getHandleCoords = function getHandleCoords() {
@@ -505,10 +521,10 @@ var CreateRect = function CreateRect(options) {
 CreateRect.prototype.startDrag = function startDrag(startX, startY) {
   var strokeColor = this.manager.getStrokeColor(),
     strokeWidth = this.manager.getStrokeWidth(),
-    zoom = this.manager.getZoom(),
-    text = this.manager.getText(),
-    textPosition = this.manager.getTextPosition(),
-    fontSize = this.manager.getFontSize();
+    zoom = this.manager.getZoom();
+ //   text = "",//this.manager.getText(),
+  //  textPosition = "topleft",//this.manager.getTextPosition(),
+  //  fontSize = 12;//this.manager.getFontSize();
   // Also need to get strokeWidth and zoom/size etc.
 
   this.startX = startX;
@@ -525,9 +541,9 @@ CreateRect.prototype.startDrag = function startDrag(startX, startY) {
     strokeWidth: strokeWidth,
     zoom: zoom,
     strokeColor: strokeColor,
-    text: text,
-    textPosition: textPosition,
-    fontSize: fontSize,
+  //  text: text,
+ //   textPosition: textPosition,
+  //  fontSize: fontSize,
   });
 };
 
