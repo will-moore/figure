@@ -38,7 +38,7 @@ var Text = function Text(options) {
   this._y = options.y;
   //this._rotation = options.rotation || 0;
 
-  this._strokeColor = options.strokeColor;
+  this._color = options.color;
   this._fontSize = options.fontSize || 10;
   this._text = options.text || "MyTestext";
 
@@ -107,7 +107,7 @@ Text.prototype.toJson = function toJson() {
     x: this._x,
     y: this._y,
     fontSize: this._fontSize,
-    strokeColor: this._strokeColor,
+    color: this._color,
     text: this._text,
   };
   if (this._id) {
@@ -152,18 +152,13 @@ Text.prototype.setCoords = function setCoords(x, y) {
   }
 };*/
 
-Text.prototype.setColor = function setColor(strokeColor) {
-  this._strokeColor = strokeColor;
+Text.prototype.setColor = function setColor(color) {
+  this._color = color;
   this.drawShape();
 };
 
-Text.prototype.getStrokeColor = function getStrokeColor() {
-  return this._strokeColor;
-};
-
-Text.prototype.setStrokeColor = function setStrokeColor(strokeColor) {
-  this._strokeColor = strokeColor;
-  this.drawShape();
+Text.prototype.getColor = function getColor() {
+  return this._color;
 };
 
 Text.prototype.setFontSize = function setFontSize(fontSize) {
@@ -329,7 +324,7 @@ Text.prototype.updateShapeFromHandles = function updateShapeFromHandles(
 };*/
 
 Text.prototype.drawShape = function drawShape() {
-  var strokeColor = this._strokeColor,
+  var color = this._color,
     fontSize = this._fontSize,
     text = this._text;
 
@@ -340,7 +335,9 @@ Text.prototype.drawShape = function drawShape() {
   this.element.attr({
     x: x,
     y: y,
-    stroke: strokeColor,
+    stroke: color,
+    fill: color,
+    "fill-opacity": 1,
     "font-size": fontSize,
     "text": text
   });

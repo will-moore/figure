@@ -69,7 +69,7 @@ var Rect = function Rect(options) {
       x: this._x,
       y: this._y,
       zoom: this._zoomFraction * 100,
-      strokeColor: this._strokeColor,
+      color: this._strokeColor,
       fontSize: this._fontSize,
       text: this._text
     }
@@ -128,7 +128,7 @@ Rect.prototype.toJson = function toJson() {
     rotation: this._rotation,
     text: this._text,
     fontSize: this._fontSize,
-    textPosition: this._textPosition
+    textPosition: this._textPosition,
   };
   if (this._id) {
     rv.id = this._id;
