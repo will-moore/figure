@@ -26,7 +26,6 @@
 import Raphael from "raphael";
 import { Text } from "./text";
 
-const textOffset = 10;
 var Rect = function Rect(options) {
   var self = this;
   this.paper = options.paper;
@@ -344,7 +343,8 @@ Rect.prototype.drawShape = function drawShape() {
         sWidth = bbox.width / this._zoomFraction,
         sHeight = bbox.height / this._zoomFraction,
         sx = bbox.x / this._zoomFraction,
-        sy = bbox.y / this._zoomFraction;
+        sy = bbox.y / this._zoomFraction,
+        textOffset = this._fontSize > 10 ? this._fontSize : 10 ;
 
     switch(this._textPosition){
       case "bottom":
