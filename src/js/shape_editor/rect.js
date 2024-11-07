@@ -335,6 +335,7 @@ Rect.prototype.drawShape = function drawShape() {
   if(this._textShape){
     this._textShape.setText(this._text)
     this._textShape.setFontSize(this._fontSize)
+    this._textShape.setZoom(this._zoomFraction * 100)
 
     var dx = 0,
         dy = 0,
@@ -344,7 +345,6 @@ Rect.prototype.drawShape = function drawShape() {
         sHeight = bbox.height / this._zoomFraction,
         sx = bbox.x / this._zoomFraction,
         sy = bbox.y / this._zoomFraction,
-       // textOffset = this._fontSize > 12 ? this._fontSize : 12,
         textOffsetX = this._strokeWidth/2 + 6,
         textOffsetY = this._strokeWidth/2 + (this._fontSize > 12 ? this._fontSize/2 : 6) + 2;
 
