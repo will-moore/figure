@@ -88,6 +88,11 @@ $(function() {
         shapeManager.setTextPosition(textPosition);
     });
 
+    $("select[name='rotateText']").change(function(){
+        var rotateText = $(this).val();
+        shapeManager.setTextRotated(rotateText);
+    });
+
     var updateZoom = function updateZoom() {
         $("#zoomDisplay").text(zoomPercent + " %");
         shapeManager.setZoom(zoomPercent);

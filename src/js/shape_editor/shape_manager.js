@@ -42,6 +42,7 @@ var ShapeManager = function ShapeManager(elementId, width, height, options) {
   this._strokeColor = "#ff0000";
   this._strokeWidth = 2;
   this._text = "";
+  this._rotateText = false;
   this._orig_width = width;
   this._orig_height = height;
   this._zoom = 100;
@@ -297,6 +298,19 @@ ShapeManager.prototype.setTextPosition = function setTextPosition(position) {
   var selected = this.getSelectedShapes();
   for (var s = 0; s < selected.length; s++) {
     selected[s].setTextPosition(position);
+  }
+};
+
+ShapeManager.prototype.getTextRotated = function getTextRotated() {
+  return this._rotateText;
+};
+
+ShapeManager.prototype.setTextRotated = function setTextRotated(rotateText) {
+  this._rotateText = rotateText === "true";
+  console.log(this._rotateText)
+  var selected = this.getSelectedShapes();
+  for (var s = 0; s < selected.length; s++) {
+    selected[s].setTextRotated(rotateText);
   }
 };
 

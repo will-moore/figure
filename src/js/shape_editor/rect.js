@@ -50,6 +50,7 @@ var Rect = function Rect(options) {
   this._text = options.text || "";
   this._fontSize = options.fontSize || 10;
   this._textPosition = options.textPosition || "top";
+  this._rotateText = options.rotateText || false;
   this._selected = false;
   this._zoomFraction = 1;
   if (options.zoom) {
@@ -70,6 +71,7 @@ var Rect = function Rect(options) {
     zoom: this._zoomFraction * 100,
     color: this._strokeColor,
     fontSize: this._fontSize,
+    rotation: this._rotation,
     text: "",
   }
 
@@ -253,7 +255,7 @@ Rect.prototype.setText = function setText(text) {
   this.drawShape();
 };
 
-Rect.prototype.geText = function geText() {
+Rect.prototype.getText = function getText() {
   return this._text;
 };
 
@@ -262,7 +264,7 @@ Rect.prototype.setTextPosition = function setTextPosition(textPosition) {
   this.drawShape();
 };
 
-Rect.prototype.geTextPosition = function geTextPosition() {
+Rect.prototype.getTextPosition = function getTextPosition() {
   return this._textPosition;
 };
 
@@ -271,7 +273,7 @@ Rect.prototype.setFontSize = function setFontSize(fontSize) {
   this.drawShape();
 };
 
-Rect.prototype.geFontSize = function geFontSize() {
+Rect.prototype.getFontSize = function getFontSize() {
   return this._fontSize;
 };
 
@@ -282,6 +284,15 @@ Rect.prototype.setStrokeWidth = function setStrokeWidth(strokeWidth) {
 
 Rect.prototype.getStrokeWidth = function getStrokeWidth() {
   return this._strokeWidth;
+};
+
+Rect.prototype.setTextRotated = function setTextRotated(rotateText) {
+  this._rotateText = rotateText;
+  this.drawShape();
+};
+
+Rect.prototype.getTextRotated = function getTextRotated() {
+  return this._rotateText;
 };
 
 Rect.prototype.destroy = function destroy() {
@@ -336,6 +347,8 @@ Rect.prototype.drawShape = function drawShape() {
     this._textShape.setText(this._text)
     this._textShape.setFontSize(this._fontSize)
     this._textShape.setZoom(this._zoomFraction * 100)
+    this._textShape.setTextRotation(this._rotation)
+    this._textShape.setTextRotated(this._rotateText)
 
     var dx = 0,
         dy = 0,

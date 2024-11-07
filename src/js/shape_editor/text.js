@@ -37,25 +37,21 @@ var Text = function Text(options) {
   }
   this._x = options.x;
   this._y = options.y;
-  //this._rotation = options.rotation || 0;
 
   this._color = options.color;
   this._fontSize = options.fontSize || 10;
   this._text = options.text || "";
   this._textAnchor = "start"
+  this._rotation = options.rotation || 0;
+  this._rotateText = options.rotateText || false;
 
   this._zoomFraction = 1;
   if (options.zoom) {
     this._zoomFraction = options.zoom / 100;
   }
-  /*if (options.area) {
-    this._area = options.area;
-  } else {
-    this._area = this._radiusX * this._radiusY * Math.PI;
-  }*/
 
   this.element = this.paper.text();
-  this.element.attr({ "fill-opacity": 0.01, fill: "#fff"});
+  this.element.attr({"fill-opacity": 0.01, fill: "#fff"});
   this.drawShape();
 
  /* // Drag handling of point
@@ -186,6 +182,20 @@ Text.prototype.setTextPosition = function setTextPosition(x, y, textAnchor) {
 Text.prototype.setZoom = function setZoom(zoom) {
     this._zoomFraction = zoom / 100;
     this.drawShape();
+};
+
+Text.prototype.setTextRotation = function setTextRotation(rotation) {
+  this._rotation = rotation;
+  this.drawShape();
+};
+
+Text.prototype.setTextRotated = function setTextRotated(rotateText) {
+  /* doesn't work properly for now
+  if(rotateText){
+    this.element.transform("r" + this._rotation);
+  }else{
+    this.element.transform("r" + (-this._rotation));
+  }*/
 };
 
 Text.prototype.destroy = function destroy() {
