@@ -340,11 +340,10 @@ Rect.prototype.drawShape = function drawShape() {
     var dx = 0,
         dy = 0,
         textAnchor = "middle",
-        bbox = this.element.getBBox(),
-        sWidth = bbox.width / this._zoomFraction,
-        sHeight = bbox.height / this._zoomFraction,
-        sx = bbox.x / this._zoomFraction,
-        sy = bbox.y / this._zoomFraction,
+        sWidth = this._width,
+        sHeight = this._height,
+        sx = this._x,
+        sy = this._y,
         textOffsetX = this._strokeWidth/2 + 6,
         textOffsetY = this._strokeWidth/2 + (this._fontSize > 12 ? this._fontSize/2 : 6) + 2;
 
@@ -388,8 +387,28 @@ Rect.prototype.drawShape = function drawShape() {
           textAnchor = "end"
     }
 
-    this._textShape.setTextPosition(sx + dx, sy + dy, textAnchor)
+    var rotatedCoords = this.applyTextRotation(sx + sWidth/2, sy + sHeight/2, sx + dx, sy + dy, this._rotation)
+    this._textShape.setTextPosition(rotatedCoords.x, rotatedCoords.y, textAnchor)
   }
+};
+
+Rect.prototype.applyTextRotation = function applyTextRotation(cx, cy, x, y, rotation){
+  var dx = cx - x
+  var dy = cy - y
+  // distance of point from centre of rotation
+  var h = Math.sqrt(dx * dx + dy * dy)
+  // and the angle
+  var angle1 = Math.atan2(dx, dy)
+
+  // Add the rotation to the angle and calculate new
+ // opposite and adjacent lengths from centre of rotation
+  var angle2 = angle1 - rotation * Math.PI / 180
+  var newo = Math.sin(angle2) * h
+  var newa = Math.cos(angle2) * h
+  // to give correct x and y within cropped panel
+  x = cx - newo
+  y = cy - newa
+  return {x, y}
 };
 
 Rect.prototype.getHandleCoords = function getHandleCoords() {

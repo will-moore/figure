@@ -218,7 +218,7 @@ $(function() {
                                "strokeWidth": 4});
 
     shapeManager.addShapeJson({"id": 1234,
-                               "rotation": 45,
+                               "rotation": 25,
                                "type": "Rectangle",
                                "strokeColor": "#ff00ff",
                                "strokeWidth": 6,
