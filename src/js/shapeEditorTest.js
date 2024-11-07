@@ -122,7 +122,7 @@ $(function() {
     });
 
     $("button[name='setText']").click(function(){
-        shapeManager.setText("New text");
+        shapeManager.setText("A");
     });
 
     $("button[name='clearText']").click(function(){

@@ -344,26 +344,48 @@ Rect.prototype.drawShape = function drawShape() {
         sHeight = bbox.height / this._zoomFraction,
         sx = bbox.x / this._zoomFraction,
         sy = bbox.y / this._zoomFraction,
-        textOffset = this._fontSize > 10 ? this._fontSize : 10 ;
+       // textOffset = this._fontSize > 12 ? this._fontSize : 12,
+        textOffsetX = this._strokeWidth/2 + 6,
+        textOffsetY = this._strokeWidth/2 + (this._fontSize > 12 ? this._fontSize/2 : 6) + 2;
 
     switch(this._textPosition){
       case "bottom":
           dx = sWidth/2;
-          dy = sHeight + textOffset;
+          dy = sHeight + textOffsetY;
           break;
-      case "right":
-          dx = -textOffset;
+      case "left":
+          dx = -textOffsetX;
           dy = sHeight/2;
           textAnchor = "end"
           break;
-      case "left":
-          dx = sWidth + textOffset;
+      case "right":
+          dx = sWidth + textOffsetX;
           dy = sHeight/2;
           textAnchor = "start"
           break;
       case "top":
           dx = sWidth/2;
-          dy = -textOffset;
+          dy = -textOffsetY;
+          break;
+      case "topleft":
+          dx = textOffsetX;
+          dy = textOffsetY;
+          textAnchor = "start"
+          break;
+      case "topright":
+          dx = sWidth - (textOffsetX);
+          dy = textOffsetY;
+          textAnchor = "end"
+          break;
+      case "bottomleft":
+          dx = textOffsetX;
+          dy = sHeight - (textOffsetY);
+          textAnchor = "start"
+          break;
+      case "bottomright":
+          dx = sWidth - (textOffsetX);
+          dy = sHeight - (textOffsetY);
+          textAnchor = "end"
     }
 
     this._textShape.setTextPosition(sx + dx, sy + dy, textAnchor)

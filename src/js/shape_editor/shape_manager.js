@@ -280,6 +280,7 @@ ShapeManager.prototype.getTextFontSize = function getTextFontSize() {
 };
 
 ShapeManager.prototype.setTextFontSize = function setTextFontSize(fontSize) {
+  fontSize = parseFloat(fontSize, 10);
   this._textFontSize = fontSize;
   var selected = this.getSelectedShapes();
   for (var s = 0; s < selected.length; s++) {
