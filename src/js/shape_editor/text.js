@@ -181,7 +181,7 @@ Text.prototype.setTextPosition = function setTextPosition(x, y, textAnchor) {
 
 Text.prototype.setZoom = function setZoom(zoom) {
     this._zoomFraction = zoom / 100;
-    this.drawShape();
+    //this.drawShape();
 };
 
 Text.prototype.setTextRotation = function setTextRotation(rotation) {
@@ -342,13 +342,10 @@ Text.prototype.drawShape = function drawShape() {
     text = this._text,
     textAnchor = this._textAnchor;
 
-  var f = this._zoomFraction,
-    x = this._x * f,
-    y = this._y * f;
-
+  // NOTE : x and y have to be scaled with the zoom_fraction before calling drawShape()
   this.element.attr({
-    x: x,
-    y: y,
+    x: this._x,
+    y: this._y,
     stroke: color,
     fill: color,
     "fill-opacity": 1,
@@ -358,22 +355,6 @@ Text.prototype.drawShape = function drawShape() {
   });
   //this.element.transform("r" + this._rotation);
 
- /* if (this.isSelected()) {
-    this.handles.show().toFront();
-  } else {
-    this.handles.hide();
-  }*/
-
-  // handles have been updated (model coords)
-  /*this._handleIds = this.getHandleCoords();
-  var hnd, h_id, hx, hy;
-  for (var h = 0, l = this.handles.length; h < l; h++) {
-    hnd = this.handles[h];
-    h_id = hnd.h_id;
-    hx = this._handleIds[h_id].x * this._zoomFraction;
-    hy = this._handleIds[h_id].y * this._zoomFraction;
-    hnd.attr({ x: hx - this.handle_wh / 2, y: hy - this.handle_wh / 2 });
-  }*/
 };
 
 /*Text.prototype.setSelected = function setSelected(selected) {

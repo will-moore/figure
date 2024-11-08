@@ -346,37 +346,33 @@ Rect.prototype.drawShape = function drawShape() {
   if(this._textShape){
     this._textShape.setText(this._text)
     this._textShape.setFontSize(this._fontSize)
-    this._textShape.setZoom(this._zoomFraction * 100)
+    //this._textShape.setZoom(this._zoomFraction * 100)
     this._textShape.setTextRotation(this._rotation)
     this._textShape.setTextRotated(this._rotateText)
 
     var dx = 0,
         dy = 0,
         textAnchor = "middle",
-        sWidth = this._width,
-        sHeight = this._height,
-        sx = this._x,
-        sy = this._y,
-        textOffsetX = this._strokeWidth/2 + 6,
-        textOffsetY = this._strokeWidth/2 + (this._fontSize > 12 ? this._fontSize/2 : 6) + 2;
+        textOffsetX = (this._strokeWidth/2 + 6),
+        textOffsetY = (this._strokeWidth/2 + (this._fontSize > 12 ? this._fontSize/2 : 6) + 4);
 
     switch(this._textPosition){
       case "bottom":
-          dx = sWidth/2;
-          dy = sHeight + textOffsetY;
+          dx = w/2;
+          dy = h + textOffsetY;
           break;
       case "left":
           dx = -textOffsetX;
-          dy = sHeight/2;
+          dy = h/2;
           textAnchor = "end"
           break;
       case "right":
-          dx = sWidth + textOffsetX;
-          dy = sHeight/2;
+          dx = w + textOffsetX;
+          dy = h/2;
           textAnchor = "start"
           break;
       case "top":
-          dx = sWidth/2;
+          dx = w/2;
           dy = -textOffsetY;
           break;
       case "topleft":
@@ -385,22 +381,22 @@ Rect.prototype.drawShape = function drawShape() {
           textAnchor = "start"
           break;
       case "topright":
-          dx = sWidth - (textOffsetX);
+          dx = w - (textOffsetX);
           dy = textOffsetY;
           textAnchor = "end"
           break;
       case "bottomleft":
           dx = textOffsetX;
-          dy = sHeight - (textOffsetY);
+          dy = h - (textOffsetY);
           textAnchor = "start"
           break;
       case "bottomright":
-          dx = sWidth - (textOffsetX);
-          dy = sHeight - (textOffsetY);
+          dx = w - (textOffsetX);
+          dy = h - (textOffsetY);
           textAnchor = "end"
     }
 
-    var rotatedCoords = this.applyTextRotation(sx + sWidth/2, sy + sHeight/2, sx + dx, sy + dy, this._rotation)
+    var rotatedCoords = this.applyTextRotation(x + w/2, y + h/2, x + dx, y + dy, this._rotation)
     this._textShape.setTextPosition(rotatedCoords.x, rotatedCoords.y, textAnchor)
   }
 };
@@ -604,10 +600,10 @@ var CreateRect = function CreateRect(options) {
 CreateRect.prototype.startDrag = function startDrag(startX, startY) {
   var strokeColor = this.manager.getStrokeColor(),
     strokeWidth = this.manager.getStrokeWidth(),
-    zoom = this.manager.getZoom();
- //   text = "",//this.manager.getText(),
-  //  textPosition = "topleft",//this.manager.getTextPosition(),
-  //  fontSize = 12;//this.manager.getFontSize();
+    zoom = this.manager.getZoom(),
+    text = this.manager.getText(),
+    textPosition = this.manager.getTextPosition(),
+    fontSize = this.manager.getTextFontSize();
   // Also need to get strokeWidth and zoom/size etc.
 
   this.startX = startX;
@@ -624,9 +620,9 @@ CreateRect.prototype.startDrag = function startDrag(startX, startY) {
     strokeWidth: strokeWidth,
     zoom: zoom,
     strokeColor: strokeColor,
-  //  text: text,
- //   textPosition: textPosition,
-  //  fontSize: fontSize,
+    text: text,
+    textPosition: textPosition,
+    fontSize: fontSize,
   });
 };
 
