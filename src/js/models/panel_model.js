@@ -266,6 +266,8 @@
                 points = shape.points.split(' ').map(function(p){
                     return p.split(",");
                 });
+            } else if (shape.type === "Text"){
+                points = [[shape.x, shape.y]];
             }
             if (points) {
                 for (var p=0; p<points.length; p++) {
@@ -746,7 +748,7 @@
             if (isNaN(rotation)) {
                 rotation = 0;
             };
-            // if we have rotated the panel clockwise within the viewport 
+            // if we have rotated the panel clockwise within the viewport
             // it's as if the viewport rectangle has rotated anti-clockwise
             rotation = 360 - rotation;
 

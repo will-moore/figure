@@ -309,7 +309,6 @@ ShapeManager.prototype.getTextRotated = function getTextRotated() {
 
 ShapeManager.prototype.setTextRotated = function setTextRotated(rotateText) {
   this._rotateText = rotateText === "true";
-  console.log(this._rotateText)
   var selected = this.getSelectedShapes();
   for (var s = 0; s < selected.length; s++) {
     selected[s].setTextRotated(rotateText);

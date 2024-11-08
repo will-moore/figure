@@ -24,7 +24,7 @@
 */
 
 import Raphael from "raphael";
-import { Text } from "./text";
+import { CreateText, Text } from "./text";
 
 var Rect = function Rect(options) {
   var self = this;
@@ -47,21 +47,36 @@ var Rect = function Rect(options) {
   }
   this._strokeColor = options.strokeColor;
   this._strokeWidth = options.strokeWidth || 2;
-  this._text = options.text || "";
-  this._fontSize = options.fontSize || 10;
-  this._textPosition = options.textPosition || "top";
-  this._rotateText = options.rotateText || false;
   this._selected = false;
   this._zoomFraction = 1;
   if (options.zoom) {
     this._zoomFraction = options.zoom / 100;
   }
   this._rotation = options.rotation || 0;
+
+  this._textId = options.textId || -1;
+  if(this._textId == -1){
+   var textShape = (new CreateText({
+      manager: this.manager,
+      paper: this.paper,
+      zoom: options.zoom,
+      text: "",
+      x: options.x,
+      y: options.y,
+      color: options.strokeColor,
+      fontSize: 12,
+      textPosition: options.textPosition || "top",
+      strokeWidth: this._strokeWidth,
+    })).getShape();
+    this._textId = textShape._id;
+  }
+  this._textShape = this.manager.getShape(this._textId)
+
   this.handle_wh = 6;
 
   this.element = this.paper.rect();
   this.element.attr({ "fill-opacity": 0.01, fill: "#fff", cursor: "pointer" });
-
+  /*this._textShape = options.textShape || undefined
   var attributes = {
     manager: this.manager,
     paper: this.paper,
@@ -75,7 +90,7 @@ var Rect = function Rect(options) {
     text: "",
   }
 
-  this._textShape = new Text(attributes)
+  this._textShape = new Text(attributes)*/
 
   if (this.manager.canEdit) {
     // Drag handling of element
@@ -126,9 +141,7 @@ Rect.prototype.toJson = function toJson() {
     strokeWidth: this._strokeWidth,
     strokeColor: this._strokeColor,
     rotation: this._rotation,
-    text: this._text,
-    fontSize: this._fontSize,
-    textPosition: this._textPosition,
+    textId: this._textId,
   };
   if (this._id) {
     rv.id = this._id;
@@ -217,6 +230,7 @@ Rect.prototype._handleMousedown = function _handleMousedown() {
 
 Rect.prototype.setSelected = function setSelected(selected) {
   this._selected = !!selected;
+  this._textShape.setSelected(this._selected)
   this.drawShape();
 };
 
@@ -251,8 +265,7 @@ Rect.prototype.getStrokeColor = function getStrokeColor() {
 };
 
 Rect.prototype.setText = function setText(text) {
-  this._text = text;
-  this.drawShape();
+  return;
 };
 
 Rect.prototype.getText = function getText() {
@@ -260,17 +273,17 @@ Rect.prototype.getText = function getText() {
 };
 
 Rect.prototype.setTextPosition = function setTextPosition(textPosition) {
-  this._textPosition = textPosition;
-  this.drawShape();
+ return;// this._textPosition = textPosition;
+ // this.drawShape();
 };
 
-Rect.prototype.getTextPosition = function getTextPosition() {
+/*Rect.prototype.getTextPosition = function getTextPosition() {
   return this._textPosition;
-};
+};*/
 
 Rect.prototype.setFontSize = function setFontSize(fontSize) {
   this._fontSize = fontSize;
-  this.drawShape();
+//  this.drawShape();
 };
 
 Rect.prototype.getFontSize = function getFontSize() {
@@ -293,6 +306,14 @@ Rect.prototype.setTextRotated = function setTextRotated(rotateText) {
 
 Rect.prototype.getTextRotated = function getTextRotated() {
   return this._rotateText;
+};
+
+Rect.prototype.getTextId = function getTextId() {
+  return this._textId;
+};
+
+Rect.prototype.setTextId = function setTextId(textId) {
+  this._textId = textId;
 };
 
 Rect.prototype.destroy = function destroy() {
@@ -342,82 +363,9 @@ Rect.prototype.drawShape = function drawShape() {
     hnd.transform("r" + this._rotation + "," + (x + (w/2)) + "," + (y + (h/2)));
   }
 
-  // update label
   if(this._textShape){
-    this._textShape.setText(this._text)
-    this._textShape.setFontSize(this._fontSize)
-    //this._textShape.setZoom(this._zoomFraction * 100)
-    this._textShape.setTextRotation(this._rotation)
-    this._textShape.setTextRotated(this._rotateText)
-
-    var dx = 0,
-        dy = 0,
-        textAnchor = "middle",
-        textOffsetX = (this._strokeWidth/2 + 6),
-        textOffsetY = (this._strokeWidth/2 + (this._fontSize > 12 ? this._fontSize/2 : 6) + 4);
-
-    switch(this._textPosition){
-      case "bottom":
-          dx = w/2;
-          dy = h + textOffsetY;
-          break;
-      case "left":
-          dx = -textOffsetX;
-          dy = h/2;
-          textAnchor = "end"
-          break;
-      case "right":
-          dx = w + textOffsetX;
-          dy = h/2;
-          textAnchor = "start"
-          break;
-      case "top":
-          dx = w/2;
-          dy = -textOffsetY;
-          break;
-      case "topleft":
-          dx = textOffsetX;
-          dy = textOffsetY;
-          textAnchor = "start"
-          break;
-      case "topright":
-          dx = w - (textOffsetX);
-          dy = textOffsetY;
-          textAnchor = "end"
-          break;
-      case "bottomleft":
-          dx = textOffsetX;
-          dy = h - (textOffsetY);
-          textAnchor = "start"
-          break;
-      case "bottomright":
-          dx = w - (textOffsetX);
-          dy = h - (textOffsetY);
-          textAnchor = "end"
-    }
-
-    var rotatedCoords = this.applyTextRotation(x + w/2, y + h/2, x + dx, y + dy, this._rotation)
-    this._textShape.setTextPosition(rotatedCoords.x, rotatedCoords.y, textAnchor)
+    this._textShape.setParentShapeCoords({x: this._x, y: this._y, width: this._width, height: this._height})
   }
-};
-
-Rect.prototype.applyTextRotation = function applyTextRotation(cx, cy, x, y, rotation){
-  var dx = cx - x
-  var dy = cy - y
-  // distance of point from centre of rotation
-  var h = Math.sqrt(dx * dx + dy * dy)
-  // and the angle
-  var angle1 = Math.atan2(dx, dy)
-
-  // Add the rotation to the angle and calculate new
- // opposite and adjacent lengths from centre of rotation
-  var angle2 = angle1 - rotation * Math.PI / 180
-  var newo = Math.sin(angle2) * h
-  var newa = Math.cos(angle2) * h
-  // to give correct x and y within cropped panel
-  x = cx - newo
-  y = cy - newa
-  return {x, y}
 };
 
 Rect.prototype.getHandleCoords = function getHandleCoords() {
@@ -601,13 +549,26 @@ CreateRect.prototype.startDrag = function startDrag(startX, startY) {
   var strokeColor = this.manager.getStrokeColor(),
     strokeWidth = this.manager.getStrokeWidth(),
     zoom = this.manager.getZoom(),
-    text = this.manager.getText(),
+    text = this.manager.getText() || "",
     textPosition = this.manager.getTextPosition(),
     fontSize = this.manager.getTextFontSize();
   // Also need to get strokeWidth and zoom/size etc.
 
   this.startX = startX;
   this.startY = startY;
+
+  this.textShape = (new CreateText({
+    manager: this.manager,
+    paper: this.paper,
+    zoom: zoom,
+    text: text,
+    x: startX,
+    y: startY,
+    color: strokeColor,
+    fontSize: fontSize,
+    textPosition: textPosition,
+    strokeWidth: strokeWidth,
+  })).getShape();
 
   this.rect = new Rect({
     manager: this.manager,
@@ -620,9 +581,7 @@ CreateRect.prototype.startDrag = function startDrag(startX, startY) {
     strokeWidth: strokeWidth,
     zoom: zoom,
     strokeColor: strokeColor,
-    text: text,
-    textPosition: textPosition,
-    fontSize: fontSize,
+    textId: this.textShape._id,
   });
 };
 
@@ -649,12 +608,15 @@ CreateRect.prototype.drag = function drag(dragX, dragY, shiftKey) {
     dragY = (dy - this.startY) * -1;
   }
 
-  this.rect.setCoords({
+  var newCoords = {
     x: Math.min(dragX, this.startX),
     y: Math.min(dragY, this.startY),
     width: Math.abs(dx),
     height: Math.abs(dy),
-  });
+  }
+
+  this.rect.setCoords(newCoords);
+  this.textShape.setParentShapeCoords(newCoords);
   this.rect._area = Math.abs(dx) * Math.abs(dy);
 };
 
@@ -663,6 +625,7 @@ CreateRect.prototype.stopDrag = function stopDrag() {
   if (coords.width < 2 || coords.height < 2) {
     this.rect.destroy();
     delete this.rect;
+    delete this.textShape;
     return;
   }
   // on the 'new:shape' trigger, this shape will already be selected

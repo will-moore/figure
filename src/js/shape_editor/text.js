@@ -26,77 +26,30 @@
 
 
 var Text = function Text(options) {
-  //var self = this;
   this.manager = options.manager;
   this.paper = options.paper;
-
-  if (options.id) {
-    this._id = options.id;
-  } else {
-    this._id = this.manager.getRandomId();
-  }
   this._x = options.x;
   this._y = options.y;
-
   this._color = options.color;
-  this._fontSize = options.fontSize || 10;
-  this._text = options.text || "";
-  this._textAnchor = "start"
-  this._rotation = options.rotation || 0;
-  this._rotateText = options.rotateText || false;
+  this._fontSize = options.fontSize;
+  this._text = options.text;
+  this._strokeWidth = options.strokeWidth;
+  this._textPosition = options.textPosition;
 
-  this._zoomFraction = 1;
-  if (options.zoom) {
-    this._zoomFraction = options.zoom / 100;
-  }
+  this._id = options.id || this.manager.getRandomId();
+  this._rotateText = options.rotateText || false;
+  this._zoomFraction = options.zoom ? options.zoom / 100 : 1
+  this._textAnchor = options.textAnchor || "start"
+  this._rotation = options.rotation || 0;
+  this._parentShapeCoords = options.parentShapeCoords || {x:0,y:0,width:0,height:0}
+
+  this._selected = false;
+  this._area = 0;
 
   this.element = this.paper.text();
   this.element.attr({"fill-opacity": 0.01, fill: "#fff"});
+
   this.drawShape();
-
- /* // Drag handling of point
-  if (this.manager.canEdit) {
-    this.element.drag(
-      function (dx, dy) {
-        // DRAG, update location and redraw
-        dx = dx / self._zoomFraction;
-        dy = dy / self._zoomFraction;
-
-        var offsetX = dx - this.prevX;
-        var offsetY = dy - this.prevY;
-        this.prevX = dx;
-        this.prevY = dy;
-
-        // Manager handles move and redraw
-        self.manager.moveSelectedShapes(offsetX, offsetY, true);
-        return false;
-      },
-      function () {
-        // START drag: note the start location
-        self._handleMousedown();
-        this.prevX = 0;
-        this.prevY = 0;
-        return false;
-      },
-      function () {
-        // STOP
-        // notify changed if moved
-        if (this.prevX !== 0 || this.prevY !== 0) {
-          self.manager.notifySelectedShapesChanged();
-        }
-        return false;
-      }
-    );
-  }
-
-  // create handles, applying this.Matrix if set
-  this.createHandles();
-  // update x, y, radiusX, radiusY & rotation
-  // If we have Matrix, recalculate width/height ratio based on all handles
-  var resizeWidth = !!this.Matrix;
-  this.updateShapeFromHandles(resizeWidth);
-  // and draw the Ellipse
-  this.drawShape();*/
 };
 
 Text.prototype.toJson = function toJson() {
@@ -107,11 +60,24 @@ Text.prototype.toJson = function toJson() {
     fontSize: this._fontSize,
     color: this._color,
     text: this._text,
+    textAnchor: this._textAnchor,
+    rotation: this._rotation,
+    textPosition: this._textPosition,
   };
   if (this._id) {
     rv.id = this._id;
   }
   return rv;
+};
+
+Text.prototype.intersectRegion = function intersectRegion(region) {
+  return;
+}
+
+Text.prototype.offsetShape = function offsetShape(dx, dy) {
+  /*this._x = this._x + dx;
+  this._y = this._y + dy;
+  this.drawShape();*/
 };
 
 /*Text.prototype.compareCoords = function compareCoords(json) {
@@ -144,13 +110,23 @@ Text.prototype.toJson = function toJson() {
   }
 };*/
 
-Text.prototype.setColor = function setColor(color) {
+
+Text.prototype.setStrokeColor = function setStrokeColor(color) {
   this._color = color;
   this.drawShape();
 };
 
-Text.prototype.getColor = function getColor() {
+Text.prototype.getStrokeColor = function getStrokeColor() {
   return this._color;
+};
+
+Text.prototype.setStrokeWidth = function setStrokeWidth(width) {
+  this._strokeWidth = width;
+  this.drawShape()
+};
+
+Text.prototype.getStrokeWidth = function getStrokeWidth() {
+  return this._strokeWidth;
 };
 
 Text.prototype.setFontSize = function setFontSize(fontSize) {
@@ -171,13 +147,14 @@ Text.prototype.getText = function getText() {
   return this._text;
 };
 
-Text.prototype.setTextPosition = function setTextPosition(x, y, textAnchor) {
-    this._x = x;
-    this._y = y;
-    this._textAnchor = textAnchor;
-    this.drawShape();
+Text.prototype.setTextPosition = function setTextPosition(textPosition) {
+  this._textPosition = textPosition;
+  this.drawShape();
 };
 
+Text.prototype.getTextPosition = function getTextPosition() {
+  return this._textPosition;
+};
 
 Text.prototype.setZoom = function setZoom(zoom) {
     this._zoomFraction = zoom / 100;
@@ -198,8 +175,21 @@ Text.prototype.setTextRotated = function setTextRotated(rotateText) {
   }*/
 };
 
+Text.prototype.setParentShapeCoords = function setParentShapeCoords(coords){
+  this._parentShapeCoords = coords;
+  this.drawShape()
+};
+
 Text.prototype.destroy = function destroy() {
   this.element.remove();
+};
+
+Text.prototype.isSelected = function isSelected() {
+  return this._selected;
+};
+
+Text.prototype.setSelected = function setSelected(selected) {
+  this._selected = selected;
 };
 
 /*Text.prototype.intersectRegion = function intersectRegion(region) {
@@ -271,81 +261,69 @@ Text.prototype.getPath = function getPath() {
     path = Raphael.transformPath(path, "r" + this._rotation);
   }
   return path;
-};
-
-Text.prototype.isSelected = function isSelected() {
-  return this._selected;
 };*/
 
-
-
-/*Text.prototype.updateHandle = function updateHandle(
-  handleId,
-  x,
-  y,
-  shiftKey
-) {
-  // Refresh the handle coordinates, then update the specified handle
-  // using MODEL coordinates
-  this._handleIds = this.getHandleCoords();
-  var h = this._handleIds[handleId];
-  h.x = x;
-  h.y = y;
-  var resizeWidth = handleId === "left" || handleId === "right";
-  this.updateShapeFromHandles(resizeWidth, shiftKey);
-};
-
-Text.prototype.updateShapeFromHandles = function updateShapeFromHandles(
-  resizeWidth,
-  shiftKey
-) {
-  var hh = this._handleIds,
-    lengthX = hh.end.x - hh.start.x,
-    lengthY = hh.end.y - hh.start.y,
-    widthX = hh.left.x - hh.right.x,
-    widthY = hh.left.y - hh.right.y,
-    rot;
-  // Use the 'start' and 'end' handles to get rotation and length
-  if (lengthX === 0) {
-    this._rotation = 90;
-  } else if (lengthX > 0) {
-    rot = Math.atan(lengthY / lengthX);
-    this._rotation = Raphael.deg(rot);
-  } else if (lengthX < 0) {
-    rot = Math.atan(lengthY / lengthX);
-    this._rotation = 180 + Raphael.deg(rot);
-  }
-
-  // centre is half-way between 'start' and 'end' handles
-  this._x = (hh.start.x + hh.end.x) / 2;
-  this._y = (hh.start.y + hh.end.y) / 2;
-  // Radius-x is half of distance between handles
-  this._radiusX = Math.sqrt(lengthX * lengthX + lengthY * lengthY) / 2;
-  // Radius-y may depend on handles OR on x/y ratio
-  if (resizeWidth) {
-    this._radiusY = Math.sqrt(widthX * widthX + widthY * widthY) / 2;
-    this._yxRatio = this._radiusY / this._radiusX;
-  } else {
-    if (shiftKey) {
-      this._yxRatio = 1;
-    }
-    this._radiusY = this._yxRatio * this._radiusX;
-  }
-  this._area = this._radiusX * this._radiusY * Math.PI;
-
-  this.drawShape();
-};*/
 
 Text.prototype.drawShape = function drawShape() {
   var color = this._color,
-    fontSize = this._fontSize,
-    text = this._text,
-    textAnchor = this._textAnchor;
+      fontSize = this._fontSize,
+      text = this._text,
+      dx = 0,
+      dy = 0,
+      textAnchor = "middle",
+      textOffsetX = this._strokeWidth/2 + 6,
+      textOffsetY = this._strokeWidth/2 + (fontSize > 12 ? fontSize/2 : 6) + 4,
+      f = this._zoomFraction,
+      x = this._parentShapeCoords.x * f,
+      y = this._parentShapeCoords.y * f,
+      w = this._parentShapeCoords.width * f,
+      h = this._parentShapeCoords.height * f;
 
-  // NOTE : x and y have to be scaled with the zoom_fraction before calling drawShape()
+  switch(this._textPosition){
+    case "bottom":
+        dx = w/2;
+        dy = h + textOffsetY;
+        break;
+    case "left":
+        dx = -textOffsetX;
+        dy = h/2;
+        textAnchor = "end"
+        break;
+    case "right":
+        dx = w + textOffsetX;
+        dy = h/2;
+        textAnchor = "start"
+        break;
+    case "top":
+        dx = w/2;
+        dy = -textOffsetY;
+        break;
+    case "topleft":
+        dx = textOffsetX;
+        dy = textOffsetY;
+        textAnchor = "start"
+        break;
+    case "topright":
+        dx = w - (textOffsetX);
+        dy = textOffsetY;
+        textAnchor = "end"
+        break;
+    case "bottomleft":
+        dx = textOffsetX;
+        dy = h - (textOffsetY);
+        textAnchor = "start"
+        break;
+    case "bottomright":
+        dx = w - (textOffsetX);
+        dy = h - (textOffsetY);
+        textAnchor = "end"
+  }
+
+  var rotatedCoords = this.applyTextRotation(x + w/2, y + h/2, x + dx, y + dy, this._rotation)
+
   this.element.attr({
-    x: this._x,
-    y: this._y,
+    x: rotatedCoords.x,
+    y: rotatedCoords.y,
     stroke: color,
     fill: color,
     "fill-opacity": 1,
@@ -354,8 +332,27 @@ Text.prototype.drawShape = function drawShape() {
     "text-anchor": textAnchor
   });
   //this.element.transform("r" + this._rotation);
-
 };
+
+Text.prototype.applyTextRotation = function applyTextRotation(cx, cy, x, y, rotation){
+  var dx = cx - x
+  var dy = cy - y
+  // distance of point from centre of rotation
+  var h = Math.sqrt(dx * dx + dy * dy)
+  // and the angle
+  var angle1 = Math.atan2(dx, dy)
+
+  // Add the rotation to the angle and calculate new
+ // opposite and adjacent lengths from centre of rotation
+  var angle2 = angle1 - rotation * Math.PI / 180
+  var newo = Math.sin(angle2) * h
+  var newa = Math.cos(angle2) * h
+  // to give correct x and y within cropped panel
+  x = cx - newo
+  y = cy - newa
+  return {x, y}
+};
+
 
 /*Text.prototype.setSelected = function setSelected(selected) {
   this._selected = !!selected;
@@ -426,46 +423,28 @@ Text.prototype.getHandleCoords = function getHandleCoords() {
 };*/
 
 // Class for creating Text.
-/*var CreateText = function CreateText(options) {
-  this.paper = options.paper;
-  this.manager = options.manager;
-};
+var CreateText = function CreateText(options) {
+  this.manager = options.manager
 
-CreateText.prototype.startDrag = function startDrag(startX, startY) {
-  var strokeColor = this.manager.getStrokeColor(),
-    strokeWidth = this.manager.getStrokeWidth(),
-    zoom = this.manager.getZoom();
-
-  this.point = new Text({
+  this.text = new Text({
     manager: this.manager,
-    paper: this.paper,
-    x: startX,
-    y: startY,
-    radiusX: POINT_RADIUS,
-    radiusY: POINT_RADIUS,
-    area: 0,
-    rotation: 0,
-    strokeWidth: strokeWidth,
-    zoom: zoom,
-    strokeColor: strokeColor,
-  });
+    paper: options.paper,
+    zoom: options.zoom,
+    text: options.text,
+    x: options.x,
+    y: options.y,
+    color: options.color,
+    fontSize: options.fontSize,
+    textPosition: options.textPosition,
+    strokeWidth: options.strokeWidth,
+  //  rotation: options.rotation,
+  })
+  this.text.setSelected(true);
+  this.manager.addShape(this.text);
 };
 
-CreateText.prototype.drag = function drag(dragX, dragY, shiftKey) {
-  // no drag behaviour on Text creation
+CreateText.prototype.getShape = function getShape() {
+  return this.text;
 };
 
-CreateText.prototype.stopDrag = function stopDrag() {
-  // Don't create ellipse of zero size (click, without drag)
-  var coords = this.point.toJson();
-  if (coords.radiusX < 2) {
-    this.point.destroy();
-    delete this.ellipse;
-    return;
-  }
-  // on the 'new:shape' trigger, this shape will already be selected
-  this.point.setSelected(true);
-  this.manager.addShape(this.point);
-};
-*/
-export { Text };
+export { CreateText, Text };
