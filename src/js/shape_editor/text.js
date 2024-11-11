@@ -30,7 +30,7 @@ var Text = function Text(options) {
   this.paper = options.paper;
   this._x = options.x;
   this._y = options.y;
-  this._color = options.color;
+  this._color = options.strokeColor;
   this._fontSize = options.fontSize;
   this._text = options.text;
   this._strokeWidth = options.strokeWidth;
@@ -58,7 +58,7 @@ Text.prototype.toJson = function toJson() {
     x: this._x,
     y: this._y,
     fontSize: this._fontSize,
-    color: this._color,
+    strokeColor: this._color,
     text: this._text,
     textAnchor: this._textAnchor,
     rotation: this._rotation,
@@ -433,7 +433,7 @@ var CreateText = function CreateText(options) {
     text: options.text,
     x: options.x,
     y: options.y,
-    color: options.color,
+    strokeColor: options.strokeColor,
     fontSize: options.fontSize,
     textPosition: options.textPosition,
     strokeWidth: options.strokeWidth,
