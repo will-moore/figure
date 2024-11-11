@@ -55,8 +55,8 @@ var Text = function Text(options) {
 Text.prototype.toJson = function toJson() {
   var rv = {
     type: "Text",
-    x: this._x,
-    y: this._y,
+    x: this._x / this._zoomFraction,
+    y: this._y / this._zoomFraction,
     fontSize: this._fontSize,
     strokeColor: this._color,
     text: this._text,
@@ -75,9 +75,9 @@ Text.prototype.intersectRegion = function intersectRegion(region) {
 }
 
 Text.prototype.offsetShape = function offsetShape(dx, dy) {
-  /*this._x = this._x + dx;
-  this._y = this._y + dy;
-  this.drawShape();*/
+  this._x = this._x + dx * this._zoomFraction;
+  this._y = this._y + dy * this._zoomFraction;
+  this.drawShape();
 };
 
 /*Text.prototype.compareCoords = function compareCoords(json) {
@@ -122,7 +122,7 @@ Text.prototype.getStrokeColor = function getStrokeColor() {
 
 Text.prototype.setStrokeWidth = function setStrokeWidth(width) {
   this._strokeWidth = width;
-  this.drawShape()
+  this.setTextPosition(this._textPosition)
 };
 
 Text.prototype.getStrokeWidth = function getStrokeWidth() {
@@ -131,7 +131,7 @@ Text.prototype.getStrokeWidth = function getStrokeWidth() {
 
 Text.prototype.setFontSize = function setFontSize(fontSize) {
   this._fontSize = fontSize;
-  this.drawShape();
+  this.setTextPosition(this._textPosition)
 };
 
 Text.prototype.getFontSize = function getFontSize() {
@@ -148,7 +148,65 @@ Text.prototype.getText = function getText() {
 };
 
 Text.prototype.setTextPosition = function setTextPosition(textPosition) {
-  this._textPosition = textPosition;
+    this._textPosition = textPosition;
+
+    var fontSize = this._fontSize,
+        dx = 0,
+        dy = 0,
+        textAnchor = "middle",
+        textOffsetX = this._strokeWidth/2 + 6,
+        textOffsetY = this._strokeWidth/2 + (fontSize > 12 ? fontSize/2 : 6) + 4,
+        f = this._zoomFraction,
+        x = this._parentShapeCoords.x * f,
+        y = this._parentShapeCoords.y * f,
+        w = this._parentShapeCoords.width * f,
+        h = this._parentShapeCoords.height * f;
+
+    switch(this._textPosition){
+      case "bottom":
+          dx = w/2;
+          dy = h + textOffsetY;
+          break;
+      case "left":
+          dx = -textOffsetX;
+          dy = h/2;
+          textAnchor = "end"
+          break;
+      case "right":
+          dx = w + textOffsetX;
+          dy = h/2;
+          textAnchor = "start"
+          break;
+      case "top":
+          dx = w/2;
+          dy = -textOffsetY;
+          break;
+      case "topleft":
+          dx = textOffsetX;
+          dy = textOffsetY;
+          textAnchor = "start"
+          break;
+      case "topright":
+          dx = w - (textOffsetX);
+          dy = textOffsetY;
+          textAnchor = "end"
+          break;
+      case "bottomleft":
+          dx = textOffsetX;
+          dy = h - (textOffsetY);
+          textAnchor = "start"
+          break;
+      case "bottomright":
+          dx = w - (textOffsetX);
+          dy = h - (textOffsetY);
+          textAnchor = "end"
+  }
+
+  var rotatedCoords = this.applyTextRotation(x + w/2, y + h/2, x + dx, y + dy, this._rotation);
+  this._x = rotatedCoords.x;
+  this._y = rotatedCoords.y;
+  this._textAnchor = textAnchor;
+
   this.drawShape();
 };
 
@@ -157,7 +215,7 @@ Text.prototype.getTextPosition = function getTextPosition() {
 };
 
 Text.prototype.setZoom = function setZoom(zoom) {
-    this._zoomFraction = zoom / 100;
+    this._zoomFraction = zoom ? zoom / 100 : 1;
     //this.drawShape();
 };
 
@@ -265,71 +323,17 @@ Text.prototype.getPath = function getPath() {
 
 
 Text.prototype.drawShape = function drawShape() {
-  var color = this._color,
-      fontSize = this._fontSize,
-      text = this._text,
-      dx = 0,
-      dy = 0,
-      textAnchor = "middle",
-      textOffsetX = this._strokeWidth/2 + 6,
-      textOffsetY = this._strokeWidth/2 + (fontSize > 12 ? fontSize/2 : 6) + 4,
-      f = this._zoomFraction,
-      x = this._parentShapeCoords.x * f,
-      y = this._parentShapeCoords.y * f,
-      w = this._parentShapeCoords.width * f,
-      h = this._parentShapeCoords.height * f;
-
-  switch(this._textPosition){
-    case "bottom":
-        dx = w/2;
-        dy = h + textOffsetY;
-        break;
-    case "left":
-        dx = -textOffsetX;
-        dy = h/2;
-        textAnchor = "end"
-        break;
-    case "right":
-        dx = w + textOffsetX;
-        dy = h/2;
-        textAnchor = "start"
-        break;
-    case "top":
-        dx = w/2;
-        dy = -textOffsetY;
-        break;
-    case "topleft":
-        dx = textOffsetX;
-        dy = textOffsetY;
-        textAnchor = "start"
-        break;
-    case "topright":
-        dx = w - (textOffsetX);
-        dy = textOffsetY;
-        textAnchor = "end"
-        break;
-    case "bottomleft":
-        dx = textOffsetX;
-        dy = h - (textOffsetY);
-        textAnchor = "start"
-        break;
-    case "bottomright":
-        dx = w - (textOffsetX);
-        dy = h - (textOffsetY);
-        textAnchor = "end"
-  }
-
-  var rotatedCoords = this.applyTextRotation(x + w/2, y + h/2, x + dx, y + dy, this._rotation)
+  var color = this._color;
 
   this.element.attr({
-    x: rotatedCoords.x,
-    y: rotatedCoords.y,
+    x: this._x,
+    y: this._y,
     stroke: color,
     fill: color,
     "fill-opacity": 1,
-    "font-size": fontSize,
-    "text": text,
-    "text-anchor": textAnchor
+    "font-size": this._fontSize,
+    "text": this._text,
+    "text-anchor": this._textAnchor
   });
   //this.element.transform("r" + this._rotation);
 };

@@ -506,6 +506,8 @@ ShapeManager.prototype.createShapeJson = function createShapeJson(jsonShape) {
     options.points = s.points;
     newShape = new Polyline(options);
   } else if (s.type === "Text") {
+    options.x = s.x || 0,
+    options.y = s.y || 0,
     options.fontSize = fontSize,
     options.textPosition = textPosition,
     options.text = text,
