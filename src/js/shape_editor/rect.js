@@ -230,12 +230,19 @@ Rect.prototype._handleMousedown = function _handleMousedown() {
 
 Rect.prototype.setSelected = function setSelected(selected) {
   this._selected = !!selected;
-  this._textShape.setSelected(this._selected)
+  if(this._textShape || this.loadTextShape()){
+    this._textShape.setSelected(this._selected)
+  }
   this.drawShape();
 };
 
 Rect.prototype.isSelected = function isSelected() {
   return this._selected;
+};
+
+Rect.prototype.loadTextShape = function loadTextShape(){
+  this._textShape = this.manager.getShape(this._textId);
+  return this._textShape;
 };
 
 Rect.prototype.setZoom = function setZoom(zoom) {
@@ -363,7 +370,7 @@ Rect.prototype.drawShape = function drawShape() {
     hnd.transform("r" + this._rotation + "," + (x + (w/2)) + "," + (y + (h/2)));
   }
 
-  if(this._textShape){
+  if(this._textShape || this.loadTextShape()){
     this._textShape.setParentShapeCoords({x: this._x, y: this._y, width: this._width, height: this._height})
   }
 };
