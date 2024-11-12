@@ -63,6 +63,8 @@ Text.prototype.toJson = function toJson() {
     textAnchor: this._textAnchor,
     rotation: this._rotation,
     textPosition: this._textPosition,
+    parentShapeCoords: this._parentShapeCoords,
+    strokeWidth: this._strokeWidth,
   };
   if (this._id) {
     rv.id = this._id;
@@ -122,7 +124,7 @@ Text.prototype.getStrokeColor = function getStrokeColor() {
 
 Text.prototype.setStrokeWidth = function setStrokeWidth(width) {
   this._strokeWidth = width;
-  this.setTextPosition(this._textPosition)
+  this.drawShape();
 };
 
 Text.prototype.getStrokeWidth = function getStrokeWidth() {
@@ -131,7 +133,7 @@ Text.prototype.getStrokeWidth = function getStrokeWidth() {
 
 Text.prototype.setFontSize = function setFontSize(fontSize) {
   this._fontSize = fontSize;
-  this.setTextPosition(this._textPosition)
+  this.drawShape();
 };
 
 Text.prototype.getFontSize = function getFontSize() {
@@ -149,65 +151,7 @@ Text.prototype.getText = function getText() {
 
 Text.prototype.setTextPosition = function setTextPosition(textPosition) {
     this._textPosition = textPosition;
-
-    var fontSize = this._fontSize,
-        dx = 0,
-        dy = 0,
-        textAnchor = "middle",
-        f = this._zoomFraction,
-        textOffsetX = (this._strokeWidth/2 + 6) / f,
-        textOffsetY = (this._strokeWidth/2 + (fontSize > 12 ? fontSize/2 : 6) + 4) / f,
-        x = this._parentShapeCoords.x,
-        y = this._parentShapeCoords.y,
-        w = this._parentShapeCoords.width,
-        h = this._parentShapeCoords.height;
-
-    switch(this._textPosition){
-      case "bottom":
-          dx = w/2;
-          dy = h + textOffsetY;
-          break;
-      case "left":
-          dx = -textOffsetX;
-          dy = h/2;
-          textAnchor = "end"
-          break;
-      case "right":
-          dx = w + textOffsetX;
-          dy = h/2;
-          textAnchor = "start"
-          break;
-      case "top":
-          dx = w/2;
-          dy = -textOffsetY;
-          break;
-      case "topleft":
-          dx = textOffsetX;
-          dy = textOffsetY;
-          textAnchor = "start"
-          break;
-      case "topright":
-          dx = w - (textOffsetX);
-          dy = textOffsetY;
-          textAnchor = "end"
-          break;
-      case "bottomleft":
-          dx = textOffsetX;
-          dy = h - (textOffsetY);
-          textAnchor = "start"
-          break;
-      case "bottomright":
-          dx = w - (textOffsetX);
-          dy = h - (textOffsetY);
-          textAnchor = "end"
-  }
-
-  var rotatedCoords = this.applyTextRotation(x + w/2, y + h/2, x + dx, y + dy, this._rotation);
-  this._x = rotatedCoords.x;
-  this._y = rotatedCoords.y;
-  this._textAnchor = textAnchor;
-
-  this.drawShape();
+    this.drawShape();
 };
 
 Text.prototype.getTextPosition = function getTextPosition() {
@@ -216,7 +160,7 @@ Text.prototype.getTextPosition = function getTextPosition() {
 
 Text.prototype.setZoom = function setZoom(zoom) {
     this._zoomFraction = zoom ? zoom / 100 : 1;
-    this.drawShape();
+   this.drawShape();
 };
 
 Text.prototype.setTextRotation = function setTextRotation(rotation) {
@@ -235,7 +179,7 @@ Text.prototype.setTextRotated = function setTextRotated(rotateText) {
 
 Text.prototype.setParentShapeCoords = function setParentShapeCoords(coords){
   this._parentShapeCoords = coords;
-  this.setTextPosition(this._textPosition)
+  this.drawShape();
 };
 
 Text.prototype.destroy = function destroy() {
@@ -324,7 +268,62 @@ Text.prototype.getPath = function getPath() {
 
 Text.prototype.drawShape = function drawShape() {
   var color = this._color,
-      f = this._zoomFraction;
+      f = this._zoomFraction,
+      fontSize = this._fontSize,
+      dx = 0,
+      dy = 0,
+      textAnchor = "middle",
+      textOffsetX = (this._strokeWidth/2 + 6) / f,
+      textOffsetY = (this._strokeWidth/2 + (fontSize > 12 ? fontSize/2 : 6) + 4) / f,
+      x = this._parentShapeCoords.x,
+      y = this._parentShapeCoords.y,
+      w = this._parentShapeCoords.width,
+      h = this._parentShapeCoords.height;
+
+  switch(this._textPosition){
+      case "bottom":
+          dx = w/2;
+          dy = h + textOffsetY;
+          break;
+      case "left":
+          dx = -textOffsetX;
+          dy = h/2;
+          textAnchor = "end"
+          break;
+      case "right":
+          dx = w + textOffsetX;
+          dy = h/2;
+          textAnchor = "start"
+          break;
+      case "top":
+          dx = w/2;
+          dy = -textOffsetY;
+          break;
+      case "topleft":
+          dx = textOffsetX;
+          dy = textOffsetY;
+          textAnchor = "start"
+          break;
+      case "topright":
+          dx = w - textOffsetX;
+          dy = textOffsetY;
+          textAnchor = "end"
+          break;
+      case "bottomleft":
+          dx = textOffsetX;
+          dy = h - textOffsetY;
+          textAnchor = "start"
+          break;
+      case "bottomright":
+          dx = w - textOffsetX;
+          dy = h - textOffsetY;
+          textAnchor = "end"
+  }
+
+  var rotatedCoords = this.applyTextRotation(x + w/2, y + h/2, x + dx, y + dy, this._rotation);
+  this._x = rotatedCoords.x;
+  this._y = rotatedCoords.y;
+  this._textAnchor = textAnchor;
 
   this.element.attr({
     x: this._x * f,
