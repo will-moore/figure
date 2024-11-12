@@ -216,7 +216,7 @@ Text.prototype.getTextPosition = function getTextPosition() {
 
 Text.prototype.setZoom = function setZoom(zoom) {
     this._zoomFraction = zoom ? zoom / 100 : 1;
-    //this.drawShape();
+    this.drawShape();
 };
 
 Text.prototype.setTextRotation = function setTextRotation(rotation) {
@@ -235,7 +235,7 @@ Text.prototype.setTextRotated = function setTextRotated(rotateText) {
 
 Text.prototype.setParentShapeCoords = function setParentShapeCoords(coords){
   this._parentShapeCoords = coords;
-  this.drawShape()
+  this.setTextPosition(this._textPosition)
 };
 
 Text.prototype.destroy = function destroy() {
