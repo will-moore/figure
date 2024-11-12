@@ -55,8 +55,8 @@ var Text = function Text(options) {
 Text.prototype.toJson = function toJson() {
   var rv = {
     type: "Text",
-    x: this._x / this._zoomFraction,
-    y: this._y / this._zoomFraction,
+    x: this._x,
+    y: this._y,
     fontSize: this._fontSize,
     strokeColor: this._color,
     text: this._text,
@@ -75,8 +75,8 @@ Text.prototype.intersectRegion = function intersectRegion(region) {
 }
 
 Text.prototype.offsetShape = function offsetShape(dx, dy) {
-  this._x = this._x + dx * this._zoomFraction;
-  this._y = this._y + dy * this._zoomFraction;
+  this._x = this._x + dx;
+  this._y = this._y + dy;
   this.drawShape();
 };
 
@@ -154,13 +154,13 @@ Text.prototype.setTextPosition = function setTextPosition(textPosition) {
         dx = 0,
         dy = 0,
         textAnchor = "middle",
-        textOffsetX = this._strokeWidth/2 + 6,
-        textOffsetY = this._strokeWidth/2 + (fontSize > 12 ? fontSize/2 : 6) + 4,
         f = this._zoomFraction,
-        x = this._parentShapeCoords.x * f,
-        y = this._parentShapeCoords.y * f,
-        w = this._parentShapeCoords.width * f,
-        h = this._parentShapeCoords.height * f;
+        textOffsetX = (this._strokeWidth/2 + 6) / f,
+        textOffsetY = (this._strokeWidth/2 + (fontSize > 12 ? fontSize/2 : 6) + 4) / f,
+        x = this._parentShapeCoords.x,
+        y = this._parentShapeCoords.y,
+        w = this._parentShapeCoords.width,
+        h = this._parentShapeCoords.height;
 
     switch(this._textPosition){
       case "bottom":
@@ -323,11 +323,12 @@ Text.prototype.getPath = function getPath() {
 
 
 Text.prototype.drawShape = function drawShape() {
-  var color = this._color;
+  var color = this._color,
+      f = this._zoomFraction;
 
   this.element.attr({
-    x: this._x,
-    y: this._y,
+    x: this._x * f,
+    y: this._y * f,
     stroke: color,
     fill: color,
     "fill-opacity": 1,
