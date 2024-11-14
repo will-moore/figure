@@ -121,7 +121,8 @@
             let selected = this.model.getSelected();
 
             selected.forEach(panel => {
-                let randomId = getRandomId();
+                let textRandomId = getRandomId();
+                let rectRandomId = getRandomId();
                 // Add Rectangle (square) in centre of viewport
                 let vp = panel.getViewportAsRect();
                 let minSide = Math.min(vp.width, vp.height);
@@ -130,18 +131,38 @@
                 var color = $('.inset-color span:first', this.$el).attr('data-color');
                 var position = $('.label-position i:first', this.$el).attr('data-position');
                 var strokeWidth = parseFloat($('button.inset-width span:first', this.$el).attr('data-line-width'));
+                var x = vp.x + ((vp.width - rectSize) / 2);
+                var y = vp.y + ((vp.height - rectSize) / 2);
+                var txtX = vp.x + 7,
+                    txtY = vp.y + 11;
+
                 let rect = {
                     type: "Rectangle",
                     strokeWidth,
                     strokeColor: "#" + color,
-                    x: vp.x + ((vp.width - rectSize) / 2),
-                    y: vp.y + ((vp.height - rectSize) / 2),
+                    x: x,
+                    y: y,
                     width: rectSize,
                     height: rectSize,
-                    id: randomId,
+                    id: rectRandomId,
+                    textId: textRandomId,
                     rotation: vp.rotation || 0,
                 }
-                panel.add_shapes([rect]);
+                let text = {
+                    type: "Text",
+                    strokeWidth,
+                    strokeColor: "#" + color,
+                    x: txtX,
+                    y: txtY,
+                    id: textRandomId,
+                    rotation: vp.rotation || 0,
+                    fontSize: 12,
+                    textPosition: "topleft",
+                    text: "A",
+                    textAnchor: "start",
+                    parentShapeCoords: {x: x,y: y,width: rectSize, height: rectSize},
+                }
+                panel.add_shapes([rect, text]);
 
                 // Create duplicate panels
                 let panelJson = panel.toJSON();
@@ -174,7 +195,7 @@
                 panelJson.zoom = Math.min(xPercent, yPercent) * 100;
                 panelJson.selected = false;
                 panelJson.shapes = [];
-                panelJson.insetRoiId = randomId;
+                panelJson.insetRoiId = rectRandomId;
 
                 this.model.panels.create(panelJson);
             });
@@ -849,7 +870,7 @@
                 return;     // Ignore keyups except 'Enter'
             }
 
-            // get the current entered value 
+            // get the current entered value
             var value = Math.round(parseFloat(event.target.value));
             if (isNaN(value)) {
                 return;

@@ -104,9 +104,17 @@
                         updated = updated.filter(shape => shape.id != insetRoiId);
                     } else {
                         let rect = panel.getViewportAsRect();
+                        let textId = -1;
                         updated = updated.map(shape => {
                             if (shape.type == 'Rectangle' && shape.id == insetRoiId) {
+                                textId = shape.textId
                                 return {...shape, ...rect}
+                            }
+                            return shape;
+                        });
+                        updated = updated.map(shape => {
+                            if (shape.type == 'Text' && shape.id == textId) {
+                                shape.parentShapeCoords = {...rect}
                             }
                             return shape;
                         });

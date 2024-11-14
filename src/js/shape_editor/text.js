@@ -33,7 +33,7 @@ var Text = function Text(options) {
   this._color = options.strokeColor;
   this._fontSize = options.fontSize;
   this._text = options.text;
-  this._strokeWidth = options.strokeWidth;
+  this._strokeWidth = options.strokeWidth || 2;
   this._textPosition = options.textPosition;
 
   this._id = options.id || this.manager.getRandomId();
