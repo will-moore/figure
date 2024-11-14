@@ -125,6 +125,7 @@
                 let rectRandomId = getRandomId();
                 // Add Rectangle (square) in centre of viewport
                 let vp = panel.getViewportAsRect();
+                let lastInsetTextIndex = (panel.getLastInsetTextIndex() || 64) + 1;
                 let minSide = Math.min(vp.width, vp.height);
                 // Square is 1/3 size of the viewport
                 let rectSize = minSide / 3;
@@ -158,11 +159,12 @@
                     rotation: vp.rotation || 0,
                     fontSize: 12,
                     textPosition: "topleft",
-                    text: "A",
+                    text: String.fromCharCode(lastInsetTextIndex),
                     textAnchor: "start",
                     parentShapeCoords: {x: x,y: y,width: rectSize, height: rectSize},
                 }
                 panel.add_shapes([rect, text]);
+                panel.setLastInsetTextIndex(lastInsetTextIndex)
 
                 // Create duplicate panels
                 let panelJson = panel.toJSON();

@@ -125,6 +125,14 @@
             }
         },
 
+        getLastInsetTextIndex: function(){
+            return this.get('lastInsetTextIndex')
+        },
+
+        setLastInsetTextIndex: function(index){
+            this.save('lastInsetTextIndex', index)
+        },
+
         // When we're creating a Panel, we process the data a little here:
         parse: function(data, options) {
             var greyscale = data.rdefs.model === "greyscale";
