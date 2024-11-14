@@ -101,7 +101,9 @@
                     // delete or update the "inset" Rectangle
                     let updated = this.get('shapes');
                     if (panelDeleted) {
-                        updated = updated.filter(shape => shape.id != insetRoiId);
+                        let rect = updated.filter(shape => shape.id == insetRoiId);
+                        updated = updated.filter(shape => (shape.id != insetRoiId && shape.id != rect[0].textId));
+                        this.save('lastInsetTextIndex', this.get('lastInsetTextIndex') - 1)
                     } else {
                         let rect = panel.getViewportAsRect();
                         let textId = -1;

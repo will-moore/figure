@@ -198,6 +198,7 @@
                 panelJson.selected = false;
                 panelJson.shapes = [];
                 panelJson.insetRoiId = rectRandomId;
+                panelJson.lastInsetTextIndex = 64;
 
                 this.model.panels.create(panelJson);
             });
