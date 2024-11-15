@@ -917,6 +917,10 @@
         padding-left: 3px;
         padding-right: 3px;
     }
+    .text-group{
+        padding-left: 0px;
+        padding-right: 0px;
+    }
     .navbar-nav > li > a {
         padding-bottom: 12px;
         padding-top: 12px;
@@ -1238,7 +1242,8 @@
 
     .roi_toolbar {
         overflow: visible;
-        padding-bottom: 10px;
+        margin: 15px;
+        margin-bottom: 5px;
     }
 
     .roi_toolbar .pressed {

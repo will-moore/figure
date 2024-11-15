@@ -76,73 +76,71 @@
 </div>
 
 
+<div class="btn-group me-2" role="group" aria-label="...">
+    <div class="input-group input-group-sm float-start">
+        <input id="label-text" type="text" class="label-text form-control"
+                placeholder="Label" value="<% print(_.escape(text)) %>" />
+    </div>
 
-<div class="input-group input-group-sm float-start">
-    <input id="label-text" type="text" class="form-control input-sm"
-            placeholder="Label" value="<% print(_.escape(text)) %>" />
+    <div class="btn-group">
+        <button type="button" class="text-font-size btn btn-outline-secondary dropdown-toggle" title="Font Size: <%= fontSize %>"
+            data-bs-toggle="dropdown">
+            <span data-font-size="<%= fontSize %>"><%= fontSize %></span>
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu dropdownSelect" role="menu">
+        <% _.each([6,8,10,12,14,18,21,24,36,48],function(p){ %>
+            <li><a class='dropdown-item' href='#'><span data-font-size='<%= p %>'><%= p %></span></a></li>
+        <% }); %>
+        </ul>
+    </div>
+
+    <div class="btn-group">
+        <button type="button" class="text-position btn btn-outline-secondary dropdown-toggle"
+                title="Text position: <%= textPosition %>" data-bs-toggle="dropdown">
+            <span data-position="<%= textPosition %>" class="<%= position_icon_cls %> dropdown_icon"></span>
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu dropdownSelect" role="menu">
+            <li role="presentation" class="dropdown-header">Inside Corners</li>
+            <!-- NB: dropdown_icon is picked on choosing dropdown, replaces icon in button above -->
+            <li><a class="dropdown-item" href="#">
+                <span data-position="topleft" class="bi-box-arrow-in-up-left dropdown_icon"></span>
+                Top Left</a>
+            </li>
+            <li><a class="dropdown-item" href="#">
+                <span data-position="topright" class="bi-box-arrow-in-up-right dropdown_icon"></span>
+                Top Right</a>
+            </li>
+            <li><a class="dropdown-item" href="#">
+                <span data-position="bottomleft" class="bi-box-arrow-in-down-left dropdown_icon"></span>
+                Bottom Left</a>
+            </li>
+            <li><a class="dropdown-item" href="#">
+                <span data-position="bottomright" class="bi-box-arrow-in-down-right dropdown_icon"></span>
+                Bottom Right</a>
+            </li>
+
+            <li role="presentation" class="dropdown-divider"></li>
+            <li role="presentation" class="dropdown-header">Outside Edges</li>
+            <li><a class="dropdown-item" href="#">
+                <span data-position="left" class="bi-box-arrow-left dropdown_icon"></span> Left</a>
+            </li>
+            <li><a class="dropdown-item" href="#">
+                <span data-position="top" class="bi-box-arrow-up dropdown_icon"></span> Top</a>
+            </li>
+            <li><a class="dropdown-item" href="#">
+                <span data-position="right" class="bi-box-arrow-right dropdown_icon"></span> Right</a>
+            </li>
+            <li><a class="dropdown-item" href="#">
+                <span data-position="bottom" class="bi-box-arrow-down dropdown_icon"></span> Bottom</a>
+            </li>
+        </ul>
+    </div>
+
+    <button type="submit" class="btn btn-success add-text" title="Add text">
+        <span >Add</span></button>
 </div>
-
-<button type="button" class="btn btn-success add-text" title="Add">
-<span >Add</span></button>
-
-<div class="btn-group me-2">
-    <button type="button" class="text-font-size btn btn-outline-secondary dropdown-toggle" title="Font Size: <%= fontSize %>"
-        data-bs-toggle="dropdown">
-        <span data-font-size="<%= fontSize %>"><%= fontSize %></span>
-        <span class="caret"></span>
-    </button>
-    <ul class="dropdown-menu dropdownSelect" role="menu">
-    <% _.each([6,8,10,12,14,18,21,24,36,48],function(p){ %>
-        <li><a class='dropdown-item' href='#'><span data-font-size='<%= p %>'><%= p %></span></a></li>
-    <% }); %>
-    </ul>
-</div>
-
-<div class="btn-group me-2">
-    <button type="button" class="text-position btn btn-outline-secondary dropdown-toggle"
-            title="Text position" data-bs-toggle="dropdown">
-        <span data-position="<%= textPosition %>" class="<%= position_icon_cls %> dropdown_icon"></span>
-        <span class="caret"></span>
-    </button>
-    <ul class="dropdown-menu dropdownSelect" role="menu">
-        <li role="presentation" class="dropdown-header">Inside Corners</li>
-        <!-- NB: dropdown_icon is picked on choosing dropdown, replaces icon in button above -->
-        <li><a class="dropdown-item" href="#">
-            <span data-position="topleft" class="bi-box-arrow-in-up-left dropdown_icon"></span>
-            Top Left</a>
-        </li>
-        <li><a class="dropdown-item" href="#">
-            <span data-position="topright" class="bi-box-arrow-in-up-right dropdown_icon"></span>
-            Top Right</a>
-        </li>
-        <li><a class="dropdown-item" href="#">
-            <span data-position="bottomleft" class="bi-box-arrow-in-down-left dropdown_icon"></span>
-            Bottom Left</a>
-        </li>
-        <li><a class="dropdown-item" href="#">
-            <span data-position="bottomright" class="bi-box-arrow-in-down-right dropdown_icon"></span>
-            Bottom Right</a>
-        </li>
-
-        <li role="presentation" class="dropdown-divider"></li>
-        <li role="presentation" class="dropdown-header">Outside Edges</li>
-        <li><a class="dropdown-item" href="#">
-            <span data-position="left" class="bi-box-arrow-left dropdown_icon"></span> Left</a>
-        </li>
-        <li><a class="dropdown-item" href="#">
-            <span data-position="top" class="bi-box-arrow-up dropdown_icon"></span> Top</a>
-        </li>
-        <li><a class="dropdown-item" href="#">
-            <span data-position="right" class="bi-box-arrow-right dropdown_icon"></span> Right</a>
-        </li>
-        <li><a class="dropdown-item" href="#">
-            <span data-position="bottom" class="bi-box-arrow-down dropdown_icon"></span> Bottom</a>
-        </li>
-    </ul>
-</div>
-
-
-
 
 
 
@@ -176,6 +174,7 @@
     </ul>
 </div>
 
+<div style="flex: auto 1 1"></div>
 
 <div class="btn-group me-2" style="float: right"
     <% if (omeroRoiCount > 0) { %>

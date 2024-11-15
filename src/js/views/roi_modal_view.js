@@ -60,8 +60,15 @@ export const RoiModalView = Backbone.View.extend({
             // Bind to 'body' instead of #roiModal since this didn't always work with
             // some events maybe getting lost to Raphael elements??
             var dialog = document.getElementById('body');
-            Mousetrap(dialog).bind(['backspace', 'del'], function(event, combo) {
+            Mousetrap(dialog).bind('backspace', function(event, combo) {
                 // Need to ignore if the dialog isn't visible
+                if(!self.$el.is(":visible")) return true;
+                var inputText = document.getElementById('label-text');
+                if(inputText === document.activeElement) return true;
+                self.deleteShapes(event);
+                return false;
+            });
+            Mousetrap(dialog).bind('del', function(event, combo) {
                 if(!self.$el.is(":visible")) return true;
                 self.deleteShapes(event);
                 return false;
@@ -127,6 +134,7 @@ export const RoiModalView = Backbone.View.extend({
             "change .text-font-size": "changeFontSize",
             "change .text-position": "changeTextPosition",
             "click .add-text":"addTextToShape",
+            "submit .add-shape-text-form":"addTextToShape",
             "change .shape-color": "changeColor",
             // shapeManager triggers on canvas element
             "change:selected .roi_paper": "shapeSelected",
@@ -345,6 +353,7 @@ export const RoiModalView = Backbone.View.extend({
         },
 
         addTextToShape: function(event){
+            event.preventDefault()
             var text = $("#label-text").val()
             this.shapeManager.setText(text);
             this.shapeManager.setTextPosition(this.shapeManager.getTextPosition());
