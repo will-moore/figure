@@ -166,6 +166,18 @@
                 panel.add_shapes([rect, text]);
                 panel.setLastInsetTextIndex(lastInsetTextIndex)
 
+                var new_label = {
+                    text:"**"+String.fromCharCode(lastInsetTextIndex)+"**",
+                    size:12,
+                    position:"topleft",
+                    color:color,
+                    inset:true,
+                };
+                var prev_labels = panel.get('labels') || []
+                var labels = [...prev_labels]
+                labels = labels.filter(lbl => !lbl.inset)
+                labels.push(new_label)
+
                 // Create duplicate panels
                 let panelJson = panel.toJSON();
 
@@ -199,6 +211,7 @@
                 panelJson.shapes = [];
                 panelJson.insetRoiId = rectRandomId;
                 panelJson.lastInsetTextIndex = 64;
+                panelJson.labels = labels;
 
                 this.model.panels.create(panelJson);
             });
