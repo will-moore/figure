@@ -1335,3 +1335,60 @@
     .form-inline{
         cursor: move;
     }
+
+    .cali_styling_form {
+        margin-bottom: 1.5rem;
+    }
+
+    .calib_form .row {
+        align-items: center;
+        display: flex;
+        gap: 3px;
+        margin-top: 3px;
+    }
+
+    .calib_form .calib_length {
+        padding-right: 0;
+    }
+
+    .calib {
+        position: absolute;
+        width: 100%;
+        bottom: 100%;
+        margin-bottom: 3px;
+    }
+
+    .calib img{
+        width: 100%;
+    }
+
+    .calib_top {
+        bottom: 100%;
+        width: 100%;
+        margin-bottom: 3px;
+    }
+
+    .calib_bottom {
+        top: 100%;
+        width: 100%;
+    }
+
+    .calib_leftvert {
+        position: absolute; 
+        left: -20px; 
+        top: 50%; 
+        transform: translateY(-50%) rotate(90deg); 
+    }
+
+    .calib_rightvert {
+        position: absolute; 
+        right: -20px; 
+        top: 50%; 
+        transform: translateY(-50%) rotate(90deg); 
+    }
+    .calibPreview {
+        /* background-image css add by lutpicker.js */
+        width: 100%;
+        height: 35px;
+        /* border-top: 1px solid #e5e5e5; */
+    }

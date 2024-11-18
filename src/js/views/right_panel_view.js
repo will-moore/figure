@@ -15,6 +15,7 @@
     import InfoPanelView from "./info_panel_view";
     import ChannelSliderView from "./channel_slider_view";
     import ScalebarFormView from "./scalebar_form_view";
+    import CalibBarFormView from "./calib_form_view";
     import ZtSlidersView from "./zt_sliders_view";
 
     import image_display_options_template from '../../templates/image_display_options.template.html?raw';
@@ -535,6 +536,18 @@
             }
             if (old_sb) {
                 old_sb.remove();
+            }
+            // show calib form for selected panels
+            var old_cb = this.calib_form;
+            var $calib_form = $("#calib_form");
+
+            if (selected.length > 0) {
+                this.calib_form = new CalibBarFormView({models: selected});
+                this.calib_form.render();
+                $calib_form.empty().append(this.calib_form.$el);
+            }
+            if (old_cb) {
+                old_cb.remove();
             }
 
             return this;
