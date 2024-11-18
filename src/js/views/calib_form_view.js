@@ -48,13 +48,6 @@ var CalibBarFormView = Backbone.View.extend({
         return false;
     },
 
-    updateBgPos: function() {
-        this.models.forEach((m) => {
-            // submit form of calib to set values to each panel
-            
-        });
-    },
-
     render: function() {
         var cb_json = {show: false},
             hidden = false,
@@ -79,11 +72,6 @@ var CalibBarFormView = Backbone.View.extend({
         }
 
         cb_json.position = cb_json.position || 'top';
-
-        if(cb_json.show){
-            this.updateBgPos();
-        }
-        console.log("last json value", cb_json);
         var html = this.template(cb_json);
         this.$el.html(html);
         return this;
