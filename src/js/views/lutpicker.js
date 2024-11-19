@@ -28,17 +28,6 @@ import { showModal, getJson } from "./util";
 // Need to handle dev vv built (omero-web) paths
 import lutsPng from "../../images/luts_10.png";
 
-var url = `${BASE_WEBFIGURE_URL}is_dynamic_lut/`;
-var lutsPngUrl, is_dynamic_lut;
-getJson(url).then(data => {
-    is_dynamic_lut = data.is_dynamic_lut;
-    if (is_dynamic_lut) {
-        lutsPngUrl = `${WEBGATEWAYINDEX}luts_png/`;
-    } else {
-        lutsPngUrl = STATIC_DIR + lutsPng;
-    }
-});
-
 // Should only ever have a singleton on this
 var LutPickerView = Backbone.View.extend({
 
@@ -69,7 +58,7 @@ var LutPickerView = Backbone.View.extend({
 
         // Update preview to show LUT
         var bgPos = this.getLutBackgroundPosition(lutName);
-        $(".lutPreview", this.el).css({'background-position': bgPos, 'background-image': `url(${lutsPngUrl})`});
+        $(".lutPreview", this.el).css({'background-position': bgPos, 'background-image': `url(${this.lutsPngUrl})`});
         // Enable OK button
         $("button[type='submit']", this.el).removeAttr('disabled');
     },
@@ -106,18 +95,22 @@ var LutPickerView = Backbone.View.extend({
             this.success = options.success;
         }
 
-        this.loadLuts().then((data) => {
-            console.log('data', data);
+        this.loadLuts().then(data => {
             this.luts = data.luts;
             this.lut_names = data.png_luts;
-            if (is_dynamic_lut){
+            this.is_dynamic_lut = Boolean(data.png_luts_new);
+            if (this.is_dynamic_lut){
                 this.luts = this.luts.map(function(lut) {
                     lut.png_index = lut.png_index_new;
                     return lut;
                 });
                 this.lut_names = data.png_luts_new;
+                this.lutsPngUrl = `${WEBGATEWAYINDEX}luts_png/`;
+            } else {
+                this.lutsPngUrl = STATIC_DIR + lutsPng;
             }
             this.lut_names = this.lut_names.map(lut_name => lut_name.split('/').pop());
+
             this.render();
         });
     },
@@ -138,14 +131,14 @@ var LutPickerView = Backbone.View.extend({
 
 
             var png_len = this.lut_names.length;
-            if (!is_dynamic_lut) {
+            if (!this.is_dynamic_lut) {
                 // png of figure does not include the gradient
                 png_len = png_len - 1;
             }
             // Set the css variables at the document root, as it's used in different places
             $(":root").css({
                 "--pngHeight": png_len * 50 + "px",
-                "--lutPng": "url("+lutsPngUrl+")"
+                "--lutPng": "url("+this.lutsPngUrl+")"
             });
             html = this.template({'luts': luts});
         }
