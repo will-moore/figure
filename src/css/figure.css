@@ -1333,7 +1333,7 @@
     }
 
     /* Center the drag label icon */
-    .bi-arrow-down-up {
+    #sort_label_icon {
         vertical-align: middle;
         margin-left: 12px;
         display: inline-block;
