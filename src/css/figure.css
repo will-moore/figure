@@ -1008,6 +1008,7 @@
 
     .colorpicker span,
     .inset-color span:first-child,
+    .fill-color span:first-child,
     .label-color span:first-child,
     .border-color span:first-child,
     .shape-color span:first-child {
@@ -1239,7 +1240,8 @@
 
     .roi_toolbar {
         overflow: visible;
-        padding-bottom: 10px;
+        margin: 15px;
+        margin-bottom: 5px;
     }
 
     .roi_toolbar .pressed {

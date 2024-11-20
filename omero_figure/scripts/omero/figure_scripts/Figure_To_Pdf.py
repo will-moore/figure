@@ -467,6 +467,8 @@ class ShapeToPdfExport(ShapeExport):
 
         if 'fillColor' in shape:
             r, g, b, a = self.get_rgba(shape['fillColor'])
+            if 'fillOpacity' in shape:
+                a = float(shape['fillOpacity'])
             self.canvas.setFillColorRGB(r, g, b, alpha=a)
             fill = 1 if closed else 0
         else:
@@ -508,6 +510,8 @@ class ShapeToPdfExport(ShapeExport):
 
         if 'fillColor' in shape:
             r, g, b, a = self.get_rgba(shape['fillColor'])
+            if 'fillOpacity' in shape:
+                a = float(shape['fillOpacity'])
             self.canvas.setFillColorRGB(r, g, b, alpha=a)
             fill = 1
         else:
@@ -691,7 +695,10 @@ class ShapeToPilExport(ShapeExport):
 
         # if fill, draw filled polygon without outline, then add line later
         # with correct stroke width
-        rgba = self.get_rgba_int(shape.get('fillColor', '#00000000'))
+        r, g, b, a = self.get_rgba_int(shape.get('fillColor', '#00000000'))
+        if 'fillOpacity' in shape:
+            a = int(float(shape['fillOpacity'])*255)
+        rgba = (r, g, b, a)
 
         # need to draw on separate image and then paste on to get transparency
         bounds = Bounds(*points).round()
@@ -747,7 +754,10 @@ class ShapeToPilExport(ShapeExport):
 
         # if fill, draw filled polygon without outline, then add line later
         # with correct stroke width
-        rgba = self.get_rgba_int(shape.get('fillColor', '#00000000'))
+        r, g, b, a = self.get_rgba_int(shape.get('fillColor', '#00000000'))
+        if 'fillOpacity' in shape:
+            a = int(float(shape['fillOpacity'])*255)
+        rgba = (r, g, b, a)
 
         # need to draw on separate image and then paste on to get transparency
         bounds = Bounds(*points).round()
@@ -816,7 +826,12 @@ class ShapeToPilExport(ShapeExport):
         # Draw outer ellipse, then remove inner ellipse with full opacity
         rgba = ShapeToPdfExport.get_rgba_int(shape['strokeColor'])
         ellipse_draw.ellipse((0, 0, width, height), fill=rgba)
-        rgba = self.get_rgba_int(shape.get('fillColor', '#00000000'))
+
+        r, g, b, a = self.get_rgba_int(shape.get('fillColor', '#00000000'))
+        if 'fillOpacity' in shape:
+            a = int(float(shape['fillOpacity'])*255)
+        rgba = (r, g, b, a)
+
         # when rx is ~zero (for a Point, scaled down) don't need inner ellipse
         if (width - w) >= w:
             ellipse_draw.ellipse((w, w, width - w, height - w), fill=rgba)
