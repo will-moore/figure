@@ -1,8 +1,10 @@
-<div class="calib label_<%= position %>">
+<div class="calib  calib_<%= position %>">
     <% if (show) { %>
-        <div class="calibPreview lutBg"  style="border:1px solid black;
+        <div class="lutBg"  style="border:1px solid rgb(0, 0, 0);
+                height: <%= thickness %>px;
                 background-position: <%= lutBgPos %>;   
                 background-image: url('/images/luts_10.png');
-                width: 100%;"></div>
+                margin-right: 0px; margin-left: 0px;
+                "></div>
     <% } %>
 </div>

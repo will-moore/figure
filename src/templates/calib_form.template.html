@@ -1,32 +1,45 @@
 <form class="calib_form">
-    <div class="form-group col-sm-auto btn-group">
-        <div class="btn-group">
-            <button type="button" class="label-position btn btn-outline-secondary btn-sm dropdown-toggle" 
-                    title="Position" data-bs-toggle="dropdown">
-                <i data-position="<%= position %>" class="bi-box-arrow-in-<%= position.replace('bottom', 'down').replace('top', 'up').replace('rightvert', 'right').replace('leftvert', 'left') %> dropdown_icon"></i>
-                <span class="caret"></span>
-            </button>
-            <ul class="dropdown-menu" role="menu">
-                <li><a class="dropdown-item" href="#">
-                    <i data-position="top" class="bi-box-arrow-up dropdown_icon"></i> Top</a>
-                </li>
-                <li><a class="dropdown-item" href="#">
-                    <i data-position="bottom" class="bi-box-arrow-down dropdown_icon"></i> Bottom</a>
-                </li>
-                <li><a class="dropdown-item" href="#">
-                    <i data-position="leftvert" class="bi-box-arrow-left dropdown_icon"></i> Left vertical</a>
-                </li>            
-                <li><a class="dropdown-item" href="#">
-                    <i data-position="rightvert" class="bi-box-arrow-right dropdown_icon"></i> Right Vertical</a>
-                </li>            
-            </ul>
-            <div class="col-auto input-group-sm" style="flex: 1 1 auto; padding-right: 0">
-                <% if (show){ %>
-                    <button type="submit" class="show_calib btn btn-sm btn-success float-end">Show</button>
-                <% } else { %>
-                    <button type="button" class="hide_calib btn btn-outline-secondary btn-sm float-end">Hide</button>
-                <% } %>
-            </div>
+    <div class="row gy-2 gx-3 align-items-center" style="--bs-gutter-x: 0.3rem;">
+        <div class="col-auto input-group-sm">
+            <label class="col-form-label col-form-label-sm" style="width:50px">Height</label>
+        </div>
+        <div class="form-group col-auto scalebar_length input-group-sm">
+            <input type="number" class="label-text calib-thickness form-control input-sm" 
+            placeholder="Height" value="<%= thickness %>" style="width:52px" />
+        </div>
+        <div class="col-auto input-group-sm" style="margin-right: 10px;">
+            <label class="col-form-label col-form-label-sm">px</label>
+        </div>
+        <div class="col-auto input-group-sm">
+            <label class="col-form-label col-form-label-sm" style="width:50px">Position</label>
+        </div>
+        <div class="form-group col-auto scalebar_length input-group-sm">
+        <button type="button" class="label-position btn btn-outline-secondary btn-sm dropdown-toggle" 
+                title="Position" data-bs-toggle="dropdown">
+            <i data-position="<%= position %>" class="bi-box-arrow-in-<%= position.replace('bottom', 'down').replace('top', 'up').replace('rightvert', 'right').replace('leftvert', 'left') %> dropdown_icon"></i>
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" role="menu">
+            <li><a class="dropdown-item" href="#">
+                <i data-position="top" class="bi-box-arrow-up dropdown_icon"></i> Top</a>
+            </li>
+            <li><a class="dropdown-item" href="#">
+                <i data-position="bottom" class="bi-box-arrow-down dropdown_icon"></i> Bottom</a>
+            </li>
+            <li><a class="dropdown-item" href="#">
+                <i data-position="leftvert" class="bi-box-arrow-left dropdown_icon"></i> Left</a>
+            </li>
+            <li><a class="dropdown-item" href="#">
+                <i data-position="rightvert" class="bi-box-arrow-right dropdown_icon"></i> Right</a>
+            </li>
+        </ul>
+    </div>
+        <div class="col-auto input-group-sm" style="flex: 1 1 auto; padding-right: 0">
+            <% if (show){ %>
+                <button type="submit" class="show_calib btn btn-sm btn-success float-end">Show</button>
+            <% } else { %>
+                <button type="button" class="hide_calib btn btn-outline-secondary btn-sm float-end">Hide</button>
+            <% } %>
         </div>
     </div>
 </form>

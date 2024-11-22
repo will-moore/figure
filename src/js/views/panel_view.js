@@ -336,10 +336,9 @@
                 var cb_json = {
                         position: cb.position,
                         show: cb.show,
+                        thickness: cb.thickness,
                         lutBgPos: lutBgPos,
                 };
-
-                
                 var cb_html = this.calib_template(cb_json);
                 this.$el.append(cb_html);
             }

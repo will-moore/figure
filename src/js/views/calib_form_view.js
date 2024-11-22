@@ -37,12 +37,14 @@ var CalibBarFormView = Backbone.View.extend({
 
     update_calib: function(event) {
         var $form = $('.calib_form');
-        var position = $('.label-position i:first', $form).attr('data-position');
+        var position = $('.label-position i:first', $form).attr('data-position'),
+            thickness = parseInt($('.calib-thickness', $form).val());
 
         this.models.forEach(function(m) {
             var lutBgPos = m.get('lutBgPos');
             var cb = { show: true, lutBgPos: lutBgPos };
             if (position != '-') cb.position = position;
+            if (thickness != '-') cb.thickness = thickness;
             m.save_calib(cb);
         });
         return false;
@@ -56,14 +58,15 @@ var CalibBarFormView = Backbone.View.extend({
         this.models.forEach(function(m) {
             cb = m.get('calib');
 
-            // if (cb) {
-            //     if (!cb_json.length) {
-            //         cb_json.position = cb.position;
-            //         cb_json.lutBgPos = lutBgPos || 0;
-            //     } else {
-            //         if (cb_json.position != cb.position) cb_json.position = '-';
-            //     }
-            // }
+            if (cb) {
+                if (!cb_json.length) {
+                    cb_json.position = cb.position;
+                    cb_json.thickness = cb.thickness;
+                } else {
+                    if (cb_json.position != cb.position) cb_json.position = '-';
+                    if (cb_json.thickness != cb.thickness) cb_json.thickness = '-';
+                }
+            }
             if (!cb || !cb.show) hidden = true;
         });
 
@@ -72,6 +75,7 @@ var CalibBarFormView = Backbone.View.extend({
         }
 
         cb_json.position = cb_json.position || 'top';
+        cb_json.thickness = cb_json.thickness || 45;
         var html = this.template(cb_json);
         this.$el.html(html);
         return this;
