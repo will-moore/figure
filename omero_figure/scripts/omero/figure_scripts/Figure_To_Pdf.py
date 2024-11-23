@@ -1600,12 +1600,8 @@ class FigureExport(object):
         the colorbar, ticks and labels on PDF/TIFF
         """
 
-        if "calib" in panel:
-            calib = panel["calib"]
-            if "show" in calib:
-                if not calib["show"]:
-                    return
-        else:
+        calib = panel.get("calib", {})
+        if not calib.get("show", False):
             return
 
         channel = None
@@ -1616,39 +1612,48 @@ class FigureExport(object):
         if not channel:
             return
 
-        n_ticks = 5  # calib['n_ticks']
-        x = panel['x']
-        y = panel['y']
-        width = panel['width']
-        height = panel['height']
-        offset = 10
-        thickness = calib['thickness']
-
         color_ramp = self.get_color_ramp(channel)
 
-        cb_json = {
+        offset = 10  # calib["offset"]
+        cbar = {
             'zoom': '100',
             'dx': 0,
             'dy': 0,
             'orig_height': panel['orig_height'],
             'orig_width': panel['orig_width'],
         }
-
+        calib["num_ticks"] = 6
+        calib["tick_len"] = 3
+        start, end = channel["window"]["start"], channel["window"]["end"]
+        labels = numpy.unique(numpy.linspace(start, end,
+                                             num=calib["num_ticks"],
+                                             dtype=int))
         if calib["position"] in ["leftvert", "rightvert"]:
             color_ramp = color_ramp.transpose((1, 0, 2))[::-1]
-            cb_json['width'] = thickness
-            cb_json['height'] = height
-            cb_json['y'] = y
-            cb_json['x'] = x - (offset + thickness)
+            cbar['width'] = calib['thickness']
+            cbar['height'] = panel['height']
+            cbar['y'] = panel['y']
+            cbar['x'] = panel['x'] - (offset + calib['thickness'])
+            labels_x = [cbar['x']]
+            labels_y = cbar['y'] + panel['height'] * (1 - labels / end)
+            align = "right"
             if calib["position"] == "rightvert":
-                cb_json['x'] = x + width + offset
+                cbar['x'] = panel['x'] + panel['width'] + offset
+                labels_x = [cbar['x'] + cbar['width']]
+                align = "left"
+            labels_x *= labels.size  # Duplicate x postions
         elif calib["position"] in ["top", "bottom"]:
-            cb_json['width'] = width
-            cb_json['height'] = thickness
-            cb_json['x'] = x
-            cb_json['y'] = y - (offset + thickness)
+            cbar['width'] = panel['width']
+            cbar['height'] = calib['thickness']
+            cbar['x'] = panel['x']
+            cbar['y'] = panel['y'] - (offset + calib['thickness'])
+            labels_x = cbar['x'] + panel['width'] * labels / end
+            labels_y = [cbar['y']]
+            align = "center"
             if calib["position"] == "bottom":
-                cb_json['y'] = y + height + offset
+                cbar['y'] = panel['y'] + panel['height'] + offset
+                labels_y = [cbar['y'] + cbar['height']]
+            labels_y *= labels.size  # Duplicate y postions
 
         pil_img = Image.fromarray(color_ramp)
         img_name = channel["color"] + ".png"
@@ -1657,8 +1662,55 @@ class FigureExport(object):
         dpi = panel.get('min_export_dpi', None)
 
         # Paste the panel to PDF or TIFF image
-        self.paste_image(pil_img, img_name, cb_json, page, dpi,
+        self.paste_image(pil_img, img_name, cbar, page, dpi,
                          is_colorbar=True)
+
+        rgb = (0, 0, 0)
+        fontsize = 10
+        tick_width = 1
+        tick_len = 3
+        contour_width = 1
+        for label, pos_x, pos_y in zip(labels, labels_x, labels_y):
+            if calib["position"] == "leftvert":
+                x2 = pos_x - tick_len
+                self.draw_scalebar_line(pos_x, pos_y, x2, pos_y,
+                                        tick_width, rgb)
+                self.draw_text(str(label), pos_x - 4,
+                               pos_y - fontsize / 2 + 1,
+                               fontsize, rgb, align=align)
+            elif calib["position"] == "rightvert":
+                x2 = pos_x + tick_len
+                self.draw_scalebar_line(pos_x, pos_y, x2, pos_y,
+                                        tick_width, rgb)
+                self.draw_text(str(label), pos_x + 4,
+                               pos_y - fontsize / 2 + 1,
+                               fontsize, rgb, align=align)
+            elif calib["position"] == "top":
+                y2 = pos_y - tick_len
+                self.draw_scalebar_line(pos_x, pos_y, pos_x, y2,
+                                        tick_width, rgb)
+                self.draw_text(str(label), pos_x, pos_y - fontsize - 1,
+                               fontsize, rgb, align=align)
+            elif calib["position"] == "bottom":
+                y2 = pos_y + tick_len
+                self.draw_scalebar_line(pos_x, pos_y, pos_x, y2,
+                                        tick_width, rgb)
+                self.draw_text(str(label), pos_x, pos_y + 4,
+                               fontsize, rgb, align=align)
+        self.draw_scalebar_line(cbar['x'], cbar['y'],
+                                cbar['x'] + cbar['width'], cbar['y'],
+                                contour_width, rgb)
+        self.draw_scalebar_line(cbar['x'] + cbar['width'],
+                                cbar['y'] + cbar['height'],
+                                cbar['x'], cbar['y'] + cbar['height'],
+                                contour_width, rgb)
+        self.draw_scalebar_line(cbar['x'], cbar['y'] + cbar['height'],
+                                cbar['x'], cbar['y'],
+                                contour_width, rgb)
+        self.draw_scalebar_line(cbar['x'] + cbar['width'], cbar['y'],
+                                cbar['x'] + cbar['width'],
+                                cbar['y'] + cbar['height'],
+                                contour_width, rgb)
 
     def is_big_image(self, image):
         """Return True if this is a 'big' tiled image."""
