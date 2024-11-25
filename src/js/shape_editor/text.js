@@ -159,6 +159,22 @@ Text.prototype.getTextPosition = function getTextPosition() {
   return this._textPosition;
 };
 
+Text.prototype.setFillColor = function setFillColor(fillColor) {
+  return;
+};
+
+Text.prototype.getFillColor = function getFillColor() {
+  return this._color;
+};
+
+Text.prototype.setFillOpacity = function setFillOpacity(fillOpacity) {
+  return;
+};
+
+Text.prototype.getFillOpacity = function getFillOpacity() {
+  return 1;
+};
+
 Text.prototype.setZoom = function setZoom(zoom) {
     this._zoomFraction = zoom ? zoom / 100 : 1;
    this.drawShape();
