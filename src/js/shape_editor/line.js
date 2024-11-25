@@ -189,6 +189,22 @@ Line.prototype.getStrokeWidth = function getStrokeWidth() {
   return this._strokeWidth;
 };
 
+Line.prototype.getFillColor = function getFillColor() {
+  return this._strokeColor;
+};
+
+Line.prototype.setFillColor = function setFillColor(fillColor) {
+  return;
+};
+
+Line.prototype.setFillOpacity = function setFillOpacity(fillOpacity) {
+  return;
+};
+
+Line.prototype.getFillOpacity = function getFillOpacity() {
+  return 1;
+};
+
 Line.prototype.destroy = function destroy() {
   this.element.remove();
   this.handles.remove();
