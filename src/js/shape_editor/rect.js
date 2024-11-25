@@ -88,21 +88,6 @@ var Rect = function Rect(options) {
 
   this.element = this.paper.rect();
   this.element.attr({ "fill-opacity": this._fillOpacity, fill: this._fillColor, cursor: "pointer" });
-  /*this._textShape = options.textShape || undefined
-  var attributes = {
-    manager: this.manager,
-    paper: this.paper,
-    text: this._text,
-    x: this._x,
-    y: this._y,
-    zoom: this._zoomFraction * 100,
-    color: this._strokeColor,
-    fontSize: this._fontSize,
-    rotation: this._rotation,
-    text: "",
-  }
-
-  this._textShape = new Text(attributes)*/
 
   if (this.manager.canEdit) {
     // Drag handling of element
@@ -304,29 +289,42 @@ Rect.prototype.getFillOpacity = function getFillOpacity() {
 };
 
 Rect.prototype.setText = function setText(text) {
-  return;
+  if(this._textShape){
+    this._textShape.setText(text)
+  }
 };
 
 Rect.prototype.getText = function getText() {
-  return this._text;
+  if(this._textShape){
+    return this._textShape.getText()
+  }
+  return "";
 };
 
 Rect.prototype.setTextPosition = function setTextPosition(textPosition) {
- return;// this._textPosition = textPosition;
- // this.drawShape();
+  if(this._textShape){
+    this._textShape.setTextPosition(textPosition)
+  }
 };
 
-/*Rect.prototype.getTextPosition = function getTextPosition() {
-  return this._textPosition;
-};*/
+Rect.prototype.getTextPosition = function getTextPosition() {
+  if(this._textShape){
+    return this._textShape.getTextPosition()
+  }
+  return "";
+};
 
 Rect.prototype.setFontSize = function setFontSize(fontSize) {
-  this._fontSize = fontSize;
-//  this.drawShape();
+  if(this._textShape){
+    this._textShape.setFontSize(fontSize)
+  }
 };
 
 Rect.prototype.getFontSize = function getFontSize() {
-  return this._fontSize;
+  if(this._textShape){
+    return this._textShape.getFontSize()
+  }
+  return;
 };
 
 Rect.prototype.setStrokeWidth = function setStrokeWidth(strokeWidth) {

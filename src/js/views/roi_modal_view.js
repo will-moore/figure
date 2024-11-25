@@ -114,6 +114,7 @@ export const RoiModalView = Backbone.View.extend({
                 $("#roiModalRoiList table").empty();
                 self.roisLoaded = false;
 
+                self.shapeManager.setText('');
                 self.render();
                 self.checkForRois();
                 self.renderPagination();
@@ -122,6 +123,7 @@ export const RoiModalView = Backbone.View.extend({
             this.shapeManager = new ShapeManager("roi_paper", 1, 1);
             self.shapeManager.setStrokeColor('#FFFFFF');
             self.shapeManager.setFillColor('#FFFFFF');
+
 
             this.$roiImg = $('.roi_image', this.$el);
         },
@@ -462,7 +464,7 @@ export const RoiModalView = Backbone.View.extend({
                 toPaste = this.model.get('clipboard'),
                 windows = navigator.platform.toUpperCase().indexOf('WIN') > -1,
                 lineWidths = [0.25, 0.5, 0.75, 1, 2, 3, 4, 5, 7, 10, 15, 20, 30],
-                opacities = ["0", "0.1", "0.2", "0.3", "0.4", "0.5", "0.6", "0.7", "0.8", "0.9", "1"];
+                opacities = ["0", "0.1", "0.2", "0.3", "0.4", "0.5", "0.6", "0.7", "0.8", "0.9", "1"],
                 textPosition = this.shapeManager.getTextPosition(),
                 fontSize = this.shapeManager.getTextFontSize(),
                 fontSizes = [6, 8, 10, 12, 14, 18, 21, 24, 36, 48],

@@ -726,7 +726,7 @@ ShapeManager.prototype.selectAllShapes = function selectAllShapes(region) {
 
 // select shapes: 'shape' can be shape object or ID
 ShapeManager.prototype.selectShapes = function selectShapes(shapes) {
-  var strokeColor, strokeWidth, fillColor, fillOpacity;
+  var strokeColor, strokeWidth, fillColor, fillOpacity, text, fontSize, textPosition;
 
   // Clear selected with silent:true, since we notify again below
   this.clearSelectedShapes(true);
@@ -777,6 +777,36 @@ ShapeManager.prototype.selectShapes = function selectShapes(shapes) {
         }
       }
 
+      // for first shape, pick text
+      if (text === undefined) {
+        text = shape.getText();
+      } else {
+        // for subsequent shapes, if text don't match - set false
+        if (text !== shape.getText()) {
+          text = false;
+        }
+      }
+
+      // for first shape, pick text font size
+      if (fontSize === undefined) {
+        fontSize = shape.getFontSize();
+      } else {
+        // for subsequent shapes, if text font size don't match - set false
+        if (fontSize !== shape.getFontSize()) {
+          fontSize = false;
+        }
+      }
+
+      // for first shape, pick text position
+      if (textPosition === undefined) {
+        textPosition = shape.getTextPosition();
+      } else {
+        // for subsequent shapes, if text position don't match - set false
+        if (textPosition !== shape.getTextPosition()) {
+          textPosition = false;
+        }
+      }
+
       shape.setSelected(true);
     }
   });
@@ -791,6 +821,15 @@ ShapeManager.prototype.selectShapes = function selectShapes(shapes) {
   }
   if (fillOpacity) {
       this._fillOpacity = fillOpacity;
+  }
+  if (text) {
+    this._text = text;
+  }
+  if (textPosition) {
+    this._textPosition = textPosition;
+  }
+  if (fontSize) {
+    this._textFontSize = fontSize;
   }
   this.$el.trigger("change:selected");
 };
