@@ -227,22 +227,3 @@
 </div>
 
 <div style="flex: auto 1 1"></div>
-
-<div class="btn-group me-2" style="float: right"
-    <% if (omeroRoiCount > 0) { %>
-        title="Load <%=omeroRoiCount%> ROIs from OMERO"
-    <% } else { %>
-        title="This image has no ROIs on the OMERO server"
-    <% } %>>
-    <button class="loadRois btn btn-success"
-        <% if (omeroRoiCount == 0) { %>
-            disabled='disabled'
-        <% } %>
-    >
-        <% if (roisLoaded) {%>
-            Refresh ROIs
-        <% } else { %>
-            Load ROIs
-        <% } %>
-    </button>
-</div>

@@ -10,6 +10,7 @@ import ShapeManager from "../shape_editor/shape_manager";
 import FigureColorPicker from "../views/colorpicker";
 
 import shape_toolbar_template from '../../templates/shapes/shape_toolbar.template.html?raw';
+import shape_sidebar_template from '../../templates/shapes/shape_sidebar.template.html?raw';
 import roi_zt_buttons from '../../templates/modal_dialogs/roi_zt_buttons.template.html?raw';
 import RoiLoaderView from './roi_loader_view';
 import { hideModal, getJson } from "./util";
@@ -30,6 +31,8 @@ export const RoiModalView = Backbone.View.extend({
         template: _.template(shape_toolbar_template),
 
         roi_zt_buttons_template: _.template(roi_zt_buttons),
+
+        sidebar_template: _.template(shape_sidebar_template),
 
         el: $("#roiModal"),
 
@@ -147,7 +150,7 @@ export const RoiModalView = Backbone.View.extend({
             "click .pasteShape": "pasteShapes",
             "click .deleteShape": "deleteShapes",
             "click .selectAll": "selectAllShapes",
-            "click .loadRois": "loadRoisFirstPage",
+            "click .loadRoisBtn": "loadRoisFirstPage",
             "click .roisPrevPage": "roisPrevPage",
             "click .roisNextPage": "roisNextPage",
             "click .roisJumpPage": "roisJumpPage",
@@ -170,21 +173,20 @@ export const RoiModalView = Backbone.View.extend({
         checkForRois: function() {
             var url = BASE_WEBFIGURE_URL + 'roiCount/' + this.m.get('imageId') + '/';
 
-            var $btn = $(".loadRois", this.$el)
+            var $btn = $("#loadRois")
                 .attr({'disabled': 'disabled'});
             $btn.parent().attr('title', 'Checking for ROIs...');  // title on parent div - still works if btn disabled
 
             getJson(url).then((data) => {
                 this.omeroRoiCount = data.roi;
-                this.renderToolbar();
+                this.renderSidebar();
             });
         },
 
         loadRoisFirstPage: function (event) {
             event.preventDefault();
             // hide button and tip
-            $(".loadRois", this.$el).prop('disabled', true);
-            $("#roiModalTip").hide();
+            $("#loadRois").prop('disabled', true);
             this.roisPage = 0;
             this.loadRois();
         },
@@ -217,10 +219,11 @@ export const RoiModalView = Backbone.View.extend({
             var roiUrl = url + '?image=' + iid + '&limit=' + this.roisPageSize + '&offset=' + (this.roisPageSize * this.roisPage);
             getJson(roiUrl).then((data) => {
                 this.Rois.set(data.data);
-                $(".loadRois", this.$el).prop('disabled', false);
+                $("#loadRois").prop('disabled', false);
                 $("#roiModalRoiList table").empty();
                 this.roisLoaded = true;
-                this.renderToolbar();
+                this.renderSidebar();
+                $("#roiModalTip").hide();
                 var roiLoaderView = new RoiLoaderView({ collection: this.Rois, panel: this.m, totalCount: this.omeroRoiCount});
                 $("#roiModalRoiList table").append(roiLoaderView.el);
                 roiLoaderView.render();
@@ -501,20 +504,22 @@ export const RoiModalView = Backbone.View.extend({
 
         // this is called each time the ROI dialog is displayed
         renderSidebar: function() {
-            var tips = [
-                // "Add ROIs to the image panel by choosing Rectangle, Line, Arrow or Ellipse from the toolbar.",
-                "You can copy and paste shapes to duplicate them or move them between panels.",
-                "If you copy a region from the Crop dialog (under the 'Preview' tab), you can paste it here to create a new Rectangle."],
-                tip;
+            var tip;
             if (this.rotated) {
-                tip = "<span class='badge text-bg-primary'>Warning</span> " +
-                      "This image panel is rotated in the figure, but this ROI editor can't work with rotated images. " +
+                tip = "This image panel is rotated in the figure, but this ROI editor can't work with rotated images. " +
                       "The image is displayed here <b>without</b> rotation, but the ROIs you add will be applied " +
                       "correctly to the image panel in the figure.";
             } else {
-                tip = "<span class='badge text-bg-primary'>Tip</span> " + tips[parseInt(Math.random() * tips.length, 10)];
+                tip = "If you copy a region from the Crop dialog (under the 'Preview' tab), you can paste it here to create a new Rectangle."
             }
-            $("#roiModalTip").show().html(tip);
+
+            var json = {
+                omeroRoiCount: this.omeroRoiCount,
+                roisLoaded: this.roisLoaded,
+                tip: tip,
+                rotated: this.rotated
+            }
+            $("#roiModalSidebar", this.$el).html(this.sidebar_template(json));
         },
 
         // for rendering bounding-box viewports for shapes
