@@ -376,7 +376,7 @@
                 'panelCount': panelCount,
                 'color': color ? color.replace('#', '') : 'FFFFFF',
                 'lineWidth': width || 2,
-                'roiCount': roiCount,
+                'roiCount': roiCount/2,
                 'canPaste': canPaste,
             }
             $('#edit_rois_form').html(this.roisTemplate(json));
