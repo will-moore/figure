@@ -367,25 +367,31 @@ ShapeManager.prototype.pasteShapesJson = function pasteShapesJson(
     newShapes = [],
     allPasted = true;
   // For each shape we want to paste...
-  jsonShapes.forEach(function (s) {
+  jsonShapes.forEach(function (sh) {
     // Create a shape to resolve any transform matrix -> coords
-    var temp = self.createShapeJson(s);
-    s = temp.toJson();
-    temp.destroy();
-    // check if a shape is at the same coordinates...
-    var match = self.findShapeAtCoords(s);
-    // if so, keep offsetting until we find a spot...
-    while (match) {
-      s = $.extend({}, s);
-      s = match.offsetCoords(s, 20, 10);
-      match = self.findShapeAtCoords(s);
+    var csh = $.extend(true, {}, sh);
+    if(csh.type !== "Text"){
+      csh.textId = -1
     }
-    // Create shape and test if it's in the specified region
-    var added = self.addShapeJson(s, constrainRegion);
-    if (added) {
-      newShapes.push(added);
-    } else {
-      allPasted = false;
+    var temp = self.createShapeJson(csh);
+    var s = temp.toJson();
+    temp.destroy();
+    if(s.type !== "Text"){
+      // check if a shape is at the same coordinates...
+      var match = self.findShapeAtCoords(s);
+      // if so, keep offsetting until we find a spot...
+      while (match) {
+        s = $.extend({}, s);
+        s = match.offsetCoords(s, 20, 10);
+        match = self.findShapeAtCoords(s);
+      }
+      // Create shape and test if it's in the specified region
+      var added = self.addShapeJson(s, constrainRegion);
+      if (added) {
+        newShapes.push(added);
+      } else {
+        allPasted = false;
+      }
     }
   });
   // Select the newly added shapes

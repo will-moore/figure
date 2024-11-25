@@ -24,6 +24,7 @@
 */
 
 
+import Raphael from "raphael";
 
 var Text = function Text(options) {
   this.manager = options.manager;
@@ -82,26 +83,26 @@ Text.prototype.offsetShape = function offsetShape(dx, dy) {
   this.drawShape();
 };
 
-/*Text.prototype.compareCoords = function compareCoords(json) {
-  var selfJson = this.toJson(),
-    match = true;
-  if (json.type !== selfJson.type) {
+Text.prototype.compareCoords = function compareCoords(json) {
+  if (json.type !== "Text") {
     return false;
   }
-  ["x", "y"].forEach(function (c) {
-    if (Math.round(json[c]) !== Math.round(selfJson[c])) {
+  var selfJson = this.toJson(),
+    match = true;
+  ["x", "y", "text"].forEach(function (c) {
+    if (json[c] !== selfJson[c]) {
       match = false;
     }
   });
   return match;
-};*/
+};
 
 // Useful for pasting json with an offset
-/*Text.prototype.offsetCoords = function offsetCoords(json, dx, dy) {
+Text.prototype.offsetCoords = function offsetCoords(json, dx, dy) {
   json.x = json.x + dx;
   json.y = json.y + dy;
   return json;
-};*/
+};
 
 
 // handle start of drag by selecting this shape
@@ -194,76 +195,46 @@ Text.prototype.setSelected = function setSelected(selected) {
   this._selected = selected;
 };
 
-/*Text.prototype.intersectRegion = function intersectRegion(region) {
+Text.prototype.intersectRegion = function intersectRegion(region) {
   var path = this.manager.regionToPath(region, this._zoomFraction * 100);
   var f = this._zoomFraction,
     x = parseInt(this._x * f, 10),
     y = parseInt(this._y * f, 10);
 
-  return Raphael.isTextInsidePath(path, x, y);
+  if (Raphael.isPointInsidePath(path, x, y)) {
+    return true;
+  }
+  var path2 = this.getPath(),
+    i = Raphael.pathIntersection(path, path2);
+  return i.length > 0;
 };
 
 Text.prototype.getPath = function getPath() {
-  // Adapted from https://github.com/poilu/raphael-boolean
-  var a = this.element.attrs,
-    radiusX = a.radiusX,
-    radiusY = a.radiusY,
-    cornerTexts = [
-      [a.x - radiusX, a.y - radiusY],
-      [a.x + radiusX, a.y - radiusY],
-      [a.x + radiusX, a.y + radiusY],
-      [a.x - radiusX, a.y + radiusY],
-    ],
-    path = [];
-  var radiusShift = [
-    [
-      [0, 1],
-      [1, 0],
-    ],
-    [
-      [-1, 0],
-      [0, 1],
-    ],
-    [
-      [0, -1],
-      [-1, 0],
-    ],
-    [
-      [1, 0],
-      [0, -1],
-    ],
+  var f = this._zoomFraction,
+    x = parseInt(this._x * f, 10),
+    y = parseInt(this._y * f, 10),
+    width = parseInt(this._width * f, 10),
+    height = parseInt(this._height * f, 10);
+
+  var cornerPoints = [
+    [x, y],
+    [x + width, y],
+    [x + width, y + height],
+    [x, y + height],
   ];
-
-  //iterate all corners
+  var path = [];
   for (var i = 0; i <= 3; i++) {
-    //insert starting point
     if (i === 0) {
-      path.push(["M", cornerTexts[0][0], cornerTexts[0][1] + radiusY]);
+      path.push("M" + cornerPoints[0].join(","));
     }
-
-    //insert "curveto" (radius factor .446 is taken from Inkscape)
-    var c1 = [
-      cornerTexts[i][0] + radiusShift[i][0][0] * radiusX * 0.446,
-      cornerTexts[i][1] + radiusShift[i][0][1] * radiusY * 0.446,
-    ];
-    var c2 = [
-      cornerTexts[i][0] + radiusShift[i][1][0] * radiusX * 0.446,
-      cornerTexts[i][1] + radiusShift[i][1][1] * radiusY * 0.446,
-    ];
-    var p2 = [
-      cornerTexts[i][0] + radiusShift[i][1][0] * radiusX,
-      cornerTexts[i][1] + radiusShift[i][1][1] * radiusY,
-    ];
-    path.push(["C", c1[0], c1[1], c2[0], c2[1], p2[0], p2[1]]);
+    if (i < 3) {
+      path.push("L" + cornerPoints[i + 1].join(","));
+    } else {
+      path.push("Z");
+    }
   }
-  path.push(["Z"]);
-  path = path.join(",").replace(/,?([achlmqrstvxz]),?/gi, "$1");
-
-  if (this._rotation !== 0) {
-    path = Raphael.transformPath(path, "r" + this._rotation);
-  }
-  return path;
-};*/
+  return path.join(",");
+};
 
 
 Text.prototype.drawShape = function drawShape() {
