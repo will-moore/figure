@@ -1669,10 +1669,20 @@ class FigureExport(object):
         fontsize = 10
         tick_width = 1
         tick_len = 3
-        contour_width = 1
+        contour_width = tick_width
         for label, pos_x, pos_y in zip(labels, labels_x, labels_y):
+
+            # Cosmetical correction, for first and last ticks to be
+            # aligned with the image
+            shift = 0
+            if label == labels[0]:
+                shift = -tick_width / 2
+            elif label == labels[-1]:
+                shift = tick_width / 2
+
             if calib["position"] == "leftvert":
                 x2 = pos_x - tick_len
+                pos_y += shift
                 self.draw_scalebar_line(pos_x, pos_y, x2, pos_y,
                                         tick_width, rgb)
                 self.draw_text(str(label), pos_x - 4,
@@ -1680,6 +1690,7 @@ class FigureExport(object):
                                fontsize, rgb, align=align)
             elif calib["position"] == "rightvert":
                 x2 = pos_x + tick_len
+                pos_y += shift
                 self.draw_scalebar_line(pos_x, pos_y, x2, pos_y,
                                         tick_width, rgb)
                 self.draw_text(str(label), pos_x + 4,
@@ -1687,30 +1698,43 @@ class FigureExport(object):
                                fontsize, rgb, align=align)
             elif calib["position"] == "top":
                 y2 = pos_y - tick_len
+                pos_x -= shift  # Order of the label is reversed
                 self.draw_scalebar_line(pos_x, pos_y, pos_x, y2,
                                         tick_width, rgb)
-                self.draw_text(str(label), pos_x, pos_y - fontsize - 1,
+                self.draw_text(str(label), pos_x, pos_y - fontsize - 2,
                                fontsize, rgb, align=align)
             elif calib["position"] == "bottom":
                 y2 = pos_y + tick_len
+                pos_x -= shift  # Order of the label is reversed
                 self.draw_scalebar_line(pos_x, pos_y, pos_x, y2,
                                         tick_width, rgb)
                 self.draw_text(str(label), pos_x, pos_y + 4,
                                fontsize, rgb, align=align)
-        self.draw_scalebar_line(cbar['x'], cbar['y'],
-                                cbar['x'] + cbar['width'], cbar['y'],
-                                contour_width, rgb)
-        self.draw_scalebar_line(cbar['x'] + cbar['width'],
-                                cbar['y'] + cbar['height'],
-                                cbar['x'], cbar['y'] + cbar['height'],
-                                contour_width, rgb)
-        self.draw_scalebar_line(cbar['x'], cbar['y'] + cbar['height'],
-                                cbar['x'], cbar['y'],
-                                contour_width, rgb)
-        self.draw_scalebar_line(cbar['x'] + cbar['width'], cbar['y'],
-                                cbar['x'] + cbar['width'],
-                                cbar['y'] + cbar['height'],
-                                contour_width, rgb)
+
+        if calib["position"] == "top":
+            self.draw_scalebar_line(cbar['x'],
+                                    cbar['y'],
+                                    cbar['x'] + cbar['width'],
+                                    cbar['y'],
+                                    contour_width, rgb)
+        elif calib["position"] == "bottom":
+            self.draw_scalebar_line(cbar['x'],
+                                    cbar['y'] + cbar['height'],
+                                    cbar['x'] + cbar['width'],
+                                    cbar['y'] + cbar['height'],
+                                    contour_width, rgb)
+        elif calib["position"] == "leftvert":
+            self.draw_scalebar_line(cbar['x'],
+                                    cbar['y'],
+                                    cbar['x'],
+                                    cbar['y'] + cbar['height'],
+                                    contour_width, rgb)
+        elif calib["position"] == "rightvert":
+            self.draw_scalebar_line(cbar['x'] + cbar['width'],
+                                    cbar['y'],
+                                    cbar['x'] + cbar['width'],
+                                    cbar['y'] + cbar['height'],
+                                    contour_width, rgb)
 
     def is_big_image(self, image):
         """Return True if this is a 'big' tiled image."""
