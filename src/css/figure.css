@@ -1041,7 +1041,8 @@
 
     .lutBg {
         /* NB: when updating png, consider using different name to avoid cache */
-        background-size: 100% 1950px;  /* height is stretched 5x (50px per LUT) */
+        background-size: 100% var(--pngHeight);
+        background-image: var(--lutPng);
         background-repeat: no-repeat;
     }
 
@@ -1052,7 +1053,7 @@
         height: 100%;
         z-index: -1;
         background-image: var(--lutPng);   /* each lut is 10px high */
-        background-size: 100% 1950px;  /* height is stretched 5x (50px per LUT) */
+        background-size: 100% var(--pngHeight);  /* height is stretched 5x (50px per LUT) */
         background-repeat: no-repeat;
         transform: scaleX(var(--scaleX));
         background-position: var(--bgPos);
@@ -1339,8 +1340,16 @@
         text-decoration: none;
     }
 
-    .form-inline{
-        cursor: move;
+    /* Center the drag label icon */
+    #sort_label_icon {
+        vertical-align: middle;
+        margin-left: 12px;
+        display: inline-block;
+        font-size: 16px;
+        transform: scale(1.2);
+        transform-origin: center;
+        opacity: 0.7;
+        cursor: grab;
     }
 
     .flipping button{
