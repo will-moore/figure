@@ -1499,7 +1499,11 @@ class FigureExport(object):
                     label_value = " ".join(label_value)
 
                 elif prop_nf[0] in ["zoom"]:
-                    label_value = str(panel["zoom"]) + " %"
+                    try:
+                        zoom = round(panel["zoom"])
+                    except Exception:
+                        zoom = panel["zoom"]
+                    label_value = str(zoom) + " %"
                 new_text.append(label_value if label_value else item.group())
                 last_idx = item.end()
 
