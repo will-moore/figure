@@ -847,7 +847,7 @@
 
             this.models.forEach(function(m){
                 self.listenTo(m,
-                    'change:width change:height change:rotation change:z_projection change:z_start change:z_end change:min_export_dpi',
+                    'change:width change:height change:rotation change:z_projection change:z_start change:z_end change:min_export_dpi change:vertical_flip change:horizontal_flip',
                     self.render);
                 self.listenTo(m,
                     'change:channels change:theZ change:theT',
@@ -1009,6 +1009,18 @@
         // while zooming / dragging.
         // TODO: Update each panel separately.
         update_img_css: function(zoom, dx, dy, save) {
+
+            const vertical_flip = this.models.some(m => m.get('vertical_flip'));
+            const horizontal_flip = this.models.some(m => m.get('horizontal_flip'));
+            // Check if vertical rotation is enabled, then invert dy
+            if (vertical_flip) {
+                dy = -dy;
+            }
+
+            // Check if horizontal rotation is enabled, then invert dx
+            if (horizontal_flip){
+                dx = -dx;
+            }
 
             var scaled_dx = dx / (zoom/100);
             var scaled_dy = dy / (zoom/100);
@@ -1216,11 +1228,13 @@
         resetZoomShape: function(event) {
             event.preventDefault();
             this.models.forEach(function(m){
+                m.set('vertical_flip', false);
+                m.set('horizontal_flip', false);
                 m.cropToRoi({
                     'x': 0,
                     'y': 0,
                     'width': m.get('orig_width'),
-                    'height': m.get('orig_height')
+                    'height': m.get('orig_height'),
                 });
             });
         },
@@ -1291,19 +1305,29 @@
             var self = this;
             this.models.forEach(function(m){
                 self.listenTo(m, 'change:channels change:z_projection', self.render);
+                self.listenTo(m, 'change:vertical_flip change:horizontal_flip', self.loadButtonState);
             });
         },
 
         events: {
             "click .show-rotation": "show_rotation",
             "click .z-projection": "z_projection",
+            "click .flipping_vertical": "flipping_vertical",
+            "click .flipping_horizontal": "flipping_horizontal",
             "input .rotation-slider": "rotation_input",
             "change .rotation-slider": "rotation_change",
         },
 
         rotation_input: function(event) {
             let val = parseInt(event.target.value);
-            $(".vp_img").css({'transform':'rotate(' + val + 'deg)'});
+            this.models.forEach(function(m) {
+                const verticalFlip = m.get('vertical_flip') ? -1 : 1;
+                const horizontalFlip = m.get('horizontal_flip') ? -1 : 1;
+                // Update the CSS transform property for each image
+                $(".vp_img").css({
+                    'transform': 'scaleX(' + horizontalFlip + ') scaleY(' + verticalFlip + ') rotate(' + val + 'deg)'
+                });
+            });
             $(".rotation_value").text(val);
         },
 
@@ -1315,6 +1339,50 @@
             });
         },
 
+        flipping_vertical: function(event) {
+            const $button = $(event.currentTarget);
+            $button.toggleClass('active'); 
+
+            const isVerticalFlipped = $button.hasClass('active');
+
+            this.models.forEach(function(m) {
+                m.save('vertical_flip', isVerticalFlipped);
+            });
+        },
+    
+        flipping_horizontal: function(event) {
+            const $button = $(event.currentTarget);
+            $button.toggleClass('active'); 
+
+            const ishorizontalFlipped = $button.hasClass('active');
+
+            this.models.forEach(function(m) {
+                m.save('horizontal_flip', ishorizontalFlipped);
+            });
+        },
+
+        loadButtonState: function() {
+            const $verticalButton = this.$(".flipping_vertical");
+            const $horizontalButton = this.$(".flipping_horizontal");
+        
+            // Ensure the buttons reflect the model state
+            this.models.forEach(function(m) {
+                // Set vertical button state
+                if (m.get('vertical_flip')) {
+                    $verticalButton.addClass('active');
+                } else {
+                    $verticalButton.removeClass('active');
+                }
+        
+                // Set horizontal button state
+                if (m.get('horizontal_flip')) {
+                    $horizontalButton.addClass('active');
+                } else {
+                    $horizontalButton.removeClass('active');
+                }
+            });
+        },
+        
         z_projection:function(e) {
             // 'flat' means that some panels have z_projection on, some off
             var flat = $(e.currentTarget).hasClass('ch-btn-flat');
@@ -1383,6 +1451,7 @@
                     'z_projection': z_projection});
                 this.$el.html(html);
             }
+            this.loadButtonState();
             return this;
         }
     });
