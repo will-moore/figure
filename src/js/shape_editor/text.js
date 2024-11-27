@@ -38,6 +38,9 @@ var Text = function Text(options) {
   this._textPosition = options.textPosition;
 
   this._id = options.id || this.manager.getRandomId();
+  if(this._id == -1){
+    this._id = this.manager.getRandomId();
+  }
   this._rotateText = options.rotateText || false;
   this._zoomFraction = options.zoom ? options.zoom / 100 : 1
   this._textAnchor = options.textAnchor || "start"
@@ -353,6 +356,7 @@ var CreateText = function CreateText(options) {
     paper: options.paper,
     zoom: options.zoom,
     text: options.text,
+    id: options.id,
     x: options.x,
     y: options.y,
     strokeColor: options.strokeColor,
