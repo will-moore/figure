@@ -284,6 +284,9 @@ export var FileListView = Backbone.View.extend({
                 </a></li>`;
         });
         $("#owner-menu").html(ownersHtml);
+        let owner = owners.find(o => o.id == filter.owner);
+        let ownerName = owner ? `${owner.firstName} ${owner.lastName}`: "Show All";
+        $("#selected_owner").html(ownerName);
 
         // render groups chooser
         var groups = this.model.pluck("group");
@@ -304,6 +307,9 @@ export var FileListView = Backbone.View.extend({
                 ${_.escape(name)}
             </a></li>`).join('\n');
         $("#group-menu").html(groupsHtml);
+        let group = groups.find(g => g.id == filter.group);
+        let groupName = group ? group.name: "Show All";
+        $("#selected_group").html(groupName);
         return this;
     }
 });

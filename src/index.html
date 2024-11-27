@@ -1082,13 +1082,14 @@
                     </form>
                   </th>
                   <th style="width: 12%">
+                    Owner:
                     <div class="btn-group" title="Filter files by owner">
                       <button
                         type="button"
-                        class="btn dropdown-toggle"
+                        class="btn dropdown-toggle btn-outline-secondary"
                         data-bs-toggle="dropdown"
                       >
-                        <b>Owner</b> <span class="caret"></span>
+                        <span id="selected_owner">Owner</span> <span class="caret"></span>
                       </button>
                       <ul
                         id="owner-menu"
@@ -1100,13 +1101,14 @@
                     </div>
                   </th>
                   <th style="width: 12%">
+                    Group:
                     <div class="btn-group" title="Filter files by group">
                       <button
                         type="button"
-                        class="btn dropdown-toggle"
+                        class="btn dropdown-toggle btn-outline-secondary"
                         data-bs-toggle="dropdown"
                       >
-                        <b>Group</b> <span class="caret"></span>
+                        <span id="selected_group">Group</span> <span class="caret"></span>
                       </button>
                       <ul
                         id="group-menu"
