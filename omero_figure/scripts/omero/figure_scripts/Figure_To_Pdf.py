@@ -278,13 +278,14 @@ class ShapeExport(object):
 class ShapeToPdfExport(ShapeExport):
     point_radius = 5
 
-    def __init__(self, canvas, panel, page, crop, page_height):
+    def __init__(self, canvas, panel, page, crop, page_height, page_width):
 
         self.canvas = canvas
         self.page = page
         # The crop region on the original image coordinates...
         self.crop = crop
         self.page_height = page_height
+        self.page_width = page_width
         # Get a mapping from original coordinates to the actual size of panel
         self.scale = float(panel['width']) / crop['width']
 
@@ -369,6 +370,47 @@ class ShapeToPdfExport(ShapeExport):
         w, h = para.wrap(10000, 100)
         para.drawOn(
             self.canvas, center[0] - w / 2, center[1] - h / 2 + size / 4)
+
+
+
+    def draw_text(self, shape):
+        text_coords = self.panel_to_page_coords(shape['x'], shape['y'])
+        text = html.escape(shape.get('text', ''))
+        if not text:
+            return
+        size = shape.get('fontSize', 12) * 2 / 3
+        r, g, b, a = self.get_rgba(shape['strokeColor'])
+        # bump up alpha a bit to make text more readable
+        rgba = (r, g, b, 0.5 + a / 2.0)
+
+        x = text_coords["x"]
+        y = self.page_height - text_coords["y"]
+        anchor = shape['textAnchor']
+        aligment = TA_LEFT
+        print(anchor)
+        if(anchor == 'middle'):
+            aligment = TA_CENTER
+            x = x - (self.page_width / 2)
+        elif(anchor == "end"):
+            aligment = TA_RIGHT
+            x = x - self.page_width
+
+        style = ParagraphStyle(
+            'label',
+            parent=getSampleStyleSheet()['Normal'],
+            alignment=aligment,
+            textColor=Color(*rgba),
+            fontSize=size,
+            leading=size,
+        )
+        para = Paragraph(text, style)
+
+        w, h = para.wrap(self.page_width, 100)
+        para.drawOn(
+            self.canvas, x, y - h/2 + int(size * 0.25))
+
+
+
 
     def draw_line(self, shape):
         start = self.panel_to_page_coords(shape['x1'], shape['y1'])
@@ -1281,7 +1323,7 @@ class FigureExport(object):
 
         crop = self.get_crop_region(panel)
         ShapeToPdfExport(self.figure_canvas, panel, page, crop,
-                         self.page_height)
+                         self.page_height, self.page_width)
 
     def draw_labels(self, panel, page):
         """
