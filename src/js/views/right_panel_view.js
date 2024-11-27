@@ -695,7 +695,9 @@
                     },
                     onEnd: function(evt) {
                         self.handle_sort(evt);
-                    }
+                    },
+                    filter: 'input',       // Required to to select text in the label input
+                    preventOnFilter: false // Required to to select text in the label input
                 });
 
                 // Store the sortable instance
