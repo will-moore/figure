@@ -299,7 +299,18 @@ class ShapeToPdfExport(ShapeExport):
         Also includes 'inPanel' key - True if point within
         the cropped panel region
         """
+
+        # Apply flip transformations to the shape coordinates
+        h_flip = self.panel.get('horizontal_flip', False)
+        v_flip = self.panel.get('vertical_flip', False)
+        if h_flip:
+            shape_x = self.crop['width'] - shape_x + 2*self.crop['x']
+        if v_flip:
+            shape_y = self.crop['height'] - shape_y + 2*self.crop['y']
+
         rotation = self.panel['rotation']
+        if v_flip != h_flip:
+            rotation = -rotation
         if rotation != 0:
             # img coords: centre of rotation
             cx = self.crop['x'] + (self.crop['width'] / 2)
@@ -504,7 +515,21 @@ class ShapeToPdfExport(ShapeExport):
         cy = self.page_height - c['y']
         rx = shape['radiusX'] * self.scale
         ry = shape['radiusY'] * self.scale
-        rotation = (shape.get('rotation', 0) + self.panel['rotation']) * -1
+
+        rotation = shape.get('rotation', 0)
+        h_flip = self.panel.get('horizontal_flip', False)
+        v_flip = self.panel.get('vertical_flip', False)
+
+        if v_flip:
+            rotation = - rotation
+        if h_flip:
+            rotation = 180 - rotation
+
+        if v_flip != h_flip:
+            rotation = (rotation - self.panel['rotation']) * -1
+        else:
+            rotation = (rotation + self.panel['rotation']) * -1
+
         r, g, b, a = self.get_rgba(shape['strokeColor'])
         self.canvas.setStrokeColorRGB(r, g, b, alpha=a)
 
@@ -569,7 +594,18 @@ class ShapeToPilExport(ShapeExport):
         x, y point around the centre of the cropped region
         and scaling appropriately
         """
+        h_flip = self.panel.get('horizontal_flip', False)
+        v_flip = self.panel.get('vertical_flip', False)
+
+        # Apply flip transformations to the shape coordinates
+        if h_flip:
+            shape_x = self.crop['width'] - shape_x + 2*self.crop['x']
+        if v_flip:
+            shape_y = self.crop['height'] - shape_y + 2*self.crop['y']
+
         rotation = self.panel['rotation']
+        if v_flip != h_flip:
+            rotation = -rotation
         if rotation != 0:
             # img coords: centre of rotation
             cx = self.crop['x'] + (self.crop['width'] / 2)
@@ -816,7 +852,20 @@ class ShapeToPilExport(ShapeExport):
         cy = ctr['y']
         rx = self.scale * shape['radiusX']
         ry = self.scale * shape['radiusY']
-        rotation = (shape.get('rotation', 0) + self.panel['rotation']) * -1
+
+        rotation = shape.get('rotation', 0)
+        h_flip = self.panel.get('horizontal_flip', False)
+        v_flip = self.panel.get('vertical_flip', False)
+
+        if v_flip:
+            rotation = - rotation
+        if h_flip:
+            rotation = 180 - rotation
+
+        if v_flip != h_flip:
+            rotation = (rotation - self.panel['rotation']) * -1
+        else:
+            rotation = (rotation + self.panel['rotation']) * -1
 
         width = int((rx * 2) + w)
         height = int((ry * 2) + w)
@@ -2220,6 +2269,15 @@ class FigureExport(object):
     def paste_image(self, pil_img, img_name, panel, page, dpi):
         """ Adds the PIL image to the PDF figure. Overwritten for TIFFs """
 
+        # Apply flip transformations before drawing the image
+        h_flip = panel.get('horizontal_flip', False)
+        v_flip = panel.get('vertical_flip', False)
+
+        if h_flip:
+            pil_img = pil_img.transpose(Image.FLIP_LEFT_RIGHT)
+        if v_flip:
+            pil_img = pil_img.transpose(Image.FLIP_TOP_BOTTOM)
+
         x = panel['x']
         y = panel['y']
         width = panel['width']
@@ -2318,6 +2376,15 @@ class TiffExport(FigureExport):
 
     def paste_image(self, pil_img, img_name, panel, page, dpi=None):
         """ Add the PIL image to the current figure page """
+
+        # Apply flip transformations before drawing the image
+        h_flip = panel.get('horizontal_flip', False)
+        v_flip = panel.get('vertical_flip', False)
+
+        if h_flip:
+            pil_img = pil_img.transpose(Image.FLIP_LEFT_RIGHT)
+        if v_flip:
+            pil_img = pil_img.transpose(Image.FLIP_TOP_BOTTOM)
 
         x = panel['x']
         y = panel['y']

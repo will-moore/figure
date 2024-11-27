@@ -30,7 +30,8 @@
             pixel_size_x_unit: 'MICROMETER',
             rotation_symbol: '\xB0',
             max_export_dpi: 1000,
-
+            vertical_flip: false,
+            horizontal_flip: false,
             // 'export_dpi' optional value to resample panel on export
             // model includes 'scalebar' object, e.g:
             // scalebar: {length: 10, position: 'bottomleft', color: 'FFFFFF',
@@ -909,6 +910,8 @@
             if (rotation == undefined) {
                 rotation = this.get('rotation') || 0;
             }
+            var vertical_flip = this.get('vertical_flip') ? -1 : 1;
+            var horizontal_flip = this.get('horizontal_flip') ? -1 : 1;
 
             var css = {'left':img_x,
                        'top':img_y,
@@ -916,8 +919,8 @@
                        'height':img_h,
                        '-webkit-transform-origin': transform_x + '% ' + transform_y + '%',
                        'transform-origin': transform_x + '% ' + transform_y + '%',
-                       '-webkit-transform': 'rotate(' + rotation + 'deg)',
-                       'transform': 'rotate(' + rotation + 'deg)'
+                       '-webkit-transform': 'scaleX(' + horizontal_flip + ') ' + 'scaleY(' + vertical_flip + ') ' + 'rotate(' + rotation + 'deg)',
+                       'transform': 'scaleX(' + horizontal_flip + ') ' + 'scaleY(' + vertical_flip + ') ' + 'rotate(' + rotation + 'deg)'
                    };
             return css;
         },
