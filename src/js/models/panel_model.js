@@ -239,6 +239,37 @@
             this.save('scalebar', sb);
         },
 
+        show_border: function(color, strokeWidth){
+            var border = {
+                'color': '#'+color,
+                'strokeWidth': strokeWidth,
+                'showBorder':true
+            }
+            this.save('border', border);
+        },
+
+        remove_border: function(){
+            this.setBorderAttr('showBorder', false)
+        },
+
+        setBorderColor: function(color){
+            this.setBorderAttr('color', '#'+color)
+        },
+
+        setBorderStrokeWidth: function(strokeWidth){
+            this.setBorderAttr('strokeWidth', strokeWidth)
+        },
+
+        setBorderAttr: function(attr, value){
+            var border =  this.get('border');
+            if(border != undefined){
+                var xtra = {};
+                xtra[attr] = value;
+                var new_border = $.extend(true, {}, border, xtra);
+                this.save('border', new_border);
+            }
+        },
+
         // Simple checking whether shape is in viewport (x, y, width, height)
         // Return true if any of the points in shape are within viewport.
         is_shape_in_viewport: function(shape, viewport) {

@@ -40,7 +40,7 @@
                 'change:channels change:zoom change:dx change:dy change:width change:height change:rotation change:labels change:theT change:deltaT change:theZ change:deltaZ change:z_projection change:z_start change:z_end',
                 this.render_labels);
             this.listenTo(this.model, 'change:shapes', this.render_shapes);
-
+            this.listenTo(this.model, 'change:border', this.render_layout);
             // During drag or resize, model isn't updated, but we trigger 'drag'
             this.model.on('drag_resize', this.drag_resize, this);
 
@@ -63,6 +63,12 @@
                 h = xywh[3];
             if (w == this.model.get('width') && h == this.model.get('height')) {
                 // If we're only dragging - simply update position
+                var border = this.model.get('border');
+                if (border?.showBorder) {
+                    let sw = border.strokeWidth;
+                    x = x - sw
+                    y = y - sw
+                }
                 this.$el.css({'top': y +'px', 'left': x +'px'});
             } else {
                 this.update_resize(x, y, w, h);
@@ -78,20 +84,37 @@
                 h = this.model.get('height');
 
             this.update_resize(x, y, w, h);
+            this.render_labels();
             this.$el.removeClass('dragging');
         },
 
         update_resize: function(x, y, w, h) {
 
+            // If we have a panel border, need to adjust x,y,w,h on the page
+            // but NOT the w & h we use for img_css below.
+            var border = this.model.get('border');
+            var page_w = w;
+            var page_h = h;
+            if (border?.showBorder) {
+                let sw = border.strokeWidth;
+                this.$el.css({'border': `solid ${sw}px ${border.color}`})
+                x = x - sw;
+                y = y - sw;
+                page_w = w + (sw * 2);
+               page_h = h + (sw * 2);
+            } else {
+                this.$el.css({'border': ''})
+            }
+
             // update layout of panel on the canvas
             this.$el.css({'top': y +'px',
                         'left': x +'px',
-                        'width': w +'px',
-                        'height': h +'px'});
+                        'width': page_w +'px',
+                        'height': page_h +'px'});
 
             // container needs to be square for rotation to vertical
-            $('.left_vlabels', this.$el).css('width', 3 * h + 'px');
-            $('.right_vlabels', this.$el).css('width', 3 * h + 'px');
+            $('.left_vlabels', this.$el).css('width', 3 * page_h + 'px');
+            $('.right_vlabels', this.$el).css('width', 3 * page_h + 'px');
 
             // update the img within the panel
             var zoom = this.model.get('zoom'),
@@ -281,6 +304,26 @@
             // need to force update of vertical labels layout
             $('.left_vlabels', self.$el).css('width', 3 * self.$el.height() + 'px');
             $('.right_vlabels', self.$el).css('width', 3 * self.$el.height() + 'px');
+
+            var border = this.model.get('border')
+            if(border != undefined){
+                var margin =  5 + border.strokeWidth
+                $('.left_vlabels>div', self.$el).css('margin-bottom', margin + 'px');
+                $('.right_vlabels>div', self.$el).css('margin-bottom', margin + 'px');
+                margin =  3 + border.strokeWidth
+                $('.label_top', self.$el).css('margin-bottom', margin + 'px');
+                margin =  border.strokeWidth
+                $('.label_bottom', self.$el).css('margin-top', margin + 'px');
+                $('.label_left', self.$el).css('margin-right', margin + 'px');
+                $('.label_right', self.$el).css('margin-left', margin + 'px');
+            }else{
+                $('.left_vlabels>div', self.$el).css('mSargin-bottom', '5px');
+                $('.right_vlabels>div', self.$el).css('margin-bottom', '5px');
+                $('.label_top', self.$el).css('margin-bottom', '3px');
+                $('.label_bottom', self.$el).css('margin-top', '');
+                $('.label_left', self.$el).css('margin-right', '');
+                $('.label_right', self.$el).css('margin-left', '');
+            }
 
             return this;
         },
