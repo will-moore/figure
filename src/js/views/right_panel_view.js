@@ -103,11 +103,16 @@
             var self = this;
             this.model.getSelected().forEach(function(m){
                 self.listenTo(m, 'change:shapes', self.render);
+                self.listenTo(m, 'change:border', self.render);
             });
         },
 
         events: {
             "click .edit_rois": "editRois",
+            "click .show_border": "showBorder",
+            "click .remove_border": "removeBorder",
+            "change .border-color": "changeBorderColor",
+            "change .border-width": "changeBorderStrokeWidth",
             "click .copyROIs": "copyROIs",
             "click .pasteROIs": "pasteROIs",
             "click .deleteROIs": "deleteROIs",
@@ -199,6 +204,25 @@
             });
         },
 
+        changeBorderColor: function() {
+            var color = $('button.border-color span:first', this.$el).attr('data-color'),
+                sel = this.model.getSelected();
+
+            sel.forEach(function(panel){
+                panel.setBorderColor(color);
+            });
+        },
+
+        changeBorderStrokeWidth: function() {
+            var width = $('button.border-width span:first', this.$el).attr('data-line-width'),
+                sel = this.model.getSelected();
+            width = parseFloat(width, 10);
+
+            sel.forEach(function(panel){
+                panel.setBorderStrokeWidth(width);
+            });
+        },
+
         copyROIs: function(event) {
             event.preventDefault();
             var sel = this.model.getSelected(),
@@ -216,6 +240,24 @@
                 this.model.set('clipboard', {'SHAPES': roiJson});
             }
             this.render();
+        },
+
+        showBorder: function(event){
+            var width = $('button.border-width span:first', this.$el).attr('data-line-width');
+            var color = $('button.border-color span:first', this.$el).attr('data-color');
+            width = parseFloat(width, 10);
+
+            this.model.getSelected().forEach(panel => {
+                panel.show_border(color, width)
+            })
+            event.preventDefault();
+        },
+
+        removeBorder: function(event){
+            this.model.getSelected().forEach(panel => {
+                panel.remove_border()
+            })
+            event.preventDefault();
         },
 
         rectToPolygon: function(rect, rotation) {
@@ -309,7 +351,9 @@
                 clipboard_data = this.model.get('clipboard'),
                 canPaste = clipboard_data && ('SHAPES' in clipboard_data || 'CROP' in clipboard_data),
                 color,
-                width;
+                width,
+                border,
+                show_btn_state = false;
 
             sel.forEach(function(panel){
                 var rois = panel.get('shapes');
@@ -333,6 +377,13 @@
                         }
                     });
                 }
+
+                border = panel.get("border")
+                if(border?.showBorder){
+                    panel.show_border(border.color.replace('#',''), parseFloat(border.strokeWidth, 10))
+                }else{
+                    show_btn_state = true;
+                }
             });
 
             var json = {
@@ -341,6 +392,9 @@
                 'lineWidth': width || 2,
                 'roiCount': roiCount,
                 'canPaste': canPaste,
+                'borderWidth': border ? border.strokeWidth : 2,
+                'borderColor': border ? border.color.replace('#', '') : 'FFFFFF',
+                'showState': show_btn_state,
             }
             $('#edit_rois_form').html(this.roisTemplate(json));
         },
