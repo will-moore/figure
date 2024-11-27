@@ -30,11 +30,11 @@
             // we render on Changes in the model OR selected shape etc.
             this.model.on('destroy', this.remove, this);
             this.listenTo(this.model,
-                'change:x change:y change:width change:height change:zoom change:dx change:dy change:rotation',
+                'change:x change:y change:width change:height change:zoom change:dx change:dy change:rotation change:vertical_flip change:horizontal_flip',
                 this.render_layout);
             this.listenTo(this.model, 'change:scalebar change:pixel_size_x', this.render_scalebar);
             this.listenTo(this.model,
-                'change:zoom change:dx change:dy change:width change:height change:channels change:theZ change:theT change:z_start change:z_end change:z_projection change:min_export_dpi change:pixel_range',
+                'change:zoom change:dx change:dy change:width change:height change:channels change:theZ change:theT change:z_start change:z_end change:z_projection change:min_export_dpi change:pixel_range change:vertical_flip change:horizontal_flip',
                 this.render_image);
             this.listenTo(this.model,
                 'change:channels change:zoom change:dx change:dy change:width change:height change:rotation change:labels change:theT change:deltaT change:theZ change:deltaZ change:z_projection change:z_start change:z_end',

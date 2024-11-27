@@ -1338,3 +1338,17 @@
     .form-inline{
         cursor: move;
     }
+
+    .flipping button{
+        margin: 2px;
+    }
+
+    .flipping .btn.active {
+        background-color: #007bff;
+        color: white;
+        border-color: #007bff;
+    }
+    
+    .flipping .btn.active i {
+        color: white;
+    }
