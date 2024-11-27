@@ -371,8 +371,6 @@ class ShapeToPdfExport(ShapeExport):
         para.drawOn(
             self.canvas, center[0] - w / 2, center[1] - h / 2 + size / 4)
 
-
-
     def draw_text(self, shape):
         text_coords = self.panel_to_page_coords(shape['x'], shape['y'])
         text = html.escape(shape.get('text', ''))
@@ -387,7 +385,7 @@ class ShapeToPdfExport(ShapeExport):
         y = self.page_height - text_coords["y"]
         anchor = shape['textAnchor']
         aligment = TA_LEFT
-        print(anchor)
+
         if(anchor == 'middle'):
             aligment = TA_CENTER
             x = x - (self.page_width / 2)
@@ -408,8 +406,6 @@ class ShapeToPdfExport(ShapeExport):
         w, h = para.wrap(self.page_width, 100)
         para.drawOn(
             self.canvas, x, y - h/2 + int(size * 0.25))
-
-
 
 
     def draw_line(self, shape):
