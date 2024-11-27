@@ -44,7 +44,7 @@ export var FigureFile = Backbone.Model.extend({
     },
 
     isVisible: function(filter) {
-        if (filter.owner) {
+        if (filter.owner !== undefined) {
             if (this.get('owner').id !== filter.owner) {
                 return false;
             }
@@ -232,7 +232,7 @@ export var FileListView = Backbone.View.extend({
             filter = {},
             filterVal = this.$fileFilter.val(),
             currentFileId = this.figureModel.get('fileId');
-        if (this.owner && this.owner != -1) {
+        if (this.owner !== undefined && this.owner != -1) {
             filter.owner = this.owner;
         }
         if (this.group && this.group != -1) {
