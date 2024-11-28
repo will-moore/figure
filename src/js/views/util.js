@@ -267,10 +267,6 @@ export function getRandomId() {
     return parseInt(Math.random() * RANDOM_NUMBER_RANGE);
 }
 
-export function newIdFromRandomId(oldId) {
-    return parseInt((oldId * Math.PI) % RANDOM_NUMBER_RANGE);
-}
-
 export function updateRoiIds(panelsJson) {
     // If we copy and paste an inset panel AND it's corresponding panel with Rect,
     // we don't want changes in viewport/Rect to trigger changes in the panels they
@@ -296,14 +292,15 @@ export function updateRoiIds(panelsJson) {
     let idsToUpdate = insetIdsFromPanels.filter(roiId => insetIdsFromShapes.includes(roiId));
 
     // Update the IDs
+    let toAdd = getRandomId();
     let updatedPanels = panelsJson.map(panelJson => {
         if (idsToUpdate.includes(panelJson.insetRoiId)) {
-            panelJson.insetRoiId = newIdFromRandomId(panelJson.insetRoiId);
+            panelJson.insetRoiId = (panelJson.insetRoiId + toAdd) % RANDOM_NUMBER_RANGE;
         }
         if (panelJson.shapes) {
             panelJson.shapes.forEach(shape => {
                 if (idsToUpdate.includes(shape.id)) {
-                    shape.id = newIdFromRandomId(shape.id);
+                    shape.id = (shape.id + toAdd) % RANDOM_NUMBER_RANGE;
                 }
             });
         }
