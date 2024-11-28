@@ -1019,7 +1019,7 @@
       role="dialog"
       aria-hidden="true"
     >
-      <div class="modal-dialog modal-lg">
+      <div class="modal-dialog modal-lg" style="--bs-modal-width: 900px">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">Open</h5>
@@ -1035,8 +1035,8 @@
             <table class="table table-sm">
               <thead>
                 <tr>
-                  <th style="width: 7%"></th>
-                  <th style="width: 45%">
+                  <th></th>
+                  <th>
                     <form class="row" role="form">
                       <div class="col-auto">
                         <label class="col-sm-2 control-label">Name</label>
@@ -1062,8 +1062,8 @@
                       </div>
                     </form>
                   </th>
-                  <th style="width: 25%">
-                    <form class="row" role="form">
+                  <th>
+                    <form class="row" role="form" style="flex-wrap: nowrap;">
                       <div class="col-auto">
                         <label class="col-sm-2 control-label">Created</label>
                       </div>
@@ -1081,10 +1081,11 @@
                       </button>
                     </form>
                   </th>
-                  <th style="width: 12%">
+                  <th>
                     Owner:
                     <div class="btn-group" title="Filter files by owner">
                       <button
+                        style="max-width: 120px; overflow: hidden;"
                         type="button"
                         class="btn dropdown-toggle btn-outline-secondary"
                         data-bs-toggle="dropdown"
@@ -1100,10 +1101,11 @@
                       </ul>
                     </div>
                   </th>
-                  <th style="width: 12%">
+                  <th>
                     Group:
                     <div class="btn-group" title="Filter files by group">
                       <button
+                        style="max-width: 120px; overflow: hidden;"
                         type="button"
                         class="btn dropdown-toggle btn-outline-secondary"
                         data-bs-toggle="dropdown"
