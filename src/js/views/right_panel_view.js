@@ -905,7 +905,7 @@
                 return;     // Ignore keyups except 'Enter'
             }
 
-            // get the current entered value 
+            // get the current entered value
             var value = Math.round(parseFloat(event.target.value));
             if (isNaN(value)) {
                 return;
@@ -1281,6 +1281,7 @@
             "click .flipping_horizontal": "flipping_horizontal",
             "input .rotation-slider": "rotation_input",
             "change .rotation-slider": "rotation_change",
+            "click .panel-rotation": "rotate_panel",
         },
 
         rotation_input: function(event) {
@@ -1306,7 +1307,7 @@
 
         flipping_vertical: function(event) {
             const $button = $(event.currentTarget);
-            $button.toggleClass('active'); 
+            $button.toggleClass('active');
 
             const isVerticalFlipped = $button.hasClass('active');
 
@@ -1314,10 +1315,10 @@
                 m.save('vertical_flip', isVerticalFlipped);
             });
         },
-    
+
         flipping_horizontal: function(event) {
             const $button = $(event.currentTarget);
-            $button.toggleClass('active'); 
+            $button.toggleClass('active');
 
             const ishorizontalFlipped = $button.hasClass('active');
 
@@ -1329,7 +1330,7 @@
         loadButtonState: function() {
             const $verticalButton = this.$(".flipping_vertical");
             const $horizontalButton = this.$(".flipping_horizontal");
-        
+
             // Ensure the buttons reflect the model state
             this.models.forEach(function(m) {
                 // Set vertical button state
@@ -1338,7 +1339,7 @@
                 } else {
                     $verticalButton.removeClass('active');
                 }
-        
+
                 // Set horizontal button state
                 if (m.get('horizontal_flip')) {
                     $horizontalButton.addClass('active');
@@ -1347,7 +1348,18 @@
                 }
             });
         },
-        
+
+        rotate_panel: function(event){
+            event.preventDefault()
+            this.models.forEach(function(m){
+                var rotation = m.setPanelRotation()
+                console.log(rotation)
+                $(".vp_img").css({'transform':'rotate(' + rotation + 'deg)'});
+                $(".rotation_value").text(rotation);
+                $(".rotation-slider").val(rotation);
+            });
+        },
+
         z_projection:function(e) {
             // 'flat' means that some panels have z_projection on, some off
             var flat = $(e.currentTarget).hasClass('ch-btn-flat');

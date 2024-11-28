@@ -331,6 +331,21 @@
             this.save('shapes', rois);
         },
 
+        setPanelRotation(){
+            var rotation = this.get('rotation') || "0"
+            var panelRotationAngle =  (parseInt(rotation) + 90) % 360
+
+            var viewport = this.getViewportAsRect()
+            var width = this.get('width')
+            var height = this.get('height')
+            var xPercent = this.get('orig_width') / viewport.height;
+            var yPercent = this.get('orig_height') / viewport.width;
+            var zoom = Math.min(xPercent, yPercent) * 100;
+            this.save({'rotation': panelRotationAngle, 'height': width, 'width': height, 'zoom': zoom});
+
+            return panelRotationAngle
+        },
+
         // Adds list of shapes to panel (same logic as for labels below)
         add_shapes: function(shapes) {
             var old = this.get('shapes'),
@@ -778,7 +793,7 @@
             if (isNaN(rotation)) {
                 rotation = 0;
             };
-            // if we have rotated the panel clockwise within the viewport 
+            // if we have rotated the panel clockwise within the viewport
             // it's as if the viewport rectangle has rotated anti-clockwise
             rotation = 360 - rotation;
 
@@ -809,7 +824,7 @@
 
             // Use offset from image centre to calculate ROI position
             var cX = orig_width/2 - dx,
-                cY = orig_height    /2 - dy,
+                cY = orig_height/2 - dy,
                 roiX = cX - (roiW / 2),
                 roiY = cY - (roiH / 2);
 
@@ -957,7 +972,7 @@
             // and panel re-shaping (stretch/squash).
 
             var zooming = Math.abs(zoom - this.get('zoom')) > 1;
-            var panning = (x !== undefined && y!== undefined);
+            var panning = (x !== undefined && y !== undefined);
 
             // Need to know what the original offsets are...
             // We know that the image is 1.5 * bigger than viewport
