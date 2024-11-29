@@ -14,7 +14,6 @@ var CalibBarFormView = Backbone.View.extend({
 
         var self = this;
         this.models.forEach(function(m) {
-            console.log(m);
             self.listenTo(m, 'change:calib', self.render);
         });
     },
@@ -38,13 +37,17 @@ var CalibBarFormView = Backbone.View.extend({
     update_calib: function(event) {
         var $form = $('.calib_form');
         var position = $('.label-position i:first', $form).attr('data-position'),
-            thickness = parseInt($('.calib-thickness', $form).val());
+            thickness = parseInt($('.calib-thickness', $form).val()),
+            font_size = $('.calib_font_size span:first', $form).text().trim(),
+            color = $('.calib-color span:first', $form).attr('data-color');
 
         this.models.forEach(function(m) {
             var lutBgPos = m.get('lutBgPos');
             var cb = { show: true, lutBgPos: lutBgPos };
             if (position != '-') cb.position = position;
             if (thickness != '-') cb.thickness = thickness;
+            if (font_size != '-') cb.font_size = font_size;
+            if (color != '-') cb.color = color;
             m.save_calib(cb);
         });
         return false;
@@ -62,9 +65,13 @@ var CalibBarFormView = Backbone.View.extend({
                 if (!cb_json.length) {
                     cb_json.position = cb.position;
                     cb_json.thickness = cb.thickness;
+                    cb_json.font_size = cb.font_size;
+                    cb_json.color = cb.color;
                 } else {
                     if (cb_json.position != cb.position) cb_json.position = '-';
                     if (cb_json.thickness != cb.thickness) cb_json.thickness = '-';
+                    if (cb_json.font_size != cb.font_size) cb_json.font_size = '-';
+                    if (cb_json.color != cb.color) cb_json.color = '-';
                 }
             }
             if (!cb || !cb.show) hidden = true;
@@ -76,6 +83,8 @@ var CalibBarFormView = Backbone.View.extend({
 
         cb_json.position = cb_json.position || 'top';
         cb_json.thickness = cb_json.thickness || 45;
+        cb_json.font_size = cb_json.font_size || 12;
+        cb_json.color = cb_json.color || '000';
         var html = this.template(cb_json);
         this.$el.html(html);
         return this;

@@ -337,6 +337,8 @@
                         position: cb.position,
                         show: cb.show,
                         thickness: cb.thickness,
+                        font_size: cb.font_size,
+                        color: cb.color,
                         lutBgPos: lutBgPos,
                 };
                 var cb_html = this.calib_template(cb_json);

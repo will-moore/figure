@@ -3,19 +3,19 @@
         <div class="lutBg calib_bg"  style="
                 height: <%= thickness %>px;
                 background-position: <%= lutBgPos %>;
-                border:1px solid #000">
+                border:1px solid #<%= color %>">
         </div>
         <div class="calibration_ticks calibration_ticks_<%= position %>">
             <div class="ticks ticks_<%= position %>">
                 <div class="ticks">
                     <div class="tick">
-                        <div class="dash" style="background-color: #000; height: 10px">
-                            <span class="label" style="">0</span>
+                        <div class="dash" style="background-color: #<%= color %>; height: 10px">
+                            <span class="label" style="font-size: <%= font_size %>px;color: #<%= color %>;">0</span>
                         </div>
                     </div>
                     <div class="tick">
-                        <div class="dash" style="background-color: #000; height: 10px">
-                            <span class="label" style="">125</span>
+                        <div class="dash" style="background-color: #<%= color %>; height: 10px">
+                            <span class="label" style="font-size: <%= font_size %>px; color: #<%= color %>;">125</span>
                         </div>
                     </div>
                 </div>
