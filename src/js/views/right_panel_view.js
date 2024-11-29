@@ -429,8 +429,8 @@
                 'lineWidth': width || 2,
                 'roiCount': roiCount/2,
                 'canPaste': canPaste,
-                'borderWidth': border ? border.strokeWidth : 2,
-                'borderColor': border ? border.color.replace('#', '') : 'FFFFFF',
+                'borderWidth': border ? border.strokeWidth : 5,
+                'borderColor': border ? border.color.replace('#', '') : 'FFFF00',
                 'showState': show_btn_state,
             }
             $('#edit_rois_form').html(this.roisTemplate(json));
