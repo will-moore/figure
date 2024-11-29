@@ -324,13 +324,18 @@
                 this.$calib.remove();
             }
             var cb = this.model.get('calib');
-            var color = "";
+            var start = 0,
+                end = 125,
+                color = "";
             for (const chann of this.model.get('channels')) {
                 if(chann.active) {
                     color = chann.color
+                    start = chann.window?.start;
+                    end = chann.window?.end;
                     break;
                 }
             }
+            console.log(start, end);
             var lutBgPos = FigureLutPicker.getLutBackgroundPosition(color);
             if (cb && cb.show) {
                 var cb_json = {
@@ -339,6 +344,10 @@
                         thickness: cb.thickness,
                         font_size: cb.font_size,
                         color: cb.color,
+                        ticks_parameter: cb.ticks_parameter,
+                        length: cb.length,
+                        start: start,
+                        end: end,
                         lutBgPos: lutBgPos,
                 };
                 var cb_html = this.calib_template(cb_json);

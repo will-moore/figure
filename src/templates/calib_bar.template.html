@@ -7,15 +7,35 @@
         </div>
         <div class="calibration_ticks calibration_ticks_<%= position %>">
             <div class="ticks ticks_<%= position %>">
-                <div class="ticks">
-                    <div class="tick">
-                        <div class="dash" style="background-color: #<%= color %>; height: 10px">
-                            <span class="label" style="font-size: <%= font_size %>px;color: #<%= color %>;">0</span>
+                <div class="ticks ticks_<%= position %>">
+                    <div class="ticks">
+                        <%
+                            var interval = Math.floor((end - start) / (ticks_parameter - 1));
+                        %>
+
+                        <!-- First tick (start value) -->
+                        <div class="tick">
+                            <div class="dash" style="background-color: #<%= color %>; height: <%= length %>px">
+                                <span class="label" style="color: #<%= color %>; font-size: <%= font_size %>px;"><%= start %></span>
+                            </div>
                         </div>
-                    </div>
-                    <div class="tick">
-                        <div class="dash" style="background-color: #<%= color %>; height: 10px">
-                            <span class="label" style="font-size: <%= font_size %>px; color: #<%= color %>;">125</span>
+
+                        <!-- Intermediate ticks -->
+                        <% for (let i = 1; i < ticks_parameter - 1; i++) { %>
+                            <div class="tick">
+                                <div class="dash" style="background-color: #<%= color %>; height: <%= length %>px">
+                                    <span class="label" style="color: #<%= color %>; font-size: <%= font_size %>px;">
+                                        <%= start + i * interval %> <!-- Dynamically calculated intermediate value -->
+                                    </span>
+                                </div>
+                            </div>
+                        <% } %>
+
+                        <!-- Last tick (end value) -->
+                        <div class="tick">
+                            <div class="dash" style="background-color: #<%= color %>; height: <%= length %>px">
+                                <span class="label" style="color: #<%= color %>; font-size: <%= font_size %>px;"><%= end %></span>
+                            </div>
                         </div>
                     </div>
                 </div>
