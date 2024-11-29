@@ -1379,3 +1379,10 @@
         left: 0%;
         margin-top: 10px;
     }
+
+    .calib_bg {
+        background-image: url('/images/luts_10.png');
+        margin-right: 0px;
+        margin-left: 0px;
+        display: flex;
+    }
