@@ -326,17 +326,16 @@
             var cb = this.model.get('calib');
             var start = 0,
                 end = 125,
-                color = "";
+                channel_color = "";
             for (const chann of this.model.get('channels')) {
                 if(chann.active) {
-                    color = chann.color
+                    channel_color = chann.color;
                     start = chann.window?.start;
                     end = chann.window?.end;
                     break;
                 }
             }
-            console.log(start, end);
-            var lutBgPos = FigureLutPicker.getLutBackgroundPosition(color);
+            var lutBgPos = FigureLutPicker.getLutBackgroundPosition(channel_color);
             if (cb && cb.show) {
                 var cb_json = {
                         position: cb.position,
@@ -348,6 +347,7 @@
                         length: cb.length,
                         start: start,
                         end: end,
+                        channel_color: channel_color,
                         lutBgPos: lutBgPos,
                 };
                 var cb_html = this.calib_template(cb_json);
