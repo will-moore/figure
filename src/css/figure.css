@@ -644,6 +644,18 @@
         transform-origin: left;
         pointer-events: all;
     }
+
+    .panel-rotation {
+        display: none;
+    }
+
+    .rotation-controls-shown .panel-rotation {
+        margin-top: 160px;
+        padding: 2px;
+        display: block;
+        pointer-events: all;
+    }
+
     .show-rotation {
         padding: 2px;
         min-width: 45px;
@@ -870,7 +882,6 @@
         background-color: #FAFAFA;
         border: 1px solid #CCCCCC;
         border-radius: 3px;
-        height: 200px;
         padding: 2px;
         position: absolute;
         z-index: 100;
