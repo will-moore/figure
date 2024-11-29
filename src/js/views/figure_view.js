@@ -617,9 +617,12 @@
             var self = this;
             this.model.clearSelected();
 
+            // deep copy to make sure we don't accidentally modify clipboard data
+            let new_panel_json = JSON.parse(JSON.stringify(clipboard_panels));
+
             // first work out the bounding box of clipboard panels
             var top, left, bottom, right;
-            _.each(clipboard_panels, function(m, i) {
+            _.each(new_panel_json, function(m, i) {
                 var t = m.y,
                     l = m.x,
                     b = t + m.height,
@@ -647,13 +650,21 @@
 
             // apply offset to clipboard data & paste
             // NB: we are modifying the list that is in the clipboard
-            clipboard_panels = updateRoiIds(clipboard_panels);
+            new_panel_json = updateRoiIds(new_panel_json);
 
-            _.each(clipboard_panels, function(m) {
+            // Create new panels with offsets
+            _.each(new_panel_json, function(m) {
                 m.x = m.x + offset_x;
                 m.y = m.y + offset_y;
                 self.model.panels.create(m);
             });
+
+            // We ALSO update the clipboard data with offsets so that we can paste again
+            _.each(clipboard_panels, function(m) {
+                m.x = m.x + offset_x;
+                m.y = m.y + offset_y;
+            });
+
             // only pasted panels are selected - simply trigger...
             this.model.notifySelectionChange();
         },
