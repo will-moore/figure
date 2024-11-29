@@ -139,8 +139,8 @@
                 var strokeWidth = parseFloat($('button.inset-width span:first', this.$el).attr('data-line-width'));
                 var x = vp.x + ((vp.width - rectSize) / 2);
                 var y = vp.y + ((vp.height - rectSize) / 2);
-                var txtX = vp.x + 7,
-                    txtY = vp.y + 11;
+                var txtX = vp.x + ((vp.width - rectSize) / 2) + 12,
+                    txtY = vp.y + ((vp.height - rectSize) / 2) + strokeWidth + 12;
 
                 let rect = {
                     type: "Rectangle",
@@ -166,7 +166,7 @@
                     textPosition: "topleft",
                     text: String.fromCharCode(lastInsetTextIndex),
                     textAnchor: "start",
-                    parentShapeCoords: {x: x,y: y,width: rectSize, height: rectSize},
+                    parentShapeCoords: {x: x, y: y, width: rectSize, height: rectSize},
                 }
                 panel.add_shapes([rect, text]);
                 panel.setLastInsetTextIndex(lastInsetTextIndex)
