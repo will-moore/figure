@@ -60,6 +60,7 @@ try:
     from reportlab.lib.colors import Color
     from reportlab.platypus import Paragraph
     from reportlab.lib.enums import TA_LEFT, TA_CENTER, TA_RIGHT
+    from reportlab.lib.utils import ImageReader
     reportlab_installed = True
 except ImportError:
     reportlab_installed = False
@@ -1525,6 +1526,216 @@ class FigureExport(object):
                 font_size, (red, green, blue),
                 align="center")
 
+    def get_color_ramp(self, channel):
+        """
+        Return the 256 1D array of the LUT from the server or
+        the color gradient.
+
+        LUT files on the server are read with the script service, and
+        file content is parsed with a custom implementation.
+        """
+        color = channel["color"]
+
+        # Convert the hexadecimal string to RGB
+        color_ramp = None
+        if len(color) == 6:
+            try:
+                r = int(color[0:2], 16)
+                g = int(color[2:4], 16)
+                b = int(color[4:6], 16)
+                color_ramp = (numpy.linspace(0, 1, 256).reshape(-1, 1)
+                              * numpy.array([r, g, b], dtype=numpy.uint8).T)
+                color_ramp = color_ramp.astype(numpy.uint8)
+            except ValueError:
+                pass
+
+        else:
+            scriptService = self.conn.getScriptService()
+            luts = scriptService.getScriptsByMimetype("text/x-lut")
+            for lut in luts:
+                if lut.name.val != color:
+                    continue
+
+                orig_file = self.conn.getObject(
+                    "OriginalFile", lut.getId()._val)
+                lut_data = bytearray()
+                # Collect the LUT data in byte form
+                for chunk in orig_file.getFileInChunks():
+                    lut_data.extend(chunk)
+
+                if len(lut_data) in [768, 800]:
+                    lut_arr = numpy.array(lut_data, dtype="uint8")[-768:]
+                    color_ramp = lut_arr.reshape(3, 256).T
+                else:
+                    lut_data = lut_data.decode()
+                    r, g, b = [], [], []
+
+                    lines = lut_data.split("\n")
+                    sep = None
+                    if "\t" in lines[0]:
+                        sep = "\t"
+                    for line in lines:
+                        val = line.split(sep)
+                        if len(val) < 3 or not val[-1].isnumeric():
+                            continue
+                        r.append(int(val[-3]))
+                        g.append(int(val[-2]))
+                        b.append(int(val[-1]))
+                    color_ramp = numpy.array([r, g, b], dtype=numpy.uint8).T
+                break
+
+        if channel.get("reverseIntensity", False):
+            color_ramp = color_ramp[::-1]
+
+        if color_ramp is None:
+            return numpy.zeros((1, 256, 3), dtype=numpy.uint8)
+        else:
+            return color_ramp[numpy.newaxis]
+
+    def draw_colorbar(self, panel, page):
+        """
+        Add the colorbar to the page.
+        Here we calculate the position of colorbar but delegate
+        to self.draw_scalebar_line() and self.draw_text() to actually place
+        the colorbar, ticks and labels on PDF/TIFF
+        """
+
+        calib = panel.get("calib", {})
+        if not calib.get("show", False):
+            return
+
+        channel = None
+        for c in panel["channels"]:
+            if c["active"]:
+                channel = c
+                break
+        if not channel:
+            return
+
+        color_ramp = self.get_color_ramp(channel)
+
+        offset = 10  # calib["offset"]
+        cbar = {
+            'zoom': '100',
+            'dx': 0,
+            'dy': 0,
+            'orig_height': panel['orig_height'],
+            'orig_width': panel['orig_width'],
+        }
+        calib["num_ticks"] = 6
+        calib["tick_len"] = 3
+        start, end = channel["window"]["start"], channel["window"]["end"]
+        labels = numpy.unique(numpy.linspace(start, end,
+                                             num=calib["num_ticks"],
+                                             dtype=int))
+        if calib["position"] in ["leftvert", "rightvert"]:
+            color_ramp = color_ramp.transpose((1, 0, 2))[::-1]
+            cbar['width'] = calib['thickness']
+            cbar['height'] = panel['height']
+            cbar['y'] = panel['y']
+            cbar['x'] = panel['x'] - (offset + calib['thickness'])
+            labels_x = [cbar['x']]
+            labels_y = cbar['y'] + panel['height'] * (1 - labels / end)
+            align = "right"
+            if calib["position"] == "rightvert":
+                cbar['x'] = panel['x'] + panel['width'] + offset
+                labels_x = [cbar['x'] + cbar['width']]
+                align = "left"
+            labels_x *= labels.size  # Duplicate x postions
+        elif calib["position"] in ["top", "bottom"]:
+            cbar['width'] = panel['width']
+            cbar['height'] = calib['thickness']
+            cbar['x'] = panel['x']
+            cbar['y'] = panel['y'] - (offset + calib['thickness'])
+            labels_x = cbar['x'] + panel['width'] * labels / end
+            labels_y = [cbar['y']]
+            align = "center"
+            if calib["position"] == "bottom":
+                cbar['y'] = panel['y'] + panel['height'] + offset
+                labels_y = [cbar['y'] + cbar['height']]
+            labels_y *= labels.size  # Duplicate y postions
+
+        pil_img = Image.fromarray(color_ramp)
+        img_name = channel["color"] + ".png"
+
+        # for PDF export, we might have a target dpi
+        dpi = panel.get('min_export_dpi', None)
+
+        # Paste the panel to PDF or TIFF image
+        self.paste_image(pil_img, img_name, cbar, page, dpi,
+                         is_colorbar=True)
+
+        rgb = (0, 0, 0)
+        fontsize = 10
+        tick_width = 1
+        tick_len = 3
+        contour_width = tick_width
+        for label, pos_x, pos_y in zip(labels, labels_x, labels_y):
+
+            # Cosmetical correction, for first and last ticks to be
+            # aligned with the image
+            shift = 0
+            if label == labels[0]:
+                shift = -tick_width / 2
+            elif label == labels[-1]:
+                shift = tick_width / 2
+
+            if calib["position"] == "leftvert":
+                x2 = pos_x - tick_len
+                pos_y += shift
+                self.draw_scalebar_line(pos_x, pos_y, x2, pos_y,
+                                        tick_width, rgb)
+                self.draw_text(str(label), pos_x - 4,
+                               pos_y - fontsize / 2 + 1,
+                               fontsize, rgb, align=align)
+            elif calib["position"] == "rightvert":
+                x2 = pos_x + tick_len
+                pos_y += shift
+                self.draw_scalebar_line(pos_x, pos_y, x2, pos_y,
+                                        tick_width, rgb)
+                self.draw_text(str(label), pos_x + 4,
+                               pos_y - fontsize / 2 + 1,
+                               fontsize, rgb, align=align)
+            elif calib["position"] == "top":
+                y2 = pos_y - tick_len
+                pos_x -= shift  # Order of the label is reversed
+                self.draw_scalebar_line(pos_x, pos_y, pos_x, y2,
+                                        tick_width, rgb)
+                self.draw_text(str(label), pos_x, pos_y - fontsize - 2,
+                               fontsize, rgb, align=align)
+            elif calib["position"] == "bottom":
+                y2 = pos_y + tick_len
+                pos_x -= shift  # Order of the label is reversed
+                self.draw_scalebar_line(pos_x, pos_y, pos_x, y2,
+                                        tick_width, rgb)
+                self.draw_text(str(label), pos_x, pos_y + 4,
+                               fontsize, rgb, align=align)
+
+        if calib["position"] == "top":
+            self.draw_scalebar_line(cbar['x'],
+                                    cbar['y'],
+                                    cbar['x'] + cbar['width'],
+                                    cbar['y'],
+                                    contour_width, rgb)
+        elif calib["position"] == "bottom":
+            self.draw_scalebar_line(cbar['x'],
+                                    cbar['y'] + cbar['height'],
+                                    cbar['x'] + cbar['width'],
+                                    cbar['y'] + cbar['height'],
+                                    contour_width, rgb)
+        elif calib["position"] == "leftvert":
+            self.draw_scalebar_line(cbar['x'],
+                                    cbar['y'],
+                                    cbar['x'],
+                                    cbar['y'] + cbar['height'],
+                                    contour_width, rgb)
+        elif calib["position"] == "rightvert":
+            self.draw_scalebar_line(cbar['x'] + cbar['width'],
+                                    cbar['y'],
+                                    cbar['x'] + cbar['width'],
+                                    cbar['y'] + cbar['height'],
+                                    contour_width, rgb)
+
     def is_big_image(self, image):
         """Return True if this is a 'big' tiled image."""
         max_w, max_h = self.conn.getMaxPlaneSize()
@@ -1784,12 +1995,6 @@ class FigureExport(object):
         """
         image_id = panel['imageId']
         channels = panel['channels']
-        x = panel['x']
-        y = panel['y']
-
-        # Handle page offsets
-        x = x - page['x']
-        y = y - page['y']
 
         image = self.conn.getObject("Image", image_id)
         if image is None:
@@ -1998,6 +2203,7 @@ class FigureExport(object):
             # Finally, add scale bar and labels to the page
             self.draw_scalebar(panel, pil_img.size[0], page)
             self.draw_labels(panel, page)
+            self.draw_colorbar(panel, page)
 
     def get_figure_file_ext(self):
         return "pdf"
@@ -2114,7 +2320,8 @@ class FigureExport(object):
         c.setStrokeColorRGB(red, green, blue, 1)
         c.line(x, y, x2, y2,)
 
-    def paste_image(self, pil_img, img_name, panel, page, dpi):
+    def paste_image(self, pil_img, img_name, panel, page, dpi,
+                    is_colorbar=False):
         """ Adds the PIL image to the PDF figure. Overwritten for TIFFs """
 
         x = panel['x']
@@ -2146,8 +2353,15 @@ class FigureExport(object):
         if self.zip_folder_name is not None:
             img_name = os.path.join(self.zip_folder_name, FINAL_DIR, img_name)
 
-        # Save Image to file, then bring into PDF
-        pil_img.save(img_name)
+        if is_colorbar:
+            # Save the image to a BytesIO stream
+            buffer = BytesIO()
+            pil_img.save(buffer, format="PNG")
+            buffer.seek(0)
+            img_name = ImageReader(buffer)  # drawImage accepts ImageReader
+        else:
+            # Save Image to file, then bring into PDF
+            pil_img.save(img_name)
         # Since coordinate system is 'bottom-up', convert from 'top-down'
         y = self.page_height - height - y
         # set fill color alpha to fully opaque, since this impacts drawImage
@@ -2213,7 +2427,8 @@ class TiffExport(FigureExport):
         """ Don't need to do anything for TIFF. Image is already colored."""
         pass
 
-    def paste_image(self, pil_img, img_name, panel, page, dpi=None):
+    def paste_image(self, pil_img, img_name, panel, page,
+                    dpi=None, is_colorbar=False):
         """ Add the PIL image to the current figure page """
 
         x = panel['x']
@@ -2235,8 +2450,9 @@ class TiffExport(FigureExport):
         width = int(round(width))
         height = int(round(height))
 
+        export_img = self.export_images and not is_colorbar
         # Save image BEFORE resampling
-        if self.export_images:
+        if export_img:
             rs_name = os.path.join(self.zip_folder_name, RESAMPLED_DIR,
                                    img_name)
             pil_img.save(rs_name)
@@ -2244,7 +2460,7 @@ class TiffExport(FigureExport):
         # Resize to our target size to match DPI of figure
         pil_img = pil_img.resize((width, height), Image.BICUBIC)
 
-        if self.export_images:
+        if export_img:
             img_name = os.path.join(self.zip_folder_name, FINAL_DIR, img_name)
             pil_img.save(img_name)
 
