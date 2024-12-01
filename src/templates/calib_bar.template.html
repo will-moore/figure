@@ -14,7 +14,7 @@
                     <div class="tick">
                         <div class="dash" style="background-color: #<%= color %>; height: <%= length %>px"></div>
                         <span class="label" style="color: #<%= color %>; font-size: <%= font_size %>px;"><%= start %></span>
-                    </div>                    
+                    </div>
 
                     <!-- Intermediate ticks -->
                     <% for (let i = 1; i < ticks_parameter - 1; i++) { %>
@@ -31,19 +31,19 @@
                         <div class="dash" style="background-color: #<%= color %>; height: <%= length %>px"></div>
                         <span class="label" style="color: #<%= color %>; font-size: <%= font_size %>px;"><%= end %></span>
                     </div>
-                     
+
                 </div>
             </div>
             <div class="lutBg calib_bg"
                  style="height: <%= thickness %>px;
-                        background-image: <%= lutBgPos === '0px 100px' ? 'linear-gradient(to left, #' + channel_color + ', black)' : 'url(/images/luts_10.png)' %>;
+                        background-image: <%= lutBgPos === '0px 100px' ? 'linear-gradient(to left, #' + channel_color + ', black)' : 'url(' + lut_url + ')' %>;
                         <%= lutBgPos !== '0px 100px' ? 'background-position: ' + lutBgPos : '' %>;">
             </div>
         <% } else { %>
             <!-- Default order for non-'top' positions -->
             <div class="lutBg calib_bg"
                  style="height: <%= thickness %>px;
-                        background-image: <%= lutBgPos === '0px 100px' ? 'linear-gradient(to left, #' + channel_color + ', black)' : 'url(/images/luts_10.png)' %>;
+                        background-image: <%= lutBgPos === '0px 100px' ? 'linear-gradient(to left, #' + channel_color + ', black)' : 'url(' + lut_url + ')' %>;
                         <%= lutBgPos !== '0px 100px' ? 'background-position: ' + lutBgPos : '' %>;">
             </div>
             <div class="calibration_ticks calibration_ticks_<%= position %>">

@@ -393,6 +393,7 @@
                         end: end,
                         channel_color: channel_color,
                         lutBgPos: lutBgPos,
+                        lut_url: FigureLutPicker.lutsPngUrl
                 };
                 var cb_html = this.calib_template(cb_json);
                 this.$el.append(cb_html);
