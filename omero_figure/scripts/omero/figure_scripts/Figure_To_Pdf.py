@@ -36,8 +36,8 @@ from omero.gateway import BlitzGateway
 from omero.rtypes import rstring, robject
 from omero.model.enums import UnitsLength
 
-
 from io import BytesIO
+
 try:
     from PIL import Image, ImageDraw, ImageFont
 except ImportError:
@@ -48,6 +48,7 @@ logger = logging.getLogger('figure_to_pdf')
 
 try:
     import markdown
+
     markdown_imported = True
 except ImportError:
     markdown_imported = False
@@ -110,7 +111,7 @@ def scale_to_export_dpi(pixels):
     Original figure coordinates assume 72 dpi figure, but we want to
     export at 300 dpi, so everything needs scaling accordingly
     """
-    return pixels * 300//72
+    return pixels * 300 // 72
 
 
 def compress(target, base):
@@ -217,20 +218,56 @@ class ShapeExport(object):
             point[0] * tf['A10'] + point[1] * tf['A11'] + tf['A12'],
         ] if tf else point
 
+    @staticmethod
+    def apply_rotation(point, centre, rotation):
+        cx = centre[0]
+        cy = centre[1]
+        x = point[0]
+        y = point[1]
+
+        dx = cx - x
+        dy = cy - y
+        # distance of point from centre of rotation
+        h = sqrt(dx * dx + dy * dy)
+        # and the angle
+        angle1 = atan2(dx, dy)
+
+        # Add the rotation to the angle and calculate new
+        # opposite and adjacent lengths from centre of rotation
+        angle2 = angle1 - radians(rotation)
+        newo = sin(angle2) * h
+        newa = cos(angle2) * h
+        # to give correct x and y within cropped panel
+        x = cx - newo
+        y = cy - newa
+        return x, y
+
     def draw_rectangle(self, shape):
         # to support rotation/transforms, convert rectangle to a simple
         # four point polygon and draw that instead
         s = deepcopy(shape)
         t = shape.get('transform')
+
         points = [
             (shape['x'], shape['y']),
             (shape['x'] + shape['width'], shape['y']),
             (shape['x'] + shape['width'], shape['y'] + shape['height']),
             (shape['x'], shape['y'] + shape['height']),
         ]
+
+        if shape.get('rotation', 0) != 0:
+            rotation = shape.get('rotation')
+            # rotate around centre of rectangle
+            cx = shape['x'] + shape['width'] / 2
+            cy = shape['y'] + shape['height'] / 2
+            points = [
+                self.apply_rotation(point, [cx, cy], rotation)
+                for point in points
+            ]
+
         s['points'] = ' '.join(','.join(
             map(str, self.apply_transform(t, point))) for point in points)
-        self.draw_polygon(s)
+        self.draw_polygon(s, True)
 
     def draw_point(self, shape):
         s = deepcopy(shape)
@@ -239,7 +276,6 @@ class ShapeExport(object):
 
 
 class ShapeToPdfExport(ShapeExport):
-
     point_radius = 5
 
     def __init__(self, canvas, panel, page, crop, page_height):
@@ -263,11 +299,22 @@ class ShapeToPdfExport(ShapeExport):
         Also includes 'inPanel' key - True if point within
         the cropped panel region
         """
+
+        # Apply flip transformations to the shape coordinates
+        h_flip = self.panel.get('horizontal_flip', False)
+        v_flip = self.panel.get('vertical_flip', False)
+        if h_flip:
+            shape_x = self.crop['width'] - shape_x + 2*self.crop['x']
+        if v_flip:
+            shape_y = self.crop['height'] - shape_y + 2*self.crop['y']
+
         rotation = self.panel['rotation']
+        if v_flip != h_flip:
+            rotation = -rotation
         if rotation != 0:
             # img coords: centre of rotation
-            cx = self.crop['x'] + (self.crop['width']/2)
-            cy = self.crop['y'] + (self.crop['height']/2)
+            cx = self.crop['x'] + (self.crop['width'] / 2)
+            cy = self.crop['y'] + (self.crop['height'] / 2)
             dx = cx - shape_x
             dy = cy - shape_y
             # distance of point from centre of rotation
@@ -335,9 +382,9 @@ class ShapeToPdfExport(ShapeExport):
             return
 
         rgb = self.get_rgb(shape['strokeColor'])
-        r = float(rgb[0])/255
-        g = float(rgb[1])/255
-        b = float(rgb[2])/255
+        r = float(rgb[0]) / 255
+        g = float(rgb[1]) / 255
+        b = float(rgb[2]) / 255
         self.canvas.setStrokeColorRGB(r, g, b)
         stroke_width = float(shape.get('strokeWidth', 1))
         self.canvas.setLineWidth(stroke_width)
@@ -362,9 +409,9 @@ class ShapeToPdfExport(ShapeExport):
             return
 
         rgb = self.get_rgb(shape['strokeColor'])
-        r = float(rgb[0])/255
-        g = float(rgb[1])/255
-        b = float(rgb[2])/255
+        r = float(rgb[0]) / 255
+        g = float(rgb[1]) / 255
+        b = float(rgb[2]) / 255
         self.canvas.setStrokeColorRGB(r, g, b)
         self.canvas.setFillColorRGB(r, g, b)
 
@@ -431,6 +478,8 @@ class ShapeToPdfExport(ShapeExport):
 
         if 'fillColor' in shape:
             r, g, b, a = self.get_rgba(shape['fillColor'])
+            if 'fillOpacity' in shape:
+                a = float(shape['fillOpacity'])
             self.canvas.setFillColorRGB(r, g, b, alpha=a)
             fill = 1 if closed else 0
         else:
@@ -466,12 +515,28 @@ class ShapeToPdfExport(ShapeExport):
         cy = self.page_height - c['y']
         rx = shape['radiusX'] * self.scale
         ry = shape['radiusY'] * self.scale
-        rotation = (shape.get('rotation', 0) + self.panel['rotation']) * -1
+
+        rotation = shape.get('rotation', 0)
+        h_flip = self.panel.get('horizontal_flip', False)
+        v_flip = self.panel.get('vertical_flip', False)
+
+        if v_flip:
+            rotation = - rotation
+        if h_flip:
+            rotation = 180 - rotation
+
+        if v_flip != h_flip:
+            rotation = (rotation - self.panel['rotation']) * -1
+        else:
+            rotation = (rotation + self.panel['rotation']) * -1
+
         r, g, b, a = self.get_rgba(shape['strokeColor'])
         self.canvas.setStrokeColorRGB(r, g, b, alpha=a)
 
         if 'fillColor' in shape:
             r, g, b, a = self.get_rgba(shape['fillColor'])
+            if 'fillOpacity' in shape:
+                a = float(shape['fillOpacity'])
             self.canvas.setFillColorRGB(r, g, b, alpha=a)
             fill = 1
         else:
@@ -520,7 +585,6 @@ class ShapeToPilExport(ShapeExport):
         self.crop = crop
         self.scale = pil_img.size[0] / crop['width']
         self.draw = ImageDraw.Draw(pil_img)
-
         super(ShapeToPilExport, self).__init__(panel)
 
     def get_panel_coords(self, shape_x, shape_y):
@@ -530,11 +594,22 @@ class ShapeToPilExport(ShapeExport):
         x, y point around the centre of the cropped region
         and scaling appropriately
         """
+        h_flip = self.panel.get('horizontal_flip', False)
+        v_flip = self.panel.get('vertical_flip', False)
+
+        # Apply flip transformations to the shape coordinates
+        if h_flip:
+            shape_x = self.crop['width'] - shape_x + 2*self.crop['x']
+        if v_flip:
+            shape_y = self.crop['height'] - shape_y + 2*self.crop['y']
+
         rotation = self.panel['rotation']
+        if v_flip != h_flip:
+            rotation = -rotation
         if rotation != 0:
             # img coords: centre of rotation
-            cx = self.crop['x'] + (self.crop['width']/2)
-            cy = self.crop['y'] + (self.crop['height']/2)
+            cx = self.crop['x'] + (self.crop['width'] / 2)
+            cy = self.crop['y'] + (self.crop['height'] / 2)
             dx = cx - shape_x
             dy = cy - shape_y
             # distance of point from centre of rotation
@@ -634,6 +709,15 @@ class ShapeToPilExport(ShapeExport):
             (shape['x'], shape['y'] + shape['height']),
         ]
         p = []
+        if shape.get('rotation', 0) != 0:
+            rotation = shape.get('rotation')
+            # rotate around centre of rectangle
+            cx = shape['x'] + shape['width'] / 2
+            cy = shape['y'] + shape['height'] / 2
+            points = [
+                self.apply_rotation(point, [cx, cy], rotation)
+                for point in points
+            ]
         t = shape.get('transform')
         for point in points:
             transformed = self.apply_transform(t, point)
@@ -647,7 +731,10 @@ class ShapeToPilExport(ShapeExport):
 
         # if fill, draw filled polygon without outline, then add line later
         # with correct stroke width
-        rgba = self.get_rgba_int(shape.get('fillColor', '#00000000'))
+        r, g, b, a = self.get_rgba_int(shape.get('fillColor', '#00000000'))
+        if 'fillOpacity' in shape:
+            a = int(float(shape['fillOpacity'])*255)
+        rgba = (r, g, b, a)
 
         # need to draw on separate image and then paste on to get transparency
         bounds = Bounds(*points).round()
@@ -703,7 +790,10 @@ class ShapeToPilExport(ShapeExport):
 
         # if fill, draw filled polygon without outline, then add line later
         # with correct stroke width
-        rgba = self.get_rgba_int(shape.get('fillColor', '#00000000'))
+        r, g, b, a = self.get_rgba_int(shape.get('fillColor', '#00000000'))
+        if 'fillOpacity' in shape:
+            a = int(float(shape['fillOpacity'])*255)
+        rgba = (r, g, b, a)
 
         # need to draw on separate image and then paste on to get transparency
         bounds = Bounds(*points).round()
@@ -725,7 +815,7 @@ class ShapeToPilExport(ShapeExport):
         temp_draw.line(points, fill=rgba, width=int(round(stroke_width)))
         # Draw ellipse at each corner
         # see https://stackoverflow.com/questions/33187698/
-        r = (stroke_width/2) * 0.9    # seems to look OK with this size
+        r = (stroke_width / 2) * 0.9  # seems to look OK with this size
         if closed:
             corners = points[:]
         else:
@@ -762,7 +852,20 @@ class ShapeToPilExport(ShapeExport):
         cy = ctr['y']
         rx = self.scale * shape['radiusX']
         ry = self.scale * shape['radiusY']
-        rotation = (shape.get('rotation', 0) + self.panel['rotation']) * -1
+
+        rotation = shape.get('rotation', 0)
+        h_flip = self.panel.get('horizontal_flip', False)
+        v_flip = self.panel.get('vertical_flip', False)
+
+        if v_flip:
+            rotation = - rotation
+        if h_flip:
+            rotation = 180 - rotation
+
+        if v_flip != h_flip:
+            rotation = (rotation - self.panel['rotation']) * -1
+        else:
+            rotation = (rotation + self.panel['rotation']) * -1
 
         width = int((rx * 2) + w)
         height = int((ry * 2) + w)
@@ -772,15 +875,20 @@ class ShapeToPilExport(ShapeExport):
         # Draw outer ellipse, then remove inner ellipse with full opacity
         rgba = ShapeToPdfExport.get_rgba_int(shape['strokeColor'])
         ellipse_draw.ellipse((0, 0, width, height), fill=rgba)
-        rgba = self.get_rgba_int(shape.get('fillColor', '#00000000'))
+
+        r, g, b, a = self.get_rgba_int(shape.get('fillColor', '#00000000'))
+        if 'fillOpacity' in shape:
+            a = int(float(shape['fillOpacity'])*255)
+        rgba = (r, g, b, a)
+
         # when rx is ~zero (for a Point, scaled down) don't need inner ellipse
         if (width - w) >= w:
             ellipse_draw.ellipse((w, w, width - w, height - w), fill=rgba)
         temp_ellipse = temp_ellipse.rotate(rotation, resample=Image.BICUBIC,
                                            expand=True)
         # Use ellipse as mask, so transparent part is not pasted
-        paste_x = cx - (temp_ellipse.size[0]/2)
-        paste_y = cy - (temp_ellipse.size[1]/2)
+        paste_x = cx - (temp_ellipse.size[0] / 2)
+        paste_y = cy - (temp_ellipse.size[1] / 2)
         self.pil_img.paste(temp_ellipse, (int(paste_x), int(paste_y)),
                            mask=temp_ellipse)
         self.draw_shape_label(shape, Bounds((cx, cy)))
@@ -848,7 +956,7 @@ class FigureExport(object):
                 if p.get('shapes') and len(p['shapes']) > 0:
                     image_pixels_width = self.get_crop_region(p)['width']
                     page_coords_width = float(p.get('width'))
-                    stroke_width_scale = page_coords_width/image_pixels_width
+                    stroke_width_scale = page_coords_width / image_pixels_width
                     for shape in p['shapes']:
                         stroke_width = float(shape.get('strokeWidth', 1))
                         stroke_width = stroke_width * stroke_width_scale
@@ -1051,7 +1159,7 @@ class FigureExport(object):
 
         for i, c in enumerate(channels):
             if c['active']:
-                c_idxs.append(i+1)
+                c_idxs.append(i + 1)
                 windows.append([c['window']['start'], c['window']['end']])
                 colors.append(c['color'])
                 reverses.append(c.get('reverseIntensity', False))
@@ -1074,8 +1182,8 @@ class FigureExport(object):
 
         # need tile_x, tile_y, tile_w, tile_h
 
-        tile_w = orig_w / (zoom/100)
-        tile_h = orig_h / (zoom/100)
+        tile_w = orig_w / (zoom / 100)
+        tile_h = orig_h / (zoom / 100)
 
         orig_ratio = float(orig_w) / orig_h
         wh = float(frame_w) / frame_h
@@ -1087,8 +1195,8 @@ class FigureExport(object):
             else:
                 tile_w = tile_h * wh
 
-        cropx = ((orig_w - tile_w)/2) - dx
-        cropy = ((orig_h - tile_h)/2) - dy
+        cropx = ((orig_w - tile_w) / 2) - dx
+        cropy = ((orig_h - tile_h) / 2) - dy
 
         return {'x': cropx, 'y': cropy, 'width': tile_w, 'height': tile_h}
 
@@ -1120,8 +1228,8 @@ class FigureExport(object):
         else:  # Format unknown
             return ""
         dec_str = "" if dec_prec == 0 else "." + "0" * dec_prec
-        if text in ["0"+dec_str+" s", "0:00"+dec_str,
-                    "0"+dec_str+" mins", "0:00:00"+dec_str]:
+        if text in ["0" + dec_str + " s", "0:00" + dec_str,
+                    "0" + dec_str + " mins", "0:00:00" + dec_str]:
             is_negative = False
         return ('-' if is_negative else '') + text
 
@@ -1129,6 +1237,45 @@ class FigureExport(object):
         """
         Add any Shapes
         """
+        if 'border' in panel and panel['border'].get('showBorder'):
+            stroke_width = panel['border'].get('strokeWidth')
+            r, g, b, a = ShapeExport.get_rgba(panel['border'].get('color'))
+            canvas = self.figure_canvas
+            canvas.setStrokeColorRGB(r, g, b, alpha=a)
+            canvas.setLineWidth(stroke_width)
+
+            # by default, line is drawn in the middle of the path
+            # we want it to be on the outside of the xywh coords
+            shift_pos = stroke_width / 2
+
+            p = canvas.beginPath()
+            x = panel['x'] - shift_pos
+            y = panel['y'] - shift_pos
+            width = panel['width'] + (shift_pos * 2)
+            height = panel['height'] + (shift_pos * 2)
+
+            # Handle page offsets
+            x = x - page['x']
+            y = y - page['y']
+
+            # rectangle around the panel
+            points = [[x, y],
+                      [x + width, y],
+                      [x + width, y + height],
+                      [x, y + height]]
+
+            # flip the y coordinate
+            for point in points:
+                point[1] = self.page_height - point[1]
+
+            # same logic as draw_polygon()
+            p.moveTo(points[0][0], points[0][1])
+            for point in points[1:]:
+                p.lineTo(point[0], point[1])
+            for point in points[0:2]:
+                p.lineTo(point[0], point[1])
+            canvas.drawPath(p, fill=0, stroke=1)
+
         if "shapes" not in panel:
             return
 
@@ -1197,7 +1344,7 @@ class FigureExport(object):
                             d_t = timestamps[the_t]
                             if offset is not None:
                                 if 1 <= offset <= len(timestamps):
-                                    d_t -= timestamps[offset-1]
+                                    d_t -= timestamps[offset - 1]
 
                         # Set the default precision value (0) if not given
                         precision = 0 if precision is None else precision
@@ -1256,7 +1403,7 @@ class FigureExport(object):
                             z_symbol = "\xB5m"
 
                         if ("z_projection" in panel.keys()
-                           and panel["z_projection"]):
+                                and panel["z_projection"]):
                             z_start, z_end = panel["z_start"], panel["z_end"]
                             if format == "pixel":
                                 label_value = (str(z_start + 1) + "-"
@@ -1310,14 +1457,18 @@ class FigureExport(object):
                     label_value = " ".join(label_value)
 
                 elif prop_nf[0] in ["zoom"]:
-                    label_value = str(panel["zoom"]) + " %"
+                    try:
+                        zoom = round(panel["zoom"])
+                    except Exception:
+                        zoom = panel["zoom"]
+                    label_value = str(zoom) + " %"
                 new_text.append(label_value if label_value else item.group())
                 last_idx = item.end()
 
             new_text.append(label['text'][last_idx:])
             label['text'] = "".join(new_text)
             pos = label['position']
-            label['size'] = int(label['size'])   # make sure 'size' is number
+            label['size'] = int(label['size'])  # make sure 'size' is number
             # If page is black and label is black, make label white
             page_color = self.figure_json.get('page_color', 'ffffff').lower()
             label_color = label['color'].lower()
@@ -1373,14 +1524,14 @@ class FigureExport(object):
                     ly = ly - label['size'] - spacer
                     draw_lab(label, lx, ly, align='right')
             elif key == 'top':
-                lx = x + (width/2)
+                lx = x + (width / 2)
                 ly = y
                 labels.reverse()
                 for label in labels:
                     ly = ly - label['size'] - spacer
                     draw_lab(label, lx, ly, align='center')
             elif key == 'bottom':
-                lx = x + (width/2)
+                lx = x + (width / 2)
                 ly = y + height + spacer
                 for label in labels:
                     label_h = draw_lab(label, lx, ly, align='center')
@@ -1388,29 +1539,29 @@ class FigureExport(object):
             elif key == 'left':
                 lx = x - spacer
                 sizes = [label['size'] for label in labels]
-                total_h = sum(sizes) + spacer * (len(labels)-1)
-                ly = y + (height-total_h)/2
+                total_h = sum(sizes) + spacer * (len(labels) - 1)
+                ly = y + (height - total_h) / 2
                 for label in labels:
                     label_h = draw_lab(label, lx, ly, align='right')
                     ly += label_h + spacer
             elif key == 'right':
                 lx = x + width + spacer
                 sizes = [label['size'] for label in labels]
-                total_h = sum(sizes) + spacer * (len(labels)-1)
-                ly = y + (height-total_h)/2
+                total_h = sum(sizes) + spacer * (len(labels) - 1)
+                ly = y + (height - total_h) / 2
                 for label in labels:
                     label_h = draw_lab(label, lx, ly)
                     ly += label_h + spacer
             elif key == 'leftvert':
                 lx = x - spacer
-                ly = y + (height/2)
+                ly = y + (height / 2)
                 labels.reverse()
                 for label in labels:
                     lx = lx - label['size'] - spacer
                     draw_lab(label, lx, ly, align='left-vertical')
             elif key == 'rightvert':
                 lx = x + width + spacer
-                ly = y + (height/2)
+                ly = y + (height / 2)
                 labels.reverse()
                 for label in labels:
                     lx = lx + label['size'] + spacer
@@ -1520,7 +1671,7 @@ class FigureExport(object):
                 ly = ly + 5
 
             self.draw_text(
-                label, (lx + lx_end)/2,
+                label, (lx + lx_end) / 2,
                 ly + ((-1 if position in ["bottomleft", "bottomright"]
                        else 1) * half_height),
                 font_size, (red, green, blue),
@@ -1847,8 +1998,8 @@ class FigureExport(object):
             max_length = 1.5 * max(vp_w, vp_h)
             extra_w = max_length - vp_w
             extra_h = max_length - vp_h
-            viewport_region = {'x': vp_x - (extra_w/2),
-                               'y': vp_y - (extra_h/2),
+            viewport_region = {'x': vp_x - (extra_w / 2),
+                               'y': vp_y - (extra_h / 2),
                                'width': vp_w + extra_w,
                                'height': vp_h + extra_h}
             max_width = max_width * (viewport_region['width'] / vp_w)
@@ -1932,8 +2083,8 @@ class FigureExport(object):
             return pil_img
 
         # Need to crop around centre before rotating...
-        cx = size_x/2
-        cy = size_y/2
+        cx = size_x / 2
+        cy = size_y / 2
         dx = panel['dx']
         dy = panel['dy']
 
@@ -1963,7 +2114,7 @@ class FigureExport(object):
         pil_img = pil_img.crop((crop_left, crop_top, crop_right, crop_bottom))
 
         # Optional rotation
-        if ('rotation' in panel and panel['rotation'] > 0):
+        if 'rotation' in panel and panel['rotation'] > 0:
             rotation = -int(panel['rotation'])
             pil_img = pil_img.rotate(rotation, Image.BICUBIC)
 
@@ -2057,7 +2208,7 @@ class FigureExport(object):
             logger.error("Couldn't add paragraph to PDF: %s" % text)
             text = "[Failed to format paragraph - not shown]"
             para = Paragraph(text, style)
-        w, h = para.wrap(aw, page_y)   # find required space
+        w, h = para.wrap(aw, page_y)  # find required space
         if thumb_src is not None:
             parah = max(h, imgh)
         else:
@@ -2065,7 +2216,7 @@ class FigureExport(object):
         # If there's not enough space, start a new page
         if parah > (page_y - margin):
             c.showPage()
-            page_y = maxh    # reset to top of new page
+            page_y = maxh  # reset to top of new page
         if thumb_src is not None:
             c.drawImage(thumb_src, margin, page_y - imgh, imgw, imgh)
             margin = margin + imgw + spacer
@@ -2145,7 +2296,7 @@ class FigureExport(object):
                     symbol = unit_symbols[sb_units]['symbol']
                 scalebars.append("%s %s" % (sb_length, symbol))
             if iid in img_ids:
-                continue    # ignore images we've already handled
+                continue  # ignore images we've already handled
             img_ids.add(iid)
             thumb_src = self.get_thumbnail(iid)
             # thumb = "<img src='%s' width='%s' height='%s' " \
@@ -2224,9 +2375,9 @@ class FigureExport(object):
         page_color = self.figure_json.get('page_color')
         if page_color and page_color.lower() != 'ffffff':
             rgb = ShapeToPdfExport.get_rgb('#' + page_color)
-            r = float(rgb[0])/255
-            g = float(rgb[1])/255
-            b = float(rgb[2])/255
+            r = float(rgb[0]) / 255
+            g = float(rgb[1]) / 255
+            b = float(rgb[2]) / 255
             self.figure_canvas.setStrokeColorRGB(r, g, b)
             self.figure_canvas.setFillColorRGB(r, g, b)
             self.figure_canvas.setLineWidth(4)
@@ -2253,14 +2404,14 @@ class FigureExport(object):
         para_width = self.page_width
 
         red, green, blue = rgb
-        red = float(red)/255
-        green = float(green)/255
-        blue = float(blue)/255
+        red = float(red) / 255
+        green = float(green) / 255
+        blue = float(blue) / 255
 
         alignment = TA_LEFT
         if (align == "center"):
             alignment = TA_CENTER
-            x = x - (para_width/2)
+            x = x - (para_width / 2)
         elif (align == "right"):
             alignment = TA_RIGHT
             x = x - para_width
@@ -2274,7 +2425,7 @@ class FigureExport(object):
             y = -px
             # Align center
             alignment = TA_CENTER
-            x = x - (para_width/2)
+            x = x - (para_width / 2)
         elif align == 'right-vertical':
             # Switch axes
             c.rotate(-90)
@@ -2283,7 +2434,7 @@ class FigureExport(object):
             y = px
             # Align center
             alignment = TA_CENTER
-            x = x - (para_width/2)
+            x = x - (para_width / 2)
 
         # set fully opaque background color to avoid transparent text
         c.setFillColorRGB(0, 0, 0, 1)
@@ -2297,7 +2448,7 @@ class FigureExport(object):
             fontSize=fontsize)
 
         para = Paragraph(text, style)
-        w, h = para.wrap(para_width, y)   # find required space
+        w, h = para.wrap(para_width, y)  # find required space
         para.drawOn(c, x, y - h + int(fontsize * 0.25))
 
         # Rotate back again
@@ -2309,20 +2460,29 @@ class FigureExport(object):
     def draw_scalebar_line(self, x, y, x2, y2, width, rgb):
         """ Adds line to PDF. Overwritten for TIFF below """
         red, green, blue = rgb
-        red = float(red)/255
-        green = float(green)/255
-        blue = float(blue)/255
+        red = float(red) / 255
+        green = float(green) / 255
+        blue = float(blue) / 255
 
         y = self.page_height - y
         y2 = self.page_height - y2
         c = self.figure_canvas
         c.setLineWidth(width)
         c.setStrokeColorRGB(red, green, blue, 1)
-        c.line(x, y, x2, y2,)
+        c.line(x, y, x2, y2)
 
     def paste_image(self, pil_img, img_name, panel, page, dpi,
                     is_colorbar=False):
         """ Adds the PIL image to the PDF figure. Overwritten for TIFFs """
+
+        # Apply flip transformations before drawing the image
+        h_flip = panel.get('horizontal_flip', False)
+        v_flip = panel.get('vertical_flip', False)
+
+        if h_flip:
+            pil_img = pil_img.transpose(Image.FLIP_LEFT_RIGHT)
+        if v_flip:
+            pil_img = pil_img.transpose(Image.FLIP_TOP_BOTTOM)
 
         x = panel['x']
         y = panel['y']
@@ -2431,6 +2591,15 @@ class TiffExport(FigureExport):
                     dpi=None, is_colorbar=False):
         """ Add the PIL image to the current figure page """
 
+        # Apply flip transformations before drawing the image
+        h_flip = panel.get('horizontal_flip', False)
+        v_flip = panel.get('vertical_flip', False)
+
+        if h_flip:
+            pil_img = pil_img.transpose(Image.FLIP_LEFT_RIGHT)
+        if v_flip:
+            pil_img = pil_img.transpose(Image.FLIP_TOP_BOTTOM)
+
         x = panel['x']
         y = panel['y']
         width = panel['width']
@@ -2466,10 +2635,28 @@ class TiffExport(FigureExport):
 
         # Now at full figure resolution - Good time to add shapes...
         crop = self.get_crop_region(panel)
-        ShapeToPilExport(pil_img, panel, crop)
+        exporter = ShapeToPilExport(pil_img, panel, crop)
 
         width, height = pil_img.size
-        box = (x, y, x + width, y + height)
+
+        # Add border if needed - Rectangle around the whole panel
+        if 'border' in panel and panel['border'].get('showBorder'):
+            sw = panel['border'].get('strokeWidth')
+            border_width = int(round(scale_to_export_dpi(sw)))
+            border_color = panel['border'].get('color')
+            padding = border_width * 2
+
+            canvas = Image.new("RGB", (width + padding, height + padding),
+                               exporter.get_rgb(border_color))
+            canvas.paste(pil_img, (border_width, border_width))
+            pil_img = canvas
+            box = (x - border_width,
+                   y - border_width,
+                   x + width + border_width,
+                   y + height + border_width)
+        else:
+            box = (x, y, x + width, y + height)
+
         self.tiff_figure.paste(pil_img, box)
 
     def draw_scalebar_line(self, x, y, x2, y2, width, rgb):
@@ -2483,7 +2670,7 @@ class TiffExport(FigureExport):
         width = scale_to_export_dpi(width)
 
         for value in range(-width // 2, width // 2):
-            draw.line([(x, y+value), (x2, y2+value)], fill=rgb)
+            draw.line([(x, y + value), (x2, y2 + value)], fill=rgb)
 
     def draw_temp_label(self, text, fontsize, rgb):
         """Returns a new PIL image with text. Handles html."""
@@ -2577,10 +2764,10 @@ class TiffExport(FigureExport):
 
         if align == "left-vertical":
             temp_label = temp_label.rotate(90, expand=True)
-            y = y - (temp_label.size[1]/2)
+            y = y - (temp_label.size[1] / 2)
         elif align == "right-vertical":
             temp_label = temp_label.rotate(-90, expand=True)
-            y = y - (temp_label.size[1]/2)
+            y = y - (temp_label.size[1] / 2)
             x = x - temp_label.size[0]
         elif align == "center":
             x = x - (temp_label.size[0] / 2)
@@ -2658,7 +2845,7 @@ class OmeroExport(TiffExport):
         group_id = self.conn.getEventContext().groupId
         if dataset is not None:
             group_id = dataset.getDetails().group.id.val
-            dataset = dataset._obj      # get the omero.model.DatasetI
+            dataset = dataset._obj  # get the omero.model.DatasetI
         self.conn.SERVICE_OPTS.setOmeroGroup(group_id)
 
         description = "Created from OMERO.figure: "
@@ -2674,7 +2861,7 @@ class OmeroExport(TiffExport):
         for p in self.figure_json['panels']:
             iid = p['imageId']
             if iid in img_ids:
-                continue    # ignore images we've already handled
+                continue  # ignore images we've already handled
             img_ids.add(iid)
             lines.append('- Image:%s %s' % (iid, p['name']))
         description += "Contains images:\n%s" % "\n".join(lines)
@@ -2703,7 +2890,6 @@ class OmeroExport(TiffExport):
 
 
 def export_figure(conn, script_params):
-
     # make sure we can find all images
     conn.SERVICE_OPTS.setOmeroGroup(-1)
 

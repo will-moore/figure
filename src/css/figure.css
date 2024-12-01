@@ -644,6 +644,18 @@
         transform-origin: left;
         pointer-events: all;
     }
+
+    .panel-rotation {
+        display: none;
+    }
+
+    .rotation-controls-shown .panel-rotation {
+        margin-top: 160px;
+        padding: 2px;
+        display: block;
+        pointer-events: all;
+    }
+
     .show-rotation {
         padding: 2px;
         min-width: 45px;
@@ -870,7 +882,6 @@
         background-color: #FAFAFA;
         border: 1px solid #CCCCCC;
         border-radius: 3px;
-        height: 200px;
         padding: 2px;
         position: absolute;
         z-index: 100;
@@ -1008,7 +1019,9 @@
 
     .colorpicker span,
     .inset-color span:first-child,
+    .fill-color span:first-child,
     .label-color span:first-child,
+    .border-color span:first-child,
     .shape-color span:first-child {
         border: solid 1px #bbb;
     }
@@ -1035,7 +1048,8 @@
 
     .lutBg {
         /* NB: when updating png, consider using different name to avoid cache */
-        background-size: 100% 1950px;  /* height is stretched 5x (50px per LUT) */
+        background-size: 100% var(--pngHeight);
+        background-image: var(--lutPng);
         background-repeat: no-repeat;
     }
 
@@ -1046,7 +1060,7 @@
         height: 100%;
         z-index: -1;
         background-image: var(--lutPng);   /* each lut is 10px high */
-        background-size: 100% 1950px;  /* height is stretched 5x (50px per LUT) */
+        background-size: 100% var(--pngHeight);  /* height is stretched 5x (50px per LUT) */
         background-repeat: no-repeat;
         transform: scaleX(var(--scaleX));
         background-position: var(--bgPos);
@@ -1238,7 +1252,8 @@
 
     .roi_toolbar {
         overflow: visible;
-        padding-bottom: 10px;
+        margin: 15px;
+        margin-bottom: 5px;
     }
 
     .roi_toolbar .pressed {
@@ -1332,8 +1347,30 @@
         text-decoration: none;
     }
 
-    .form-inline{
-        cursor: move;
+    /* Center the drag label icon */
+    #sort_label_icon {
+        vertical-align: middle;
+        margin-left: 12px;
+        display: inline-block;
+        font-size: 16px;
+        transform: scale(1.2);
+        transform-origin: center;
+        opacity: 0.7;
+        cursor: grab;
+    }
+
+    .flipping button{
+        margin: 2px;
+    }
+
+    .flipping .btn.active {
+        background-color: #007bff;
+        color: white;
+        border-color: #007bff;
+    }
+    
+    .flipping .btn.active i {
+        color: white;
     }
 
     .calib {

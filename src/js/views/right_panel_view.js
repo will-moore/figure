@@ -104,11 +104,16 @@
             var self = this;
             this.model.getSelected().forEach(function(m){
                 self.listenTo(m, 'change:shapes', self.render);
+                self.listenTo(m, 'change:border', self.render);
             });
         },
 
         events: {
             "click .edit_rois": "editRois",
+            "click .show_border": "showBorder",
+            "click .remove_border": "removeBorder",
+            "change .border-color": "changeBorderColor",
+            "change .border-width": "changeBorderStrokeWidth",
             "click .copyROIs": "copyROIs",
             "click .pasteROIs": "pasteROIs",
             "click .deleteROIs": "deleteROIs",
@@ -200,6 +205,25 @@
             });
         },
 
+        changeBorderColor: function() {
+            var color = $('button.border-color span:first', this.$el).attr('data-color'),
+                sel = this.model.getSelected();
+
+            sel.forEach(function(panel){
+                panel.setBorderColor(color);
+            });
+        },
+
+        changeBorderStrokeWidth: function() {
+            var width = $('button.border-width span:first', this.$el).attr('data-line-width'),
+                sel = this.model.getSelected();
+            width = parseFloat(width, 10);
+
+            sel.forEach(function(panel){
+                panel.setBorderStrokeWidth(width);
+            });
+        },
+
         copyROIs: function(event) {
             event.preventDefault();
             var sel = this.model.getSelected(),
@@ -217,6 +241,24 @@
                 this.model.set('clipboard', {'SHAPES': roiJson});
             }
             this.render();
+        },
+
+        showBorder: function(event){
+            var width = $('button.border-width span:first', this.$el).attr('data-line-width');
+            var color = $('button.border-color span:first', this.$el).attr('data-color');
+            width = parseFloat(width, 10);
+
+            this.model.getSelected().forEach(panel => {
+                panel.show_border(color, width)
+            })
+            event.preventDefault();
+        },
+
+        removeBorder: function(event){
+            this.model.getSelected().forEach(panel => {
+                panel.remove_border()
+            })
+            event.preventDefault();
         },
 
         rectToPolygon: function(rect, rotation) {
@@ -310,7 +352,9 @@
                 clipboard_data = this.model.get('clipboard'),
                 canPaste = clipboard_data && ('SHAPES' in clipboard_data || 'CROP' in clipboard_data),
                 color,
-                width;
+                width,
+                border,
+                show_btn_state = false;
 
             sel.forEach(function(panel){
                 var rois = panel.get('shapes');
@@ -334,6 +378,13 @@
                         }
                     });
                 }
+
+                border = panel.get("border")
+                if(border?.showBorder){
+                    panel.show_border(border.color.replace('#',''), parseFloat(border.strokeWidth, 10))
+                }else{
+                    show_btn_state = true;
+                }
             });
 
             var json = {
@@ -342,6 +393,9 @@
                 'lineWidth': width || 2,
                 'roiCount': roiCount,
                 'canPaste': canPaste,
+                'borderWidth': border ? border.strokeWidth : 2,
+                'borderColor': border ? border.color.replace('#', '') : 'FFFFFF',
+                'showState': show_btn_state,
             }
             $('#edit_rois_form').html(this.roisTemplate(json));
         },
@@ -654,7 +708,9 @@
                     },
                     onEnd: function(evt) {
                         self.handle_sort(evt);
-                    }
+                    },
+                    filter: 'input',       // Required to to select text in the label input
+                    preventOnFilter: false // Required to to select text in the label input
                 });
 
                 // Store the sortable instance
@@ -769,7 +825,7 @@
 
             this.models.forEach(function(m){
                 self.listenTo(m,
-                    'change:width change:height change:rotation change:z_projection change:z_start change:z_end change:min_export_dpi',
+                    'change:width change:height change:rotation change:z_projection change:z_start change:z_end change:min_export_dpi change:vertical_flip change:horizontal_flip',
                     self.render);
                 self.listenTo(m,
                     'change:channels change:theZ change:theT',
@@ -862,7 +918,7 @@
                 return;     // Ignore keyups except 'Enter'
             }
 
-            // get the current entered value 
+            // get the current entered value
             var value = Math.round(parseFloat(event.target.value));
             if (isNaN(value)) {
                 return;
@@ -931,6 +987,18 @@
         // while zooming / dragging.
         // TODO: Update each panel separately.
         update_img_css: function(zoom, dx, dy, save) {
+
+            const vertical_flip = this.models.some(m => m.get('vertical_flip'));
+            const horizontal_flip = this.models.some(m => m.get('horizontal_flip'));
+            // Check if vertical rotation is enabled, then invert dy
+            if (vertical_flip) {
+                dy = -dy;
+            }
+
+            // Check if horizontal rotation is enabled, then invert dx
+            if (horizontal_flip){
+                dx = -dx;
+            }
 
             var scaled_dx = dx / (zoom/100);
             var scaled_dy = dy / (zoom/100);
@@ -1138,11 +1206,13 @@
         resetZoomShape: function(event) {
             event.preventDefault();
             this.models.forEach(function(m){
+                m.set('vertical_flip', false);
+                m.set('horizontal_flip', false);
                 m.cropToRoi({
                     'x': 0,
                     'y': 0,
                     'width': m.get('orig_width'),
-                    'height': m.get('orig_height')
+                    'height': m.get('orig_height'),
                 });
             });
         },
@@ -1213,19 +1283,30 @@
             var self = this;
             this.models.forEach(function(m){
                 self.listenTo(m, 'change:channels change:z_projection', self.render);
+                self.listenTo(m, 'change:vertical_flip change:horizontal_flip', self.loadButtonState);
             });
         },
 
         events: {
             "click .show-rotation": "show_rotation",
             "click .z-projection": "z_projection",
+            "click .flipping_vertical": "flipping_vertical",
+            "click .flipping_horizontal": "flipping_horizontal",
             "input .rotation-slider": "rotation_input",
             "change .rotation-slider": "rotation_change",
+            "click .panel-rotation": "rotate_panel",
         },
 
         rotation_input: function(event) {
             let val = parseInt(event.target.value);
-            $(".vp_img").css({'transform':'rotate(' + val + 'deg)'});
+            this.models.forEach(function(m) {
+                const verticalFlip = m.get('vertical_flip') ? -1 : 1;
+                const horizontalFlip = m.get('horizontal_flip') ? -1 : 1;
+                // Update the CSS transform property for each image
+                $(".vp_img").css({
+                    'transform': 'scaleX(' + horizontalFlip + ') scaleY(' + verticalFlip + ') rotate(' + val + 'deg)'
+                });
+            });
             $(".rotation_value").text(val);
         },
 
@@ -1234,6 +1315,61 @@
             this.rotation = val;
             this.models.forEach(function(m){
                 m.save('rotation', val);
+            });
+        },
+
+        flipping_vertical: function(event) {
+            const $button = $(event.currentTarget);
+            $button.toggleClass('active');
+
+            const isVerticalFlipped = $button.hasClass('active');
+
+            this.models.forEach(function(m) {
+                m.save('vertical_flip', isVerticalFlipped);
+            });
+        },
+
+        flipping_horizontal: function(event) {
+            const $button = $(event.currentTarget);
+            $button.toggleClass('active');
+
+            const ishorizontalFlipped = $button.hasClass('active');
+
+            this.models.forEach(function(m) {
+                m.save('horizontal_flip', ishorizontalFlipped);
+            });
+        },
+
+        loadButtonState: function() {
+            const $verticalButton = this.$(".flipping_vertical");
+            const $horizontalButton = this.$(".flipping_horizontal");
+
+            // Ensure the buttons reflect the model state
+            this.models.forEach(function(m) {
+                // Set vertical button state
+                if (m.get('vertical_flip')) {
+                    $verticalButton.addClass('active');
+                } else {
+                    $verticalButton.removeClass('active');
+                }
+
+                // Set horizontal button state
+                if (m.get('horizontal_flip')) {
+                    $horizontalButton.addClass('active');
+                } else {
+                    $horizontalButton.removeClass('active');
+                }
+            });
+        },
+
+        rotate_panel: function(event){
+            event.preventDefault()
+            this.models.forEach(function(m){
+                var rotation = m.setPanelRotation()
+                console.log(rotation)
+                $(".vp_img").css({'transform':'rotate(' + rotation + 'deg)'});
+                $(".rotation_value").text(rotation);
+                $(".rotation-slider").val(rotation);
             });
         },
 
@@ -1305,6 +1441,7 @@
                     'z_projection': z_projection});
                 this.$el.html(html);
             }
+            this.loadButtonState();
             return this;
         }
     });

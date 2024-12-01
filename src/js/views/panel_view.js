@@ -14,7 +14,7 @@
     import scalebar_panel_template from '../../templates/scalebar_panel.template.html?raw';
     import calib_bar_panel_template from '../../templates/calib_bar.template.html?raw';
     import FigureLutPicker from "../views/lutpicker";
-    
+
     // -------------------------Panel View -----------------------------------
     // A Panel is a <div>, added to the #paper by the FigureView below.
     var PanelView = Backbone.View.extend({
@@ -33,18 +33,18 @@
             // we render on Changes in the model OR selected shape etc.
             this.model.on('destroy', this.remove, this);
             this.listenTo(this.model,
-                'change:x change:y change:width change:height change:zoom change:dx change:dy change:rotation',
+                'change:x change:y change:width change:height change:zoom change:dx change:dy change:rotation change:vertical_flip change:horizontal_flip',
                 this.render_layout);
             this.listenTo(this.model, 'change:scalebar change:pixel_size_x', this.render_scalebar);
             this.listenTo(this.model, 'change:calib change:channels', this.render_calib);
             this.listenTo(this.model,
-                'change:zoom change:dx change:dy change:width change:height change:channels change:theZ change:theT change:z_start change:z_end change:z_projection change:min_export_dpi change:pixel_range',
+                'change:zoom change:dx change:dy change:width change:height change:channels change:theZ change:theT change:z_start change:z_end change:z_projection change:min_export_dpi change:pixel_range change:vertical_flip change:horizontal_flip',
                 this.render_image);
             this.listenTo(this.model,
                 'change:channels change:zoom change:dx change:dy change:width change:height change:rotation change:labels change:theT change:deltaT change:theZ change:deltaZ change:z_projection change:z_start change:z_end',
                 this.render_labels);
             this.listenTo(this.model, 'change:shapes', this.render_shapes);
-
+            this.listenTo(this.model, 'change:border', this.render_layout);
             // During drag or resize, model isn't updated, but we trigger 'drag'
             this.model.on('drag_resize', this.drag_resize, this);
 
@@ -67,6 +67,12 @@
                 h = xywh[3];
             if (w == this.model.get('width') && h == this.model.get('height')) {
                 // If we're only dragging - simply update position
+                var border = this.model.get('border');
+                if (border?.showBorder) {
+                    let sw = border.strokeWidth;
+                    x = x - sw
+                    y = y - sw
+                }
                 this.$el.css({'top': y +'px', 'left': x +'px'});
             } else {
                 this.update_resize(x, y, w, h);
@@ -82,20 +88,37 @@
                 h = this.model.get('height');
 
             this.update_resize(x, y, w, h);
+            this.render_labels();
             this.$el.removeClass('dragging');
         },
 
         update_resize: function(x, y, w, h) {
 
+            // If we have a panel border, need to adjust x,y,w,h on the page
+            // but NOT the w & h we use for img_css below.
+            var border = this.model.get('border');
+            var page_w = w;
+            var page_h = h;
+            if (border?.showBorder) {
+                let sw = border.strokeWidth;
+                this.$el.css({'border': `solid ${sw}px ${border.color}`})
+                x = x - sw;
+                y = y - sw;
+                page_w = w + (sw * 2);
+               page_h = h + (sw * 2);
+            } else {
+                this.$el.css({'border': ''})
+            }
+
             // update layout of panel on the canvas
             this.$el.css({'top': y +'px',
                         'left': x +'px',
-                        'width': w +'px',
-                        'height': h +'px'});
+                        'width': page_w +'px',
+                        'height': page_h +'px'});
 
             // container needs to be square for rotation to vertical
-            $('.left_vlabels', this.$el).css('width', 3 * h + 'px');
-            $('.right_vlabels', this.$el).css('width', 3 * h + 'px');
+            $('.left_vlabels', this.$el).css('width', 3 * page_h + 'px');
+            $('.right_vlabels', this.$el).css('width', 3 * page_h + 'px');
 
             // update the img within the panel
             var zoom = this.model.get('zoom'),
@@ -211,7 +234,7 @@
                     }
                 }
                 const matches = [...ljson.text.matchAll(/\[.+?\]/g)]; // Non greedy regex capturing expressions in []
-                if (matches.length>0){ 
+                if (matches.length>0){
                     var new_text = "";
                     var last_idx = 0;
                     for (const match of matches) {// Loops on the match to replace in the ljson.text the expression by their values
@@ -245,7 +268,7 @@
                         } else if (['x', 'y', 'z', 'width', 'height', 'w', 'h', 'rotation', 'rot'].includes(prop_nf[0])){
                             format = prop_nf[1] ? prop_nf[1] : "pixel";
                             precision = param_dict["precision"] !== undefined ? param_dict["precision"] : 2; // decimal places default to 2
-                            label_value = self.model.get_view_label_text(prop_nf[0], format, param_dict["offset"], precision);  
+                            label_value = self.model.get_view_label_text(prop_nf[0], format, param_dict["offset"], precision);
                         } else if (['channels', 'c'].includes(prop_nf[0])) {
                             label_value = self.model.get_channels_label_text();
                         } else if (['zoom'].includes(prop_nf[0])) {
@@ -285,6 +308,26 @@
             // need to force update of vertical labels layout
             $('.left_vlabels', self.$el).css('width', 3 * self.$el.height() + 'px');
             $('.right_vlabels', self.$el).css('width', 3 * self.$el.height() + 'px');
+
+            var border = this.model.get('border')
+            if(border != undefined){
+                var margin =  5 + border.strokeWidth
+                $('.left_vlabels>div', self.$el).css('margin-bottom', margin + 'px');
+                $('.right_vlabels>div', self.$el).css('margin-bottom', margin + 'px');
+                margin =  3 + border.strokeWidth
+                $('.label_top', self.$el).css('margin-bottom', margin + 'px');
+                margin =  border.strokeWidth
+                $('.label_bottom', self.$el).css('margin-top', margin + 'px');
+                $('.label_left', self.$el).css('margin-right', margin + 'px');
+                $('.label_right', self.$el).css('margin-left', margin + 'px');
+            }else{
+                $('.left_vlabels>div', self.$el).css('mSargin-bottom', '5px');
+                $('.right_vlabels>div', self.$el).css('margin-bottom', '5px');
+                $('.label_top', self.$el).css('margin-bottom', '3px');
+                $('.label_bottom', self.$el).css('margin-top', '');
+                $('.label_left', self.$el).css('margin-right', '');
+                $('.label_right', self.$el).css('margin-left', '');
+            }
 
             return this;
         },

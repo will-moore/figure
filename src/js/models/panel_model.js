@@ -30,7 +30,8 @@
             pixel_size_x_unit: 'MICROMETER',
             rotation_symbol: '\xB0',
             max_export_dpi: 1000,
-
+            vertical_flip: false,
+            horizontal_flip: false,
             // 'export_dpi' optional value to resample panel on export
             // model includes 'scalebar' object, e.g:
             // scalebar: {length: 10, position: 'bottomleft', color: 'FFFFFF',
@@ -253,6 +254,37 @@
             this.save('calib', cb);
         },
 
+        show_border: function(color, strokeWidth){
+            var border = {
+                'color': '#'+color,
+                'strokeWidth': strokeWidth,
+                'showBorder':true
+            }
+            this.save('border', border);
+        },
+
+        remove_border: function(){
+            this.setBorderAttr('showBorder', false)
+        },
+
+        setBorderColor: function(color){
+            this.setBorderAttr('color', '#'+color)
+        },
+
+        setBorderStrokeWidth: function(strokeWidth){
+            this.setBorderAttr('strokeWidth', strokeWidth)
+        },
+
+        setBorderAttr: function(attr, value){
+            var border =  this.get('border');
+            if(border != undefined){
+                var xtra = {};
+                xtra[attr] = value;
+                var new_border = $.extend(true, {}, border, xtra);
+                this.save('border', new_border);
+            }
+        },
+
         // Simple checking whether shape is in viewport (x, y, width, height)
         // Return true if any of the points in shape are within viewport.
         is_shape_in_viewport: function(shape, viewport) {
@@ -311,6 +343,21 @@
                 rois.push($.extend(true, {}, roi, xtra));
             });
             this.save('shapes', rois);
+        },
+
+        setPanelRotation(){
+            var rotation = this.get('rotation') || "0"
+            var panelRotationAngle =  (parseInt(rotation) + 90) % 360
+
+            var viewport = this.getViewportAsRect()
+            var width = this.get('width')
+            var height = this.get('height')
+            var xPercent = this.get('orig_width') / viewport.height;
+            var yPercent = this.get('orig_height') / viewport.width;
+            var zoom = Math.min(xPercent, yPercent) * 100;
+            this.save({'rotation': panelRotationAngle, 'height': width, 'width': height, 'zoom': zoom});
+
+            return panelRotationAngle
         },
 
         // Adds list of shapes to panel (same logic as for labels below)
@@ -760,7 +807,7 @@
             if (isNaN(rotation)) {
                 rotation = 0;
             };
-            // if we have rotated the panel clockwise within the viewport 
+            // if we have rotated the panel clockwise within the viewport
             // it's as if the viewport rectangle has rotated anti-clockwise
             rotation = 360 - rotation;
 
@@ -791,7 +838,7 @@
 
             // Use offset from image centre to calculate ROI position
             var cX = orig_width/2 - dx,
-                cY = orig_height    /2 - dy,
+                cY = orig_height/2 - dy,
                 roiX = cX - (roiW / 2),
                 roiY = cY - (roiH / 2);
 
@@ -892,6 +939,8 @@
             if (rotation == undefined) {
                 rotation = this.get('rotation') || 0;
             }
+            var vertical_flip = this.get('vertical_flip') ? -1 : 1;
+            var horizontal_flip = this.get('horizontal_flip') ? -1 : 1;
 
             var css = {'left':img_x,
                        'top':img_y,
@@ -899,8 +948,8 @@
                        'height':img_h,
                        '-webkit-transform-origin': transform_x + '% ' + transform_y + '%',
                        'transform-origin': transform_x + '% ' + transform_y + '%',
-                       '-webkit-transform': 'rotate(' + rotation + 'deg)',
-                       'transform': 'rotate(' + rotation + 'deg)'
+                       '-webkit-transform': 'scaleX(' + horizontal_flip + ') ' + 'scaleY(' + vertical_flip + ') ' + 'rotate(' + rotation + 'deg)',
+                       'transform': 'scaleX(' + horizontal_flip + ') ' + 'scaleY(' + vertical_flip + ') ' + 'rotate(' + rotation + 'deg)'
                    };
             return css;
         },
@@ -937,7 +986,7 @@
             // and panel re-shaping (stretch/squash).
 
             var zooming = Math.abs(zoom - this.get('zoom')) > 1;
-            var panning = (x !== undefined && y!== undefined);
+            var panning = (x !== undefined && y !== undefined);
 
             // Need to know what the original offsets are...
             // We know that the image is 1.5 * bigger than viewport
