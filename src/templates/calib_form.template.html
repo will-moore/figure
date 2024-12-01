@@ -1,17 +1,18 @@
 <form class="calib_form">
     <div class="row gy-2 gx-3 align-items-center" style="--bs-gutter-x: 0.3rem;">
         <div class="col-auto input-group-sm">
-            <label class="col-form-label col-form-label-sm" style="width:50px">Height</label>
+            <label class="col-form-label col-form-label-sm" style="">Thickness</label>
         </div>
         <div class="form-group col-auto scalebar_length input-group-sm">
             <input type="number" class="label-text calib-thickness form-control input-sm" 
-            placeholder="Height" value="<%= thickness %>" style="width:52px" />
-        </div>
-        <div class="col-auto input-group-sm" style="margin-right: 10px;">
-            <label class="col-form-label col-form-label-sm">px</label>
+            placeholder="Thickness" value="<%= thickness %>" style="width:52px" />
         </div>
         <div class="col-auto input-group-sm">
-            <label class="col-form-label col-form-label-sm" style="width:50px">Position</label>
+            <label class="col-form-label col-form-label-sm" style="">Spacing</label>
+        </div>
+        <div class="form-group col-auto scalebar_length input-group-sm">
+            <input type="number" class="label-text calib-spacing form-control input-sm" 
+            placeholder="Height" value="<%= spacing %>" style="width:52px" />
         </div>
         <div class="form-group col-auto scalebar_length input-group-sm">
             <button type="button" class="label-position btn btn-outline-secondary btn-sm dropdown-toggle" 
@@ -42,69 +43,66 @@
             <% } %>
         </div>
     </div>
-    <div class="col-auto input-group-sm btn-group">
-        <label class="col-form-label col-form-label-sm" style="width:50px">Tick Label Size</label>
-    </div>
-    <div class="col-auto btn-group" style="padding: 0; width: 50px;">
-        <button type="button" class="calib_font_size btn btn-outline-secondary btn-sm dropdown-toggle" title="Font Size"
-        data-bs-toggle="dropdown" style="width:33px;">
-            <span class='dropdown_icon'><%= font_size %></span>
-            <span class="caret"></span>
-        </button>
-        <ul class="dropdown-menu" role="menu">
-        <% _.each([6,8,10,12,14,18,21,24,36,48],function(p){
-            print ("<li><a class='dropdown-item' href='#'><span class='dropdown_icon'>"+p+"</span></a></li>")
-        }); %>
-        </ul>
-    </div>
-    <div class="form-group col-sm-auto btn-group">
-        <button type="button" class="calib-color btn btn-outline-secondary btn-sm dropdown-toggle" title="Label Color"
-            data-bs-toggle="dropdown">
-            <span class="dropdown_icon" data-color="<%= color %>" style="background-color:#<%= color %>">&nbsp &nbsp &nbsp</span>
-            <span class="caret"></span>
-        </button>
-        <ul class="dropdown-menu colorpicker" role="menu">
-            <!-- NB: dropdown_icon is picked on choosing dropdown, replaces icon in button above -->
-            <li><a class="dropdown-item" href="#">
-                <span class="dropdown_icon" data-color="000000" style="background-color:#000">&nbsp &nbsp &nbsp</span>&nbsp Black
-            </a></li>
-            <li><a class="dropdown-item" href="#">
-                <span class="dropdown_icon" data-color="0000FF" style="background-color:#00f">&nbsp &nbsp &nbsp</span>&nbsp Blue
-            </a></li>
-            <li><a class="dropdown-item" href="#">
-                <span class="dropdown_icon" data-color="00FF00" style="background-color:#0f0">&nbsp &nbsp &nbsp</span>&nbsp Green
-            </a></li>
-            <li><a class="dropdown-item" href="#">
-                <span class="dropdown_icon" data-color="FF0000" style="background-color:#f00">&nbsp &nbsp &nbsp</span>&nbsp Red
-            </a></li>
-            <li><a class="dropdown-item" href="#">
-                <span class="dropdown_icon" data-color="FFFF00" style="background-color:#ff0">&nbsp &nbsp &nbsp</span>&nbsp Yellow
-            </a></li>
-            <li><a class="dropdown-item" href="#">
-                <span class="dropdown_icon" data-color="FFFFFF" style="background-color:#fff">&nbsp &nbsp &nbsp</span>&nbsp White
-            </a></li>
-            <li><a class="dropdown-item" href="#">
-                <span class="dropdown_icon" data-color="FF00FF" style="background-color:#f0f">&nbsp &nbsp &nbsp</span>&nbsp Magenta
-            </a></li>
-            <li><a class="dropdown-item" href="#">
-                <span class="dropdown_icon" data-color="00FFFF" style="background-color:#0ff">&nbsp &nbsp &nbsp</span>&nbsp Cyan
-            </a></li>
-        </ul>
-    </div>
-    <div class="row gy-2 gx-3 align-items-center" style="--bs-gutter-x: 0.3rem;">
-        <div class="col-auto input-group-sm">
-            <label class="col-form-label col-form-label-sm" style="width:50px">No. of Ticks</label>
+    <div class="row gy-2 gx-3 align-items-center" style="margin: 5px 0px">
+        <div class="col-auto btn-group">
+            <label class="col-form-label col-form-label-sm" >Ticks</label>
         </div>
-        <div class="col-auto input-group-sm">
+        <div class="col-auto btn-group">
           <input type="number" class="calib-tick-parameter input-sm form-control"
-            placeholder="Parameter" value="<%= ticks_parameter %>" style="width:50px"/>
+            placeholder="Parameter" value="<%= ticks_parameter %>" style="width:52px"/>
         </div>
-        <div class="col-auto input-group-sm">
-            <label class="col-form-label col-form-label-sm" style="width:50px">Length</label>
+        <div class="col-auto btn-group">
+            <label class="col-form-label col-form-label-sm" style="">Length</label>
         </div>
-        <div class="col-auto input-group-sm">
+        <div class="col-auto btn-group">
           <input type="number" class="calib-tick-length input-sm form-control"
             placeholder="Length" value="<%= length %>" style="width:52px"/>
-        </div>    
+        </div>
+        <div class="col-auto btn-group" style="padding: 0; width:50px;">
+            <button type="button" class="calib_font_size btn btn-outline-secondary btn-sm dropdown-toggle" title="Font Size"
+            data-bs-toggle="dropdown" style="width:33px;">
+                <span class='dropdown_icon'><%= font_size %></span>
+                <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" role="menu">
+            <% _.each([6,8,10,12,14,18,21,24,36,48],function(p){
+                print ("<li><a class='dropdown-item' href='#'><span class='dropdown_icon'>"+p+"</span></a></li>")
+            }); %>
+            </ul>
+        </div>
+        <div class="form-group col-sm-auto btn-group">
+            <button type="button" class="calib-color btn btn-outline-secondary btn-sm dropdown-toggle" title="Label Color"
+                data-bs-toggle="dropdown">
+                <span class="dropdown_icon" data-color="<%= color %>" style="background-color:#<%= color %>">&nbsp &nbsp &nbsp</span>
+                <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu colorpicker" role="menu">
+                <!-- NB: dropdown_icon is picked on choosing dropdown, replaces icon in button above -->
+                <li><a class="dropdown-item" href="#">
+                    <span class="dropdown_icon" data-color="000000" style="background-color:#000">&nbsp &nbsp &nbsp</span>&nbsp Black
+                </a></li>
+                <li><a class="dropdown-item" href="#">
+                    <span class="dropdown_icon" data-color="0000FF" style="background-color:#00f">&nbsp &nbsp &nbsp</span>&nbsp Blue
+                </a></li>
+                <li><a class="dropdown-item" href="#">
+                    <span class="dropdown_icon" data-color="00FF00" style="background-color:#0f0">&nbsp &nbsp &nbsp</span>&nbsp Green
+                </a></li>
+                <li><a class="dropdown-item" href="#">
+                    <span class="dropdown_icon" data-color="FF0000" style="background-color:#f00">&nbsp &nbsp &nbsp</span>&nbsp Red
+                </a></li>
+                <li><a class="dropdown-item" href="#">
+                    <span class="dropdown_icon" data-color="FFFF00" style="background-color:#ff0">&nbsp &nbsp &nbsp</span>&nbsp Yellow
+                </a></li>
+                <li><a class="dropdown-item" href="#">
+                    <span class="dropdown_icon" data-color="FFFFFF" style="background-color:#fff">&nbsp &nbsp &nbsp</span>&nbsp White
+                </a></li>
+                <li><a class="dropdown-item" href="#">
+                    <span class="dropdown_icon" data-color="FF00FF" style="background-color:#f0f">&nbsp &nbsp &nbsp</span>&nbsp Magenta
+                </a></li>
+                <li><a class="dropdown-item" href="#">
+                    <span class="dropdown_icon" data-color="00FFFF" style="background-color:#0ff">&nbsp &nbsp &nbsp</span>&nbsp Cyan
+                </a></li>
+            </ul>
+        </div>
     </div>
 </form>

@@ -1396,17 +1396,21 @@
     }
 
     .calibration_ticks_top .ticks_top {
-        -webkit-transform: rotate(180deg);
-        transform: scaleX(1) rotate(180deg);
-        top: -45px;
+        -webkit-transform: scaleX(-1) rotate(180deg);
+        transform: scaleX(-1) rotate(180deg);
+    }
+
+    .calibration_ticks_top .label{
+        transform: scaleX(-1) rotate(180deg);
     }
 
     .calibration_ticks_leftvert .label{
-        -webkit-transform: rotate(-90deg);
+        -webkit-transform: scaleX(-1) rotate(-90deg);
         transform: scaleX(-1) rotate(-90deg);
     }
 
     .calibration_ticks_rightvert .label{
+        -webkit-transform: rotate(90deg);
         transform: rotate(90deg);
     }
 
@@ -1422,7 +1426,6 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        border: 1px solid cyan;
     }
 
     .dash {

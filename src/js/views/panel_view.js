@@ -345,6 +345,7 @@
                         color: cb.color,
                         ticks_parameter: cb.ticks_parameter,
                         length: cb.length,
+                        spacing: cb.spacing,
                         start: start,
                         end: end,
                         channel_color: channel_color,

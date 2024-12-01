@@ -1,10 +1,51 @@
-<div class="calib  calib_<%= position %>">
-    <% if (show) {
-        if( lutBgPos === "0px 100px"){%>
-            <div class="lutBg calib_bg"  style="height: <%= thickness %>px;background-image: linear-gradient(to left, #<%= channel_color %>, black); "></div>
-        <% }else { %>
-            <div class="lutBg calib_bg"  style="height: <%= thickness %>px;background-image: url('/images/luts_10.png');background-position: <%= lutBgPos %>;"></div>
-        <% } %>
+<div class="calib calib_<%= position %>"
+     style="<% if (position === 'top') { %> margin-bottom: <%= spacing %>px; <% }
+                else if (position === 'bottom') { %> margin-top: <%= spacing %>px; <% }
+                else if (position === 'leftvert') { %> margin-right: <%= spacing %>px; <% }
+                else if (position === 'rightvert') { %> margin-left: <%= spacing %>px; <% } %>">
+    <% if (show) { %>
+        <% if (position === 'top') { %>
+            <!-- Render div 2 first for 'top' -->
+            <div class="calibration_ticks calibration_ticks_<%= position %>">
+                <div class="ticks ticks_<%= position %>" style="border-top: 2px solid #<%= color %>;">
+                    <% var interval = Math.floor((end - start) / (ticks_parameter - 1)); %>
+
+                    <!-- First tick (start value) -->
+                    <div class="tick">
+                        <div class="dash" style="background-color: #<%= color %>; height: <%= length %>px"></div>
+                        <span class="label" style="color: #<%= color %>; font-size: <%= font_size %>px;"><%= start %></span>
+                    </div>                    
+
+                    <!-- Intermediate ticks -->
+                    <% for (let i = 1; i < ticks_parameter - 1; i++) { %>
+                        <div class="tick">
+                            <div class="dash" style="background-color: #<%= color %>; height: <%= length %>px"></div>
+                            <span class="label" style="color: #<%= color %>; font-size: <%= font_size %>px;">
+                                <%= start + i * interval %>
+                            </span>
+                        </div>
+                    <% } %>
+
+                    <!-- Last tick (end value) -->
+                    <div class="tick">
+                        <div class="dash" style="background-color: #<%= color %>; height: <%= length %>px"></div>
+                        <span class="label" style="color: #<%= color %>; font-size: <%= font_size %>px;"><%= end %></span>
+                    </div>
+                     
+                </div>
+            </div>
+            <div class="lutBg calib_bg"
+                 style="height: <%= thickness %>px;
+                        background-image: <%= lutBgPos === '0px 100px' ? 'linear-gradient(to left, #' + channel_color + ', black)' : 'url(/images/luts_10.png)' %>;
+                        <%= lutBgPos !== '0px 100px' ? 'background-position: ' + lutBgPos : '' %>;">
+            </div>
+        <% } else { %>
+            <!-- Default order for non-'top' positions -->
+            <div class="lutBg calib_bg"
+                 style="height: <%= thickness %>px;
+                        background-image: <%= lutBgPos === '0px 100px' ? 'linear-gradient(to left, #' + channel_color + ', black)' : 'url(/images/luts_10.png)' %>;
+                        <%= lutBgPos !== '0px 100px' ? 'background-position: ' + lutBgPos : '' %>;">
+            </div>
             <div class="calibration_ticks calibration_ticks_<%= position %>">
                 <div class="ticks ticks_<%= position %>" style="border-top: 2px solid #<%= color %>;">
                     <% var interval = Math.floor((end - start) / (ticks_parameter - 1)); %>
@@ -15,15 +56,15 @@
                         <span class="label" style="color: #<%= color %>; font-size: <%= font_size %>px;"><%= start %></span>
                     </div>
 
-                        <!-- Intermediate ticks -->
-                        <% for (let i = 1; i < ticks_parameter - 1; i++) { %>
-                            <div class="tick">
-                                <div class="dash" style="background-color: #<%= color %>; height: <%= length %>px"></div>
-                                <span class="label" style="color: #<%= color %>; font-size: <%= font_size %>px;">
-                                    <%= start + i * interval %> <!-- Dynamically calculated intermediate value -->
-                                </span>
-                            </div>
-                        <% } %>
+                    <!-- Intermediate ticks -->
+                    <% for (let i = 1; i < ticks_parameter - 1; i++) { %>
+                        <div class="tick">
+                            <div class="dash" style="background-color: #<%= color %>; height: <%= length %>px"></div>
+                            <span class="label" style="color: #<%= color %>; font-size: <%= font_size %>px;">
+                                <%= start + i * interval %>
+                            </span>
+                        </div>
+                    <% } %>
 
                     <!-- Last tick (end value) -->
                     <div class="tick">
@@ -32,5 +73,6 @@
                     </div>
                 </div>
             </div>
+        <% } %>
     <% } %>
 </div>

@@ -49,7 +49,8 @@ var CalibBarFormView = Backbone.View.extend({
             font_size = $('.calib_font_size span:first', $form).text().trim(),
             color = $('.calib-color span:first', $form).attr('data-color'),
             ticks_parameter = parseInt($('.calib-tick-parameter', $form).val()),
-            length = parseInt($('.calib-tick-length', $form).val());
+            length = parseInt($('.calib-tick-length', $form).val()),
+            spacing = parseInt($('.calib-spacing', $form).val());
 
         this.models.forEach(function(m) {
             var lutBgPos = m.get('lutBgPos');
@@ -60,6 +61,7 @@ var CalibBarFormView = Backbone.View.extend({
             if (color != '-') cb.color = color;
             if (ticks_parameter != '-') cb.ticks_parameter = ticks_parameter;
             if (length != '-') cb.length = length;
+            if (spacing != '-') cb.spacing = spacing;
             m.save_calib(cb);
         });
         return false;
@@ -81,6 +83,7 @@ var CalibBarFormView = Backbone.View.extend({
                     cb_json.color = cb.color;
                     cb_json.ticks_parameter = cb.ticks_parameter;
                     cb_json.length = cb.length;
+                    cb_json.spacing = cb.spacing;
                 } else {
                     if (cb_json.position != cb.position) cb_json.position = '-';
                     if (cb_json.thickness != cb.thickness) cb_json.thickness = '-';
@@ -88,6 +91,7 @@ var CalibBarFormView = Backbone.View.extend({
                     if (cb_json.color != cb.color) cb_json.color = '-';
                     if (cb_json.ticks_parameter != cb.ticks_parameter) cb_json.ticks_parameter = '-';
                     if (cb_json.length != cb.length) cb_json.length = '-';
+                    if (cb_json.spacing != cb.spacing) cb_json.spacing = '-';
                 }
             }
             if (!cb || !cb.show) hidden = true;
@@ -103,6 +107,7 @@ var CalibBarFormView = Backbone.View.extend({
         cb_json.color = cb_json.color || '000';
         cb_json.ticks_parameter = cb_json.ticks_parameter || 6;
         cb_json.length = cb_json.length || 10;
+        cb_json.spacing = cb_json.spacing || 10;
         var html = this.template(cb_json);
         this.$el.html(html);
         return this;
