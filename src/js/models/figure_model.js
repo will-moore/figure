@@ -518,6 +518,11 @@
             // new image panels appropriately in a grid.
             var invalidIds = [];
             for (var i=0; i<iIds.length; i++) {
+                console.log("Adding image", iIds[i]);
+                if (iIds[i].includes(".zarr")) {
+                    this.importZarrImage(iIds[i], coords, i);
+                    continue;
+                }
                 var imgId = iIds[i].replace("|", ""),
                     validId = parseInt(imgId, 10) + "",
                     imgDataUrl = BASE_WEBFIGURE_URL + 'imgData/' + validId + '/';
@@ -531,6 +536,106 @@
                 var plural = invalidIds.length > 1 ? "s" : "";
                 alert("Could not add image with invalid ID" + plural + ": " + invalidIds.join(", "));
             }
+        },
+
+        importZarrImage: async function(zarrUrl, coords, index) {
+            let self = this;
+            this.set('loading_count', this.get('loading_count') + 1);
+
+            let zattrs = await fetch(zarrUrl + "/.zattrs").then(rsp => rsp.json());
+            let zarrName = zarrUrl.split("/").pop();
+            let multiscales = zattrs?.multiscales;
+            console.log("zarr zattrs", zattrs);
+            if (!multiscales) {
+                alert(`Image loading from ${imgDataUrl} included an Error: ${message}`);
+                return;
+            }
+
+            // if we got multiscales, load first dataset...
+            // TODO: handle bioformats2raw.layout
+            let dsPath = multiscales[0]?.datasets[0].path;
+            let imgName = multiscales[0].name || zarrName;
+            let axes = multiscales[0].axes;
+            let axesNames = axes.map(axis => axis.name);
+
+            let zarray = await fetch(`${zarrUrl}/${dsPath}/.zarray`).then(rsp => rsp.json());
+            console.log("zarray", zarray);
+            let shape = zarray.shape;
+            let dims = shape.length;
+            let sizeX = shape[dims - 1];
+            let sizeY = shape[dims - 2];
+            let sizeZ = 1;
+            let sizeT = 1;
+            if (axesNames.includes('z')) {
+                sizeZ = shape[axesNames.indexOf('z')]
+            }
+            let defaultZ = parseInt(sizeZ / 2);
+            if (axesNames.includes('t')) {
+                sizeT = shape[axesNames.indexOf('t')]
+            }
+            let defaultT = parseInt(sizeT / 2);
+            self.set('loading_count', self.get('loading_count') - 1);
+
+            // channels...
+            // TODO: if no omero data, need to construct channels!
+            let channels = zattrs.omero?.channels || [];
+
+            coords.spacer = coords.spacer || sizeX/20;
+            var full_width = (coords.colCount * (sizeX + coords.spacer)) - coords.spacer,
+                full_height = (coords.rowCount * (sizeY + coords.spacer)) - coords.spacer;
+            coords.scale = coords.paper_width / (full_width + (2 * coords.spacer));
+            coords.scale = Math.min(coords.scale, 1);    // only scale down
+            // For the FIRST IMAGE ONLY (coords.px etc undefined), we
+            // need to work out where to start (px,py) now that we know size of panel
+            // (assume all panels are same size)
+            coords.px = coords.px || coords.c.x - (full_width * coords.scale)/2;
+            coords.py = coords.py || coords.c.y - (full_height * coords.scale)/2;
+
+            // calculate panel coordinates from index...
+            var row = parseInt(index / coords.colCount, 10);
+            var col = index % coords.colCount;
+            var panelX = coords.px + ((sizeX + coords.spacer) * coords.scale * col);
+            var panelY = coords.py + ((sizeY + coords.spacer) * coords.scale * row);
+
+            // ****** This is the Data Model ******
+            //-------------------------------------
+            // Any changes here will create a new version
+            // of the model and will also have to be applied
+            // to the 'version_transform()' function so that
+            // older files can be brought up to date.
+            // Also check 'previewSetId()' for changes.
+            var n = {
+                'imageId': zarrUrl,
+                'name': imgName,
+                'width': sizeX * coords.scale,
+                'height': sizeY * coords.scale,
+                'sizeZ': sizeZ,
+                'theZ': defaultZ,
+                'sizeT': sizeT,
+                'theT': defaultT,
+                'rdefs': {'model': "-"},
+                'channels': channels,
+                'orig_width': sizeX,
+                'orig_height': sizeY,
+                'x': panelX,
+                'y': panelY,
+                // 'datasetName': data.meta.datasetName,
+                // 'datasetId': data.meta.datasetId,
+                // 'pixel_size_x': data.pixel_size.valueX,
+                // 'pixel_size_y': data.pixel_size.valueY,
+                // 'pixel_size_z': data.pixel_size.valueZ,
+                // 'pixel_size_x_symbol': data.pixel_size.symbolX,
+                // 'pixel_size_z_symbol': data.pixel_size.symbolZ,
+                // 'pixel_size_x_unit': data.pixel_size.unitX,
+                // 'pixel_size_z_unit': data.pixel_size.unitZ,
+                // 'deltaT': data.deltaT,
+                // 'pixelsType': data.meta.pixelsType,
+                // 'pixel_range': data.pixel_range,
+            };
+            // create Panel (and select it)
+            // We do some additional processing in Panel.parse()
+            self.panels.create(n, {'parse': true}).set('selected', true);
+            self.notifySelectionChange();
         },
 
         importImage: function(imgDataUrl, coords, baseUrl, index) {
