@@ -361,7 +361,7 @@
             this.render_layout();
         },
 
-        render_calib: function() {
+        render_calib: async function() {
 
             if (this.$calib) {
                 this.$calib.remove();
@@ -378,22 +378,23 @@
                     break;
                 }
             }
+            var lut_url = await FigureLutPicker.loadLuts(false)  // Ensure lut url and list are loaded
             var lutBgPos = FigureLutPicker.getLutBackgroundPosition(channel_color);
             if (cb && cb.show) {
                 var cb_json = {
-                        position: cb.position,
-                        show: cb.show,
-                        thickness: cb.thickness,
-                        font_size: cb.font_size,
-                        color: cb.color,
-                        ticks_parameter: cb.ticks_parameter,
-                        length: cb.length,
-                        spacing: cb.spacing,
-                        start: start,
-                        end: end,
-                        channel_color: channel_color,
-                        lutBgPos: lutBgPos,
-                        lut_url: FigureLutPicker.lutsPngUrl
+                    position: cb.position,
+                    show: cb.show,
+                    thickness: cb.thickness,
+                    font_size: cb.font_size,
+                    color: cb.color,
+                    ticks_parameter: cb.ticks_parameter,
+                    length: cb.length,
+                    spacing: cb.spacing,
+                    start: start,
+                    end: end,
+                    channel_color: channel_color,
+                    lutBgPos: lutBgPos,
+                    lut_url: lut_url
                 };
                 var cb_html = this.calib_template(cb_json);
                 this.$el.append(cb_html);
