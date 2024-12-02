@@ -290,10 +290,6 @@ export var FileListView = Backbone.View.extend({
 
         // render groups chooser
         var groups = this.model.pluck("group");
-        if (filter.owner) {
-            let groupIds = this.model.models.filter(f => f.get('owner').id == filter.owner).map(f => f.get('group').id);
-            groups = groups.filter(g => groupIds.includes(g.id));
-        }
         var groupsByName = {};
         groups.forEach(function (g) {
             groupsByName[g.name] = g.id;
