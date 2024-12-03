@@ -1336,15 +1336,15 @@
         cursor: move;
     }
 
-    .calib {
+    .colorbar {
         position: absolute;
     }
 
-    .calib_middle td {
+    .colorbar_middle td {
         vertical-align: middle;
     }
 
-    .calib_leftvert{
+    .colorbar_left{
         position: absolute;
         top: 0%;
         right:100%;
@@ -1355,7 +1355,7 @@
         transform: scaleX(-1) rotate(-90deg);
     }
 
-    .calib_rightvert{
+    .colorbar_right{
         position: absolute;
         top: 0%;
         left: 100%;
@@ -1366,27 +1366,27 @@
         transform: rotate(-90deg);
     }
 
-    .calib_top {
+    .colorbar_top {
         bottom: 100%;
         width: 100%;
         left: 0%;
         margin-bottom: 10px;
     }
 
-    .calib_bottom {
+    .colorbar_bottom {
         top: 100%;
         width: 100%;
         left: 0%;
         margin-top: 10px;
     }
 
-    .calib_bg {
+    .colorbar_bg {
         margin-right: 0px;
         margin-left: 0px;
         display: flex;
     }
         
-    .calibration_ticks {
+    .colorbar_ticks {
         margin: 0;
         display: flex;
         align-items: center;
@@ -1395,23 +1395,30 @@
         width: 100%;
     }
 
-    .calibration_ticks_top .ticks_top {
+    .colorbar_ticks_top .ticks_top {
         -webkit-transform: scaleX(-1) rotate(180deg);
         transform: scaleX(-1) rotate(180deg);
     }
 
-    .calibration_ticks_top .label{
+    .colorbar_ticks_top .label{
         transform: scaleX(-1) rotate(180deg);
+        text-align: center;
     }
 
-    .calibration_ticks_leftvert .label{
+    .colorbar_ticks_bottom .label{
+        text-align: center;
+    }
+
+    .colorbar_ticks_left .label{
         -webkit-transform: scaleX(-1) rotate(-90deg);
         transform: scaleX(-1) rotate(-90deg);
+        text-align: right;
     }
 
-    .calibration_ticks_rightvert .label{
+    .colorbar_ticks_right .label{
         -webkit-transform: rotate(90deg);
         transform: rotate(90deg);
+        text-align: left;
     }
 
     .ticks {
@@ -1430,11 +1437,4 @@
 
     .dash {
         width: 2px;
-        margin-bottom: 5px;
-    }
-
-    .label {
-        font-size: 12px;
-        text-align: center;
-        margin-left: 0;
     }

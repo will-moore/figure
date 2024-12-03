@@ -239,18 +239,18 @@
             this.save('scalebar', sb);
         },
 
-        hide_calib: function() {
-            // keep all calib properties, except 'show'
-            var cb = $.extend(true, {}, this.get('calib'));
+        hide_colorbar: function() {
+            // keep all colorbar properties, except 'show'
+            var cb = $.extend(true, {}, this.get('colorbar'));
             cb.show = false;
-            this.save('calib', cb);
+            this.save('colorbar', cb);
         },
 
-        save_calib: function(new_cb) {
-            // update only the attributes of calib we're passed
-            var old_cb = $.extend(true, {}, this.get('calib') || {});
+        save_colorbar: function(new_cb) {
+            // update only the attributes of colorbar we're passed
+            var old_cb = $.extend(true, {}, this.get('colorbar') || {});
             var cb = $.extend(true, old_cb, new_cb);
-            this.save('calib', cb);
+            this.save('colorbar', cb);
         },
 
         // Simple checking whether shape is in viewport (x, y, width, height)

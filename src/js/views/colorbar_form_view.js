@@ -2,11 +2,11 @@ import Backbone from "backbone";
 import _, { forEach } from "underscore";
 import $ from "jquery";
 
-import calib_form_template from '../../templates/calib_form.template.html?raw';
+import colorbar_form_template from '../../templates/colorbar_form.template.html?raw';
 
-var CalibBarFormView = Backbone.View.extend({
+var ColorbarFormView = Backbone.View.extend({
 
-    template: _.template(calib_form_template),
+    template: _.template(colorbar_form_template),
 
     initialize: function(opts) {
         this.render = _.debounce(this.render);
@@ -14,21 +14,21 @@ var CalibBarFormView = Backbone.View.extend({
 
         var self = this;
         this.models.forEach(function(m) {
-            self.listenTo(m, 'change:calib', self.render);
+            self.listenTo(m, 'change:colorbar', self.render);
         });
     },
 
     events: {
-        "submit .calib_form": "update_calib",
+        "submit .colorbar_form": "update_colorbar",
         "change .btn": "dropdown_btn_changed",
-        "click .hide_calib": "hide_calib",
+        "click .hide_colorbar": "hide_colorbar",
         "keyup input[type='number']"  : "handle_keyup",
      },
 
     handle_keyup: function (event) {
         // If Enter key - submit form...
         if (event.which == 13) {
-            this.update_calib();
+            this.update_colorbar();
         }
     },
 
@@ -36,21 +36,22 @@ var CalibBarFormView = Backbone.View.extend({
         $(event.target).closest('form').submit();
     },
 
-    hide_calib: function() {
+    hide_colorbar: function() {
         this.models.forEach(function(m) {
-            m.hide_calib();
+            m.hide_colorbar();
         });
     },
 
-    update_calib: function(event) {
-        var $form = $('.calib_form');
+    update_colorbar: function(event) {
+        var $form = $('.colorbar_form');
         var position = $('.label-position i:first', $form).attr('data-position'),
-            thickness = parseInt($('.calib-thickness', $form).val()),
-            font_size = $('.calib_font_size span:first', $form).text().trim(),
-            color = $('.calib-color span:first', $form).attr('data-color'),
-            ticks_parameter = parseInt($('.calib-tick-parameter', $form).val()),
-            length = parseInt($('.calib-tick-length', $form).val()),
-            spacing = parseInt($('.calib-spacing', $form).val());
+            thickness = parseInt($('.colorbar-thickness', $form).val()),
+            font_size = $('.colorbar_font_size span:first', $form).text().trim(),
+            color = $('.colorbar-color span:first', $form).attr('data-color'),
+            ticks_parameter = parseInt($('.colorbar-tick-parameter', $form).val()),
+            length = parseInt($('.colorbar-tick-length', $form).val()),
+            spacing = parseInt($('.colorbar-spacing', $form).val()),
+            tick_label_spacing = parseInt($('.colorbar-tick-label-spacing', $form).val());
 
         this.models.forEach(function(m) {
             var lutBgPos = m.get('lutBgPos');
@@ -62,7 +63,8 @@ var CalibBarFormView = Backbone.View.extend({
             if (ticks_parameter != '-') cb.ticks_parameter = ticks_parameter;
             if (length != '-') cb.length = length;
             if (spacing != '-') cb.spacing = spacing;
-            m.save_calib(cb);
+            if (tick_label_spacing != '-') cb.tick_label_spacing = tick_label_spacing;
+            m.save_colorbar(cb);
         });
         return false;
     },
@@ -73,7 +75,7 @@ var CalibBarFormView = Backbone.View.extend({
             cb;
 
         this.models.forEach(function(m) {
-            cb = m.get('calib');
+            cb = m.get('colorbar');
 
             if (cb) {
                 if (!cb_json.length) {
@@ -84,6 +86,7 @@ var CalibBarFormView = Backbone.View.extend({
                     cb_json.ticks_parameter = cb.ticks_parameter;
                     cb_json.length = cb.length;
                     cb_json.spacing = cb.spacing;
+                    cb_json.tick_label_spacing = cb.tick_label_spacing;
                 } else {
                     if (cb_json.position != cb.position) cb_json.position = '-';
                     if (cb_json.thickness != cb.thickness) cb_json.thickness = '-';
@@ -92,6 +95,7 @@ var CalibBarFormView = Backbone.View.extend({
                     if (cb_json.ticks_parameter != cb.ticks_parameter) cb_json.ticks_parameter = '-';
                     if (cb_json.length != cb.length) cb_json.length = '-';
                     if (cb_json.spacing != cb.spacing) cb_json.spacing = '-';
+                    if (cb_json.tick_label_spacing != cb.tick_label_spacing) cb_json.tick_label_spacing = '-';
                 }
             }
             if (!cb || !cb.show) hidden = true;
@@ -101,17 +105,18 @@ var CalibBarFormView = Backbone.View.extend({
             cb_json.show = true;
         }
 
-        cb_json.position = cb_json.position || 'top';
-        cb_json.thickness = cb_json.thickness || 45;
-        cb_json.font_size = cb_json.font_size || 12;
+        cb_json.position = cb_json.position || 'right';
+        cb_json.thickness = cb_json.thickness || 15;
+        cb_json.font_size = cb_json.font_size || 10;
         cb_json.color = cb_json.color || '000';
-        cb_json.ticks_parameter = cb_json.ticks_parameter || 6;
-        cb_json.length = cb_json.length || 10;
-        cb_json.spacing = cb_json.spacing || 10;
+        cb_json.ticks_parameter = cb_json.ticks_parameter || 7;
+        cb_json.length = cb_json.length || 3;
+        cb_json.spacing = cb_json.spacing || 5;
+        cb_json.tick_label_spacing = cb_json.tick_label_spacing || 5;
         var html = this.template(cb_json);
         this.$el.html(html);
         return this;
     }
 });
 
-export default CalibBarFormView;
+export default ColorbarFormView;
