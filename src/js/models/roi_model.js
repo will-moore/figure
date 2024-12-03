@@ -14,6 +14,14 @@ var ShapeModel = Backbone.Model.extend({
             intAsHex = ("00000000" + intAsHex).slice(-8);
             return '#' + intAsHex.substring(0,6);
         }
+
+        var rgbint_to_opacity = function(signed_integer) {
+            if (signed_integer < 0) signed_integer = signed_integer >>> 0;
+            var intAsHex = signed_integer.toString(16);
+            intAsHex = ("00000000" + intAsHex).slice(-2);
+             return parseInt(intAsHex, 16) / 255;
+        }
+
         shape.id = shape['@id'];
         shape.type = shape['@type'].split('#')[1];
         delete shape['@id']
@@ -27,6 +35,9 @@ var ShapeModel = Backbone.Model.extend({
         _.each(["StrokeColor", "FillColor", ], function(attr) {
             if (shape[attr] !== undefined) {
                 shape[lowerFirst(attr)] = rgbint_to_css(shape[attr]);
+                // strokeColor -> strokeOpacity, fillColor -> fillOpacity
+                let opacityAttr = lowerFirst(attr).replace("Color", "Opacity")
+                shape[opacityAttr] = rgbint_to_opacity(shape[attr]);
                 delete shape[attr];
             }
         });

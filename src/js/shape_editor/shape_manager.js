@@ -10,10 +10,10 @@
 // 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following
 // disclaimer in the documentation // and/or other materials provided with the distribution.
 //
-// 3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived 
+// 3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived
 // from this software without specific prior written permission.
 
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, 
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
 // BUT NOT LIMITED TO,
 // THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
 // THE COPYRIGHT HOLDER OR CONTRIBUTORS
@@ -41,6 +41,8 @@ var ShapeManager = function ShapeManager(elementId, width, height, options) {
   this._state = "SELECT";
   this._strokeColor = "#ff0000";
   this._strokeWidth = 2;
+  this._fillColor = "#ffffff";
+  this._fillOpacity = 0;
   this._orig_width = width;
   this._orig_height = height;
   this._zoom = 100;
@@ -262,6 +264,32 @@ ShapeManager.prototype.getStrokeWidth = function getStrokeWidth() {
   return this._strokeWidth;
 };
 
+ShapeManager.prototype.getFillColor = function getFillColor() {
+  return this._fillColor;
+};
+
+ShapeManager.prototype.setFillColor = function setFillColor(fillColor) {
+  this._fillColor = fillColor;
+  var selected = this.getSelectedShapes();
+  for (var s=0; s<selected.length; s++) {
+      selected[s].setFillColor(fillColor);
+  }
+};
+
+ShapeManager.prototype.getFillOpacity = function getFillOpacity() {
+  return this._fillOpacity;
+};
+
+ShapeManager.prototype.setFillOpacity = function setFillOpacity(fillOpacity) {
+  var fillOpacity = parseFloat(fillOpacity, 10).toFixed(1);
+  if(fillOpacity == 0) fillOpacity = 0.01;
+  this._fillOpacity = fillOpacity;
+    var selected = this.getSelectedShapes();
+    for (var s=0; s<selected.length; s++) {
+        selected[s].setFillOpacity(fillOpacity);
+    }
+};
+
 ShapeManager.prototype.getShapesJson = function getShapesJson() {
   var data = [];
   this.getShapes().forEach(function (s) {
@@ -392,6 +420,8 @@ ShapeManager.prototype.createShapeJson = function createShapeJson(jsonShape) {
   var s = jsonShape,
     newShape,
     strokeColor = s.strokeColor || this.getStrokeColor(),
+    fillColor = s.fillColor || this.getFillColor(),
+    fillOpacity = s.fillOpacity == undefined ? this.getFillOpacity() : s.fillOpacity,
     strokeWidth = s.strokeWidth || this.getStrokeWidth(),
     zoom = this.getZoom(),
     options = {
@@ -400,6 +430,8 @@ ShapeManager.prototype.createShapeJson = function createShapeJson(jsonShape) {
       strokeWidth: strokeWidth,
       zoom: zoom,
       strokeColor: strokeColor,
+      fillColor: fillColor,
+      fillOpacity: parseFloat(fillOpacity).toFixed(1)
     };
   if (jsonShape.id) {
     options.id = jsonShape.id;
@@ -621,7 +653,7 @@ ShapeManager.prototype.selectAllShapes = function selectAllShapes(region) {
 
 // select shapes: 'shape' can be shape object or ID
 ShapeManager.prototype.selectShapes = function selectShapes(shapes) {
-  var strokeColor, strokeWidth;
+  var strokeColor, strokeWidth, fillColor, fillOpacity;
 
   // Clear selected with silent:true, since we notify again below
   this.clearSelectedShapes(true);
@@ -641,15 +673,37 @@ ShapeManager.prototype.selectShapes = function selectShapes(shapes) {
           strokeColor = false;
         }
       }
+
+      // for first shape, pick color
+      if (fillColor === undefined) {
+        fillColor = shape.getFillColor();
+      } else {
+        // for subsequent shapes, if colors don't match - set false
+        if (fillColor !== shape.getFillColor()) {
+            fillColor = false;
+        }
+      }
+
       // for first shape, pick strokeWidth
       if (strokeWidth === undefined) {
         strokeWidth = shape.getStrokeWidth();
       } else {
-        // for subsequent shapes, if colors don't match - set false
+        // for subsequent shapes, if stock width don't match - set false
         if (strokeWidth !== shape.getStrokeWidth()) {
           strokeWidth = false;
         }
       }
+
+      // for first shape, pick fillOpacity
+      if (fillOpacity === undefined) {
+        fillOpacity = shape.getFillOpacity();
+      } else {
+        // for subsequent shapes, if opacity don't match - set false
+        if (fillOpacity !== shape.getFillOpacity()) {
+            fillOpacity = false;
+        }
+      }
+
       shape.setSelected(true);
     }
   });
@@ -658,6 +712,12 @@ ShapeManager.prototype.selectShapes = function selectShapes(shapes) {
   }
   if (strokeWidth) {
     this._strokeWidth = strokeWidth;
+  }
+  if (fillColor) {
+    this._fillColor = fillColor;
+  }
+  if (fillOpacity) {
+      this._fillOpacity = fillOpacity;
   }
   this.$el.trigger("change:selected");
 };

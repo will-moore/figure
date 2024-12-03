@@ -17,7 +17,7 @@
                     <div class="tick">
                         <div class="dash" style="background-color: #<%= color %>; height: <%= length %>px; margin-bottom:<%= tick_label_spacing %>px"></div>
                         <span class="label" style="color: #<%= color %>; font-size: <%= font_size %>px;"><%= start %></span>
-                    </div>                    
+                    </div>
 
                     <!-- Intermediate ticks -->
                     <% for (let i = 1; i < ticks_parameter - 1; i++) { %>
@@ -34,7 +34,7 @@
                         <div class="dash" style="background-color: #<%= color %>; height: <%= length %>px; margin-bottom:<%= tick_label_spacing %>px"></div>
                         <span class="label" style="color: #<%= color %>; font-size: <%= font_size %>px;"><%= end %></span>
                     </div>
-                     
+
                 </div>
             </div>
             <div class="lutBg colorbar_bg"
@@ -42,15 +42,14 @@
                         background-image: <%= reverseIntensity ? 
                            (lutBgPos === '0px 100px' ? 'linear-gradient(to right, #' + channel_color + ', black)' : 'url(/images/luts_10.png)') :
                            (lutBgPos === '0px 100px' ? 'linear-gradient(to left, #' + channel_color + ', black)' : 'url(/images/luts_10.png)') %>;
+                        background-image: <%= lutBgPos === '0px 100px' ? 'linear-gradient(to left, #' + channel_color + ', black)' : 'url(' + lut_url + ')' %>;
                         <%= lutBgPos !== '0px 100px' ? 'background-position: ' + lutBgPos : '' %>;">
             </div>
         <% } else { %>
             <!-- Default order for non-'top' positions -->
             <div class="lutBg colorbar_bg"
                  style="height: <%= thickness %>px;
-                        background-image: <%= reverseIntensity ? 
-                           (lutBgPos === '0px 100px' ? 'linear-gradient(to right, #' + channel_color + ', black)' : 'url(/images/luts_10.png)') :
-                           (lutBgPos === '0px 100px' ? 'linear-gradient(to left, #' + channel_color + ', black)' : 'url(/images/luts_10.png)') %>;
+                        background-image: <%= lutBgPos === '0px 100px' ? 'linear-gradient(to left, #' + channel_color + ', black)' : 'url(' + lut_url + ')' %>;
                         <%= lutBgPos !== '0px 100px' ? 'background-position: ' + lutBgPos : '' %>;">
             </div>
             <div class="colorbar_ticks colorbar_ticks_<%= position %>">
