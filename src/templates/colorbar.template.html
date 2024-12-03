@@ -42,16 +42,17 @@
                         background-image: <%= reverseIntensity ? 
                            (lutBgPos === '0px 100px' ? 'linear-gradient(to right, #' + channel_color + ', black)' : 'url(/images/luts_10.png)') :
                            (lutBgPos === '0px 100px' ? 'linear-gradient(to left, #' + channel_color + ', black)' : 'url(/images/luts_10.png)') %>;
-                        background-image: <%= lutBgPos === '0px 100px' ? 'linear-gradient(to left, #' + channel_color + ', black)' : 'url(' + lut_url + ')' %>;
                         <%= lutBgPos !== '0px 100px' ? 'background-position: ' + lutBgPos : '' %>;">
             </div>
         <% } else { %>
             <!-- Default order for non-'top' positions -->
             <div class="lutBg colorbar_bg"
-                 style="height: <%= thickness %>px;
-                        background-image: <%= lutBgPos === '0px 100px' ? 'linear-gradient(to left, #' + channel_color + ', black)' : 'url(' + lut_url + ')' %>;
-                        <%= lutBgPos !== '0px 100px' ? 'background-position: ' + lutBgPos : '' %>;">
-            </div>
+            style="height: <%= thickness %>px;
+                   background-image: <%= reverseIntensity ? 
+                      (lutBgPos === '0px 100px' ? 'linear-gradient(to right, #' + channel_color + ', black)' : 'url(/images/luts_10.png)') :
+                      (lutBgPos === '0px 100px' ? 'linear-gradient(to left, #' + channel_color + ', black)' : 'url(/images/luts_10.png)') %>;
+                   <%= lutBgPos !== '0px 100px' ? 'background-position: ' + lutBgPos : '' %>;">
+       </div>
             <div class="colorbar_ticks colorbar_ticks_<%= position %>">
                 <div class="ticks ticks_<%= position %>" style="border-top: 2px solid #<%= color %>;">
                     <% 

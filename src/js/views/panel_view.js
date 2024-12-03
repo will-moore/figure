@@ -361,11 +361,7 @@
             this.render_layout();
         },
 
-<<<<<<< HEAD
-        render_colorbar: function() {
-=======
-        render_calib: async function() {
->>>>>>> 51b1b7af6b947400b92940ab8437166f5bd5bd03
+        render_colorbar: async function() {
 
             if (this.$colorbar) {
                 this.$colorbar.remove();
@@ -389,22 +385,6 @@
             var lutBgPos = FigureLutPicker.getLutBackgroundPosition(channel_color);
             if (cb && cb.show) {
                 var cb_json = {
-<<<<<<< HEAD
-                        position: cb.position,
-                        show: cb.show,
-                        thickness: cb.thickness,
-                        font_size: cb.font_size,
-                        color: cb.color,
-                        ticks_parameter: cb.ticks_parameter,
-                        length: cb.length,
-                        spacing: cb.spacing,
-                        tick_label_spacing: cb.tick_label_spacing,
-                        start: start,
-                        end: end,
-                        channel_color: channel_color,
-                        lutBgPos: lutBgPos,
-                        reverseIntensity: reverseIntensity,
-=======
                     position: cb.position,
                     show: cb.show,
                     thickness: cb.thickness,
@@ -413,12 +393,13 @@
                     ticks_parameter: cb.ticks_parameter,
                     length: cb.length,
                     spacing: cb.spacing,
+                    tick_label_spacing: cb.tick_label_spacing,
                     start: start,
                     end: end,
                     channel_color: channel_color,
                     lutBgPos: lutBgPos,
-                    lut_url: lut_url
->>>>>>> 51b1b7af6b947400b92940ab8437166f5bd5bd03
+                    lut_url: lut_url,
+                    reverseIntensity: reverseIntensity,
                 };
                 console.log("Reverse Intensity", reverseIntensity);
                 var cb_html = this.colorbar_template(cb_json);
