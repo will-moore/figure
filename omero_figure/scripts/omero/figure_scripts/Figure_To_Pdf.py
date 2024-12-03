@@ -373,16 +373,11 @@ class ShapeToPdfExport(ShapeExport):
 
     def draw_text(self, shape):
         text_coords = self.panel_to_page_coords(shape['x'], shape['y'])
-
         text = html.escape(shape.get('text', ''))
         if not text:
             return
-
-        if markdown_imported:
-            # convert markdown to html
-            text = markdown.markdown(text)
-
-        size = shape.get('fontSize', 12) * 2 / 3
+        size = shape.get('fontSize', 12)
+        strokeWidth = shape.get('strokeWidth', 2)
         r, g, b, a = self.get_rgba(shape['strokeColor'])
         # bump up alpha a bit to make text more readable
         rgba = (r, g, b, 0.5 + a / 2.0)
@@ -411,7 +406,7 @@ class ShapeToPdfExport(ShapeExport):
 
         w, h = para.wrap(self.page_width, 100)
         para.drawOn(
-            self.canvas, x, y - h/2 + int(size * 0.25))
+            self.canvas, x + int(strokeWidth*0.25), y - h/2 - int(size * 0.25) - int(strokeWidth*0.25))
 
     def draw_line(self, shape):
         start = self.panel_to_page_coords(shape['x1'], shape['y1'])

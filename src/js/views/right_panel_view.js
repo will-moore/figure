@@ -139,12 +139,12 @@
                 var strokeWidth = parseFloat($('button.inset-width span:first', this.$el).attr('data-line-width'));
                 var x = vp.x + ((vp.width - rectSize) / 2);
                 var y = vp.y + ((vp.height - rectSize) / 2);
-                var txtX = vp.x + ((vp.width - rectSize) / 2) + 12,
-                    txtY = vp.y + ((vp.height - rectSize) / 2) + strokeWidth + 12;
+                var txtX = x + 12,
+                    txtY = y + strokeWidth + 12;
 
                 let rect = {
                     type: "Rectangle",
-                    strokeWidth,
+                    strokeWidth: strokeWidth,
                     strokeColor: "#" + color,
                     x: x,
                     y: y,
@@ -156,7 +156,7 @@
                 }
                 let text = {
                     type: "Text",
-                    strokeWidth,
+                    strokeWidth: strokeWidth,
                     strokeColor: "#" + color,
                     x: txtX,
                     y: txtY,
@@ -172,11 +172,11 @@
                 panel.setLastInsetTextIndex(lastInsetTextIndex)
 
                 var new_label = {
-                    text:"**"+String.fromCharCode(lastInsetTextIndex)+"**",
-                    size:12,
-                    position:"topleft",
-                    color:color,
-                    inset:true,
+                    text: "**"+String.fromCharCode(lastInsetTextIndex)+"**",
+                    size: 18,
+                    position: "topleft",
+                    color: color,
+                    inset: true,
                 };
                 var prev_labels = panel.get('labels') || []
                 var labels = [...prev_labels]
