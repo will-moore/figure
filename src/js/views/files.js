@@ -256,6 +256,10 @@ export var FileListView = Backbone.View.extend({
             self.$tbody.prepend(e);
         });
         var owners = this.model.pluck("owner");
+        // Lookup owner by ID "before" filtering, in case the chosen owner is filtered out
+        let owner = owners.find(o => o.id == filter.owner);
+        let ownerName = owner ? `${owner.firstName} ${owner.lastName}`: "Show All";
+
         if (filter.group) {
             let ownerIds = this.model.models.filter(f => f.get('group').id == filter.group).map(f => f.get('owner').id);
             owners = owners.filter(o => ownerIds.includes(o.id));
@@ -284,8 +288,6 @@ export var FileListView = Backbone.View.extend({
                 </a></li>`;
         });
         $("#owner-menu").html(ownersHtml);
-        let owner = owners.find(o => o.id == filter.owner);
-        let ownerName = owner ? `${owner.firstName} ${owner.lastName}`: "Show All";
         $("#selected_owner").html(ownerName);
 
         // render groups chooser
