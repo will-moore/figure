@@ -137,10 +137,27 @@
                 var color = $('.inset-color span:first', this.$el).attr('data-color');
                 var position = $('.label-position i:first', this.$el).attr('data-position');
                 var strokeWidth = parseFloat($('button.inset-width span:first', this.$el).attr('data-line-width'));
+
+                var maxSize = 550,
+                frame_w = maxSize,
+                frame_h = maxSize,
+                wh = panel.get('width') / panel.get('height');
+                if (wh <= 1) {
+                    frame_h = maxSize;
+                    frame_w = maxSize * wh;
+                } else {
+                    frame_w = maxSize;
+                    frame_h = maxSize / wh;
+                }
+
+                // Get css for the SVG (full plane)
+                var svg_css = panel.get_vp_full_plane_css(panel.get('zoom'), frame_w, frame_h);
+                var scale = svg_css.width / panel.get('orig_width');
+
                 var x = vp.x + ((vp.width - rectSize) / 2);
                 var y = vp.y + ((vp.height - rectSize) / 2);
-                var txtX = x + 12,
-                    txtY = y + strokeWidth + 12;
+                var txtX = x + (strokeWidth/2 + 6) / scale,
+                    txtY = y + (strokeWidth/2 + 10)  / scale;
 
                 let rect = {
                     type: "Rectangle",
