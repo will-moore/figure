@@ -558,8 +558,41 @@
             let axes = multiscales[0].axes;
             let axesNames = axes.map(axis => axis.name);
 
-            let zarray = await fetch(`${zarrUrl}/${dsPath}/.zarray`).then(rsp => rsp.json());
+            let datasets = multiscales[0].datasets;
+            let zarrays = [];
+            // 'consolidate' the metadata for all arrays
+            for (let ds of datasets) {
+                let zarray = await fetch(`${zarrUrl}/${ds.path}/.zarray`).then(rsp => rsp.json());
+                zarrays.push(zarray);
+            }
+            // store under 'arrays' key
+            zattrs['arrays'] = zarrays;
+
+            let zarray = zarrays[0];
             console.log("zarray", zarray);
+
+            // e.g. "<u1" -> "uint8"
+            let dtypeToPixelsType = (dtype) => {
+                let dt = "";
+                if (dtype.includes("u")) {
+                    dt += "uint";
+                } else if (dtype.includes("i")) {
+                    dt += "int";
+                } else if (dtype.includes("f")) {
+                    dt += "float";
+                }
+                if (dtype.includes("8")) {
+                    dt += "64";
+                } else if (dtype.includes("4")) {
+                    dt += "32";
+                } else if (dtype.includes("2")) {
+                    dt += "16";
+                } else if (dtype.includes("1")) {
+                    dt += "8";
+                }
+                return dt;
+            }
+            let dtype = zarray.dtype;  
             let shape = zarray.shape;
             let dims = shape.length;
             let sizeX = shape[dims - 1];
@@ -629,8 +662,10 @@
                 // 'pixel_size_x_unit': data.pixel_size.unitX,
                 // 'pixel_size_z_unit': data.pixel_size.unitZ,
                 // 'deltaT': data.deltaT,
-                // 'pixelsType': data.meta.pixelsType,
+                'pixelsType': dtypeToPixelsType(dtype),
                 // 'pixel_range': data.pixel_range,
+                // let's dump the zarr data into the panel
+                'zarr': zattrs,
             };
             // create Panel (and select it)
             // We do some additional processing in Panel.parse()
