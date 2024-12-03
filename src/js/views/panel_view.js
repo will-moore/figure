@@ -371,7 +371,6 @@
                 end = 125,
                 reverseIntensity = false,
                 channel_color = "";
-            console.log("channel model", this.model.get('channels'));
             for (const chann of this.model.get('channels')) {
                 if(chann.active) {
                     channel_color = chann.color;
@@ -401,7 +400,6 @@
                     lut_url: lut_url,
                     reverseIntensity: reverseIntensity,
                 };
-                console.log("Reverse Intensity", reverseIntensity);
                 var cb_html = this.colorbar_template(cb_json);
                 this.$el.append(cb_html);
             }
