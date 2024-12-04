@@ -305,9 +305,9 @@ class ShapeToPdfExport(ShapeExport):
         h_flip = self.panel.get('horizontal_flip', False)
         v_flip = self.panel.get('vertical_flip', False)
         if h_flip:
-            shape_x = self.crop['width'] - shape_x + 2*self.crop['x']
+            shape_x = self.crop['width'] - shape_x + 2 * self.crop['x']
         if v_flip:
-            shape_y = self.crop['height'] - shape_y + 2*self.crop['y']
+            shape_y = self.crop['height'] - shape_y + 2 * self.crop['y']
 
         rotation = self.panel['rotation']
         if v_flip != h_flip:
@@ -373,9 +373,12 @@ class ShapeToPdfExport(ShapeExport):
 
     def draw_text(self, shape):
         text_coords = self.panel_to_page_coords(shape['x'], shape['y'])
-        text = html.escape(shape.get('text', ''))
-        if not text:
-            return
+        text = ""
+
+        if markdown_imported:
+            # convert markdown to html
+            text = markdown.markdown(shape.get('text'))
+
         size = shape.get('fontSize', 12)
         strokeWidth = shape.get('strokeWidth', 2)
         r, g, b, a = self.get_rgba(shape['strokeColor'])
@@ -387,10 +390,10 @@ class ShapeToPdfExport(ShapeExport):
         anchor = shape['textAnchor']
         aligment = TA_LEFT
 
-        if(anchor == 'middle'):
+        if (anchor == 'middle'):
             aligment = TA_CENTER
             x = x - (self.page_width / 2)
-        elif(anchor == "end"):
+        elif (anchor == "end"):
             aligment = TA_RIGHT
             x = x - self.page_width
 
@@ -406,7 +409,7 @@ class ShapeToPdfExport(ShapeExport):
 
         w, h = para.wrap(self.page_width, 100)
         para.drawOn(
-            self.canvas, x + int(strokeWidth*0.25), y - h/2 - int(size * 0.25) - int(strokeWidth*0.25))
+            self.canvas, x + int(strokeWidth * 0.25), y - h / 2 - int(size * 0.25) - int(strokeWidth * 0.25))
 
     def draw_line(self, shape):
         start = self.panel_to_page_coords(shape['x1'], shape['y1'])
@@ -637,9 +640,9 @@ class ShapeToPilExport(ShapeExport):
 
         # Apply flip transformations to the shape coordinates
         if h_flip:
-            shape_x = self.crop['width'] - shape_x + 2*self.crop['x']
+            shape_x = self.crop['width'] - shape_x + 2 * self.crop['x']
         if v_flip:
-            shape_y = self.crop['height'] - shape_y + 2*self.crop['y']
+            shape_y = self.crop['height'] - shape_y + 2 * self.crop['y']
 
         rotation = self.panel['rotation']
         if v_flip != h_flip:
@@ -771,7 +774,7 @@ class ShapeToPilExport(ShapeExport):
         # with correct stroke width
         r, g, b, a = self.get_rgba_int(shape.get('fillColor', '#00000000'))
         if 'fillOpacity' in shape:
-            a = int(float(shape['fillOpacity'])*255)
+            a = int(float(shape['fillOpacity']) * 255)
         rgba = (r, g, b, a)
 
         # need to draw on separate image and then paste on to get transparency
@@ -830,7 +833,7 @@ class ShapeToPilExport(ShapeExport):
         # with correct stroke width
         r, g, b, a = self.get_rgba_int(shape.get('fillColor', '#00000000'))
         if 'fillOpacity' in shape:
-            a = int(float(shape['fillOpacity'])*255)
+            a = int(float(shape['fillOpacity']) * 255)
         rgba = (r, g, b, a)
 
         # need to draw on separate image and then paste on to get transparency
@@ -916,7 +919,7 @@ class ShapeToPilExport(ShapeExport):
 
         r, g, b, a = self.get_rgba_int(shape.get('fillColor', '#00000000'))
         if 'fillOpacity' in shape:
-            a = int(float(shape['fillOpacity'])*255)
+            a = int(float(shape['fillOpacity']) * 255)
         rgba = (r, g, b, a)
 
         # when rx is ~zero (for a Point, scaled down) don't need inner ellipse
@@ -1710,8 +1713,8 @@ class FigureExport(object):
 
             self.draw_text(
                 label, (lx + lx_end) / 2,
-                ly + ((-1 if position in ["bottomleft", "bottomright"]
-                       else 1) * half_height),
+                       ly + ((-1 if position in ["bottomleft", "bottomright"]
+                              else 1) * half_height),
                 font_size, (red, green, blue),
                 align="center")
 
