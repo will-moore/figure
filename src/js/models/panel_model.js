@@ -3,7 +3,7 @@
     import _ from "underscore";
     import $ from "jquery";
     import { rotatePoint } from "../views/util";
-
+    import {renderZarrToSrc} from "./zarr_utils";
     // Corresponds to css - allows us to calculate size of labels
     var LINE_HEIGHT = 1.43;
 
@@ -977,7 +977,14 @@
             return this.get('orig_width') * this.get('orig_height') > MAX_PLANE_SIZE;
         },
 
-        get_img_src: function(force_no_padding) {
+        get_zarr_img_src: async function() {
+            return renderZarrToSrc(this.get('imageId'), this.get('zarr'), this.get('theZ'), this.get('theT'), this.get('channels'));
+        },
+
+        get_img_src: async function(force_no_padding) {
+            if (this.get("zarr")) {
+                return this.get_zarr_img_src();
+            }
             var chs = this.get('channels');
             var cStrings = chs.map(function(c, i){
                 return (c.active ? '' : '-') + (1+i) + "|" + c.window.start + ":" + c.window.end + "$" + c.color;

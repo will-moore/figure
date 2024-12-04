@@ -43,6 +43,6 @@
     "sortablejs": "^1.15.2",
     "underscore": "^1.13.4",
     "vite-plugin-html-inject": "^1.1.2",
-    "zarrita": "^0.4.0-next.17"
+    "zarrita": "^0.4.0-next.19"
   }
 }

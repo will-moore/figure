@@ -559,11 +559,12 @@
             let axesNames = axes.map(axis => axis.name);
 
             let datasets = multiscales[0].datasets;
-            let zarrays = [];
+            let zarrays = {};
             // 'consolidate' the metadata for all arrays
             for (let ds of datasets) {
-                let zarray = await fetch(`${zarrUrl}/${ds.path}/.zarray`).then(rsp => rsp.json());
-                zarrays.push(zarray);
+                let path = ds.path;
+                let zarray = await fetch(`${zarrUrl}/${path}/.zarray`).then(rsp => rsp.json());
+                zarrays[path] = zarray;
             }
             // store under 'arrays' key
             zattrs['arrays'] = zarrays;

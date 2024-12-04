@@ -201,8 +201,8 @@
                 this.$img_panel.show();
             }.bind(this));
 
-            var src = this.model.get_img_src();
-            this.$img_panel.attr('src', src);
+            this.model.get_img_src()
+                .then(src => this.$img_panel.attr('src', src));
 
             // if a 'reasonable' dpi is set, we don't pixelate
             if (this.model.get('min_export_dpi') > 100) {
