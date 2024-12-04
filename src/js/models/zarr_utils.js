@@ -2,6 +2,8 @@
 import * as zarr from "zarrita";
 import { slice } from "@zarrita/indexing";
 
+const ZARRITA_ARRAY_CACHE = {};
+const ZARR_DATA_CACHE = {};
 
 export async function renderZarrToSrc(source, attrs, theZ, theT, channels) {
   let paths = attrs.multiscales[0].datasets.map((d) => d.path);
@@ -28,9 +30,15 @@ export async function renderZarrToSrc(source, attrs, theZ, theT, channels) {
   }
   
   console.log("Init zarr.FetchStore:", source + "/" + path);
-  const store = new zarr.FetchStore(source + "/" + path);
-  
-  const arr = await zarr.open(store, { kind: "array" });
+  let storeArrayPath = source + "/" + path;
+  let arr;
+  if (ZARRITA_ARRAY_CACHE[storeArrayPath]) {
+    arr = ZARRITA_ARRAY_CACHE[storeArrayPath];
+  } else {
+    let store = new zarr.FetchStore(source + "/" + path);
+    arr = await zarr.open(store, { kind: "array" });
+    ZARRITA_ARRAY_CACHE[storeArrayPath] = arr;
+  }
 
   let chDim = axes.indexOf("c");
   let shape = zarrays[path].shape;
@@ -51,26 +59,45 @@ export async function renderZarrToSrc(source, attrs, theZ, theT, channels) {
   console.log("minMaxValues", minMaxValues);
 
   let promises = activeChIndicies.map((chIndex) => {
+    let sliceKey = [];
     let slices = shape.map((dimSize, index) => {
       // channel
-      if (index == chDim) return chIndex;
+      if (index == chDim) {
+        sliceKey.push("" + chIndex);
+        return chIndex;
+      }
       // x and y
       if (index >= dims - 2) {
+        sliceKey.push(`${0}:${dimSize}`);
         return slice(0, dimSize);
       }
       // z
       if (axes[index] == "z") {
-        return parseInt(dimSize / 2 + "");
+        sliceKey.push("" + theZ);
+        return theZ;
       }
       if (axes[index] == "t") {
-        return parseInt(dimSize / 2 + "");
+        sliceKey.push("" + theT);
+        return theT;
       }
       return 0;
     });
-    console.log("Zarr chIndex slices:", chIndex, slices);
+    let cacheKey = `${source}/${path}/${sliceKey.join(",")}`;
+    console.log("cacheKey", cacheKey);
+    console.log("Zarr chIndex slices:", chIndex, "" + slices);
     console.log("Zarr chIndex shape:", chIndex, shape);
     // TODO: add controller: { opts: { signal: controller.signal } }
-    return zarr.get(arr, slices);
+    // check cache!
+    if (ZARR_DATA_CACHE[cacheKey]) {
+      console.log("RETURN cache!", ZARR_DATA_CACHE[cacheKey]);
+      return ZARR_DATA_CACHE[cacheKey];
+    }
+
+    return zarr.get(arr, slices).then(data => {
+      console.log("populate cache...");
+      ZARR_DATA_CACHE[cacheKey] = data;
+      return data;
+    });
   });
 
   let ndChunks = await Promise.all(promises);
@@ -86,7 +113,6 @@ export async function renderZarrToSrc(source, attrs, theZ, theT, channels) {
   const context = canvas.getContext("2d");
   context.putImageData(new ImageData(rbgData, width, height), 0, 0);
   let dataUrl = canvas.toDataURL("image/png");
-  console.log("Zarr dataUrl", dataUrl);
   return dataUrl;
 }
 
