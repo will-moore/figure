@@ -8,7 +8,7 @@
             <!-- Top is has colorbar rendered after ticks -->
             <div class="lutBg colorbar_bg"
                 style="height: <%= thickness %>px;
-                        background-image: <%= isLUT ? 'linear-gradient(to right, #' + color + ', black)' : 'url(' + lut_url + ')' %>;
+                        background-image: <%= isLUT ? 'url(' + lut_url + ')' : 'linear-gradient(to left, #' + color + ', black)' %>;
                         <%= isLUT ? 'background-position: ' + lutBgPos : '' %>;
                         <%= reverseIntensity ? 'transform: scaleX(-1);' : '' %>;">
             </div>
@@ -28,7 +28,7 @@
         <% if (position === 'top') { %>
             <div class="lutBg colorbar_bg"
                 style="height: <%= thickness %>px;
-                        background-image: <%= isLUT ? 'linear-gradient(to right, #' + color + ', black)' : 'url(' + lut_url + ')' %>;
+                        background-image: <%= isLUT ? 'url(' + lut_url + ')' : 'linear-gradient(to left, #' + color + ', black)' %>;
                         <%= isLUT ? 'background-position: ' + lutBgPos : '' %>;
                         <%= reverseIntensity ? 'transform: scaleX(-1);' : '' %>;">
             </div>
