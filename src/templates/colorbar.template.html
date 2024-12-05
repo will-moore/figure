@@ -1,85 +1,36 @@
 <div class="colorbar colorbar_<%= position %>"
      style="<% if (position === 'top') { %> margin-bottom: <%= spacing %>px; <% }
-                else if (position === 'bottom') { %> margin-top: <%= spacing %>px; <% }
-                else if (position === 'left') { %> margin-right: <%= spacing %>px; <% }
-                else if (position === 'right') { %> margin-left: <%= spacing %>px; <% } %>">
+               else if (position === 'bottom') { %> margin-top: <%= spacing %>px; <% }
+               else if (position === 'left') { %> margin-right: <%= spacing %>px; <% }
+               else if (position === 'right') { %> margin-left: <%= spacing %>px; <% } %>">
     <% if (show) { %>
-        <% if (position === 'top') { %>
-            <!-- Render div 2 first for 'top' -->
-            <div class="colorbar_ticks colorbar_ticks_<%= position %>">
-                <div class="ticks ticks_<%= position %>" style="border-top: 2px solid #<%= axis_color %>;">
-                    <%
-                        var interval = Math.floor((end - start) / (num_ticks - 1));
-                    %>
-                    <!-- First tick (start value) -->
-                    <div class="tick">
-                        <div class="dash" style="background-color: #<%= axis_color %>; height: <%= tick_len %>px; margin-bottom:<%= label_margin %>px"></div>
-                        <span class="label" style="color: #<%= axis_color %>; font-size: <%= font_size %>px;"><%= start %></span>
-                    </div>
-
-                    <!-- Intermediate ticks -->
-                    <% for (let i = 1; i < num_ticks - 1; i++) { %>
-                        <div class="tick">
-                            <div class="dash" style="background-color: #<%= axis_color %>; height: <%= tick_len %>px; margin-bottom:<%= label_margin %>px"></div>
-                            <span class="label" style="color: #<%= axis_color %>; font-size: <%= font_size %>px;">
-                                <%= Math.abs(start + i * interval) %>
-                            </span>
-                        </div>
-                    <% } %>
-
-                    <!-- Last tick (end value) -->
-                    <div class="tick">
-                        <div class="dash" style="background-color: #<%= axis_color %>; height: <%= tick_len %>px; margin-bottom:<%= label_margin %>px"></div>
-                        <span class="label" style="color: #<%= axis_color %>; font-size: <%= font_size %>px;"><%= end %></span>
-                    </div>
-
-                </div>
-            </div>
+        <% if (position !== 'top') { %>
+            <!-- Top is has colorbar rendered after ticks -->
             <div class="lutBg colorbar_bg"
                 style="height: <%= thickness %>px;
-                        background-image: <%= reverseIntensity ?
-                        (lutBgPos === '0px 100px' ? 'linear-gradient(to right, #' + color + ', black)' : 'url(' + lut_url + ')') :
-                        (lutBgPos === '0px 100px' ? 'linear-gradient(to left, #' + color + ', black)' : 'url(' + lut_url + ')') %>;
-                        <%= lutBgPos !== '0px 100px' && reverseIntensity ? 'transform: scaleX(-1);' : '' %>;
-                        <%= lutBgPos !== '0px 100px' ? 'background-position: ' + lutBgPos : '' %>;">
+                        background-image: <%= isLUT ? 'linear-gradient(to right, #' + color + ', black)' : 'url(' + lut_url + ')' %>;
+                        <%= isLUT ? 'background-position: ' + lutBgPos : '' %>;
+                        <%= reverseIntensity ? 'transform: scaleX(-1);' : '' %>;">
             </div>
-        <% } else { %>
-            <!-- Default order for non-'top' positions -->
-            <div class="lutBg colorbar_bg"
-            style="height: <%= thickness %>px;
-                        background-image: <%= reverseIntensity ?
-                        (lutBgPos === '0px 100px' ? 'linear-gradient(to right, #' + color + ', black)' : 'url(' + lut_url + ')') :
-                        (lutBgPos === '0px 100px' ? 'linear-gradient(to left, #' + color + ', black)' : 'url(' + lut_url + ')') %>;
-                        <%= lutBgPos !== '0px 100px' && reverseIntensity ? 'transform: scaleX(-1);' : '' %>;
-                        <%= lutBgPos !== '0px 100px' ? 'background-position: ' + lutBgPos : '' %>;">
-       </div>
-            <div class="colorbar_ticks colorbar_ticks_<%= position %>">
-                <div class="ticks ticks_<%= position %>" style="border-top: 2px solid #<%= axis_color %>;">
-                    <%
-                        var interval = Math.floor((end - start) / (num_ticks - 1));
-                    %>
-                    <!-- First tick (start value) -->
-                    <div class="tick">
-                        <div class="dash dash" style="background-color: #<%= axis_color %>; height: <%= tick_len %>px; margin-bottom:<%= label_margin %>px"></div>
-                        <span class="label" style="color: #<%= axis_color %>; font-size: <%= font_size %>px;"><%= start %></span>
-                    </div>
+        <% } %>
 
-                    <!-- Intermediate ticks -->
-                    <% for (let i = 1; i < num_ticks - 1; i++) { %>
-                        <div class="tick">
-                            <div class="dash" style="background-color: #<%= axis_color %>; height: <%= tick_len %>px; margin-bottom:<%= label_margin %>px"></div>
-                            <span class="label" style="color: #<%= axis_color %>; font-size: <%= font_size %>px;">
-                                <%= Math.abs(start + i * interval) %>
-                            </span>
-                        </div>
-                    <% } %>
-
-                    <!-- Last tick (end value) -->
-                    <div class="tick">
-                        <div class="dash" style="background-color: #<%= axis_color %>; height: <%= tick_len %>px; margin-bottom:<%= label_margin %>px"></div>
-                        <span class="label" style="color: #<%= axis_color %>; font-size: <%= font_size %>px;"><%= end %></span>
-                    </div>
+        <div class="colorbar_ticks colorbar_ticks_<%= position %>" style="border-top: 2px solid #<%= axis_color %>;">
+            <% for (let i = 0; i < num_ticks; i++) { %>
+                <div class="tick">
+                    <div class="dash" style="background-color: #<%= axis_color %>; height: <%= tick_len %>px; margin-bottom:<%= label_margin %>px"></div>
+                    <span class="label" style="color: #<%= axis_color %>; font-size: <%= font_size %>px;">
+                        <%= Math.round((end - start) * i / (num_ticks-1)) %>
+                    </span>
                 </div>
+            <% } %>
+        </div>
+
+        <% if (position === 'top') { %>
+            <div class="lutBg colorbar_bg"
+                style="height: <%= thickness %>px;
+                        background-image: <%= isLUT ? 'linear-gradient(to right, #' + color + ', black)' : 'url(' + lut_url + ')' %>;
+                        <%= isLUT ? 'background-position: ' + lutBgPos : '' %>;
+                        <%= reverseIntensity ? 'transform: scaleX(-1);' : '' %>;">
             </div>
         <% } %>
     <% } %>

@@ -28,7 +28,6 @@
         scalebar_template: _.template(scalebar_panel_template),
         colorbar_template: _.template(colorbar_panel_template),
 
-
         initialize: function(opts) {
             // we render on Changes in the model OR selected shape etc.
             this.model.on('destroy', this.remove, this);
@@ -157,6 +156,11 @@
                 var sb_pixels = convert_factor * physical_length / this.model.get('pixel_size_x');
                 var sb_width = panel_scale * sb_pixels;
                 this.$scalebar.css('width', sb_width);
+            }
+            var cb = this.model.get('colorbar');
+            if (cb && cb.show && (cb.position == "left" || cb.position == "right")) {
+                this.$colorbar.css('width', h);
+                this.$colorbar.css('height', h);
             }
         },
 
@@ -382,6 +386,7 @@
             }
             var lut_url = await FigureLutPicker.loadLuts(false)  // Ensure lut url and list are loaded
             var lutBgPos = FigureLutPicker.getLutBackgroundPosition(color);
+            var isLUT = (color.length != 6) && isNaN(parseInt(color, 16))  // check if it's a normal color or a LUT
             if (cb && cb.show) {
                 var cb_json = {
                     position: cb.position,
@@ -396,6 +401,7 @@
                     start: start,
                     end: end,
                     color: color,
+                    isLUT: isLUT,
                     lutBgPos: lutBgPos,
                     lut_url: lut_url,
                     reverseIntensity: reverseIntensity,
