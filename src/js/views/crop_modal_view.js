@@ -513,7 +513,6 @@ export const CropModalView = Backbone.View.extend({
                 let rotation = rect.rotation || 0;
                 if (rect.theT > -1) this.m.set('theT', rect.theT, {'silent': true});
                 if (rect.theZ > -1) this.m.set('theZ', rect.theZ, {'silent': true});
-                src = this.m.get_img_src(true);
                 if (rect.width > rect.height) {
                     div_w = size;
                     div_h = (rect.height/rect.width) * div_w;
@@ -529,8 +528,12 @@ export const CropModalView = Backbone.View.extend({
                 rect.theT = rect.theT !== undefined ? rect.theT : origT;
                 rect.theZ = rect.theZ !== undefined ? rect.theZ : origZ;
                 let css = this.m._viewport_css(left, top, img_w, img_h, size, size, rotation);
+                let random_id = "rect_" + Math.random();
+                this.m.get_img_src(true)
+                    .then(src => document.getElementById(random_id).src = src);
 
                 var json = {
+                    'id': random_id,
                     'msg': msg,
                     'src': src,
                     'rect': rect,
@@ -586,15 +589,15 @@ export const CropModalView = Backbone.View.extend({
             this.m.set('zoom', 100);
             this.m.set('width', newW);
             this.m.set('height', newH);
-            var src = this.m.get_img_src(true);
+            this.m.get_img_src(true)
+                .then(src => this.$cropImg.attr('src', src));
             var css = this.m.get_vp_full_plane_css(100, newW, newH);
 
             this.paper.setSize(newW, newH);
             $("#crop_paper").css({'height': newH, 'width': newW});
             $("#cropViewer").css({'height': newH, 'width': newW});
 
-            this.$cropImg.css(css)
-                    .attr('src', src);
+            this.$cropImg.css(css);
 
             var roiX = this.currentROI.x * scale,
                 roiY = this.currentROI.y * scale,

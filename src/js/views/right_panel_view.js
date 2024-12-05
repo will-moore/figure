@@ -1043,9 +1043,14 @@
                 var frame_h = this.full_size / wh;
             }
             this.models.forEach(function(m){
-                var src = m.get_img_src();
+                var img_id = "image_" + Math.random();
+                // src is async, so we set an id instead. When src returns we
+                // use the ID to find the element and set the src.
+                m.get_img_src().then(src => {
+                    document.getElementById(img_id).src = src;
+                });
                 var img_css = m.get_vp_img_css(m.get('zoom'), frame_w, frame_h);
-                img_css.src = src;
+                img_css.id = img_id;
                 // if a 'reasonable' dpi is set, we don't pixelate
                 var dpiSet = m.get('min_export_dpi') > 100;
                 img_css.pixelated = !dpiSet;

@@ -2,7 +2,8 @@
 <tr class="roiPickMe">
     <td>
         <div class="roi_wrapper" style="position: relative; overflow: hidden; margin: 5px; height: <%= h %>px; width: <%= w %>px">
-            <img class="roi_content"
+            <img id="<%= id %>"
+                class="roi_content"
                 data-roiId="<%= roiId %>"
                 data-rotation="<%= rect.rotation %>"
                 data-x="<%= rect.x %>" data-y="<%= rect.y %>" 
