@@ -1766,6 +1766,7 @@ class FigureExport(object):
         color_ramp = self.get_color_ramp(channel)
 
         spacing = colorbar["spacing"]
+        thickness = colorbar["thickness"]
         cbar = {  # Dict of colorbar properties to pass to paste_image
             'zoom': '100',
             'dx': 0,
@@ -1773,18 +1774,16 @@ class FigureExport(object):
             'orig_height': panel['orig_height'],
             'orig_width': panel['orig_width'],
         }
-        colorbar["num_ticks"] = 6
-        colorbar["tick_len"] = 3
         start, end = channel["window"]["start"], channel["window"]["end"]
         labels = numpy.unique(numpy.linspace(start, end,
                                              num=colorbar["num_ticks"],
                                              dtype=int))
         if colorbar["position"] in ["left", "right"]:
             color_ramp = color_ramp.transpose((1, 0, 2))[::-1]
-            cbar['width'] = colorbar['thickness']
+            cbar['width'] = thickness
             cbar['height'] = panel['height']
             cbar['y'] = panel['y']
-            cbar['x'] = panel['x'] - (spacing + colorbar['thickness'])
+            cbar['x'] = panel['x'] - (spacing + thickness)
             labels_x = [cbar['x']]
             labels_y = cbar['y'] + panel['height'] * (1 - labels / end)
             align = "right"
@@ -1795,9 +1794,9 @@ class FigureExport(object):
             labels_x *= labels.size  # Duplicate x postions
         elif colorbar["position"] in ["top", "bottom"]:
             cbar['width'] = panel['width']
-            cbar['height'] = colorbar['thickness']
+            cbar['height'] = thickness
             cbar['x'] = panel['x']
-            cbar['y'] = panel['y'] - (spacing + colorbar['thickness'])
+            cbar['y'] = panel['y'] - (spacing + thickness)
             labels_x = cbar['x'] + panel['width'] * labels / end
             labels_y = [cbar['y']]
             align = "center"

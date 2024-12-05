@@ -370,10 +370,10 @@
             var start = 0,
                 end = 125,
                 reverseIntensity = false,
-                channel_color = "";
+                color = "";
             for (const chann of this.model.get('channels')) {
                 if(chann.active) {
-                    channel_color = chann.color;
+                    color = chann.color;
                     start = chann.window?.start;
                     end = chann.window?.end;
                     reverseIntensity = chann.reverseIntensity;
@@ -381,21 +381,21 @@
                 }
             }
             var lut_url = await FigureLutPicker.loadLuts(false)  // Ensure lut url and list are loaded
-            var lutBgPos = FigureLutPicker.getLutBackgroundPosition(channel_color);
+            var lutBgPos = FigureLutPicker.getLutBackgroundPosition(color);
             if (cb && cb.show) {
                 var cb_json = {
                     position: cb.position,
                     show: cb.show,
                     thickness: cb.thickness,
                     font_size: cb.font_size,
-                    color: cb.color,
-                    ticks_parameter: cb.ticks_parameter,
-                    length: cb.length,
+                    axis_color: cb.axis_color,
+                    num_ticks: cb.num_ticks,
+                    tick_len: cb.tick_len,
                     spacing: cb.spacing,
-                    tick_label_spacing: cb.tick_label_spacing,
+                    label_margin: cb.label_margin,
                     start: start,
                     end: end,
-                    channel_color: channel_color,
+                    color: color,
                     lutBgPos: lutBgPos,
                     lut_url: lut_url,
                     reverseIntensity: reverseIntensity,
