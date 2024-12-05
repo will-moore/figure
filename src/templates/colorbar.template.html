@@ -8,10 +8,10 @@
             <!-- Render div 2 first for 'top' -->
             <div class="colorbar_ticks colorbar_ticks_<%= position %>">
                 <div class="ticks ticks_<%= position %>" style="border-top: 2px solid #<%= color %>;">
-                    <% 
+                    <%
                         var tickStart = reverseIntensity ? end : start;
                         var tickEnd = reverseIntensity ? start : end;
-                        var interval = Math.floor((tickEnd - tickStart) / (ticks_parameter - 1)); 
+                        var interval = Math.floor((tickEnd - tickStart) / (ticks_parameter - 1));
                     %>
                     <!-- First tick (start value) -->
                     <div class="tick">
@@ -39,9 +39,9 @@
             </div>
             <div class="lutBg colorbar_bg"
                 style="height: <%= thickness %>px;
-                        background-image: <%= reverseIntensity ? 
-                        (lutBgPos === '0px 100px' ? 'linear-gradient(to right, #' + channel_color + ', black)' : 'url(/images/luts_10.png)') :
-                        (lutBgPos === '0px 100px' ? 'linear-gradient(to left, #' + channel_color + ', black)' : 'url(/images/luts_10.png)') %>;
+                        background-image: <%= reverseIntensity ?
+                        (lutBgPos === '0px 100px' ? 'linear-gradient(to right, #' + channel_color + ', black)' : 'url(' + lut_url + ')') :
+                        (lutBgPos === '0px 100px' ? 'linear-gradient(to left, #' + channel_color + ', black)' : 'url(' + lut_url + ')') %>;
                         <%= lutBgPos !== '0px 100px' && reverseIntensity ? 'transform: scaleX(-1);' : '' %>;
                         <%= lutBgPos !== '0px 100px' ? 'background-position: ' + lutBgPos : '' %>;">
             </div>
@@ -49,18 +49,18 @@
             <!-- Default order for non-'top' positions -->
             <div class="lutBg colorbar_bg"
             style="height: <%= thickness %>px;
-                        background-image: <%= reverseIntensity ? 
-                        (lutBgPos === '0px 100px' ? 'linear-gradient(to right, #' + channel_color + ', black)' : 'url(/images/luts_10.png)') :
-                        (lutBgPos === '0px 100px' ? 'linear-gradient(to left, #' + channel_color + ', black)' : 'url(/images/luts_10.png)') %>;
+                        background-image: <%= reverseIntensity ?
+                        (lutBgPos === '0px 100px' ? 'linear-gradient(to right, #' + channel_color + ', black)' : 'url(' + lut_url + ')') :
+                        (lutBgPos === '0px 100px' ? 'linear-gradient(to left, #' + channel_color + ', black)' : 'url(' + lut_url + ')') %>;
                         <%= lutBgPos !== '0px 100px' && reverseIntensity ? 'transform: scaleX(-1);' : '' %>;
                         <%= lutBgPos !== '0px 100px' ? 'background-position: ' + lutBgPos : '' %>;">
        </div>
             <div class="colorbar_ticks colorbar_ticks_<%= position %>">
                 <div class="ticks ticks_<%= position %>" style="border-top: 2px solid #<%= color %>;">
-                    <% 
+                    <%
                         var tickStart = reverseIntensity ? end : start;
                         var tickEnd = reverseIntensity ? start : end;
-                        var interval = Math.floor((tickEnd - tickStart) / (ticks_parameter - 1)); 
+                        var interval = Math.floor((tickEnd - tickStart) / (ticks_parameter - 1));
                     %>
                     <!-- First tick (start value) -->
                     <div class="tick">
