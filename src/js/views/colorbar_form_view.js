@@ -78,7 +78,7 @@ var ColorbarFormView = Backbone.View.extend({
             cb = m.get('colorbar');
 
             if (cb) {
-                if (!cb_json.tick_len) {
+                if (!cb_json.length) {
                     cb_json.position = cb.position;
                     cb_json.thickness = cb.thickness;
                     cb_json.font_size = cb.font_size;

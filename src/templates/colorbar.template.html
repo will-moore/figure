@@ -9,9 +9,7 @@
             <div class="colorbar_ticks colorbar_ticks_<%= position %>">
                 <div class="ticks ticks_<%= position %>" style="border-top: 2px solid #<%= axis_color %>;">
                     <%
-                        var tickStart = reverseIntensity ? end : start;
-                        var tickEnd = reverseIntensity ? start : end;
-                        var interval = Math.floor((tickEnd - tickStart) / (num_ticks - 1));
+                        var interval = Math.floor((end - start) / (num_ticks - 1));
                     %>
                     <!-- First tick (start value) -->
                     <div class="tick">

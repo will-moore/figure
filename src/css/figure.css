@@ -1368,7 +1368,7 @@
         color: white;
         border-color: #007bff;
     }
-    
+
     .flipping .btn.active i {
         color: white;
     }
@@ -1422,7 +1422,7 @@
         margin-left: 0px;
         display: flex;
     }
-        
+
     .colorbar_ticks {
         margin: 0;
         display: flex;
