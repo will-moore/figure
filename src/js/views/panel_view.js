@@ -386,7 +386,7 @@
             }
             var lut_url = await FigureLutPicker.loadLuts(false)  // Ensure lut url and list are loaded
             var lutBgPos = FigureLutPicker.getLutBackgroundPosition(color);
-            var isLUT = (color.length != 6) && isNaN(parseInt(color, 16))  // check if it's a normal color or a LUT
+            var isLUT = !(/^[0-9a-fA-F]+$/.test(color))  // check if it's a normal color or a LUT
             if (cb && cb.show) {
                 var cb_json = {
                     position: cb.position,
