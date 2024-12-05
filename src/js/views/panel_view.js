@@ -158,7 +158,7 @@
                 this.$scalebar.css('width', sb_width);
             }
             var cb = this.model.get('colorbar');
-            if (cb && cb.show && (cb.position == "left" || cb.position == "right")) {
+            if (cb && cb.show && (cb.position == "left" || cb.position == "right") && this.$colorbar) {
                 this.$colorbar.css('width', h);
                 this.$colorbar.css('height', h);
             }

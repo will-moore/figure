@@ -1816,7 +1816,7 @@ class FigureExport(object):
                          is_colorbar=True)
 
         rgb = (0, 0, 0)
-        fontsize = colorbar["font_size"]
+        fontsize = int(colorbar["font_size"])
         tick_width = 1
         tick_len = 3
         contour_width = tick_width
