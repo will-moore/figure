@@ -1751,8 +1751,8 @@ class FigureExport(object):
         the colorbar, ticks and labels on PDF/TIFF
         """
 
-        calib = panel.get("calib", {})
-        if not calib.get("show", False):
+        colorbar = panel.get("colorbar", {})
+        if not colorbar.get("show", False):
             return
 
         channel = None
@@ -1765,44 +1765,44 @@ class FigureExport(object):
 
         color_ramp = self.get_color_ramp(channel)
 
-        offset = 10  # calib["offset"]
-        cbar = {
+        spacing = colorbar["spacing"]
+        cbar = {  # Dict of colorbar properties to pass to paste_image
             'zoom': '100',
             'dx': 0,
             'dy': 0,
             'orig_height': panel['orig_height'],
             'orig_width': panel['orig_width'],
         }
-        calib["num_ticks"] = 6
-        calib["tick_len"] = 3
+        colorbar["num_ticks"] = 6
+        colorbar["tick_len"] = 3
         start, end = channel["window"]["start"], channel["window"]["end"]
         labels = numpy.unique(numpy.linspace(start, end,
-                                             num=calib["num_ticks"],
+                                             num=colorbar["num_ticks"],
                                              dtype=int))
-        if calib["position"] in ["leftvert", "rightvert"]:
+        if colorbar["position"] in ["left", "right"]:
             color_ramp = color_ramp.transpose((1, 0, 2))[::-1]
-            cbar['width'] = calib['thickness']
+            cbar['width'] = colorbar['thickness']
             cbar['height'] = panel['height']
             cbar['y'] = panel['y']
-            cbar['x'] = panel['x'] - (offset + calib['thickness'])
+            cbar['x'] = panel['x'] - (spacing + colorbar['thickness'])
             labels_x = [cbar['x']]
             labels_y = cbar['y'] + panel['height'] * (1 - labels / end)
             align = "right"
-            if calib["position"] == "rightvert":
-                cbar['x'] = panel['x'] + panel['width'] + offset
+            if colorbar["position"] == "right":
+                cbar['x'] = panel['x'] + panel['width'] + spacing
                 labels_x = [cbar['x'] + cbar['width']]
                 align = "left"
             labels_x *= labels.size  # Duplicate x postions
-        elif calib["position"] in ["top", "bottom"]:
+        elif colorbar["position"] in ["top", "bottom"]:
             cbar['width'] = panel['width']
-            cbar['height'] = calib['thickness']
+            cbar['height'] = colorbar['thickness']
             cbar['x'] = panel['x']
-            cbar['y'] = panel['y'] - (offset + calib['thickness'])
+            cbar['y'] = panel['y'] - (spacing + colorbar['thickness'])
             labels_x = cbar['x'] + panel['width'] * labels / end
             labels_y = [cbar['y']]
             align = "center"
-            if calib["position"] == "bottom":
-                cbar['y'] = panel['y'] + panel['height'] + offset
+            if colorbar["position"] == "bottom":
+                cbar['y'] = panel['y'] + panel['height'] + spacing
                 labels_y = [cbar['y'] + cbar['height']]
             labels_y *= labels.size  # Duplicate y postions
 
@@ -1817,13 +1817,13 @@ class FigureExport(object):
                          is_colorbar=True)
 
         rgb = (0, 0, 0)
-        fontsize = 10
+        fontsize = colorbar["font_size"]
         tick_width = 1
         tick_len = 3
         contour_width = tick_width
         for label, pos_x, pos_y in zip(labels, labels_x, labels_y):
 
-            # Cosmetical correction, for first and last ticks to be
+            # Cosmetic correction, for first and last ticks to be
             # aligned with the image
             shift = 0
             if label == labels[0]:
@@ -1831,7 +1831,7 @@ class FigureExport(object):
             elif label == labels[-1]:
                 shift = tick_width / 2
 
-            if calib["position"] == "leftvert":
+            if colorbar["position"] == "left":
                 x2 = pos_x - tick_len
                 pos_y += shift
                 self.draw_scalebar_line(pos_x, pos_y, x2, pos_y,
@@ -1839,7 +1839,7 @@ class FigureExport(object):
                 self.draw_text(str(label), pos_x - 4,
                                pos_y - fontsize / 2 + 1,
                                fontsize, rgb, align=align)
-            elif calib["position"] == "rightvert":
+            elif colorbar["position"] == "right":
                 x2 = pos_x + tick_len
                 pos_y += shift
                 self.draw_scalebar_line(pos_x, pos_y, x2, pos_y,
@@ -1847,14 +1847,14 @@ class FigureExport(object):
                 self.draw_text(str(label), pos_x + 4,
                                pos_y - fontsize / 2 + 1,
                                fontsize, rgb, align=align)
-            elif calib["position"] == "top":
+            elif colorbar["position"] == "top":
                 y2 = pos_y - tick_len
                 pos_x -= shift  # Order of the label is reversed
                 self.draw_scalebar_line(pos_x, pos_y, pos_x, y2,
                                         tick_width, rgb)
                 self.draw_text(str(label), pos_x, pos_y - fontsize - 2,
                                fontsize, rgb, align=align)
-            elif calib["position"] == "bottom":
+            elif colorbar["position"] == "bottom":
                 y2 = pos_y + tick_len
                 pos_x -= shift  # Order of the label is reversed
                 self.draw_scalebar_line(pos_x, pos_y, pos_x, y2,
@@ -1862,25 +1862,25 @@ class FigureExport(object):
                 self.draw_text(str(label), pos_x, pos_y + 4,
                                fontsize, rgb, align=align)
 
-        if calib["position"] == "top":
+        if colorbar["position"] == "top":
             self.draw_scalebar_line(cbar['x'],
                                     cbar['y'],
                                     cbar['x'] + cbar['width'],
                                     cbar['y'],
                                     contour_width, rgb)
-        elif calib["position"] == "bottom":
+        elif colorbar["position"] == "bottom":
             self.draw_scalebar_line(cbar['x'],
                                     cbar['y'] + cbar['height'],
                                     cbar['x'] + cbar['width'],
                                     cbar['y'] + cbar['height'],
                                     contour_width, rgb)
-        elif calib["position"] == "leftvert":
+        elif colorbar["position"] == "left":
             self.draw_scalebar_line(cbar['x'],
                                     cbar['y'],
                                     cbar['x'],
                                     cbar['y'] + cbar['height'],
                                     contour_width, rgb)
-        elif calib["position"] == "rightvert":
+        elif colorbar["position"] == "right":
             self.draw_scalebar_line(cbar['x'] + cbar['width'],
                                     cbar['y'],
                                     cbar['x'] + cbar['width'],
