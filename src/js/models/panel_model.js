@@ -1098,6 +1098,17 @@
             y = top_labels.reduce(function(prev, l){
                 return prev - (LINE_HEIGHT * l.size);
             }, y);
+
+            var cb = this.get("colorbar");
+            if (cb && cb.show && cb.position == "top") {
+                var shift = (cb.spacing + cb.thickness +
+                    Number(cb.font_size) + cb.tick_len + cb.label_margin);
+                if (shift > 0) {
+                    y = y - shift;
+                }
+            }
+
+
             return y;
         },
 
@@ -1112,6 +1123,24 @@
             x = left_labels.reduce(function(prev, l){
                 return prev - (LINE_HEIGHT * l.size);
             }, x);
+
+            var end = "";
+            for (const chann of this.get('channels')) {
+                if(chann.active) {
+                    end = chann.window?.end;
+                    break;
+                }
+            }
+            var cb = this.get("colorbar");
+            if (cb && cb.show && cb.position == "left") {
+                const textwidth = this.measureTextWidth(end, cb.font_size + "px");
+                var shift = (cb.spacing + cb.thickness +
+                    textwidth + cb.tick_len + cb.label_margin);
+                if (shift > 0) {
+                    x = x - shift;
+                }
+            }
+
             return x;
         },
 
@@ -1127,6 +1156,23 @@
                 return prev + (LINE_HEIGHT * l.size);
             }, x);
 
+            var end = "";
+            for (const chann of this.get('channels')) {
+                if(chann.active) {
+                    end = chann.window?.end;
+                    break;
+                }
+            }
+            var cb = this.get("colorbar");
+            if (cb && cb.show && cb.position == "right") {
+                const textwidth = this.measureTextWidth(end, cb.font_size + "px");
+                var shift = (cb.spacing + cb.thickness +
+                    textwidth + cb.tick_len + cb.label_margin);
+                if (shift > 0) {
+                    x = x + shift;
+                }
+            }
+
             return x;
         },
 
@@ -1140,7 +1186,32 @@
             y = bottom_labels.reduce(function(prev, l){
                 return prev + (LINE_HEIGHT * l.size);
             }, y);
+
+            var cb = this.get("colorbar");
+            if (cb && cb.show && cb.position == "bottom") {
+                var shift = (cb.spacing + cb.thickness +
+                    Number(cb.font_size) + cb.tick_len + cb.label_margin);
+                if (shift > 0) {
+                    y = y + shift;
+                }
+            }
             return y;
+        },
+
+        measureTextWidth: function(text, fontSize) {
+            var fontFamily = "bs-font-sans-serif";
+            // Create a canvas element
+            var canvas = document.createElement('canvas');
+            var context = canvas.getContext('2d');
+
+            // Set the font properties
+            context.font = `${fontSize} ${fontFamily}`;
+            var metrics = context.measureText(text);
+
+            context = null;
+            canvas = null;
+
+            return metrics.width;
         },
 
         // True if coords (x,y,width, height) overlap with panel
