@@ -1415,6 +1415,7 @@
         margin-right: 0px;
         margin-left: 0px;
         display: flex;
+        position: relative;
     }
 
     .colorbar_ticks {
@@ -1424,42 +1425,26 @@
         width: 100%;
         margin: 0;
         align-items: center;
-        position: relative;
+        position: absolute;
     }
 
     .colorbar_ticks .label{
         width: 0px;
-    }
-
-    .colorbar_ticks_top {
-        -webkit-transform: scaleX(-1) rotate(180deg);
-        transform: scaleX(-1) rotate(180deg);
-    }
-
-    .colorbar_ticks_top .label{
-        transform: scaleX(-1) rotate(180deg);
-        text-align: center;
+        position: absolute;
         display: flex;
         justify-content: center;
-    }
-
-    .colorbar_ticks_bottom .label{
-        text-align: center;
-        display: flex;
-        justify-content: center;
+        line-height: 1;
     }
 
     .colorbar_ticks_left .label{
         display: flex;
         flex-direction: row-reverse;
-        -webkit-transform: scaleX(-1) rotate(-90deg);
-        transform: scaleX(-1) rotate(-90deg);
+        -webkit-transform: scaleX(-1) rotate(180deg);
+        transform: scaleX(-1) rotate(180deg);
     }
 
-    .colorbar_ticks_right .label{
-        -webkit-transform: rotate(90deg);
-        transform: rotate(90deg);
-        text-align: right;
+    .colorbar_ticks_top .tick .dash{
+        position: relative;
     }
 
     .tick {
