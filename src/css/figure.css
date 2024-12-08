@@ -1439,8 +1439,15 @@
     .colorbar_ticks_left .label{
         display: flex;
         flex-direction: row-reverse;
-        -webkit-transform: scaleX(-1) rotate(180deg);
-        transform: scaleX(-1) rotate(180deg);
+        -webkit-transform: scaleX(-1) rotate(-90deg);
+        transform: scaleX(-1) rotate(-90deg);
+    }
+
+    .colorbar_ticks_right .label{
+        display: flex;
+        flex-direction: row-reverse;
+        -webkit-transform: rotate(90deg);
+        transform: rotate(90deg);
     }
 
     .colorbar_ticks_top .tick .dash{
