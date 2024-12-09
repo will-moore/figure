@@ -102,7 +102,12 @@
                     // delete or update the "inset" Rectangle
                     let updated = this.get('shapes');
                     if (panelDeleted) {
-                        updated = updated.filter(shape => shape.id != insetRoiId);
+                        // Delete the inset Rectangle IF there are NO other remaining insets
+                        let insets = figureModel.panels.filter(p => p.get('insetRoiId') == insetRoiId);
+                        if (insets.length == 0) {
+                            updated = updated.filter(shape => shape.id != insetRoiId);
+                        }
+                        this.save('shapes', updated);
                     } else {
                         let rect = panel.getViewportAsRect();
                         updated = updated.map(shape => {
@@ -111,8 +116,8 @@
                             }
                             return shape;
                         });
+                        this.save('shapes', updated);
                     }
-                    this.save('shapes', updated);
                     this.silenceTriggers = false;
                 }
             }
