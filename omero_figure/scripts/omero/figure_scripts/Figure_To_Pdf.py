@@ -1701,8 +1701,8 @@ class FigureExport(object):
                 pass
 
         else:
-            scriptService = self.conn.getScriptService()
-            luts = scriptService.getScriptsByMimetype("text/x-lut")
+            script_service = self.conn.getScriptService()
+            luts = script_service.getScriptsByMimetype("text/x-lut")
             for lut in luts:
                 if lut.name.val != color:
                     continue
