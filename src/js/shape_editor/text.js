@@ -256,7 +256,14 @@ Text.prototype.drawShape = function drawShape() {
       x = this._parentShapeCoords.x,
       y = this._parentShapeCoords.y,
       w = this._parentShapeCoords.width,
-      h = this._parentShapeCoords.height;
+      h = this._parentShapeCoords.height,
+      outPositions = {"top": 0, "left": 1, "bottom": 2, "right":3},
+      inPositions = {"topleft": 0, "bottomleft": 1, "bottomright": 2, "topright":3},
+      offsetsX = [0,  textOffsetY - textOffsetX,  0, textOffsetY - textOffsetX],
+      offsetsY = [0, 0, textOffsetX - textOffsetY, 0],
+      outAnchors = ["middle", "end", "middle", "start"],
+      inAnchors = ["start", "start", "end", "end"],
+      rotationIndex = Math.floor(((360-this._rotation+45) / 90)) % 4
 
   switch(this._textPosition){
       case "bottom":
@@ -296,6 +303,29 @@ Text.prototype.drawShape = function drawShape() {
           dx = w - textOffsetX;
           dy = h - textOffsetY;
           textAnchor = "end"
+  }
+
+  switch(this._textPosition){
+    case "bottom":
+    case "left":
+    case "right":
+    case "top":
+        var posIndex = outPositions[this._textPosition]
+        var finalIndex = (posIndex + rotationIndex) % 4
+        dx = dx + offsetsX[finalIndex];
+        dy = dy + offsetsY[finalIndex];
+        textAnchor = outAnchors[finalIndex]
+        break;
+    case "topleft":
+    case "topright":
+    case "bottomleft":
+    case "bottomright":
+        var posIndex = inPositions[this._textPosition]
+        var finalIndex = (posIndex + rotationIndex) % 4
+        dx = dx + offsetsX[finalIndex];
+        dy = dy + offsetsY[finalIndex];
+        textAnchor = inAnchors[finalIndex]
+        break;
   }
 
   var rotatedCoords = this.applyShapeRotation(x + w/2, y + h/2, x + dx, y + dy, this._rotation);
