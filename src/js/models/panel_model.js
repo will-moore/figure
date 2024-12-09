@@ -1133,9 +1133,9 @@
             }
             var cb = this.get("colorbar");
             if (cb && cb.show && cb.position == "left") {
-                const textwidth = this.measureTextWidth(end, cb.font_size + "px");
+                const metrics = this.measureTextSize(end, cb.font_size + "px");
                 var shift = (cb.spacing + cb.thickness +
-                    textwidth + cb.tick_len + cb.label_margin);
+                    metrics.width + cb.tick_len + cb.label_margin);
                 if (shift > 0) {
                     x = x - shift;
                 }
@@ -1165,9 +1165,9 @@
             }
             var cb = this.get("colorbar");
             if (cb && cb.show && cb.position == "right") {
-                const textwidth = this.measureTextWidth(end, cb.font_size + "px");
+                const metrics = this.measureTextSize(end, cb.font_size + "px");
                 var shift = (cb.spacing + cb.thickness +
-                    textwidth + cb.tick_len + cb.label_margin);
+                    metrics.width + cb.tick_len + cb.label_margin);
                 if (shift > 0) {
                     x = x + shift;
                 }
@@ -1198,7 +1198,7 @@
             return y;
         },
 
-        measureTextWidth: function(text, fontSize) {
+        measureTextSize: function(text, fontSize) {
             var fontFamily = "bs-font-sans-serif";
             // Create a canvas element
             var canvas = document.createElement('canvas');
@@ -1211,7 +1211,7 @@
             context = null;
             canvas = null;
 
-            return metrics.width;
+            return metrics;
         },
 
         // True if coords (x,y,width, height) overlap with panel
