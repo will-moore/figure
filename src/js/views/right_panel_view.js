@@ -179,6 +179,7 @@
                     y: txtY,
                     id: textRandomId,
                     rotation: vp.rotation || 0,
+                    textRotation: -vp.rotation || 0,
                     fontSize: 12,
                     textPosition: "topleft",
                     text: String.fromCharCode(lastInsetTextIndex),
@@ -1355,7 +1356,18 @@
             let val = parseInt(event.target.value);
             this.rotation = val;
             this.models.forEach(function(m){
-                m.save('rotation', val);
+                var shapes = m.get('shapes');
+                if(shapes){
+                    shapes.forEach(function(sh){
+                        if(sh.type == "Text"){
+                            sh.textRotation = val;
+                        }
+                    })
+                    m.save({'rotation': val, 'shapes': shapes});
+                }else{
+                    m.save('rotation', val);
+                }
+
             });
         },
 
@@ -1407,7 +1419,6 @@
             event.preventDefault()
             this.models.forEach(function(m){
                 var rotation = m.setPanelRotation()
-                console.log(rotation)
                 $(".vp_img").css({'transform':'rotate(' + rotation + 'deg)'});
                 $(".rotation_value").text(rotation);
                 $(".rotation-slider").val(rotation);

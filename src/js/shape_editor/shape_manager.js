@@ -551,6 +551,8 @@ ShapeManager.prototype.createShapeJson = function createShapeJson(jsonShape) {
     options.text = text,
     options.textAnchor = s.textAnchor,
     options.parentShapeCoords = s.parentShapeCoords,
+    options.rotation = s.rotation,
+    options.textRotation = s.textRotation,
     newShape = new Text(options);
   }
   return newShape;

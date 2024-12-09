@@ -45,6 +45,7 @@ var Text = function Text(options) {
   this._zoomFraction = options.zoom ? options.zoom / 100 : 1
   this._textAnchor = options.textAnchor || "start"
   this._rotation = options.rotation || 0;
+  this._textRotation = options.textRotation || 0;
   this._parentShapeCoords = options.parentShapeCoords || {x:0,y:0,width:0,height:0}
 
   this._selected = false;
@@ -66,6 +67,7 @@ Text.prototype.toJson = function toJson() {
     text: this._text,
     textAnchor: this._textAnchor,
     rotation: this._rotation,
+    textRotation: this._textRotation,
     textPosition: this._textPosition,
     parentShapeCoords: this._parentShapeCoords,
     strokeWidth: this._strokeWidth,
@@ -106,16 +108,6 @@ Text.prototype.offsetCoords = function offsetCoords(json, dx, dy) {
   json.y = json.y + dy;
   return json;
 };
-
-
-// handle start of drag by selecting this shape
-// if not already selected
-/*Text.prototype._handleMousedown = function _handleMousedown() {
-  if (!this._selected) {
-    this.manager.selectShapes([this]);
-  }
-};*/
-
 
 Text.prototype.setStrokeColor = function setStrokeColor(color) {
   this._color = color;
@@ -183,18 +175,14 @@ Text.prototype.setZoom = function setZoom(zoom) {
    this.drawShape();
 };
 
-Text.prototype.setTextRotation = function setTextRotation(rotation) {
+Text.prototype.setRotation = function setRotation(rotation) {
   this._rotation = rotation;
   this.drawShape();
 };
 
-Text.prototype.setTextRotated = function setTextRotated(rotateText) {
-  /* doesn't work properly for now
-  if(rotateText){
-    this.element.transform("r" + this._rotation);
-  }else{
-    this.element.transform("r" + (-this._rotation));
-  }*/
+Text.prototype.setTextRotation = function setTextRotation(textRotation) {
+  this._textRotation = textRotation;
+  this.drawShape();
 };
 
 Text.prototype.setParentShapeCoords = function setParentShapeCoords(coords){
@@ -310,7 +298,7 @@ Text.prototype.drawShape = function drawShape() {
           textAnchor = "end"
   }
 
-  var rotatedCoords = this.applyTextRotation(x + w/2, y + h/2, x + dx, y + dy, this._rotation);
+  var rotatedCoords = this.applyShapeRotation(x + w/2, y + h/2, x + dx, y + dy, this._rotation);
   this._x = rotatedCoords.x;
   this._y = rotatedCoords.y;
   this._textAnchor = textAnchor;
@@ -325,10 +313,11 @@ Text.prototype.drawShape = function drawShape() {
     "text": this._text,
     "text-anchor": this._textAnchor
   });
-  //this.element.transform("r" + this._rotation);
+
+  this.element.transform("r" + (-this._textRotation));
 };
 
-Text.prototype.applyTextRotation = function applyTextRotation(cx, cy, x, y, rotation){
+Text.prototype.applyShapeRotation = function applyShapeRotation(cx, cy, x, y, rotation){
   var dx = cx - x
   var dy = cy - y
   // distance of point from centre of rotation
@@ -363,7 +352,8 @@ var CreateText = function CreateText(options) {
     fontSize: options.fontSize,
     textPosition: options.textPosition,
     strokeWidth: options.strokeWidth,
-  //  rotation: options.rotation,
+    rotation: options.rotation,
+    textRotation: options.textRotation,
   })
   this.text.setSelected(true);
   this.manager.addShape(this.text);

@@ -144,6 +144,8 @@
                                 shape.parentShapeCoords = {...rect}
                                 shape.x = shape.x + rect.x - prev.x
                                 shape.y = shape.y + rect.y - prev.y
+                                shape.rotation = rect.rotation
+
                                 if(inset_lbl && inset_lbl[0]){
                                     if(inset_lbl[0].text !== shape.text){
                                         shape.text = inset_lbl[0].text.replaceAll("*","")
@@ -393,6 +395,16 @@
             var xPercent = this.get('orig_width') / viewport.height;
             var yPercent = this.get('orig_height') / viewport.width;
             var zoom = Math.min(xPercent, yPercent) * 100;
+
+            var shapes = this.get('shapes');
+            if(shapes){
+                shapes.forEach(function(sh){
+                    if(sh.type == "Text"){
+                        sh.textRotation = panelRotationAngle;
+                    }
+                })
+                this.save('shapes', shapes)
+            }
             this.save({'rotation': panelRotationAngle, 'height': width, 'width': height, 'zoom': zoom});
 
             return panelRotationAngle
