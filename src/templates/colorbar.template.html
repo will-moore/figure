@@ -16,7 +16,7 @@
                         <div class="tick">
                             <div class="dash" style="background-color: #<%= axis_color %>; height: <%= tick_len %>px;"></div>
                             <span class="label" style="color: #<%= axis_color %>; font-size: <%= font_size %>px; top: <%= tick_len + label_margin %>px;">
-                                <%= Math.round((end - start) * i / (num_ticks-1)) %>
+                                <%= Math.round((end - start) * i / (num_ticks-1)) + start %>
                             </span>
                         </div>
                     <% } %>
@@ -34,7 +34,7 @@
                         <div class="tick">
                             <div class="dash" style="background-color: #<%= axis_color %>; height: <%= tick_len %>px;"></div>
                             <span class="label" style="color: #<%= axis_color %>; font-size: <%= font_size %>px; bottom: <%= tick_len + label_margin %>px;">
-                                <%= Math.round((end - start) * i / (num_ticks-1)) %>
+                                <%= Math.round((end - start) * i / (num_ticks-1)) + start %>
                             </span>
                         </div>
                     <% } %>
