@@ -273,12 +273,10 @@ Text.prototype.drawShape = function drawShape() {
       case "left":
           dx = -textOffsetX;
           dy = h/2;
-          textAnchor = "end"
           break;
       case "right":
           dx = w + textOffsetX;
           dy = h/2;
-          textAnchor = "start"
           break;
       case "top":
           dx = w/2;
@@ -287,22 +285,18 @@ Text.prototype.drawShape = function drawShape() {
       case "topleft":
           dx = textOffsetX;
           dy = textOffsetY;
-          textAnchor = "start"
           break;
       case "topright":
           dx = w - textOffsetX;
           dy = textOffsetY;
-          textAnchor = "end"
           break;
       case "bottomleft":
           dx = textOffsetX;
           dy = h - textOffsetY;
-          textAnchor = "start"
           break;
       case "bottomright":
           dx = w - textOffsetX;
           dy = h - textOffsetY;
-          textAnchor = "end"
   }
 
   switch(this._textPosition){
