@@ -4,20 +4,21 @@
              style="margin-<%= inv_position %>: <%= spacing %>px;">
 
             <div class="colorbar_bg "
-                style="height: <%= thickness %>px;
+                style="height: <%= thickness + 1 %>px;
                         background-image: <%= isLUT ? 'url(' + lut_url + ')' : 'linear-gradient(to left, #' + color + ', black)' %>;
                         <%= isLUT ? 'background-position: ' + lutBgPos : '' %>;
                         <%= reverseIntensity ? 'transform: scaleX(-1);' : '' %>;">
             </div>
         </div>
 
-        <div class="colorbar_ticks_<%= position %>" style="border-<%= inv_position %>: 2px solid #<%= axis_color %>; margin-<%= inv_position %>: <%= thickness + spacing%>px; ">
+        <div class="colorbar_ticks_<%= position %>" style="border-<%= inv_position %>: 2px solid #<%= axis_color %>; margin-<%= inv_position %>: <%= thickness + spacing %>px; ">
             <% for (let i = 0; i < num_ticks; i++) { %>
                 <div class="colorbar_tick_<%= orientation %>">
                     <% if (position == "right" || position == "bottom") { %>
                         <div class="colorbar_dash_<%= orientation %>"
                             style="background-color: #<%= axis_color %>;
-                                   <%= position == 'right' ? 'width' : 'height' %>: <%= tick_len %>px;">
+                                   <%= position == 'right' ? 'width' : 'height' %>: <%= tick_len + 1 %>px;
+                                   <%= position %>: 1px">
                         </div>
                     <% } %>
                         <span class="label colorbar_label_<%= orientation %>"
@@ -29,7 +30,8 @@
                     <% if (position == "left" || position == "top") { %>
                         <div class="colorbar_dash_<%= orientation %>"
                              style="background-color: #<%= axis_color %>;
-                                    <%= position == 'left' ? 'width' : 'height' %>: <%= tick_len %>px;">
+                                    <%= position == 'left' ? 'width' : 'height' %>: <%= tick_len + 1 %>px;
+                                    <%= position %>: 1px">
                         </div>
                     <% } %>
                 </div>

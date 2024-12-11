@@ -1470,6 +1470,7 @@
 
     .colorbar_dash_vertical {
         height: 2px;
+        position: relative;
     }
 
     .colorbar_tick_horizontal {
