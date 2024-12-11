@@ -387,9 +387,23 @@
             var lut_url = await FigureLutPicker.loadLuts(false)  // Ensure lut url and list are loaded
             var lutBgPos = FigureLutPicker.getLutBackgroundPosition(color);
             var isLUT = !(/^[0-9a-fA-F]+$/.test(color))  // check if it's a normal color or a LUT
+            var inverted_pos = {  // convenience variable for the colorbar template.
+                "left": "right",
+                "right": "left",
+                "top": "bottom",
+                "bottom": "top",
+            };
+            var orientation = {  // convenience variable for the colorbar template.
+                "left": "vertical",
+                "right": "vertical",
+                "top": "horizontal",
+                "bottom": "horizontal",
+            }
             if (cb && cb.show) {
                 var cb_json = {
                     position: cb.position,
+                    inv_position: inverted_pos[cb.position],
+                    orientation: orientation[cb.position],
                     show: cb.show,
                     thickness: cb.thickness,
                     font_size: cb.font_size,
