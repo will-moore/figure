@@ -125,7 +125,7 @@ var LutPickerView = Backbone.View.extend({
             this.success = options.success;
         }
 
-        this.loadLuts(false);
+        this.loadLuts();
         this.render();
     },
 

@@ -384,7 +384,7 @@
                     break;
                 }
             }
-            var lut_url = await FigureLutPicker.loadLuts(false)  // Ensure lut url and list are loaded
+            var lut_url = await FigureLutPicker.loadLuts()  // Ensure lut url and list are loaded
             var lutBgPos = FigureLutPicker.getLutBackgroundPosition(color);
             var isLUT = !(/^[0-9a-fA-F]+$/.test(color))  // check if it's a normal color or a LUT
             var inverted_pos = {  // convenience variable for the colorbar template.
