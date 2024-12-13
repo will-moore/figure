@@ -1094,67 +1094,88 @@
             var y = this.get('y');
             // get labels by position
             var top_labels = labels.filter(function(l) {return l.position === 'top'});
-            // offset by font-size of each
-            y = top_labels.reduce(function(prev, l){
-                return prev - (LINE_HEIGHT * l.size);
-            }, y);
+            // calculate offset by font-size of each
+            var shift = 0;
+            shift = top_labels.reduce(function(prev, l){
+                return prev + (LINE_HEIGHT * l.size);
+            }, shift);
 
+            var shift_cbar = 0;
             var cb = this.get("colorbar");
-            if (cb && cb.show && cb.position == "top") {
-                var shift = (cb.spacing + cb.thickness +
-                    Number(cb.font_size) + cb.tick_len + cb.label_margin);
-                if (shift > 0) {
-                    y = y - shift;
+            if (cb && cb.show) {
+                var size = Number(cb.font_size);
+                if (cb.position == "top") {
+                    shift_cbar = (cb.spacing + cb.thickness +
+                        size + cb.tick_len + cb.label_margin);
+                    shift_cbar = Math.max(0, shift_cbar);
+                } else if (cb.position == "left" || cb.position == "right") {
+                    // get height of topmost tick label and take half of it
+                    shift_cbar = size / 2;
                 }
             }
-
-
-            return y;
+            return y - Math.max(shift, shift_cbar);
         },
 
         getBoundingBoxLeft: function() {
-            // get left of panel including 'leftvert' labels (ignore
-            // left horizontal labels - hard to calculate width)
             var labels = this.get("labels");
             var x = this.get('x');
             // get labels by position
             var left_labels = labels.filter(function(l) {return l.position === 'leftvert'});
-            // offset by font-size of each
-            x = left_labels.reduce(function(prev, l){
-                return prev - (LINE_HEIGHT * l.size);
-            }, x);
+            // calculate offset by font-size of each vertical label
+            var shift = 0;
+            shift = left_labels.reduce(function(prev, l){
+                return prev + (LINE_HEIGHT * l.size);
+            }, shift);
 
+            left_labels = labels.filter(function(l) {return l.position === 'left'});
+            // compare offset of each horizontal label
+            for (const l of left_labels) {
+                const width = this.measureTextSize(l.text, l.size + "px");
+                shift = Math.max(shift, width);
+            }
+            var start = "";
             var end = "";
             for (const chann of this.get('channels')) {
                 if(chann.active) {
+                    start = chann.window?.start;
                     end = chann.window?.end;
                     break;
                 }
             }
+            var shift_cbar = 0;
             var cb = this.get("colorbar");
-            if (cb && cb.show && cb.position == "left") {
-                const metrics = this.measureTextSize(end, cb.font_size + "px");
-                var shift = (cb.spacing + cb.thickness +
-                    metrics.width + cb.tick_len + cb.label_margin);
-                if (shift > 0) {
-                    x = x - shift;
+            if (cb && cb.show) {
+                if (cb.position == "left") {
+                    const width = this.measureTextSize(end, cb.font_size + "px");
+                    shift_cbar = (cb.spacing + cb.thickness +
+                        width + cb.tick_len + cb.label_margin);
+                    shift_cbar = Math.max(0, shift_cbar);
+                } else if (cb.position == "top" || cb.position == "bottom"){
+                    shift_cbar = this.measureTextSize(start, cb.font_size + "px");
+                    shift_cbar = shift_cbar / 2;
                 }
             }
 
-            return x;
+            return x - Math.max(shift, shift_cbar);
         },
 
         getBoundingBoxRight: function() {
-            // Ignore right (horizontal) labels since we don't know how long they are
-            // but include right vertical labels
             var labels = this.get("labels");
             var x = this.get('x') + this.get('width');
             // get labels by position
             var right_labels = labels.filter(function(l) {return l.position === 'rightvert'});
-            // offset by font-size of each
-            x = right_labels.reduce(function(prev, l){
+            // calculate offset by font-size of each vertical label
+            var shift = 0;
+            shift = right_labels.reduce(function(prev, l){
                 return prev + (LINE_HEIGHT * l.size);
-            }, x);
+            }, shift);
+
+            right_labels = labels.filter(function(l) {return l.position === 'right'});
+            // compare offset of each horizontal label
+            for (const l of right_labels) {
+                const width = this.measureTextSize(l.text, l.size + "px");
+                shift = Math.max(shift, width);
+            }
 
             var end = "";
             for (const chann of this.get('channels')) {
@@ -1163,17 +1184,21 @@
                     break;
                 }
             }
+            var shift_cbar = 0;
             var cb = this.get("colorbar");
-            if (cb && cb.show && cb.position == "right") {
-                const metrics = this.measureTextSize(end, cb.font_size + "px");
-                var shift = (cb.spacing + cb.thickness +
-                    metrics.width + cb.tick_len + cb.label_margin);
-                if (shift > 0) {
-                    x = x + shift;
+            if (cb && cb.show) {
+                if (cb.position == "right") {
+                    const width = this.measureTextSize(end, cb.font_size + "px");
+                    shift_cbar = (cb.spacing + cb.thickness +
+                        width + cb.tick_len + cb.label_margin);
+                    shift_cbar = Math.max(0, shift_cbar);
+                } else if (cb.position == "top" || cb.position == "bottom"){
+                    shift_cbar = this.measureTextSize(end, cb.font_size + "px");
+                    shift_cbar = shift_cbar / 2;
                 }
             }
 
-            return x;
+            return x + Math.max(shift, shift_cbar);
         },
 
         getBoundingBoxBottom: function() {
@@ -1182,20 +1207,26 @@
             var y = this.get('y') + this.get('height');
             // get labels by position
             var bottom_labels = labels.filter(function(l) {return l.position === 'bottom'});
-            // offset by font-size of each
-            y = bottom_labels.reduce(function(prev, l){
+            // calculate offset by font-size of each
+            var shift = 0;
+            shift = bottom_labels.reduce(function(prev, l){
                 return prev + (LINE_HEIGHT * l.size);
-            }, y);
+            }, shift);
 
+            var shift_cbar = 0;
             var cb = this.get("colorbar");
-            if (cb && cb.show && cb.position == "bottom") {
-                var shift = (cb.spacing + cb.thickness +
-                    Number(cb.font_size) + cb.tick_len + cb.label_margin);
-                if (shift > 0) {
-                    y = y + shift;
+            if (cb && cb.show) {
+                var size = Number(cb.font_size);
+                if (cb.position == "bottom") {
+                    shift_cbar = (cb.spacing + cb.thickness +
+                        size + cb.tick_len + cb.label_margin);
+                    shift_cbar = Math.max(0, shift_cbar);
+                } else if (cb.position == "left" || cb.position == "right") {
+                    // get height of topmost tick label and take half of it
+                    shift_cbar = size / 2;
                 }
             }
-            return y;
+            return y + Math.max(shift, shift_cbar);
         },
 
         measureTextSize: function(text, fontSize) {
@@ -1211,7 +1242,7 @@
             context = null;
             canvas = null;
 
-            return metrics;
+            return metrics.width;
         },
 
         // True if coords (x,y,width, height) overlap with panel
