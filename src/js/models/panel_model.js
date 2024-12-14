@@ -1133,6 +1133,7 @@
                 const width = this.measureTextSize(l.text, l.size + "px");
                 shift = Math.max(shift, width);
             }
+
             var start = "";
             var end = "";
             for (const chann of this.get('channels')) {
@@ -1145,6 +1146,9 @@
             var shift_cbar = 0;
             var cb = this.get("colorbar");
             if (cb && cb.show) {
+                let rounding = Math.max(0, Math.ceil(-Math.log10((end - start) / cb.num_ticks)));
+                start = start.toFixed(rounding);
+                end = end.toFixed(rounding);
                 if (cb.position == "left") {
                     const width = this.measureTextSize(end, cb.font_size + "px");
                     shift_cbar = (cb.spacing + cb.thickness +
@@ -1177,9 +1181,11 @@
                 shift = Math.max(shift, width);
             }
 
+            var start = "";
             var end = "";
             for (const chann of this.get('channels')) {
                 if(chann.active) {
+                    start = chann.window?.start;
                     end = chann.window?.end;
                     break;
                 }
@@ -1187,6 +1193,9 @@
             var shift_cbar = 0;
             var cb = this.get("colorbar");
             if (cb && cb.show) {
+                let rounding = Math.max(0, Math.ceil(-Math.log10((end - start) / cb.num_ticks)));
+                start = start.toFixed(rounding);
+                end = end.toFixed(rounding);
                 if (cb.position == "right") {
                     const width = this.measureTextSize(end, cb.font_size + "px");
                     shift_cbar = (cb.spacing + cb.thickness +

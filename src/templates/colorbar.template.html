@@ -25,7 +25,8 @@
                               style="color: #<%= axis_color %>;
                                      font-size: <%= font_size %>px;
                                      margin-<%= inv_position %>: <%= label_margin %>px;">
-                            <%= Math.round((end - start) * i / (num_ticks-1)) + start %>
+                            <!-- Label is rounded to decimal proportionally to the spacing between each tick.  -->
+                            <%= ((end - start) * i / (num_ticks-1) + start).toFixed(Math.max(0, Math.ceil(-Math.log10((end - start) / num_ticks)))) %>
                         </span>
                     <% if (position == "left" || position == "top") { %>
                         <div class="colorbar_dash_<%= orientation %>"
