@@ -1775,9 +1775,11 @@ class FigureExport(object):
             'orig_width': panel['orig_width'],
         }
         start, end = channel["window"]["start"], channel["window"]["end"]
-        labels = numpy.unique(numpy.linspace(start, end,
-                                             num=colorbar["num_ticks"],
-                                             dtype=int))
+
+        decimals = max(0, int(numpy.ceil(
+            -numpy.log10((end - start) / colorbar["num_ticks"]))))
+        labels = numpy.linspace(start, end, num=colorbar["num_ticks"])
+        pos_ratio = numpy.linspace(0, 1, colorbar["num_ticks"])
         if colorbar["position"] in ["left", "right"]:
             color_ramp = color_ramp.transpose((1, 0, 2))[::-1]
             cbar['width'] = thickness
@@ -1785,7 +1787,7 @@ class FigureExport(object):
             cbar['y'] = panel['y']
             cbar['x'] = panel['x'] - (spacing + thickness)
             labels_x = [cbar['x']]
-            labels_y = cbar['y'] + panel['height'] * (1 - labels / end)
+            labels_y = cbar['y'] + panel['height'] * pos_ratio[::-1]
             align = "right"
             if colorbar["position"] == "right":
                 cbar['x'] = panel['x'] + panel['width'] + spacing
@@ -1797,7 +1799,7 @@ class FigureExport(object):
             cbar['height'] = thickness
             cbar['x'] = panel['x']
             cbar['y'] = panel['y'] - (spacing + thickness)
-            labels_x = cbar['x'] + panel['width'] * labels / end
+            labels_x = cbar['x'] + panel['width'] * pos_ratio
             labels_y = [cbar['y']]
             align = "center"
             if colorbar["position"] == "bottom":
@@ -1815,10 +1817,11 @@ class FigureExport(object):
         self.paste_image(pil_img, img_name, cbar, page, dpi,
                          is_colorbar=True)
 
-        rgb = (0, 0, 0)
+        rgb = tuple(int(colorbar["axis_color"][i:i+2], 16) for i in (0, 2, 4))
         fontsize = int(colorbar["font_size"])
         tick_width = 1
-        tick_len = 3
+        tick_len = colorbar["tick_len"]
+        label_margin = colorbar["label_margin"]
         contour_width = tick_width
         for label, pos_x, pos_y in zip(labels, labels_x, labels_y):
 
@@ -1830,12 +1833,15 @@ class FigureExport(object):
             elif label == labels[-1]:
                 shift = tick_width / 2
 
+            # Round the label str to the appropriate decimal
+            label = f"{label:.{decimals}f}"
+
             if colorbar["position"] == "left":
                 x2 = pos_x - tick_len
                 pos_y += shift
                 self.draw_scalebar_line(pos_x, pos_y, x2, pos_y,
                                         tick_width, rgb)
-                self.draw_text(str(label), pos_x - 4,
+                self.draw_text(label, pos_x - 4 - label_margin,
                                pos_y - fontsize / 2 + 1,
                                fontsize, rgb, align=align)
             elif colorbar["position"] == "right":
@@ -1843,7 +1849,7 @@ class FigureExport(object):
                 pos_y += shift
                 self.draw_scalebar_line(pos_x, pos_y, x2, pos_y,
                                         tick_width, rgb)
-                self.draw_text(str(label), pos_x + 4,
+                self.draw_text(label, pos_x + 4 + label_margin,
                                pos_y - fontsize / 2 + 1,
                                fontsize, rgb, align=align)
             elif colorbar["position"] == "top":
@@ -1851,14 +1857,15 @@ class FigureExport(object):
                 pos_x -= shift  # Order of the label is reversed
                 self.draw_scalebar_line(pos_x, pos_y, pos_x, y2,
                                         tick_width, rgb)
-                self.draw_text(str(label), pos_x, pos_y - fontsize - 2,
+                self.draw_text(label, pos_x,
+                               pos_y - fontsize - 2 - label_margin,
                                fontsize, rgb, align=align)
             elif colorbar["position"] == "bottom":
                 y2 = pos_y + tick_len
                 pos_x -= shift  # Order of the label is reversed
                 self.draw_scalebar_line(pos_x, pos_y, pos_x, y2,
                                         tick_width, rgb)
-                self.draw_text(str(label), pos_x, pos_y + 4,
+                self.draw_text(label, pos_x, pos_y + 4 + label_margin,
                                fontsize, rgb, align=align)
 
         if colorbar["position"] == "top":
