@@ -26,7 +26,7 @@ from datetime import datetime
 import os
 from os import path
 import zipfile
-from math import atan2, atan, sin, cos, sqrt, radians, floor, ceil, log2
+from math import atan2, atan, sin, cos, sqrt, radians, floor, ceil, log2, fmod
 from copy import deepcopy
 import re
 
@@ -406,12 +406,56 @@ class ShapeToPdfExport(ShapeExport):
             leading=size,
         )
         para = Paragraph(text, style)
+        w, h = para.wrap(self.page_width, y)
 
-        w, h = para.wrap(self.page_width, 100)
-        para.drawOn(
-            self.canvas,
-            x + int(stroke_width * 0.25),
-            y - h / 2 - int(size * 0.25) - int(stroke_width * 0.25))
+        rotation = shape.get('textRotation', 0)
+        panel_rotation = shape.get('rotation', 0)
+        rotation = rotation + panel_rotation
+
+        text_position = shape['textPosition']
+        text_offset_x = stroke_width / 4 + 4
+        text_offset_y = size / 2 + stroke_width / 4 + 4
+        outPositions = ["top", "left", "bottom","right"]
+        inPositions = ["topleft", "bottomleft", "bottomright", "topright"]
+        rotationIndex = fmod(floor((360 - rotation + 45) / 90), 4)
+        finalIndex = 0
+
+        if text_position in ["bottom", "top", "right", "left"]:
+            posIndex = outPositions.index(text_position)
+            finalIndex = int(fmod((posIndex + rotationIndex), 4))
+            text_position = outPositions[finalIndex]
+        if text_position in ["topleft", "topright", "bottomleft", "bottomright"]:
+            posIndex = inPositions.index(text_position)
+            finalIndex = int(fmod((posIndex + rotationIndex), 4))
+            text_position = inPositions[finalIndex]
+
+        if text_position == "bottom":
+            dx = 0;
+            dy = text_offset_y;
+        if text_position == "left":
+            dx = -text_offset_x;
+            dy = 0;
+        if text_position == "right":
+            dx = text_offset_x;
+            dy = 0;
+        if text_position == "top":
+            dx = 0;
+            dy = -stroke_width / 2
+        if text_position == "topleft":
+            dx = text_offset_x;
+            dy = text_offset_y;
+        if text_position == "topright":
+            dx = -text_offset_x;
+            dy = text_offset_y;
+        if text_position == "bottomleft":
+            dx = text_offset_x;
+            dy = -stroke_width / 2
+        if text_position == "bottomright":
+            dx = -text_offset_x;
+            dy = -stroke_width / 2
+
+        para.drawOn(self.canvas, x + dx, y - dy)
+
 
     def draw_line(self, shape):
         start = self.panel_to_page_coords(shape['x1'], shape['y1'])

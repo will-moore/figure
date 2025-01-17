@@ -25,7 +25,6 @@
 
 
 import Raphael from "raphael";
-import { findIndex } from "underscore";
 
 var Text = function Text(options) {
   this.manager = options.manager;
@@ -260,15 +259,9 @@ Text.prototype.drawShape = function drawShape() {
       h = this._parentShapeCoords.height,
       outPositions = ["top", "left", "bottom","right"],
       inPositions = ["topleft", "bottomleft", "bottomright", "topright"],
-      outOffsetsX = [w/2,  -textOffsetX,  w/2, w + textOffsetX],
-      outOffsetsY = [-textOffsetY, h/2, h + textOffsetY, h/2],
-      inOffsetsX = [textOffsetX,  textOffsetX,  w - textOffsetX, w - textOffsetX],
-      inOffsetsY = [textOffsetY, h - textOffsetY, h - textOffsetY, textOffsetY],
-     // offsetsX = [0,  textOffsetY - textOffsetX,  0, textOffsetY - textOffsetX],
-      //offsetsY = [0, 0, textOffsetX - textOffsetY, 0],
       outAnchors = ["middle", "end", "middle", "start"],
       inAnchors = ["start", "start", "end", "end"],
-      rotationIndex = Math.floor(((360-this._rotation+45) / 90)) % 4,
+      rotationIndex = Math.floor(((360 - this._rotation + 45) / 90)) % 4,
       finalIndex
 
   switch(this._textPosition){
@@ -329,68 +322,6 @@ Text.prototype.drawShape = function drawShape() {
       dy = h - textOffsetY;
       textAnchor = inAnchors[finalIndex]
   }
-  /*switch(this._textPosition){
-      case "bottom":
-          dx = w/2;
-          dy = h + textOffsetY;
-          break;
-      case "left":
-          dx = -textOffsetX;
-          dy = h/2;
-          textAnchor = "end";
-          break;
-      case "right":
-          dx = w + textOffsetX;
-          dy = h/2;
-          textAnchor = "start";
-          break;
-      case "top":
-          dx = w/2;
-          dy = -textOffsetY;
-          break;
-      case "topleft":
-          dx = textOffsetX;
-          dy = textOffsetY;
-          textAnchor = "start";
-          break;
-      case "topright":
-          dx = w - textOffsetX;
-          dy = textOffsetY;
-          textAnchor = "end";
-          break;
-      case "bottomleft":
-          dx = textOffsetX;
-          dy = h - textOffsetY;
-          textAnchor = "start";
-          break;
-      case "bottomright":
-          dx = w - textOffsetX;
-          dy = h - textOffsetY;
-          textAnchor = "end";
-  }*/
-
-  /*switch(this._textPosition){
-    case "bottom":
-    case "left":
-    case "right":
-    case "top":
-        var posIndex = outPositions[this._textPosition]
-        var finalIndex = (posIndex + rotationIndex) % 4
-        dx = dx + offsetsX[finalIndex];
-        dy = dy + offsetsY[finalIndex];
-        textAnchor = outAnchors[finalIndex]
-        break;
-    case "topleft":
-    case "topright":
-    case "bottomleft":
-    case "bottomright":
-        var posIndex = inPositions[this._textPosition]
-        var finalIndex = (posIndex + rotationIndex) % 4
-        dx = dx + offsetsX[finalIndex];
-        dy = dy + offsetsY[finalIndex];
-        textAnchor = inAnchors[finalIndex]
-        break;
-  }*/
 
   var rotatedCoords = this.applyShapeRotation(x + w/2, y + h/2, x + dx, y + dy, this._rotation);
   this._x = rotatedCoords.x;
