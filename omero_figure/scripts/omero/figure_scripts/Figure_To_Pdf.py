@@ -742,6 +742,90 @@ class ShapeToPilExport(ShapeExport):
         xy = (int(center[0] - width / 2.0), int(center[1] - height / 2.0))
         self.draw.text(xy, text, fill=rgba, font=font)
 
+    def draw_text(self, shape):
+        text_coords = self.get_panel_coords(shape['x'], shape['y'])
+        text = ""
+
+        text = shape.get('text')
+
+        font_size_dpi = scale_to_export_dpi(shape.get('fontSize', 12))
+        stroke_width = shape.get('strokeWidth', 2)
+        stroke_width_dpi = scale_to_export_dpi(float(stroke_width))
+
+        r, g, b, a = self.get_rgba_int(shape['strokeColor'])
+        # bump up alpha a bit to make text more readable
+        rgba = (r, g, b, int(128 + a / 2))
+        font_name = "FreeSans.ttf"
+        from omero.gateway import THISPATH
+        path_to_font = os.path.join(THISPATH, "pilfonts", font_name)
+        try:
+            font = ImageFont.truetype(path_to_font, font_size_dpi)
+        except Exception:
+            font = ImageFont.load(
+                '%s/pilfonts/B%0.2d.pil' % (self.GATEWAYPATH, font_size_dpi))
+
+        box = font.getbbox(text)
+        txt_w = box[2] - box[0]
+        txt_h = box[3] - box[1]
+
+        x = text_coords["x"]
+        y = text_coords["y"]
+        anchor = shape['textAnchor']
+
+        if (anchor == 'middle'):
+            x = x - txt_w / 2
+        elif (anchor == "end"):
+            x = x - txt_w
+
+        rotation = shape.get('textRotation', 0)
+        panel_rotation = shape.get('rotation', 0)
+        rotation = rotation + panel_rotation
+
+        text_position = shape['textPosition']
+        text_offset_x = scale_to_export_dpi(stroke_width / 4 + 4)
+        outPositions = ["top", "left", "bottom","right"]
+        inPositions = ["topleft", "bottomleft", "bottomright", "topright"]
+        rotationIndex = fmod(floor((360 - rotation + 45) / 90), 4)
+        finalIndex = 0
+
+        if text_position in ["bottom", "top", "right", "left"]:
+            posIndex = outPositions.index(text_position)
+            finalIndex = int(fmod((posIndex + rotationIndex), 4))
+            text_position = outPositions[finalIndex]
+        if text_position in ["topleft", "topright", "bottomleft", "bottomright"]:
+            posIndex = inPositions.index(text_position)
+            finalIndex = int(fmod((posIndex + rotationIndex), 4))
+            text_position = inPositions[finalIndex]
+
+        if text_position == "bottom":
+            dx = 0;
+            dy = stroke_width_dpi / 4
+        if text_position == "left":
+            dx = -text_offset_x;
+            dy = -txt_h / 2;
+        if text_position == "right":
+            dx = text_offset_x;
+            dy = -txt_h / 2;
+        if text_position == "top":
+            dx = 0;
+            dy = -font_size_dpi - stroke_width_dpi / 2
+        if text_position == "topleft":
+            dx = text_offset_x;
+            dy = 2;
+        if text_position == "topright":
+            dx = -text_offset_x;
+            dy = 2;
+        if text_position == "bottomleft":
+            dx = text_offset_x;
+            dy = -font_size_dpi - stroke_width_dpi / 2
+        if text_position == "bottomright":
+            dx = -text_offset_x;
+            dy = -font_size_dpi - stroke_width_dpi / 2
+
+        xy = (x + dx, y + dy)
+
+        self.draw.text(xy, text, fill=rgba, font=font)
+
     def draw_arrow(self, shape):
 
         start = self.get_panel_coords(shape['x1'], shape['y1'])
