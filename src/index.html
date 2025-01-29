@@ -11,7 +11,7 @@
       const BASE_OMEROWEB_URL = dev_omeroweb_url;
       const EXPORT_ENABLED = false;
       const SCRIPT_VERSION = "";
-      const IS_ADMIN = true;
+      const IS_ADMIN = false;
       const WEBINDEX_URL = BASE_OMEROWEB_URL + "webclient/";
       const BASE_WEBFIGURE_URL = BASE_OMEROWEB_URL + "figure/";
       const WEBGATEWAYINDEX = BASE_OMEROWEB_URL + "webgateway/";
@@ -1584,13 +1584,6 @@
             </button> -->
 
             <div class="btn-group">
-              <button
-                title="Wrong script version!"
-                type="button"
-                class="btn btn-danger btn-sm script_version_warning"
-              >
-                <i class="bi-exclamation-circle"></i>
-              </button>
               <!-- button enabled if EXPORT_ENABLED is true -->
               <button
                 type="button"
@@ -1599,6 +1592,13 @@
                 class="btn btn-success btn-sm export_pdf"
               >
                 Export PDF
+              </button>
+              <!-- script warning shown in FigureView.initialise() if needed -->
+              <button
+                type="button" style="display: none"
+                class="btn btn-danger btn-sm script_version_warning"
+              >
+                <i class="bi-exclamation-circle"></i>
               </button>
               <button
                 type="button"

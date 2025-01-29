@@ -26,6 +26,7 @@
         hideModals,
         hideModal,
         updateRoiIds} from "./util";
+    const RELEASE_VERSION = import.meta.env.VITE_VERSION;
 
     // This extends Backbone to support keyboardEvents
     backboneMousetrap(_, Backbone, Mousetrap);
@@ -92,6 +93,14 @@
             // enable export (script is available)
             if (EXPORT_ENABLED) {
                 $("button.export_pdf").removeAttr("disabled");
+                // check script version
+                if (SCRIPT_VERSION != RELEASE_VERSION) {
+                    $(".script_version_warning").show()
+                    .attr("title", "Script Version Warning");
+                }
+            } else if (IS_ADMIN) {
+                $(".script_version_warning").show()
+                    .attr("title", "Script Not Upload to OMERO.server");
             }
 
             // respond to zoom changes
@@ -225,7 +234,6 @@
         },
 
         script_version_warning: function(event) {
-            const RELEASE_VERSION = import.meta.env.VITE_VERSION;
             document.getElementById("figure_app_version").innerHTML = RELEASE_VERSION;
             let script_version = SCRIPT_VERSION.length > 0 ? SCRIPT_VERSION : "unknown";
             document.getElementById("export_script_version").innerHTML = script_version;
