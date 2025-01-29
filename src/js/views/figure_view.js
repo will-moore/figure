@@ -117,6 +117,8 @@
 
         events: {
             "click .export_pdf": "export_pdf",
+            "click .script_version_warning": "script_version_warning",
+            "click .upload_omero_script": "upload_omero_script",
             "click .export_options li": "export_options",
             "click .add_panel": "addPanel",
             "click .delete_panel": "deleteSelectedPanels",
@@ -220,6 +222,27 @@
 
             // clear file list (will be re-fetched when needed)
             this.figureFiles.reset();
+        },
+
+        script_version_warning: function(event) {
+            const RELEASE_VERSION = import.meta.env.VITE_VERSION;
+            document.getElementById("figure_app_version").innerHTML = RELEASE_VERSION;
+            let script_version = SCRIPT_VERSION.length > 0 ? SCRIPT_VERSION : "unknown";
+            document.getElementById("export_script_version").innerHTML = script_version;
+
+            if (IS_ADMIN) {
+                $("#admin_script_message").show();
+            } else {
+                $("#non_admin_script_message").show();
+            }
+            showModal("scriptManagerDialog");
+        },
+
+        upload_omero_script: function(event) {
+            $.post(UPLOAD_OMERO_SCRIPT_URL)
+             .done(function( data ) {
+                alert(data);
+            });
         },
 
         // Heavy lifting of PDF generation handled by OMERO.script...

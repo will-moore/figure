@@ -1,0 +1,65 @@
+<div
+  class="modal"
+  id="scriptManagerDialog"
+  tabindex="-1"
+  role="dialog"
+  aria-hidden="true"
+>
+  <div class="modal-dialog" style="width: 400px">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Script Version Warning</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <p>
+          Your figure export script version is
+          <code id="export_script_version">Unknown</code>.
+        </p>
+        <p>
+          Your OMERO.figure app version is
+          <code id="figure_app_version">Unknown</code>.
+        </p>
+
+        <div class="alert alert-danger" role="alert">
+          Your Figure may not be correctly exported to PDF or TIFF when using an
+          older version of the export script.
+        </div>
+
+        <!-- Alternative messages depending whether user isAdmin.
+         1 of these is shown when the dialog is opened -->
+        <!-- if NOT Admin -->
+        <p id="non_admin_script_message" style="display: none">
+          Users must have <code>Admin</code> permissions in order to update the
+          script.
+        </p>
+        <!-- if Admin -->
+        <div id="admin_script_message" style="display: none">
+          <p>
+            You have <code>Admin</code> permissions and can update the script on
+            the OMERO server.
+          </p>
+          <p>
+            <button
+              type="button"
+              data-export-option="PDF"
+              class="btn btn-success btn-sm float-end upload_omero_script"
+            >
+              Update Script
+            </button>
+          </p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">
+          OK
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

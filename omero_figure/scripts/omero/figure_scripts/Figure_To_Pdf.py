@@ -2721,7 +2721,11 @@ def run_script():
                        description="Name of the Pdf Figure"),
 
         scripts.String("Figure_URI",
-                       description="URL to the Figure")
+                       description="URL to the Figure"),
+
+        # This allows clients to query the script version
+        # by listing script params and getting default value
+        scripts.String("FIGURE_VERSION", default=VERSION)
     )
 
     try:
