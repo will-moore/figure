@@ -100,7 +100,7 @@
                 }
             } else if (IS_ADMIN) {
                 $(".script_version_warning").show()
-                    .attr("title", "Script Not Upload to OMERO.server");
+                    .attr("title", "Script missing! Click to Upload...");
             }
 
             // respond to zoom changes
