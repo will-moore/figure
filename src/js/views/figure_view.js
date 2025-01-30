@@ -267,8 +267,9 @@
                 $spinner.hide();
                 let message = data.Error ? "Error: " + data.Error : data.Message;
                 if (data.script_id) {
-                    // success! Hide warning button
+                    // success! Hide warning button and enable export.
                     $(".script_version_warning").hide();
+                    $(".export_pdf").removeAttr("disabled");
                     message += ". Script ID: " + data.script_id;
                 }
                 $("#script_upload_message").text(message).show();
