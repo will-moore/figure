@@ -234,22 +234,44 @@
         },
 
         script_version_warning: function(event) {
+            // Show the script manager (warning/upload) dialog
             document.getElementById("figure_app_version").innerHTML = RELEASE_VERSION;
             let script_version = SCRIPT_VERSION.length > 0 ? SCRIPT_VERSION : "unknown";
             document.getElementById("export_script_version").innerHTML = script_version;
 
+            if (EXPORT_ENABLED) {
+                $(".script_version_mismatch").show();
+                $(".script_missing").hide();
+            } else {
+                $(".script_version_mismatch").hide();
+                $(".script_missing").show();
+            }
             if (IS_ADMIN) {
                 $("#admin_script_message").show();
             } else {
                 $("#non_admin_script_message").show();
             }
+            $("#script_upload_message").hide();
             showModal("scriptManagerDialog");
         },
 
         upload_omero_script: function(event) {
+            let $btn = $(".upload_omero_script");
+            let $spinner = $(".spinner", $btn);
+            $btn.attr("disabled", "disabled");
+            $spinner.show();
             $.post(UPLOAD_OMERO_SCRIPT_URL)
              .done(function( data ) {
-                alert(data);
+                console.log("rsp", data);
+                $btn.removeAttr("disabled");
+                $spinner.hide();
+                let message = data.Error ? "Error: " + data.Error : data.Message;
+                if (data.script_id) {
+                    // success! Hide warning button
+                    $(".script_version_warning").hide();
+                    message += ". Script ID: " + data.script_id;
+                }
+                $("#script_upload_message").text(message).show();
             });
         },
 

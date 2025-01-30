@@ -8,7 +8,11 @@
   <div class="modal-dialog" style="width: 400px">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Script Version Warning</h5>
+        <!-- When this dialog is shown in script_version_warning() we show/hide sections... -->
+        <!-- All the .script_version_mismatch sections are shown if script exists (but outdated) -->
+        <h5 class="script_version_mismatch" class="modal-title">Script Version Warning</h5>
+        <!-- All the .script_missing sections are shown if script is missing -->
+        <h5 class="script_missing" class="modal-title">Export Script not on OMERO.server</h5>
         <button
           type="button"
           class="btn-close"
@@ -17,18 +21,27 @@
         ></button>
       </div>
       <div class="modal-body">
-        <p>
-          Your figure export script version is
-          <code id="export_script_version">Unknown</code>.
-        </p>
-        <p>
-          Your OMERO.figure app version is
-          <code id="figure_app_version">Unknown</code>.
-        </p>
 
-        <div class="alert alert-danger" role="alert">
-          Your Figure may not be correctly exported to PDF or TIFF when using an
-          older version of the export script.
+        <div class="script_version_mismatch">
+          <p>
+            Your figure export script version is
+            <code id="export_script_version">Unknown</code>.
+          </p>
+          <p>
+            Your OMERO.figure app version is
+            <code id="figure_app_version">Unknown</code>.
+          </p>
+
+          <div class="alert alert-danger" role="alert">
+            Your Figure may not be correctly exported to PDF or TIFF when using an
+            older version of the export script.
+          </div>
+        </div>
+
+        <div class="script_missing">
+          <div class="alert alert-danger" role="alert">
+            The Figure Export Script is not available on the OMERO server.
+          </div>
         </div>
 
         <!-- Alternative messages depending whether user isAdmin.
@@ -41,18 +54,26 @@
         <!-- if Admin -->
         <div id="admin_script_message" style="display: none">
           <p>
-            You have <code>Admin</code> permissions and can update the script on
-            the OMERO server.
+            You have <code>Admin</code> permissions and can
+            <span class="script_missing">upload</span>
+            <span class="script_version_mismatch">update</span>
+            the script on the OMERO server.
           </p>
-          <p>
+          <p style="text-align: right;">
             <button
               type="button"
               data-export-option="PDF"
-              class="btn btn-success float-end upload_omero_script"
+              class="btn btn-success upload_omero_script"
             >
-              Update Script
+              <span class="script_missing">Upload Script</span>
+              <span class="script_version_mismatch">Update Script</span>
+              <i class="bi-arrow-repeat spinner" style="display: none"></i>
             </button>
           </p>
+          <div id="script_upload_message" class="alert alert-success" role="alert"
+               style="display: none">
+            <!-- Script upload response message goes here -->
+          </div>
         </div>
       </div>
       <div class="modal-footer">
