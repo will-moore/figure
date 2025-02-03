@@ -101,7 +101,7 @@
                 x = x - sw;
                 y = y - sw;
                 page_w = w + (sw * 2);
-               page_h = h + (sw * 2);
+                page_h = h + (sw * 2);
             } else {
                 this.$el.css({'border': ''})
             }
@@ -306,7 +306,7 @@
             $('.right_vlabels', self.$el).css('width', 3 * self.$el.height() + 'px');
 
             var border = this.model.get('border')
-            if(border != undefined){
+            if(border?.showBorder){
                 var margin =  5 + border.strokeWidth
                 $('.left_vlabels>div', self.$el).css('margin-bottom', margin + 'px');
                 $('.right_vlabels>div', self.$el).css('margin-bottom', margin + 'px');
