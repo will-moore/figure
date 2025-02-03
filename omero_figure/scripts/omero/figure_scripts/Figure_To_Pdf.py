@@ -1294,7 +1294,7 @@ class FigureExport(object):
         y = panel['y']
         width = panel['width']
         height = panel['height']
-        border = panel['border']
+        border = panel.get('border')
 
         viewport_region = self.get_crop_region(panel)
 
