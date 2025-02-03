@@ -1303,7 +1303,7 @@ class FigureExport(object):
         y = y - page['y']
 
         spacer = 5
-        if border is not None and border['showBorder'] == True:
+        if border is not None and border['showBorder']:
             spacer = spacer + border['strokeWidth']
 
         # group by 'position':
