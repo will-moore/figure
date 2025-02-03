@@ -1294,6 +1294,7 @@ class FigureExport(object):
         y = panel['y']
         width = panel['width']
         height = panel['height']
+        border = panel['border']
 
         viewport_region = self.get_crop_region(panel)
 
@@ -1302,6 +1303,8 @@ class FigureExport(object):
         y = y - page['y']
 
         spacer = 5
+        if border is not None and border['showBorder'] == True:
+            spacer = spacer + border['strokeWidth']
 
         # group by 'position':
         positions = {'top': [], 'bottom': [], 'left': [],
