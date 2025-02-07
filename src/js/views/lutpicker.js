@@ -92,7 +92,7 @@ var LutPickerView = Backbone.View.extend({
             }
             // Set the css variables at the document root, as it's used in different places
             $(":root").css({
-                "--pngHeight": png_len * 50 + "px",
+                "--pngHeight": png_len * 1000 + "px",
                 "--lutPng": "url("+this.lutsPngUrl+")"
             });
         }
@@ -102,7 +102,7 @@ var LutPickerView = Backbone.View.extend({
     getLutBackgroundPosition: function(lutName) {
         var lutIndex = this.lut_names.indexOf(lutName);
         if (lutIndex > -1) {
-            return '0px -' + ((lutIndex * 50) +2) + 'px';
+            return '0px -' + ((lutIndex * 1000) +2) + 'px';
         } else {
             return '0px 100px';  // hides background
         }

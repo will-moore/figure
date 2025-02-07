@@ -1041,7 +1041,7 @@
     }
 
     .ch_slider .ui-slider-range {
-        background-size: 100% 50px;
+        background-size: 100% 1000px;
         background-position: 0 0;
         background-repeat: no-repeat;
     }
@@ -1051,6 +1051,7 @@
         background-size: 100% var(--pngHeight);
         background-image: var(--lutPng);
         background-repeat: no-repeat;
+        image-rendering: pixelated;  /* Universal support since 2021 */
     }
 
     .ch_start_slider::before {
@@ -1064,6 +1065,7 @@
         background-repeat: no-repeat;
         transform: scaleX(var(--scaleX));
         background-position: var(--bgPos);
+        image-rendering: pixelated;
       }
 
     .channel-btn {
@@ -1418,6 +1420,7 @@
         margin-left: 0px;
         display: flex;
         position: relative;
+        image-rendering: pixelated;
     }
 
     .colorbar_ticks_right, .colorbar_ticks_left {
