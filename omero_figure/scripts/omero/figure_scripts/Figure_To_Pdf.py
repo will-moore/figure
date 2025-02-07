@@ -1823,8 +1823,11 @@ class FigureExport(object):
         tick_len = colorbar["tick_len"]
         label_margin = colorbar["label_margin"]
         contour_width = tick_width
-        for label, pos_x, pos_y in zip(labels, labels_x, labels_y):
 
+        for label, pos_x, pos_y in zip(labels, labels_x, labels_y):
+            # Handle page offsets
+            pos_x -= page['x']
+            pos_x -= page['y']
             # Cosmetic correction, for first and last ticks to be
             # aligned with the image
             shift = 0
@@ -1868,6 +1871,9 @@ class FigureExport(object):
                 self.draw_text(label, pos_x, pos_y + 4 + label_margin,
                                fontsize, rgb, align=align)
 
+        # Handle page offsets
+        cbar['x'] -= page['x']
+        cbar['y'] -= page['y']
         if colorbar["position"] == "top":
             self.draw_scalebar_line(cbar['x'],
                                     cbar['y'],
