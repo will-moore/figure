@@ -1828,7 +1828,7 @@ class FigureExport(object):
         for label, pos_x, pos_y in zip(labels, labels_x, labels_y):
             # Handle page offsets
             pos_x -= page['x']
-            pos_x -= page['y']
+            pos_y -= page['y']
             # Cosmetic correction, for first and last ticks to be
             # aligned with the image
             shift = 0
@@ -1863,7 +1863,7 @@ class FigureExport(object):
                 pos_x -= shift  # Order of the label is reversed
                 if tick_width > 0:
                     self.draw_scalebar_line(pos_x, pos_y, pos_x, y2,
-                                            tick_width, rgb, ori="vertical")
+                                            tick_width, rgb)
                 self.draw_text(label, pos_x,
                                pos_y - fontsize - tick_len - label_margin,
                                fontsize, rgb, align=align)
@@ -1872,7 +1872,7 @@ class FigureExport(object):
                 pos_x -= shift  # Order of the label is reversed
                 if tick_width > 0:
                     self.draw_scalebar_line(pos_x, pos_y, pos_x, y2,
-                                            tick_width, rgb, ori="vertical")
+                                            tick_width, rgb)
                 self.draw_text(label, pos_x, pos_y + tick_len + label_margin,
                                fontsize, rgb, align=align)
 
@@ -1896,13 +1896,13 @@ class FigureExport(object):
                                     cbar['y'],
                                     cbar['x'],
                                     cbar['y'] + cbar['height'],
-                                    contour_width, rgb, ori="vertical")
+                                    contour_width, rgb)
         elif colorbar["position"] == "right":
             self.draw_scalebar_line(cbar['x'] + cbar['width'],
                                     cbar['y'],
                                     cbar['x'] + cbar['width'],
                                     cbar['y'] + cbar['height'],
-                                    contour_width, rgb, ori="vertical")
+                                    contour_width, rgb)
 
     def is_big_image(self, image):
         """Return True if this is a 'big' tiled image."""
@@ -2474,7 +2474,7 @@ class FigureExport(object):
         elif align == 'right-vertical':
             c.rotate(90)
 
-    def draw_scalebar_line(self, x, y, x2, y2, width, rgb, ori=""):
+    def draw_scalebar_line(self, x, y, x2, y2, width, rgb):
         """ Adds line to PDF. Overwritten for TIFF below """
         red, green, blue = rgb
         red = float(red) / 255
@@ -2676,7 +2676,7 @@ class TiffExport(FigureExport):
 
         self.tiff_figure.paste(pil_img, box)
 
-    def draw_scalebar_line(self, x, y, x2, y2, width, rgb, ori="horizontal"):
+    def draw_scalebar_line(self, x, y, x2, y2, width, rgb):
         """ Draw line on the current figure page """
         draw = ImageDraw.Draw(self.tiff_figure)
 
