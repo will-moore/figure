@@ -1844,7 +1844,7 @@ class FigureExport(object):
                 pos_y += shift
                 self.draw_scalebar_line(pos_x, pos_y, x2, pos_y,
                                         tick_width, rgb)
-                self.draw_text(label, pos_x - 4 - label_margin,
+                self.draw_text(label, pos_x - tick_len - label_margin,
                                pos_y - fontsize / 2 + 1,
                                fontsize, rgb, align=align)
             elif colorbar["position"] == "right":
@@ -1852,7 +1852,7 @@ class FigureExport(object):
                 pos_y += shift
                 self.draw_scalebar_line(pos_x, pos_y, x2, pos_y,
                                         tick_width, rgb)
-                self.draw_text(label, pos_x + 4 + label_margin,
+                self.draw_text(label, pos_x + tick_len + label_margin,
                                pos_y - fontsize / 2 + 1,
                                fontsize, rgb, align=align)
             elif colorbar["position"] == "top":
@@ -1861,14 +1861,14 @@ class FigureExport(object):
                 self.draw_scalebar_line(pos_x, pos_y, pos_x, y2,
                                         tick_width, rgb)
                 self.draw_text(label, pos_x,
-                               pos_y - fontsize - 2 - label_margin,
+                               pos_y - fontsize - tick_len - label_margin,
                                fontsize, rgb, align=align)
             elif colorbar["position"] == "bottom":
                 y2 = pos_y + tick_len
                 pos_x -= shift  # Order of the label is reversed
                 self.draw_scalebar_line(pos_x, pos_y, pos_x, y2,
                                         tick_width, rgb)
-                self.draw_text(label, pos_x, pos_y + 4 + label_margin,
+                self.draw_text(label, pos_x, pos_y + tick_len + label_margin,
                                fontsize, rgb, align=align)
 
         # Handle page offsets
