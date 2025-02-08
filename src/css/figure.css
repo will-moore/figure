@@ -1375,6 +1375,22 @@
         color: white;
     }
 
+    .colorbar_form .input-group {
+        width:80px;
+        margin-right: 4px;
+    }
+
+    .colorbar_form .form-group {
+        margin-bottom: 0;
+    }
+
+    .colorbar_form .row {
+        align-items: center;
+        display: flex;
+        gap: 3px;
+        margin-top: 3px;
+    }
+
     .colorbar {
         position: absolute;
         width: 100%;
