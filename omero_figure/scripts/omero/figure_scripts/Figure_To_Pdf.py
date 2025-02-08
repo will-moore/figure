@@ -1824,6 +1824,7 @@ class FigureExport(object):
         label_margin = colorbar["label_margin"]
         contour_width = tick_width
 
+        # Drawing of the ticks (line + label)
         for label, pos_x, pos_y in zip(labels, labels_x, labels_y):
             # Handle page offsets
             pos_x -= page['x']
@@ -1842,32 +1843,36 @@ class FigureExport(object):
             if colorbar["position"] == "left":
                 x2 = pos_x - tick_len
                 pos_y += shift
-                self.draw_scalebar_line(pos_x, pos_y, x2, pos_y,
-                                        tick_width, rgb)
+                if tick_width > 0:  # Do not add empty elements
+                    self.draw_scalebar_line(pos_x, pos_y, x2, pos_y,
+                                            tick_width, rgb)
                 self.draw_text(label, pos_x - tick_len - label_margin,
                                pos_y - fontsize / 2 + 1,
                                fontsize, rgb, align=align)
             elif colorbar["position"] == "right":
                 x2 = pos_x + tick_len
                 pos_y += shift
-                self.draw_scalebar_line(pos_x, pos_y, x2, pos_y,
-                                        tick_width, rgb)
+                if tick_width > 0:
+                    self.draw_scalebar_line(pos_x, pos_y, x2, pos_y,
+                                            tick_width, rgb)
                 self.draw_text(label, pos_x + tick_len + label_margin,
                                pos_y - fontsize / 2 + 1,
                                fontsize, rgb, align=align)
             elif colorbar["position"] == "top":
                 y2 = pos_y - tick_len
                 pos_x -= shift  # Order of the label is reversed
-                self.draw_scalebar_line(pos_x, pos_y, pos_x, y2,
-                                        tick_width, rgb, ori="vertical")
+                if tick_width > 0:
+                    self.draw_scalebar_line(pos_x, pos_y, pos_x, y2,
+                                            tick_width, rgb, ori="vertical")
                 self.draw_text(label, pos_x,
                                pos_y - fontsize - tick_len - label_margin,
                                fontsize, rgb, align=align)
             elif colorbar["position"] == "bottom":
                 y2 = pos_y + tick_len
                 pos_x -= shift  # Order of the label is reversed
-                self.draw_scalebar_line(pos_x, pos_y, pos_x, y2,
-                                        tick_width, rgb, ori="vertical")
+                if tick_width > 0:
+                    self.draw_scalebar_line(pos_x, pos_y, pos_x, y2,
+                                            tick_width, rgb, ori="vertical")
                 self.draw_text(label, pos_x, pos_y + tick_len + label_margin,
                                fontsize, rgb, align=align)
 
@@ -2681,12 +2686,7 @@ class TiffExport(FigureExport):
         y2 = scale_to_export_dpi(y2)
         width = scale_to_export_dpi(width)
 
-        if ori == "horizontal":
-            for value in range(-width // 2, width // 2):
-                draw.line([(x, y + value), (x2, y2 + value)], fill=rgb)
-        else:  # vertical expected
-            for value in range(-width // 2, width // 2):
-                draw.line([(x + value, y), (x2 + value, y2)], fill=rgb)
+        draw.line([(x, y), (x2, y2)], fill=rgb, width=width)
 
     def draw_temp_label(self, text, fontsize, rgb):
         """Returns a new PIL image with text. Handles html."""
