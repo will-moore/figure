@@ -7,7 +7,7 @@
   "scripts": {
     "start": "vite",
     "build": "vite build --emptyOutDir && ./deploy_build.sh",
-    "ghpages": "vite build --outDir ../gh_pages && ./deploy_ghpages.sh",
+    "ghpages": "vite build --base=./ --outDir ../gh_pages && ./deploy_ghpages.sh",
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "watch 'npm run build' ./src"
   },
