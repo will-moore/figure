@@ -1,7 +1,7 @@
 <div class="colorbar" style="<%= inv_position %>: 100%;">
     <% if (show) { %>
         <div class="colorbar_<%= position %>"
-             style="margin-<%= inv_position %>: <%= spacing %>px;">
+             style="margin-<%= inv_position %>: <%= gap %>px;">
 
             <div class="colorbar_bg "
                 style="height: <%= thickness + 1 %>px;
@@ -11,7 +11,7 @@
             </div>
         </div>
 
-        <div class="colorbar_ticks_<%= position %>" style="border-<%= inv_position %>: 2px solid #<%= axis_color %>; margin-<%= inv_position %>: <%= thickness + spacing %>px; ">
+        <div class="colorbar_ticks_<%= position %>" style="border-<%= inv_position %>: 2px solid #<%= axis_color %>; margin-<%= inv_position %>: <%= thickness + gap %>px; ">
             <% for (let i = 0; i < num_ticks; i++) { %>
                 <div class="colorbar_tick_<%= orientation %>">
                     <% if (position == "right" || position == "bottom") { %>

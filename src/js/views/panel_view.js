@@ -410,7 +410,7 @@
                     axis_color: cb.axis_color,
                     num_ticks: cb.num_ticks,
                     tick_len: cb.tick_len,
-                    spacing: cb.spacing,
+                    gap: cb.gap,
                     label_margin: cb.label_margin,
                     start: start,
                     end: end,

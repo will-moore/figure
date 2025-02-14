@@ -1765,7 +1765,7 @@ class FigureExport(object):
 
         color_ramp = self.get_color_ramp(channel)
 
-        spacing = colorbar["spacing"]
+        gap = colorbar["gap"]
         thickness = colorbar["thickness"]
         cbar = {  # Dict of colorbar properties to pass to paste_image
             'zoom': '100',
@@ -1785,12 +1785,12 @@ class FigureExport(object):
             cbar['width'] = thickness
             cbar['height'] = panel['height']
             cbar['y'] = panel['y']
-            cbar['x'] = panel['x'] - (spacing + thickness)
+            cbar['x'] = panel['x'] - (gap + thickness)
             labels_x = [cbar['x']]
             labels_y = cbar['y'] + panel['height'] * pos_ratio[::-1]
             align = "right"
             if colorbar["position"] == "right":
-                cbar['x'] = panel['x'] + panel['width'] + spacing
+                cbar['x'] = panel['x'] + panel['width'] + gap
                 labels_x = [cbar['x'] + cbar['width']]
                 align = "left"
             labels_x *= labels.size  # Duplicate x postions
@@ -1798,12 +1798,12 @@ class FigureExport(object):
             cbar['width'] = panel['width']
             cbar['height'] = thickness
             cbar['x'] = panel['x']
-            cbar['y'] = panel['y'] - (spacing + thickness)
+            cbar['y'] = panel['y'] - (gap + thickness)
             labels_x = cbar['x'] + panel['width'] * pos_ratio
             labels_y = [cbar['y']]
             align = "center"
             if colorbar["position"] == "bottom":
-                cbar['y'] = panel['y'] + panel['height'] + spacing
+                cbar['y'] = panel['y'] + panel['height'] + gap
                 labels_y = [cbar['y'] + cbar['height']]
             labels_y *= labels.size  # Duplicate y postions
 

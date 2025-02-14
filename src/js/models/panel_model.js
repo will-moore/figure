@@ -1105,7 +1105,7 @@
             if (cb && cb.show) {
                 var size = Number(cb.font_size);
                 if (cb.position == "top") {
-                    shift_cbar = (cb.spacing + cb.thickness +
+                    shift_cbar = (cb.gap + cb.thickness +
                         size + cb.tick_len + cb.label_margin);
                     shift_cbar = Math.max(0, shift_cbar);
                 } else if (cb.position == "left" || cb.position == "right") {
@@ -1151,7 +1151,7 @@
                 end = end.toFixed(rounding);
                 if (cb.position == "left") {
                     const width = this.measureTextSize(end, cb.font_size + "px");
-                    shift_cbar = (cb.spacing + cb.thickness +
+                    shift_cbar = (cb.gap + cb.thickness +
                         width + cb.tick_len + cb.label_margin);
                     shift_cbar = Math.max(0, shift_cbar);
                 } else if (cb.position == "top" || cb.position == "bottom"){
@@ -1198,7 +1198,7 @@
                 end = end.toFixed(rounding);
                 if (cb.position == "right") {
                     const width = this.measureTextSize(end, cb.font_size + "px");
-                    shift_cbar = (cb.spacing + cb.thickness +
+                    shift_cbar = (cb.gap + cb.thickness +
                         width + cb.tick_len + cb.label_margin);
                     shift_cbar = Math.max(0, shift_cbar);
                 } else if (cb.position == "top" || cb.position == "bottom"){
@@ -1227,7 +1227,7 @@
             if (cb && cb.show) {
                 var size = Number(cb.font_size);
                 if (cb.position == "bottom") {
-                    shift_cbar = (cb.spacing + cb.thickness +
+                    shift_cbar = (cb.gap + cb.thickness +
                         size + cb.tick_len + cb.label_margin);
                     shift_cbar = Math.max(0, shift_cbar);
                 } else if (cb.position == "left" || cb.position == "right") {
