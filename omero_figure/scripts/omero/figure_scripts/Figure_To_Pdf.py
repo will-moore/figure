@@ -1821,7 +1821,7 @@ class FigureExport(object):
         fontsize = int(colorbar["font_size"])
         tick_width = 1
         tick_len = colorbar["tick_len"]
-        label_margin = colorbar["label_margin"]
+        tick_margin = colorbar["tick_margin"]
         contour_width = tick_width
 
         # Drawing of the ticks (line + label)
@@ -1846,7 +1846,7 @@ class FigureExport(object):
                 if tick_width > 0:  # Do not add empty elements
                     self.draw_scalebar_line(pos_x, pos_y, x2, pos_y,
                                             tick_width, rgb)
-                self.draw_text(label, pos_x - tick_len - label_margin,
+                self.draw_text(label, pos_x - tick_len - tick_margin,
                                pos_y - fontsize / 2 + 1,
                                fontsize, rgb, align=align)
             elif colorbar["position"] == "right":
@@ -1855,7 +1855,7 @@ class FigureExport(object):
                 if tick_width > 0:
                     self.draw_scalebar_line(pos_x, pos_y, x2, pos_y,
                                             tick_width, rgb)
-                self.draw_text(label, pos_x + tick_len + label_margin,
+                self.draw_text(label, pos_x + tick_len + tick_margin,
                                pos_y - fontsize / 2 + 1,
                                fontsize, rgb, align=align)
             elif colorbar["position"] == "top":
@@ -1865,7 +1865,7 @@ class FigureExport(object):
                     self.draw_scalebar_line(pos_x, pos_y, pos_x, y2,
                                             tick_width, rgb)
                 self.draw_text(label, pos_x,
-                               pos_y - fontsize - tick_len - label_margin,
+                               pos_y - fontsize - tick_len - tick_margin,
                                fontsize, rgb, align=align)
             elif colorbar["position"] == "bottom":
                 y2 = pos_y + tick_len
@@ -1873,7 +1873,7 @@ class FigureExport(object):
                 if tick_width > 0:
                     self.draw_scalebar_line(pos_x, pos_y, pos_x, y2,
                                             tick_width, rgb)
-                self.draw_text(label, pos_x, pos_y + tick_len + label_margin,
+                self.draw_text(label, pos_x, pos_y + tick_len + tick_margin,
                                fontsize, rgb, align=align)
 
         # Handle page offsets

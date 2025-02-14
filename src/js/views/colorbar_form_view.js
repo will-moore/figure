@@ -51,7 +51,7 @@ var ColorbarFormView = Backbone.View.extend({
             num_ticks = parseInt($('.colorbar-num-ticks', $form).val()),
             tick_len = parseInt($('.colorbar-tick-length', $form).val()),
             gap = parseInt($('.colorbar-gap', $form).val()),
-            label_margin = parseInt($('.colorbar-label-margin', $form).val());
+            tick_margin = parseInt($('.colorbar-tick-margin', $form).val());
 
         this.models.forEach(function(m) {
             var lutBgPos = m.get('lutBgPos');
@@ -63,7 +63,7 @@ var ColorbarFormView = Backbone.View.extend({
             if (num_ticks != '-') cb.num_ticks = num_ticks;
             if (tick_len != '-') cb.tick_len = tick_len;
             if (gap != '-') cb.gap = gap;
-            if (label_margin != '-') cb.label_margin = label_margin;
+            if (tick_margin != '-') cb.tick_margin = tick_margin;
             m.save_colorbar(cb);
         });
         return false;
@@ -86,7 +86,7 @@ var ColorbarFormView = Backbone.View.extend({
                     cb_json.num_ticks = cb.num_ticks;
                     cb_json.tick_len = cb.tick_len;
                     cb_json.gap = cb.gap;
-                    cb_json.label_margin = cb.label_margin;
+                    cb_json.tick_margin = cb.tick_margin;
                 } else {
                     if (cb_json.position != cb.position) cb_json.position = '-';
                     if (cb_json.thickness != cb.thickness) cb_json.thickness = '-';
@@ -95,7 +95,7 @@ var ColorbarFormView = Backbone.View.extend({
                     if (cb_json.num_ticks != cb.num_ticks) cb_json.num_ticks = '-';
                     if (cb_json.tick_len != cb.tick_len) cb_json.tick_len = '-';
                     if (cb_json.gap != cb.gap) cb_json.gap = '-';
-                    if (cb_json.label_margin != cb.label_margin) cb_json.label_margin = '-';
+                    if (cb_json.tick_margin != cb.tick_margin) cb_json.tick_margin = '-';
                 }
             }
             if (!cb || !cb.show) {
@@ -114,7 +114,7 @@ var ColorbarFormView = Backbone.View.extend({
         cb_json.num_ticks = cb_json.num_ticks ?? 7;
         cb_json.tick_len = cb_json.tick_len ?? 3;
         cb_json.gap = cb_json.gap ?? 5;
-        cb_json.label_margin = cb_json.label_margin ?? 2;
+        cb_json.tick_margin = cb_json.tick_margin ?? 2;
         var html = this.template(cb_json);
         this.$el.html(html);
         return this;

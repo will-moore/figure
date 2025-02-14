@@ -24,7 +24,7 @@
                         <span class="label colorbar_label_<%= orientation %>"
                               style="color: #<%= axis_color %>;
                                      font-size: <%= font_size %>px;
-                                     margin-<%= inv_position %>: <%= label_margin %>px;">
+                                     margin-<%= inv_position %>: <%= tick_margin %>px;">
                             <!-- Label is rounded to decimal proportionally to the spacing between each tick.  -->
                             <%= ((end - start) * i / (num_ticks-1) + start).toFixed(Math.max(0, Math.ceil(-Math.log10((end - start) / num_ticks)))) %>
                         </span>

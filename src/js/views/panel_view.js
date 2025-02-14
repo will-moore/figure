@@ -411,7 +411,7 @@
                     num_ticks: cb.num_ticks,
                     tick_len: cb.tick_len,
                     gap: cb.gap,
-                    label_margin: cb.label_margin,
+                    tick_margin: cb.tick_margin,
                     start: start,
                     end: end,
                     color: color,
