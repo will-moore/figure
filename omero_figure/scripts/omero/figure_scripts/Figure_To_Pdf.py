@@ -1820,7 +1820,7 @@ class FigureExport(object):
         rgb = tuple(int(colorbar["axis_color"][i:i+2], 16) for i in (0, 2, 4))
         fontsize = int(colorbar["font_size"])
         tick_width = 1
-        tick_len = colorbar["tick_len"]
+        mark_len = colorbar["mark_len"]
         tick_margin = colorbar["tick_margin"]
         contour_width = tick_width
 
@@ -1841,39 +1841,39 @@ class FigureExport(object):
             label = f"{label:.{decimals}f}"
 
             if colorbar["position"] == "left":
-                x2 = pos_x - tick_len
+                x2 = pos_x - mark_len
                 pos_y += shift
                 if tick_width > 0:  # Do not add empty elements
                     self.draw_scalebar_line(pos_x, pos_y, x2, pos_y,
                                             tick_width, rgb)
-                self.draw_text(label, pos_x - tick_len - tick_margin,
+                self.draw_text(label, pos_x - mark_len - tick_margin,
                                pos_y - fontsize / 2 + 1,
                                fontsize, rgb, align=align)
             elif colorbar["position"] == "right":
-                x2 = pos_x + tick_len
+                x2 = pos_x + mark_len
                 pos_y += shift
                 if tick_width > 0:
                     self.draw_scalebar_line(pos_x, pos_y, x2, pos_y,
                                             tick_width, rgb)
-                self.draw_text(label, pos_x + tick_len + tick_margin,
+                self.draw_text(label, pos_x + mark_len + tick_margin,
                                pos_y - fontsize / 2 + 1,
                                fontsize, rgb, align=align)
             elif colorbar["position"] == "top":
-                y2 = pos_y - tick_len
+                y2 = pos_y - mark_len
                 pos_x -= shift  # Order of the label is reversed
                 if tick_width > 0:
                     self.draw_scalebar_line(pos_x, pos_y, pos_x, y2,
                                             tick_width, rgb)
                 self.draw_text(label, pos_x,
-                               pos_y - fontsize - tick_len - tick_margin,
+                               pos_y - fontsize - mark_len - tick_margin,
                                fontsize, rgb, align=align)
             elif colorbar["position"] == "bottom":
-                y2 = pos_y + tick_len
+                y2 = pos_y + mark_len
                 pos_x -= shift  # Order of the label is reversed
                 if tick_width > 0:
                     self.draw_scalebar_line(pos_x, pos_y, pos_x, y2,
                                             tick_width, rgb)
-                self.draw_text(label, pos_x, pos_y + tick_len + tick_margin,
+                self.draw_text(label, pos_x, pos_y + mark_len + tick_margin,
                                fontsize, rgb, align=align)
 
         # Handle page offsets

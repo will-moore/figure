@@ -409,7 +409,7 @@
                     font_size: cb.font_size,
                     axis_color: cb.axis_color,
                     num_ticks: cb.num_ticks,
-                    tick_len: cb.tick_len,
+                    mark_len: cb.mark_len,
                     gap: cb.gap,
                     tick_margin: cb.tick_margin,
                     start: start,

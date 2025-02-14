@@ -17,7 +17,7 @@
                     <% if (position == "right" || position == "bottom") { %>
                         <div class="colorbar_dash_<%= orientation %>"
                             style="background-color: #<%= axis_color %>;
-                                   <%= position == 'right' ? 'width' : 'height' %>: <%= tick_len + 1 %>px;
+                                   <%= position == 'right' ? 'width' : 'height' %>: <%= mark_len + 1 %>px;
                                    <%= position %>: 1px">
                         </div>
                     <% } %>
@@ -31,7 +31,7 @@
                     <% if (position == "left" || position == "top") { %>
                         <div class="colorbar_dash_<%= orientation %>"
                              style="background-color: #<%= axis_color %>;
-                                    <%= position == 'left' ? 'width' : 'height' %>: <%= tick_len + 1 %>px;
+                                    <%= position == 'left' ? 'width' : 'height' %>: <%= mark_len + 1 %>px;
                                     <%= position %>: 1px">
                         </div>
                     <% } %>

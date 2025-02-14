@@ -1106,7 +1106,7 @@
                 var size = Number(cb.font_size);
                 if (cb.position == "top") {
                     shift_cbar = (cb.gap + cb.thickness +
-                        size + cb.tick_len + cb.tick_margin);
+                        size + cb.mark_len + cb.tick_margin);
                     shift_cbar = Math.max(0, shift_cbar);
                 } else if (cb.position == "left" || cb.position == "right") {
                     // get height of topmost tick label and take half of it
@@ -1152,7 +1152,7 @@
                 if (cb.position == "left") {
                     const width = this.measureTextSize(end, cb.font_size + "px");
                     shift_cbar = (cb.gap + cb.thickness +
-                        width + cb.tick_len + cb.tick_margin);
+                        width + cb.mark_len + cb.tick_margin);
                     shift_cbar = Math.max(0, shift_cbar);
                 } else if (cb.position == "top" || cb.position == "bottom"){
                     shift_cbar = this.measureTextSize(start, cb.font_size + "px");
@@ -1199,7 +1199,7 @@
                 if (cb.position == "right") {
                     const width = this.measureTextSize(end, cb.font_size + "px");
                     shift_cbar = (cb.gap + cb.thickness +
-                        width + cb.tick_len + cb.tick_margin);
+                        width + cb.mark_len + cb.tick_margin);
                     shift_cbar = Math.max(0, shift_cbar);
                 } else if (cb.position == "top" || cb.position == "bottom"){
                     shift_cbar = this.measureTextSize(end, cb.font_size + "px");
@@ -1228,7 +1228,7 @@
                 var size = Number(cb.font_size);
                 if (cb.position == "bottom") {
                     shift_cbar = (cb.gap + cb.thickness +
-                        size + cb.tick_len + cb.tick_margin);
+                        size + cb.mark_len + cb.tick_margin);
                     shift_cbar = Math.max(0, shift_cbar);
                 } else if (cb.position == "left" || cb.position == "right") {
                     // get height of topmost tick label and take half of it
