@@ -9,6 +9,7 @@
         figureConfirmDialog,
         getJson,
         saveFigureToStorage} from "../views/util";
+    import { loadZarrForPanel } from "./zarr_utils";
 
     // Version of the json file we're saving.
     // This only needs to increment when we make breaking changes (not linked to release versions.)
@@ -542,135 +543,12 @@
             let self = this;
             this.set('loading_count', this.get('loading_count') + 1);
 
-            let zattrs = await fetch(zarrUrl + "/.zattrs").then(rsp => rsp.json());
-            let zarrName = zarrUrl.split("/").pop();
-            let multiscales = zattrs?.multiscales;
-            console.log("zarr zattrs", zattrs);
-            if (!multiscales) {
-                alert(`Image loading from ${imgDataUrl} included an Error: ${message}`);
-                return;
-            }
+            let panel_json = await loadZarrForPanel(zarrUrl);
 
-            // if we got multiscales, load first dataset...
-            // TODO: handle bioformats2raw.layout
-            let dsPath = multiscales[0]?.datasets[0].path;
-            let imgName = multiscales[0].name || zarrName;
-            let axes = multiscales[0].axes;
-            let axesNames = axes.map(axis => axis.name);
-
-            let datasets = multiscales[0].datasets;
-            let zarrays = {};
-            // 'consolidate' the metadata for all arrays
-            for (let ds of datasets) {
-                let path = ds.path;
-                let zarray = await fetch(`${zarrUrl}/${path}/.zarray`).then(rsp => rsp.json());
-                zarrays[path] = zarray;
-            }
-            // store under 'arrays' key
-            zattrs['arrays'] = zarrays;
-
-            let zarray = zarrays[0];
-            console.log("zarray", zarray);
-
-            // e.g. "<u1" -> "uint8"
-            let dtypeToPixelsType = (dtype) => {
-                let dt = "";
-                if (dtype.includes("u")) {
-                    dt += "uint";
-                } else if (dtype.includes("i")) {
-                    dt += "int";
-                } else if (dtype.includes("f")) {
-                    dt += "float";
-                }
-                if (dtype.includes("8")) {
-                    dt += "64";
-                } else if (dtype.includes("4")) {
-                    dt += "32";
-                } else if (dtype.includes("2")) {
-                    dt += "16";
-                } else if (dtype.includes("1")) {
-                    dt += "8";
-                }
-                return dt;
-            }
-            let dtype = zarray.dtype;  
-            let shape = zarray.shape;
-            let dims = shape.length;
-            let sizeX = shape[dims - 1];
-            let sizeY = shape[dims - 2];
-            let sizeZ = 1;
-            let sizeT = 1;
-            if (axesNames.includes('z')) {
-                sizeZ = shape[axesNames.indexOf('z')]
-            }
-            let defaultZ = parseInt(sizeZ / 2);
-            if (axesNames.includes('t')) {
-                sizeT = shape[axesNames.indexOf('t')]
-            }
-            let defaultT = parseInt(sizeT / 2);
             self.set('loading_count', self.get('loading_count') - 1);
-
-            // channels...
-            // TODO: if no omero data, need to construct channels!
-            let channels = zattrs.omero?.channels || [];
-
-            coords.spacer = coords.spacer || sizeX/20;
-            var full_width = (coords.colCount * (sizeX + coords.spacer)) - coords.spacer,
-                full_height = (coords.rowCount * (sizeY + coords.spacer)) - coords.spacer;
-            coords.scale = coords.paper_width / (full_width + (2 * coords.spacer));
-            coords.scale = Math.min(coords.scale, 1);    // only scale down
-            // For the FIRST IMAGE ONLY (coords.px etc undefined), we
-            // need to work out where to start (px,py) now that we know size of panel
-            // (assume all panels are same size)
-            coords.px = coords.px || coords.c.x - (full_width * coords.scale)/2;
-            coords.py = coords.py || coords.c.y - (full_height * coords.scale)/2;
-
-            // calculate panel coordinates from index...
-            var row = parseInt(index / coords.colCount, 10);
-            var col = index % coords.colCount;
-            var panelX = coords.px + ((sizeX + coords.spacer) * coords.scale * col);
-            var panelY = coords.py + ((sizeY + coords.spacer) * coords.scale * row);
-
-            // ****** This is the Data Model ******
-            //-------------------------------------
-            // Any changes here will create a new version
-            // of the model and will also have to be applied
-            // to the 'version_transform()' function so that
-            // older files can be brought up to date.
-            // Also check 'previewSetId()' for changes.
-            var n = {
-                'imageId': zarrUrl,
-                'name': imgName,
-                'width': sizeX * coords.scale,
-                'height': sizeY * coords.scale,
-                'sizeZ': sizeZ,
-                'theZ': defaultZ,
-                'sizeT': sizeT,
-                'theT': defaultT,
-                'rdefs': {'model': "-"},
-                'channels': channels,
-                'orig_width': sizeX,
-                'orig_height': sizeY,
-                'x': panelX,
-                'y': panelY,
-                // 'datasetName': data.meta.datasetName,
-                // 'datasetId': data.meta.datasetId,
-                // 'pixel_size_x': data.pixel_size.valueX,
-                // 'pixel_size_y': data.pixel_size.valueY,
-                // 'pixel_size_z': data.pixel_size.valueZ,
-                // 'pixel_size_x_symbol': data.pixel_size.symbolX,
-                // 'pixel_size_z_symbol': data.pixel_size.symbolZ,
-                // 'pixel_size_x_unit': data.pixel_size.unitX,
-                // 'pixel_size_z_unit': data.pixel_size.unitZ,
-                // 'deltaT': data.deltaT,
-                'pixelsType': dtypeToPixelsType(dtype),
-                // 'pixel_range': data.pixel_range,
-                // let's dump the zarr data into the panel
-                'zarr': zattrs,
-            };
             // create Panel (and select it)
             // We do some additional processing in Panel.parse()
-            self.panels.create(n, {'parse': true}).set('selected', true);
+            self.panels.create(panel_json, {'parse': true}).set('selected', true);
             self.notifySelectionChange();
         },
 

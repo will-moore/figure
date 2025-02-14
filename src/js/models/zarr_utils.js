@@ -1,13 +1,194 @@
-
 import * as zarr from "zarrita";
 import { slice } from "@zarrita/indexing";
+import _ from 'underscore';
 
 const ZARRITA_ARRAY_CACHE = {};
 const ZARR_DATA_CACHE = {};
 
+export async function loadZarrForPanel(zarrUrl) {
+  let store = new zarr.FetchStore(zarrUrl);
+
+  // we load smallest array. Only need it for min/max values if not in 'omero' metadata
+  let datasetIndex = -1;
+  const  {arr, shapes, multiscale, omero, scales, zarr_version} = await omezarr.getMultiscaleWithArray(store, datasetIndex);
+  console.log({arr, shapes, multiscale, omero, scales, zarr_version})
+  let zarrName = zarrUrl.split("/").pop();
+  console.log("multiscale", multiscale);
+  if (!multiscale) {
+    alert(`Failed to load multiscale from ${zarrUrl}`);
+    return;
+  }
+
+  let imgName = multiscale.name || zarrName;
+  let axes = multiscale.axes;
+  let axesNames = axes?.map((axis) => axis.name) || ["t", "c", "z", "y", "x"];
+
+  let datasets = multiscale.datasets;
+  let zarrays = {};
+  // 'consolidate' the metadata for all arrays
+  for (let ds of datasets) {
+    let path = ds.path;
+    let zarray = await fetch(`${zarrUrl}/${path}/.zarray`).then((rsp) =>
+      rsp.json()
+    );
+    zarrays[path] = zarray;
+  }
+  // store under 'arrays' key
+  let zarr_attrs = {
+    multiscales: [multiscale],
+  }
+  zarr_attrs["arrays"] = zarrays;
+
+  let zarray = zarrays[0];
+  console.log("zarray", zarray);
+
+  let dtype = zarray.dtype;
+  let shape = zarray.shape;
+  let dims = shape.length;
+  let sizeX = shape[dims - 1];
+  let sizeY = shape[dims - 2];
+  let sizeZ = 1;
+  let sizeT = 1;
+  let sizeC = 1;
+  if (axesNames.includes("z")) {
+    sizeZ = shape[axesNames.indexOf("z")];
+  }
+  let defaultZ = parseInt(sizeZ / 2);
+  if (axesNames.includes("t")) {
+    sizeT = shape[axesNames.indexOf("t")];
+  }
+  let defaultT = parseInt(sizeT / 2);
+  if (axesNames.includes("c")) {
+    sizeC = shape[axesNames.indexOf("c")];
+  }
+
+  // channels...
+  // if no omero data, need to construct channels!
+  let default_colors = [
+    "FF0000",
+    "00FF00",
+    "0000FF",
+    "FFFF00",
+    "00FFFF",
+    "FFFFFF",
+  ];
+  let channels = omero?.channels;
+  if (!channels) {
+    // load smallest array to get min/max values for every channel
+    let slices = getSlices(_.range(sizeC), shape, axesNames, {});
+    let promises = slices.map((chSlice) => zarr.get(arr, chSlice));
+    let ndChunks = await Promise.all(promises);
+
+    channels = _.range(sizeC).map((idx) => {
+      let mm = getMinMaxValues(ndChunks[idx]);
+      return {
+        label: "Ch" + idx,
+        active: true,
+        color: default_colors[idx],
+        window: {
+          min: mm[0],
+          max: mm[1],
+          start: mm[0],
+          end: mm[1],
+        },
+      };
+    });
+  }
+
+  // coords.spacer = coords.spacer || sizeX / 20;
+  // var full_width = coords.colCount * (sizeX + coords.spacer) - coords.spacer,
+  //   full_height = coords.rowCount * (sizeY + coords.spacer) - coords.spacer;
+  // coords.scale = coords.paper_width / (full_width + 2 * coords.spacer);
+  // coords.scale = Math.min(coords.scale, 1); // only scale down
+  // // For the FIRST IMAGE ONLY (coords.px etc undefined), we
+  // // need to work out where to start (px,py) now that we know size of panel
+  // // (assume all panels are same size)
+  // coords.px = coords.px || coords.c.x - (full_width * coords.scale) / 2;
+  // coords.py = coords.py || coords.c.y - (full_height * coords.scale) / 2;
+
+  // // calculate panel coordinates from index...
+  // var row = parseInt(index / coords.colCount, 10);
+  // var col = index % coords.colCount;
+  // var panelX = coords.px + (sizeX + coords.spacer) * coords.scale * col;
+  // var panelY = coords.py + (sizeY + coords.spacer) * coords.scale * row;
+
+  let panelX = 0;
+  let panelY = 0;
+  let coords = {scale: 1};
+
+  // ****** This is the Data Model ******
+  //-------------------------------------
+  // Any changes here will create a new version
+  // of the model and will also have to be applied
+  // to the 'version_transform()' function so that
+  // older files can be brought up to date.
+  // Also check 'previewSetId()' for changes.
+  var n = {
+    imageId: zarrUrl,
+    name: imgName,
+    width: sizeX * coords.scale,
+    height: sizeY * coords.scale,
+    sizeZ: sizeZ,
+    theZ: defaultZ,
+    sizeT: sizeT,
+    theT: defaultT,
+    rdefs: { model: "-" },
+    channels: channels,
+    orig_width: sizeX,
+    orig_height: sizeY,
+    x: panelX,
+    y: panelY,
+    // 'datasetName': data.meta.datasetName,
+    // 'datasetId': data.meta.datasetId,
+    // 'pixel_size_x': data.pixel_size.valueX,
+    // 'pixel_size_y': data.pixel_size.valueY,
+    // 'pixel_size_z': data.pixel_size.valueZ,
+    // 'pixel_size_x_symbol': data.pixel_size.symbolX,
+    // 'pixel_size_z_symbol': data.pixel_size.symbolZ,
+    // 'pixel_size_x_unit': data.pixel_size.unitX,
+    // 'pixel_size_z_unit': data.pixel_size.unitZ,
+    // 'deltaT': data.deltaT,
+    pixelsType: dtypeToPixelsType(dtype),
+    // 'pixel_range': data.pixel_range,
+    // let's dump the zarr data into the panel
+    zarr: zarr_attrs,
+  };
+  console.log("Zarr Panel Model", n);
+
+  return n;
+}
+
+// e.g. "<u1" -> "uint8"
+function dtypeToPixelsType(dtype) {
+  let dt = "";
+  if (dtype.includes("u")) {
+    dt += "uint";
+  } else if (dtype.includes("i")) {
+    dt += "int";
+  } else if (dtype.includes("f")) {
+    dt += "float";
+  }
+  if (dtype.includes("8")) {
+    dt += "64";
+  } else if (dtype.includes("4")) {
+    dt += "32";
+  } else if (dtype.includes("2")) {
+    dt += "16";
+  } else if (dtype.includes("1")) {
+    dt += "8";
+  }
+  return dt;
+};
+
 export async function renderZarrToSrc(source, attrs, theZ, theT, channels) {
   let paths = attrs.multiscales[0].datasets.map((d) => d.path);
-  let axes = attrs.multiscales[0].axes.map((a) => a.name);
+  let axes = attrs.multiscales[0].axes?.map((a) => a.name) || [
+    "t",
+    "c",
+    "z",
+    "y",
+    "x",
+  ];
   let zarrays = attrs.arrays;
 
   // Pick first resolution that is below a max size...
@@ -25,10 +206,12 @@ export async function renderZarrToSrc(source, attrs, theZ, theT, channels) {
   }
 
   if (!path) {
-    console.error(`Lowest resolution too large for rendering: > ${MAX_SIZE} x ${MAX_SIZE}`);
+    console.error(
+      `Lowest resolution too large for rendering: > ${MAX_SIZE} x ${MAX_SIZE}`
+    );
     return;
   }
-  
+
   console.log("Init zarr.FetchStore:", source + "/" + path);
   let storeArrayPath = source + "/" + path;
   let arr;
@@ -93,7 +276,7 @@ export async function renderZarrToSrc(source, attrs, theZ, theT, channels) {
       return ZARR_DATA_CACHE[cacheKey];
     }
 
-    return zarr.get(arr, slices).then(data => {
+    return zarr.get(arr, slices).then((data) => {
       console.log("populate cache...");
       ZARR_DATA_CACHE[cacheKey] = data;
       return data;
@@ -101,12 +284,25 @@ export async function renderZarrToSrc(source, attrs, theZ, theT, channels) {
   });
 
   let ndChunks = await Promise.all(promises);
-  // let minMaxValues = ndChunks.map((ch) => getMinMaxValues(ch));
-  let rbgData = renderTo8bitArray(ndChunks, minMaxValues, colors);
+  console.log(
+    "renderTo8bitArray ndChunks, minMaxValues, colors, luts, inverteds",
+    ndChunks,
+    minMaxValues,
+    colors,
+    luts,
+    inverteds
+  );
+  let rbgData = omezarr.renderTo8bitArray(
+    ndChunks,
+    minMaxValues,
+    colors,
+    luts,
+    inverteds
+  );
 
   let width = shape.at(-1);
   let height = shape.at(-2);
-  
+
   const canvas = document.createElement("canvas");
   canvas.width = width;
   canvas.height = height;
@@ -228,4 +424,52 @@ export function hexToRGB(hex) {
   const g = parseInt(hex.slice(2, 4), 16);
   const b = parseInt(hex.slice(4, 6), 16);
   return [r, g, b];
+}
+
+
+// Copied from ome-zarr.js
+export function getSlices(activeChannelIndices, shape, axesNames, indices) {
+  // For each active channel, get a multi-dimensional slice
+  let chSlices = activeChannelIndices.map((chIndex) => {
+    let chSlice = shape.map((dimSize, index) => {
+      let name = axesNames[index];
+      // channel
+      if (name == "c") return chIndex;
+      
+      if (name in indices) {
+        let idx = indices[name];
+        if (Array.isArray(idx)) {
+          return slice(idx[0], idx[1]);
+        } else if (Number.isInteger(idx)) {
+          return idx;
+        }
+      }
+      // no valid indices supplied, use defaults...
+      // x and y - we want full range
+      if (name == "x" || name == "y") {
+        return slice(0, dimSize);
+      }
+      // Use omero for z/t if available, otherwise use middle slice
+      if (name == "z" || name == "t") {
+        return parseInt(dimSize / 2 + "");
+      }
+      return 0;
+    });
+    return chSlice;
+  });
+  return chSlices;
+}
+
+// Copied from ome-zarr.js
+export function getMinMaxValues(chunk2d) {
+  const data = chunk2d.data;
+  let maxV = 0;
+  let minV = Infinity;
+  let length = chunk2d.data.length;
+  for (let y = 0; y < length; y++) {
+    let rawValue = data[y];
+    maxV = Math.max(maxV, rawValue);
+    minV = Math.min(minV, rawValue);
+  }
+  return [minV, maxV];
 }
