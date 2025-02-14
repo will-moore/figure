@@ -15,7 +15,7 @@
         <div class="col-auto input-group-sm" style="padding-right: 0px;">
             <label class="col-form-label col-form-label-sm">Gap</label>
         </div>
-        <div class="col-auto input-group-sm"  style="padding-right: 0px;">
+        <div class="col-auto input-group-sm"  style="padding-right: 0px;" title="Distance between panel and colorbar (negative value allowed)">
             <input type="number" class="colorbar-gap input-sm form-control"
             value="<%= gap %>" style="width:42px" />
         </div>
@@ -56,7 +56,7 @@
     </div>
     <div class="row gy-2 gx-3 align-items-center" style="--bs-gutter-x: 0.3rem;">
 
-        <div class="col-auto input-group-sm" style="padding-right: 0px;">
+        <div class="col-auto input-group-sm" style="padding-right: 0px;" title="Number of ticks">
             <input type="number" class="colorbar-num-ticks input-sm form-control"
             value="<%= num_ticks %>" style="width:33px" min="2"/>
         </div>
@@ -65,7 +65,7 @@
         </div>
 
         <div class="form-group col-sm-auto btn-group">
-            <button type="button" class="colorbar-axis-color btn btn-outline-secondary btn-sm dropdown-toggle" title="Label Color"
+            <button type="button" class="colorbar-axis-color btn btn-outline-secondary btn-sm dropdown-toggle" title="Tick Color"
                 data-bs-toggle="dropdown">
                 <span class="dropdown_icon" data-axis-color="<%= axis_color %>" style="background-color:#<%= axis_color %>">&nbsp &nbsp &nbsp</span>
                 <span class="caret"></span>
@@ -117,7 +117,7 @@
         </div> -->
         <div class="col-auto input-group-sm" style="padding-right: 0px;">
           <input type="number" class="colorbar-tick-length input-sm form-control"
-            value="<%= tick_len %>" style="width:35px" min="0" />
+            value="<%= tick_len %>" style="width:35px" min="0" title="Tick mark length"/>
         </div>
         <div class="col-auto input-group-sm" style="padding-left: 0px; margin-right: 3px;">
             <label class="col-form-label col-form-label-sm">px</label>
@@ -126,7 +126,7 @@
         <div class="col-auto input-group-sm" style="padding-right: 0px;">
             <label class="col-form-label col-form-label-sm">Margin</label>
         </div>
-        <div class="col-auto input-group-sm" style="padding-right: 0px;">
+        <div class="col-auto input-group-sm" style="padding-right: 0px;" title="Margin between the ticks mark and label">
             <input type="number" class="colorbar-tick-margin input-sm form-control"
             value="<%= tick_margin %>" style="width:35px" />
         </div>
