@@ -24,7 +24,7 @@
 */
 
 import Raphael from "raphael";
-import { CreateText, Text } from "./text";
+import CreateText from "./text";
 
 
 const TEMP_SHAPE_ID = -1234;
@@ -338,15 +338,6 @@ Rect.prototype.setStrokeWidth = function setStrokeWidth(strokeWidth) {
 
 Rect.prototype.getStrokeWidth = function getStrokeWidth() {
   return this._strokeWidth;
-};
-
-Rect.prototype.setTextRotated = function setTextRotated(rotateText) {
-  this._rotateText = rotateText;
-  this.drawShape();
-};
-
-Rect.prototype.getTextRotated = function getTextRotated() {
-  return this._rotateText;
 };
 
 Rect.prototype.getTextId = function getTextId() {

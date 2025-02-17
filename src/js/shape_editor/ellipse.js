@@ -24,7 +24,10 @@
 */
 
 import Raphael from "raphael";
-import { Text } from "./text";
+import CreateText from "./text";
+
+
+const TEMP_SHAPE_ID = -1234;
 
 var Ellipse = function Ellipse(options) {
   var self = this;
@@ -91,6 +94,26 @@ var Ellipse = function Ellipse(options) {
   } else {
     this._area = this._radiusX * this._radiusY * Math.PI;
   }
+
+  this._textId = options.textId || -1;
+  if(this._textId == -1 || this._textId == TEMP_SHAPE_ID){
+    var textShape = (new CreateText({
+      manager: this.manager,
+      paper: this.paper,
+      id: this._textId,
+      zoom: options.zoom,
+      text: "",
+      x: options.x,
+      y: options.y,
+      strokeColor: options.strokeColor,
+      fontSize: 12,
+      textPosition: options.textPosition || "top",
+      strokeWidth: this._strokeWidth,
+    })).getShape();
+    this._textId = textShape._id;
+  }
+  this._textShape = this.manager.getShape(this._textId)
+
   this.handle_wh = 6;
 
   this.element = this.paper.ellipse();
@@ -154,9 +177,7 @@ Ellipse.prototype.toJson = function toJson() {
     strokeColor: this._strokeColor,
     fillColor: this._fillColor,
     fillOpacity: this._fillOpacity,
-    text: this._text,
-    fontSize: this._fontSize,
-    textPosition: this._textPosition,
+    textId: this._textId,
   };
   if (this._id) {
     rv.id = this._id;
@@ -241,31 +262,56 @@ Ellipse.prototype.getFillOpacity = function getFillOpacity() {
   return this._fillOpacity;
 };
 
-Ellipse.prototype.setText = function setText(text) {
-  this._text = text;
-  this.drawShape();
+Ellipse.prototype.loadTextShape = function loadTextShape(){
+  this._textShape = this.manager.getShape(this._textId);
+  return this._textShape;
 };
 
-Ellipse.prototype.geText = function geText() {
-  return this._text;
+Ellipse.prototype.setText = function setText(text) {
+  if(this._textShape){
+    this._textShape.setText(text)
+  }
+};
+
+Ellipse.prototype.getText = function getText() {
+  if(this._textShape){
+    return this._textShape.getText()
+  }
+  return "";
 };
 
 Ellipse.prototype.setTextPosition = function setTextPosition(textPosition) {
-  this._textPosition = textPosition;
-  this.drawShape();
+  if(this._textShape){
+    this._textShape.setTextPosition(textPosition)
+  }
 };
 
-Ellipse.prototype.geTextPosition = function geTextPosition() {
-  return this._textPosition;
+Ellipse.prototype.getTextPosition = function getTextPosition() {
+  if(this._textShape){
+    return this._textShape.getTextPosition()
+  }
+  return "";
 };
 
 Ellipse.prototype.setFontSize = function setFontSize(fontSize) {
-  this._fontSize = fontSize;
-  this.drawShape();
+  if(this._textShape){
+    this._textShape.setFontSize(fontSize)
+  }
 };
 
-Ellipse.prototype.geFontSize = function geFontSize() {
-  return this._fontSize;
+Ellipse.prototype.getFontSize = function getFontSize() {
+  if(this._textShape){
+    return this._textShape.getFontSize()
+  }
+  return;
+};
+
+Ellipse.prototype.getTextId = function getTextId() {
+  return this._textId;
+};
+
+Ellipse.prototype.setTextId = function setTextId(textId) {
+  this._textId = textId;
 };
 
 Ellipse.prototype.destroy = function destroy() {
@@ -459,64 +505,8 @@ Ellipse.prototype.drawShape = function drawShape() {
     hnd.attr({ x: hx - this.handle_wh / 2, y: hy - this.handle_wh / 2 });
   }
 
-  // update label
-  if(this._textShape){
-    this._textShape.setText(this._text)
-    this._textShape.setFontSize(this._fontSize)
-    this._textShape.setZoom(this._zoomFraction * 100)
-
-    var dx = 0,
-        dy = 0,
-        textAnchor = "middle",
-        bbox = this.element.getBBox(),
-        sWidth = bbox.width / this._zoomFraction,
-        sHeight = bbox.height / this._zoomFraction,
-        sx = bbox.x / this._zoomFraction,
-        sy = bbox.y / this._zoomFraction,
-        textOffsetX = this._strokeWidth/2 + 6,
-        textOffsetY = this._strokeWidth/2 + (this._fontSize > 12 ? this._fontSize/2 : 6) + 2;
-
-    switch(this._textPosition){
-      case "bottom":
-          dx = sWidth/2;
-          dy = sHeight + textOffsetY;
-          break;
-      case "left":
-          dx = -textOffsetX;
-          dy = sHeight/2;
-          textAnchor = "end"
-          break;
-      case "right":
-          dx = sWidth + textOffsetX;
-          dy = sHeight/2;
-          textAnchor = "start"
-          break;
-      case "top":
-          dx = sWidth/2;
-          dy = -textOffsetY;
-          break;
-      case "topleft":
-          dx = textOffsetX;
-          dy = textOffsetY;
-          textAnchor = "start"
-          break;
-      case "topright":
-          dx = sWidth - (textOffsetX);
-          dy = textOffsetY;
-          textAnchor = "end"
-          break;
-      case "bottomleft":
-          dx = textOffsetX;
-          dy = sHeight - (textOffsetY);
-          textAnchor = "start"
-          break;
-      case "bottomright":
-          dx = sWidth - (textOffsetX);
-          dy = sHeight - (textOffsetY);
-          textAnchor = "end"
-    }
-
-    this._textShape.setTextPosition(sx + dx, sy + dy, textAnchor)
+  if(this._textShape || this.loadTextShape()){
+    this._textShape.setParentShapeCoords({x: this._x, y: this._y, width: this._width, height: this._height})
   }
 };
 
@@ -653,7 +643,27 @@ CreateEllipse.prototype.startDrag = function startDrag(startX, startY) {
     strokeWidth = this.manager.getStrokeWidth(),
     fillColor = this.manager.getFillColor(),
     fillOpacity = this.manager.getFillOpacity(),
-    zoom = this.manager.getZoom();
+    zoom = this.manager.getZoom(),
+    text = this.manager.getText() || "",
+    textPosition = this.manager.getTextPosition(),
+    fontSize = this.manager.getTextFontSize();
+
+
+  this.startX = startX;
+  this.startY = startY;
+
+  this.textShape = (new CreateText({
+    manager: this.manager,
+    paper: this.paper,
+    zoom: zoom,
+    text: text,
+    x: startX,
+    y: startY,
+    strokeColor: strokeColor,
+    fontSize: fontSize,
+    textPosition: textPosition,
+    strokeWidth: strokeWidth,
+  })).getShape();
 
   this.ellipse = new Ellipse({
     manager: this.manager,
@@ -668,12 +678,25 @@ CreateEllipse.prototype.startDrag = function startDrag(startX, startY) {
     zoom: zoom,
     strokeColor: strokeColor,
     fillColor: fillColor,
-    fillOpacity: fillOpacity
+    fillOpacity: fillOpacity,
+    textId: this.textShape._id,
   });
 };
 
 CreateEllipse.prototype.drag = function drag(dragX, dragY, shiftKey) {
   this.ellipse.updateHandle("end", dragX, dragY, shiftKey);
+
+  var dx = this.startX - dragX,
+      dy = this.startY - dragY;
+
+  var newCoords = {
+    x: Math.min(dragX, this.startX),
+    y: Math.min(dragY, this.startY),
+    width: Math.abs(dx),
+    height: Math.abs(dy),
+  }
+
+  this.textShape.setParentShapeCoords(newCoords);
 };
 
 CreateEllipse.prototype.stopDrag = function stopDrag() {
@@ -682,6 +705,7 @@ CreateEllipse.prototype.stopDrag = function stopDrag() {
   if (coords.radiusX < 2) {
     this.ellipse.destroy();
     delete this.ellipse;
+    delete this.textShape;
     return;
   }
   // on the 'new:shape' trigger, this shape will already be selected
