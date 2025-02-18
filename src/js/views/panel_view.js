@@ -310,19 +310,17 @@
                 var margin =  5 + border.strokeWidth
                 $('.left_vlabels>div', self.$el).css('margin-bottom', margin + 'px');
                 $('.right_vlabels>div', self.$el).css('margin-bottom', margin + 'px');
-                margin =  3 + border.strokeWidth
                 $('.label_top', self.$el).css('margin-bottom', margin + 'px');
-                margin =  border.strokeWidth
                 $('.label_bottom', self.$el).css('margin-top', margin + 'px');
                 $('.label_left', self.$el).css('margin-right', margin + 'px');
                 $('.label_right', self.$el).css('margin-left', margin + 'px');
             }else{
-                $('.left_vlabels>div', self.$el).css('mSargin-bottom', '5px');
+                $('.left_vlabels>div', self.$el).css('margin-bottom', '5px');
                 $('.right_vlabels>div', self.$el).css('margin-bottom', '5px');
-                $('.label_top', self.$el).css('margin-bottom', '3px');
-                $('.label_bottom', self.$el).css('margin-top', '');
-                $('.label_left', self.$el).css('margin-right', '');
-                $('.label_right', self.$el).css('margin-left', '');
+                $('.label_top', self.$el).css('margin-bottom', '5px');
+                $('.label_bottom', self.$el).css('margin-top', '5px');
+                $('.label_left', self.$el).css('margin-right', '5px');
+                $('.label_right', self.$el).css('margin-left', '5px');
             }
 
             return this;
