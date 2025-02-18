@@ -75,12 +75,12 @@ export async function loadZarrForPanel(zarrUrl) {
   let channels = omero?.channels;
   if (!channels) {
     // load smallest array to get min/max values for every channel
-    let slices = getSlices(_.range(sizeC), shape, axesNames, {});
+    let slices = omezarr.getSlices(_.range(sizeC), shape, axesNames, {});
     let promises = slices.map((chSlice) => zarr.get(arr, chSlice));
     let ndChunks = await Promise.all(promises);
 
     channels = _.range(sizeC).map((idx) => {
-      let mm = getMinMaxValues(ndChunks[idx]);
+      let mm = omezarr.getMinMaxValues(ndChunks[idx]);
       return {
         label: "Ch" + idx,
         active: true,
@@ -424,52 +424,4 @@ export function hexToRGB(hex) {
   const g = parseInt(hex.slice(2, 4), 16);
   const b = parseInt(hex.slice(4, 6), 16);
   return [r, g, b];
-}
-
-
-// Copied from ome-zarr.js
-export function getSlices(activeChannelIndices, shape, axesNames, indices) {
-  // For each active channel, get a multi-dimensional slice
-  let chSlices = activeChannelIndices.map((chIndex) => {
-    let chSlice = shape.map((dimSize, index) => {
-      let name = axesNames[index];
-      // channel
-      if (name == "c") return chIndex;
-      
-      if (name in indices) {
-        let idx = indices[name];
-        if (Array.isArray(idx)) {
-          return slice(idx[0], idx[1]);
-        } else if (Number.isInteger(idx)) {
-          return idx;
-        }
-      }
-      // no valid indices supplied, use defaults...
-      // x and y - we want full range
-      if (name == "x" || name == "y") {
-        return slice(0, dimSize);
-      }
-      // Use omero for z/t if available, otherwise use middle slice
-      if (name == "z" || name == "t") {
-        return parseInt(dimSize / 2 + "");
-      }
-      return 0;
-    });
-    return chSlice;
-  });
-  return chSlices;
-}
-
-// Copied from ome-zarr.js
-export function getMinMaxValues(chunk2d) {
-  const data = chunk2d.data;
-  let maxV = 0;
-  let minV = Infinity;
-  let length = chunk2d.data.length;
-  for (let y = 0; y < length; y++) {
-    let rawValue = data[y];
-    maxV = Math.max(maxV, rawValue);
-    minV = Math.min(minV, rawValue);
-  }
-  return [minV, maxV];
 }
