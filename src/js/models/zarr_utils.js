@@ -163,7 +163,7 @@ function dtypeToPixelsType(dtype) {
   return dt;
 };
 
-export async function renderZarrToSrc(source, attrs, theZ, theT, channels) {
+export async function renderZarrToSrc(source, attrs, theZ, theT, channels, rect) {
   let paths = attrs.multiscales[0].datasets.map((d) => d.path);
   let axes = attrs.multiscales[0].axes?.map((a) => a.name) || [
     "t",
@@ -175,18 +175,49 @@ export async function renderZarrToSrc(source, attrs, theZ, theT, channels) {
   let zarrays = attrs.arrays;
 
   // Pick first resolution that is below a max size...
-  const MAX_SIZE = 2000;
-  console.log("Zarr pick size to render...");
+  const MAX_SIZE = 500;
+  // use the arrays themselves to determine 'scale', since we might
+  // not have 'coordinateTransforms' for pre-v0.4 etc.
+  console.log("Zarr pick size to render...", rect);
   let path;
+
+  // size of full-size image
+  let fullShape = zarrays[paths[0]].shape;
+
+  let region_x = rect?.x || 0;
+  let region_y = rect?.y || 0;
+  let region_width = rect?.width || fullShape.at(-1);
+  let region_height = rect?.height || fullShape.at(-2);
+
+  // crop region for the downscaled array
+  let array_rect;
+
   for (let p of paths) {
     let arrayAttrs = zarrays[p];
-    console.log(path, arrayAttrs);
+    console.log("checking path...", p, arrayAttrs.shape);
     let shape = arrayAttrs.shape;
-    if (shape.at(-1) * shape.at(-2) < MAX_SIZE * MAX_SIZE) {
+    // E.g. if dataset shape is 1/2 of fullShape then crop size will be half
+    let crop_w = region_width * shape.at(-1) / fullShape.at(-1);
+    let crop_h = region_height * shape.at(-2) / fullShape.at(-2);
+
+    if (crop_w * crop_h < MAX_SIZE * MAX_SIZE) {
+      console.log("crop_w * crop_h < MAX_SIZE", crop_w * crop_h, MAX_SIZE * MAX_SIZE);
+      array_rect = {
+        x: Math.floor(region_x * shape.at(-1) / fullShape.at(-1)),
+        y: Math.floor(region_y * shape.at(-2) / fullShape.at(-2)),
+        width: Math.floor(crop_w),
+        height: Math.floor(crop_h),
+      }
       path = p;
       break;
     }
   }
+  console.log("Orign array_rect", array_rect);
+
+  // We can create canvas of the size of the array_rect
+  const canvas = document.createElement("canvas");
+  canvas.width = array_rect.width;
+  canvas.height = array_rect.height;
 
   if (!path) {
     console.error(
@@ -220,9 +251,39 @@ export async function renderZarrToSrc(source, attrs, theZ, theT, channels) {
       minMaxValues.push([ch.window.start, ch.window.end]);
     }
   });
-  console.log("activeChIndicies", activeChIndicies);
-  console.log("colors", colors);
-  console.log("minMaxValues", minMaxValues);
+  // console.log("activeChIndicies", activeChIndicies);
+  // console.log("colors", colors);
+  // console.log("minMaxValues", minMaxValues);
+
+  // Need same logic as https://github.com/ome/omero-figure/blob/9cc36cde05bde4def7b62b07c2e9ae5f66712e96/omero_figure/views.py#L310
+  // if we have a crop region outside the bounds of the image
+  let array_shape = zarrays[path].shape;
+  let size_x = array_shape.at(-1);
+  let size_y = array_shape.at(-2);
+  let paste_x = 0;
+  let paste_y = 0;
+  // let {x, y, width, height} = array_rect;
+  if (array_rect.x < 0) {
+    paste_x = - array_rect.x
+    array_rect.width += array_rect.x;
+    array_rect.x = 0;
+  }
+  if (array_rect.y < 0) {
+    paste_y = - array_rect.y;
+    array_rect.height += array_rect.y;
+    array_rect.y = 0;
+  }
+  if (array_rect.x + array_rect.width > size_x) {
+    array_rect.width = size_x - array_rect.x;
+  }
+  if (array_rect.y + array_rect.height > size_y) {
+    array_rect.height = size_y - array_rect.y;
+  }
+
+  console.log("array_shape", array_shape);
+  console.log("array_rect", array_rect);
+  console.log("paste_x", paste_x);
+  console.log("paste_y", paste_y);
 
   let promises = activeChIndicies.map((chIndex) => {
     let sliceKey = [];
@@ -232,12 +293,16 @@ export async function renderZarrToSrc(source, attrs, theZ, theT, channels) {
         sliceKey.push("" + chIndex);
         return chIndex;
       }
-      // x and y
-      if (index >= dims - 2) {
-        sliceKey.push(`${0}:${dimSize}`);
-        return slice(0, dimSize);
+      // x and y - crop to rect
+      if (axes[index] == "x") {
+        sliceKey.push(`${array_rect.x}:${array_rect.x + array_rect.width}`);
+        return slice(array_rect.x, array_rect.x + array_rect.width);
       }
-      // z
+      if (axes[index] == "y") {
+        sliceKey.push(`${array_rect.y}:${array_rect.y + array_rect.height}`);
+        return slice(array_rect.y, array_rect.y + array_rect.height);
+      }
+      // z: TODO: handle case where lower resolution is downsampled in Z
       if (axes[index] == "z") {
         sliceKey.push("" + theZ);
         return theZ;
@@ -249,9 +314,9 @@ export async function renderZarrToSrc(source, attrs, theZ, theT, channels) {
       return 0;
     });
     let cacheKey = `${source}/${path}/${sliceKey.join(",")}`;
-    console.log("cacheKey", cacheKey);
-    console.log("Zarr chIndex slices:", chIndex, "" + slices);
-    console.log("Zarr chIndex shape:", chIndex, shape);
+    // console.log("cacheKey", cacheKey);
+    // console.log("Zarr chIndex slices:", chIndex, "" + slices);
+    // console.log("Zarr chIndex shape:", chIndex, shape);
     // TODO: add controller: { opts: { signal: controller.signal } }
     // check cache!
     if (ZARR_DATA_CACHE[cacheKey]) {
@@ -267,14 +332,10 @@ export async function renderZarrToSrc(source, attrs, theZ, theT, channels) {
   });
 
   let ndChunks = await Promise.all(promises);
-  console.log(
-    "renderTo8bitArray ndChunks, minMaxValues, colors, luts, inverteds",
-    ndChunks,
-    minMaxValues,
-    colors,
-    luts,
-    inverteds
-  );
+  console.log("ndChunk", ndChunks[0].shape);
+  console.log("array_rect", array_rect);
+
+  let start = new Date().getTime();
   let rbgData = omezarr.renderTo8bitArray(
     ndChunks,
     minMaxValues,
@@ -282,15 +343,15 @@ export async function renderZarrToSrc(source, attrs, theZ, theT, channels) {
     luts,
     inverteds
   );
+  console.log("renderTo8bitArray took", new Date().getTime() - start, "ms");
 
-  let width = shape.at(-1);
-  let height = shape.at(-2);
+  let chunk_width = ndChunks[0].shape.at(-1);
+  let chunk_height = ndChunks[0].shape.at(-2);
 
-  const canvas = document.createElement("canvas");
-  canvas.width = width;
-  canvas.height = height;
   const context = canvas.getContext("2d");
-  context.putImageData(new ImageData(rbgData, width, height), 0, 0);
+  context.fillStyle = "#ddd";
+  context.fillRect(0, 0, canvas.width, canvas.height);
+  context.putImageData(new ImageData(rbgData, chunk_width, chunk_height), paste_x, paste_y);
   let dataUrl = canvas.toDataURL("image/png");
   return dataUrl;
 }
