@@ -95,23 +95,6 @@ export async function loadZarrForPanel(zarrUrl) {
     });
   }
 
-  // coords.spacer = coords.spacer || sizeX / 20;
-  // var full_width = coords.colCount * (sizeX + coords.spacer) - coords.spacer,
-  //   full_height = coords.rowCount * (sizeY + coords.spacer) - coords.spacer;
-  // coords.scale = coords.paper_width / (full_width + 2 * coords.spacer);
-  // coords.scale = Math.min(coords.scale, 1); // only scale down
-  // // For the FIRST IMAGE ONLY (coords.px etc undefined), we
-  // // need to work out where to start (px,py) now that we know size of panel
-  // // (assume all panels are same size)
-  // coords.px = coords.px || coords.c.x - (full_width * coords.scale) / 2;
-  // coords.py = coords.py || coords.c.y - (full_height * coords.scale) / 2;
-
-  // // calculate panel coordinates from index...
-  // var row = parseInt(index / coords.colCount, 10);
-  // var col = index % coords.colCount;
-  // var panelX = coords.px + (sizeX + coords.spacer) * coords.scale * col;
-  // var panelY = coords.py + (sizeY + coords.spacer) * coords.scale * row;
-
   let panelX = 0;
   let panelY = 0;
   let coords = {scale: 1};

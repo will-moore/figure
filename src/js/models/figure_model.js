@@ -539,17 +539,45 @@
             }
         },
 
+        updateCoordsAndPanelCoords(panel_json, coords, index) {
+            console.log("importZarrImage coords.spacer coords:", coords.spacer, coords);
+            // update panel_json and coords
+            coords.spacer = coords.spacer || panel_json.orig_width/20;
+            var full_width = (coords.colCount * (panel_json.orig_width + coords.spacer)) - coords.spacer,
+                full_height = (coords.rowCount * (panel_json.orig_height + coords.spacer)) - coords.spacer;
+            coords.scale = coords.paper_width / (full_width + (2 * coords.spacer));
+            coords.scale = Math.min(coords.scale, 1);    // only scale down
+            // For the FIRST IMAGE ONLY (coords.px etc undefined), we
+            // need to work out where to start (px,py) now that we know size of panel
+            // (assume all panels are same size)
+            coords.px = coords.px || coords.c.x - (full_width * coords.scale)/2;
+            coords.py = coords.py || coords.c.y - (full_height * coords.scale)/2;
+            // calculate panel coordinates from index...
+            var row = parseInt(index / coords.colCount, 10);
+            var col = index % coords.colCount;
+            var panelX = coords.px + ((panel_json.orig_width + coords.spacer) * coords.scale * col);
+            var panelY = coords.py + ((panel_json.orig_height + coords.spacer) * coords.scale * row);
+            
+            // update panel_json
+            panel_json.x = panelX;
+            panel_json.y = panelY;
+            panel_json.width = panel_json.orig_width * coords.scale;
+            panel_json.height = panel_json.orig_height * coords.scale;
+        },
+
         importZarrImage: async function(zarrUrl, coords, index) {
-            let self = this;
             this.set('loading_count', this.get('loading_count') + 1);
 
             let panel_json = await loadZarrForPanel(zarrUrl);
 
-            self.set('loading_count', self.get('loading_count') - 1);
+            // coords (px, py etc) are incremented for each panel added
+            this.updateCoordsAndPanelCoords(panel_json, coords, index)
+
+            this.set('loading_count', this.get('loading_count') - 1);
             // create Panel (and select it)
             // We do some additional processing in Panel.parse()
-            self.panels.create(panel_json, {'parse': true}).set('selected', true);
-            self.notifySelectionChange();
+            this.panels.create(panel_json, {'parse': true}).set('selected', true);
+            this.notifySelectionChange();
         },
 
         importImage: function(imgDataUrl, coords, baseUrl, index) {
@@ -584,22 +612,22 @@
                         return;
                     }
 
-                    coords.spacer = coords.spacer || data.size.width/20;
-                    var full_width = (coords.colCount * (data.size.width + coords.spacer)) - coords.spacer,
-                        full_height = (coords.rowCount * (data.size.height + coords.spacer)) - coords.spacer;
-                    coords.scale = coords.paper_width / (full_width + (2 * coords.spacer));
-                    coords.scale = Math.min(coords.scale, 1);    // only scale down
-                    // For the FIRST IMAGE ONLY (coords.px etc undefined), we
-                    // need to work out where to start (px,py) now that we know size of panel
-                    // (assume all panels are same size)
-                    coords.px = coords.px || coords.c.x - (full_width * coords.scale)/2;
-                    coords.py = coords.py || coords.c.y - (full_height * coords.scale)/2;
+                    // coords.spacer = coords.spacer || data.size.width/20;
+                    // var full_width = (coords.colCount * (data.size.width + coords.spacer)) - coords.spacer,
+                    //     full_height = (coords.rowCount * (data.size.height + coords.spacer)) - coords.spacer;
+                    // coords.scale = coords.paper_width / (full_width + (2 * coords.spacer));
+                    // coords.scale = Math.min(coords.scale, 1);    // only scale down
+                    // // For the FIRST IMAGE ONLY (coords.px etc undefined), we
+                    // // need to work out where to start (px,py) now that we know size of panel
+                    // // (assume all panels are same size)
+                    // coords.px = coords.px || coords.c.x - (full_width * coords.scale)/2;
+                    // coords.py = coords.py || coords.c.y - (full_height * coords.scale)/2;
 
-                    // calculate panel coordinates from index...
-                    var row = parseInt(index / coords.colCount, 10);
-                    var col = index % coords.colCount;
-                    var panelX = coords.px + ((data.size.width + coords.spacer) * coords.scale * col);
-                    var panelY = coords.py + ((data.size.height + coords.spacer) * coords.scale * row);
+                    // // calculate panel coordinates from index...
+                    // var row = parseInt(index / coords.colCount, 10);
+                    // var col = index % coords.colCount;
+                    // var panelX = coords.px + ((data.size.width + coords.spacer) * coords.scale * col);
+                    // var panelY = coords.py + ((data.size.height + coords.spacer) * coords.scale * row);
 
                     // ****** This is the Data Model ******
                     //-------------------------------------
@@ -639,6 +667,10 @@
                     if (baseUrl) {
                         n.baseUrl = baseUrl;
                     }
+
+                    // coords (px, py etc) are incremented for each panel added
+                    self.updateCoordsAndPanelCoords(n, coords, index);
+
                     // create Panel (and select it)
                     // We do some additional processing in Panel.parse()
                     self.panels.create(n, {'parse': true}).set('selected', true);

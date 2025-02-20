@@ -977,13 +977,26 @@
             return this.get('orig_width') * this.get('orig_height') > MAX_PLANE_SIZE;
         },
 
-        get_zarr_img_src: async function() {
-            return renderZarrToSrc(this.get('imageId'), this.get('zarr'), this.get('theZ'), this.get('theT'), this.get('channels'));
+        get_zarr_img_src: async function(force_no_padding) {
+            var rect;
+            if (this.is_big_image()) {
+                rect = this.getViewportAsRect();
+                if (!force_no_padding) {
+                    var length = Math.max(rect.width, rect.height) * 1.5;
+                    rect.x = rect.x - ((length - rect.width) / 2);
+                    rect.y = rect.y - ((length - rect.height) / 2);
+                    rect.width = length;
+                    rect.height = length;
+                }
+            }
+            console.log("------> get_zarr_img_src -force_no_padding,  rect", force_no_padding, rect)
+            return renderZarrToSrc(this.get('imageId'), this.get('zarr'), this.get('theZ'), this.get('theT'), this.get('channels'), rect);
         },
 
         get_img_src: async function(force_no_padding) {
+            // async function since zarr src is the rendered image data
             if (this.get("zarr")) {
-                return this.get_zarr_img_src();
+                return this.get_zarr_img_src(force_no_padding);
             }
             var chs = this.get('channels');
             var cStrings = chs.map(function(c, i){
