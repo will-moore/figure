@@ -111,7 +111,7 @@ def scale_to_export_dpi(pixels):
     Original figure coordinates assume 72 dpi figure, but we want to
     export at 300 dpi, so everything needs scaling accordingly
     """
-    return pixels * 300 // 72
+    return int(round(pixels * 300 / 72))
 
 
 def compress(target, base):
@@ -1767,45 +1767,49 @@ class FigureExport(object):
 
         gap = colorbar["gap"]
         thickness = colorbar["thickness"]
-        cbar = {  # Dict of colorbar properties to pass to paste_image
+        ramp_d = {  # Dict of color ramp properties to pass to paste_image
             'zoom': '100',
             'dx': 0,
             'dy': 0,
             'orig_height': panel['orig_height'],
-            'orig_width': panel['orig_width'],
+            'orig_width': panel['orig_width']
         }
         start, end = channel["window"]["start"], channel["window"]["end"]
 
         decimals = max(0, int(numpy.ceil(
             -numpy.log10((end - start) / colorbar["num_ticks"]))))
         labels = numpy.linspace(start, end, num=colorbar["num_ticks"])
+        # Round the label str to the appropriate decimal
+        labels = [f"{label:.{decimals}f}" for label in labels]
+
         pos_ratio = numpy.linspace(0, 1, colorbar["num_ticks"])
         if colorbar["position"] in ["left", "right"]:
             color_ramp = color_ramp.transpose((1, 0, 2))[::-1]
-            cbar['width'] = thickness
-            cbar['height'] = panel['height']
-            cbar['y'] = panel['y']
-            cbar['x'] = panel['x'] - (gap + thickness)
-            labels_x = [cbar['x']]
-            labels_y = cbar['y'] + panel['height'] * pos_ratio[::-1]
-            align = "right"
+            ramp_d['width'] = thickness
+            ramp_d['height'] = panel['height']
+            ramp_d['y'] = panel['y']
+            ramp_d['x'] = panel['x'] - (gap + thickness)
+            labels_x = [ramp_d['x']]
+            labels_y = ramp_d['y'] + panel['height'] * pos_ratio
+            labels = labels[::-1]
+            ramp_d["align"] = "right"
             if colorbar["position"] == "right":
-                cbar['x'] = panel['x'] + panel['width'] + gap
-                labels_x = [cbar['x'] + cbar['width']]
-                align = "left"
-            labels_x *= labels.size  # Duplicate x postions
+                ramp_d['x'] = panel['x'] + panel['width'] + gap
+                labels_x = [ramp_d['x'] + ramp_d['width']]
+                ramp_d["align"] = "left"
+            labels_x *= len(labels)  # Duplicate x postions
         elif colorbar["position"] in ["top", "bottom"]:
-            cbar['width'] = panel['width']
-            cbar['height'] = thickness
-            cbar['x'] = panel['x']
-            cbar['y'] = panel['y'] - (gap + thickness)
-            labels_x = cbar['x'] + panel['width'] * pos_ratio
-            labels_y = [cbar['y']]
-            align = "center"
+            ramp_d['width'] = panel['width']
+            ramp_d['height'] = thickness
+            ramp_d['x'] = panel['x']
+            ramp_d['y'] = panel['y'] - (gap + thickness)
+            labels_x = ramp_d['x'] + panel['width'] * pos_ratio
+            labels_y = [ramp_d['y']]
+            ramp_d["align"] = "center"
             if colorbar["position"] == "bottom":
-                cbar['y'] = panel['y'] + panel['height'] + gap
-                labels_y = [cbar['y'] + cbar['height']]
-            labels_y *= labels.size  # Duplicate y postions
+                ramp_d['y'] = panel['y'] + panel['height'] + gap
+                labels_y = [ramp_d['y'] + ramp_d['height']]
+            labels_y *= len(labels)  # Duplicate y postions
 
         pil_img = Image.fromarray(color_ramp)
         img_name = channel["color"] + ".png"
@@ -1814,95 +1818,90 @@ class FigureExport(object):
         dpi = panel.get('min_export_dpi', None)
 
         # Paste the panel to PDF or TIFF image
-        self.paste_image(pil_img, img_name, cbar, page, dpi,
+        self.paste_image(pil_img, img_name, ramp_d, page, dpi,
                          is_colorbar=True)
 
-        rgb = tuple(int(colorbar["axis_color"][i:i+2], 16) for i in (0, 2, 4))
+        # Handle page offsets
+        ramp_d['x'] -= page['x']
+        ramp_d['y'] -= page['y']
+        labels_x = numpy.array(labels_x) - page['x']
+        labels_y = numpy.array(labels_y) - page['y']
+
+        self.draw_colorbar_ticks(colorbar, ramp_d, labels, labels_x, labels_y)
+
+    def draw_colorbar_ticks(self, colorbar, ramp_d, labels,
+                            labels_x, labels_y):
+        """ Adds colorbar spine and tick to PDF. Overwritten for TIFF below """
+
         fontsize = int(colorbar["font_size"])
-        tick_width = 1
         mark_len = colorbar["mark_len"]
         tick_margin = colorbar["tick_margin"]
-        contour_width = tick_width
+        pos = colorbar["position"]
+        tick_thickness = colorbar.get("tick_thickness", 1)
+        rgb = colorbar["axis_color"]
+        rgb = tuple(int(rgb[i:i+2], 16) for i in (0, 2, 4))
+
+        align = ramp_d["align"]
 
         # Drawing of the ticks (line + label)
         for label, pos_x, pos_y in zip(labels, labels_x, labels_y):
-            # Handle page offsets
-            pos_x -= page['x']
-            pos_y -= page['y']
             # Cosmetic correction, for first and last ticks to be
             # aligned with the image
             shift = 0
             if label == labels[0]:
-                shift = -tick_width / 2
+                shift = -tick_thickness / 2
             elif label == labels[-1]:
-                shift = tick_width / 2
+                shift = tick_thickness / 2
 
-            # Round the label str to the appropriate decimal
-            label = f"{label:.{decimals}f}"
+            if pos in ["left", "right"]:
+                pos_y -= shift
+                x1 = pos_x
+                y1 = pos_y
+                y2 = pos_y
+                y_txt = pos_y - fontsize / 2 + 1
 
-            if colorbar["position"] == "left":
-                x2 = pos_x - mark_len
-                pos_y += shift
-                if tick_width > 0:  # Do not add empty elements
-                    self.draw_scalebar_line(pos_x, pos_y, x2, pos_y,
-                                            tick_width, rgb)
-                self.draw_text(label, pos_x - mark_len - tick_margin,
-                               pos_y - fontsize / 2 + 1,
-                               fontsize, rgb, align=align)
-            elif colorbar["position"] == "right":
-                x2 = pos_x + mark_len
-                pos_y += shift
-                if tick_width > 0:
-                    self.draw_scalebar_line(pos_x, pos_y, x2, pos_y,
-                                            tick_width, rgb)
-                self.draw_text(label, pos_x + mark_len + tick_margin,
-                               pos_y - fontsize / 2 + 1,
-                               fontsize, rgb, align=align)
-            elif colorbar["position"] == "top":
-                y2 = pos_y - mark_len
-                pos_x -= shift  # Order of the label is reversed
-                if tick_width > 0:
-                    self.draw_scalebar_line(pos_x, pos_y, pos_x, y2,
-                                            tick_width, rgb)
-                self.draw_text(label, pos_x,
-                               pos_y - fontsize - mark_len - tick_margin,
-                               fontsize, rgb, align=align)
-            elif colorbar["position"] == "bottom":
-                y2 = pos_y + mark_len
-                pos_x -= shift  # Order of the label is reversed
-                if tick_width > 0:
-                    self.draw_scalebar_line(pos_x, pos_y, pos_x, y2,
-                                            tick_width, rgb)
-                self.draw_text(label, pos_x, pos_y + mark_len + tick_margin,
-                               fontsize, rgb, align=align)
+                if pos == "left":
+                    x2 = pos_x - mark_len
+                    x_txt = pos_x - mark_len - tick_margin
+                else:
+                    x2 = pos_x + mark_len
+                    x_txt = pos_x + mark_len + tick_margin
 
-        # Handle page offsets
-        cbar['x'] -= page['x']
-        cbar['y'] -= page['y']
-        if colorbar["position"] == "top":
-            self.draw_scalebar_line(cbar['x'],
-                                    cbar['y'],
-                                    cbar['x'] + cbar['width'],
-                                    cbar['y'],
-                                    contour_width, rgb)
-        elif colorbar["position"] == "bottom":
-            self.draw_scalebar_line(cbar['x'],
-                                    cbar['y'] + cbar['height'],
-                                    cbar['x'] + cbar['width'],
-                                    cbar['y'] + cbar['height'],
-                                    contour_width, rgb)
-        elif colorbar["position"] == "left":
-            self.draw_scalebar_line(cbar['x'],
-                                    cbar['y'],
-                                    cbar['x'],
-                                    cbar['y'] + cbar['height'],
-                                    contour_width, rgb)
-        elif colorbar["position"] == "right":
-            self.draw_scalebar_line(cbar['x'] + cbar['width'],
-                                    cbar['y'],
-                                    cbar['x'] + cbar['width'],
-                                    cbar['y'] + cbar['height'],
-                                    contour_width, rgb)
+            elif pos in ["top", "bottom"]:
+                pos_x -= shift
+                x1 = pos_x
+                x2 = pos_x
+                y1 = pos_y
+                x_txt = pos_x
+                if pos == "top":
+                    y2 = pos_y - mark_len
+                    y_txt = pos_y - fontsize - mark_len - tick_margin
+                else:
+                    y2 = pos_y + mark_len
+                    y_txt = pos_y + mark_len + tick_margin
+
+            if mark_len > 0:  # Do not add empty elements
+                self.draw_scalebar_line(x1, y1, x2, y2,
+                                        tick_thickness, rgb)
+            self.draw_text(label, x_txt, y_txt, fontsize, rgb, align=align)
+
+        if pos in ["top", "bottom"]:
+            x1 = ramp_d['x']
+            x2 = ramp_d['x'] + ramp_d['width']
+            y1 = ramp_d['y']
+            if pos == "bottom":
+                y1 += ramp_d['height']
+            y2 = y1
+
+        elif pos in ["left", "right"]:
+            x1 = ramp_d['x']
+            y1 = ramp_d['y']
+            y2 = ramp_d['y'] + ramp_d['height']
+            if pos == "right":
+                x1 += ramp_d['width']
+            x2 = x1
+
+        self.draw_scalebar_line(x1, y1, x2, y2, tick_thickness, rgb)
 
     def is_big_image(self, image):
         """Return True if this is a 'big' tiled image."""
@@ -2626,15 +2625,12 @@ class TiffExport(FigureExport):
         x = x - page['x']
         y = y - page['y']
 
+        x2 = scale_to_export_dpi(x + width)
+        y2 = scale_to_export_dpi(y + height)
         x = scale_to_export_dpi(x)
         y = scale_to_export_dpi(y)
-        width = scale_to_export_dpi(width)
-        height = scale_to_export_dpi(height)
-
-        x = int(round(x))
-        y = int(round(y))
-        width = int(round(width))
-        height = int(round(height))
+        width = x2 - x
+        height = y2 - y
 
         export_img = self.export_images and not is_colorbar
         # Save image BEFORE resampling
@@ -2686,6 +2682,7 @@ class TiffExport(FigureExport):
         y2 = scale_to_export_dpi(y2)
         width = scale_to_export_dpi(width)
 
+        # the coordinates are included in the line
         draw.line([(x, y), (x2, y2)], fill=rgb, width=width)
 
     def draw_temp_label(self, text, fontsize, rgb):
@@ -2717,6 +2714,110 @@ class TiffExport(FigureExport):
             textdraw.text((w, -box[1]), t['text'], font=font, fill=rgb)
             w += txt_w
         return temp_label
+
+    def draw_colorbar_ticks(self, colorbar, ramp_d, labels,
+                            labels_x, labels_y):
+        """ Draw colorbar spine and ticks on the current figure page """
+
+        fontsize = int(colorbar["font_size"])
+        mark_len = colorbar["mark_len"]
+        tick_margin = colorbar["tick_margin"]
+        pos = colorbar["position"]
+        tick_thickness = colorbar.get("tick_thickness", 1)
+        rgb = colorbar["axis_color"]
+        rgb = tuple(int(rgb[i:i+2], 16) for i in (0, 2, 4))
+
+        align = ramp_d["align"]
+
+        # Drawing of the ticks (line + label)
+        draw = ImageDraw.Draw(self.tiff_figure)
+        tick_thick_px = scale_to_export_dpi(tick_thickness)
+        for label, pos_x, pos_y in zip(labels, labels_x, labels_y):
+            # Cosmetic correction flag for first and last label
+            shift = 0
+            if label == labels[0]:
+                shift = -1
+            elif label == labels[-1]:
+                shift = 1
+
+            if pos in ["left", "right"]:
+                x1 = pos_x
+                y1 = pos_y
+                y2 = pos_y
+                y_txt = pos_y - fontsize / 2 + 1
+
+                if pos == "left":
+                    x2 = pos_x - mark_len
+                    x_txt = pos_x - mark_len - tick_margin
+                    x1, x2 = x2, x1
+                else:
+                    x2 = pos_x + mark_len
+                    x_txt = pos_x + mark_len + tick_margin
+
+            elif pos in ["top", "bottom"]:
+                x1 = pos_x
+                x2 = pos_x
+                y1 = pos_y
+                x_txt = pos_x
+                if pos == "top":
+                    y2 = pos_y - mark_len
+                    y_txt = pos_y - fontsize - mark_len - tick_margin
+                    y1, y2 = y2, y1
+                else:
+                    y2 = pos_y + mark_len
+                    y_txt = pos_y + mark_len + tick_margin
+
+            x1 = scale_to_export_dpi(x1)
+            y1 = scale_to_export_dpi(y1)
+            x2 = scale_to_export_dpi(x2)
+            y2 = scale_to_export_dpi(y2)
+
+            offset = 1  # Centering the marks
+            offset += int(tick_thick_px/2) * shift  # first or last label
+            if pos in ["left", "right"]:
+                x2 -= 1  # x2/y2 are included in the line, remove last pixel
+                y1, y2 = y1 - offset, y2 - offset
+                y_txt -= tick_thickness / 2 * shift
+            elif pos in ["top", "bottom"]:
+                y2 -= 1
+                x1, x2 = x1 - offset, x2 - offset
+                x_txt -= tick_thickness / 2 * shift
+
+            if mark_len > 0:  # Do not add empty elements
+                # the coordinates are included in the line
+                draw.line([(x1, y1), (x2, y2)],
+                          fill=rgb, width=tick_thick_px)
+
+            self.draw_text(label, x_txt, y_txt, fontsize, rgb, align=align)
+
+        # Draw colorbar spine
+        if pos in ["top", "bottom"]:
+            x1 = ramp_d['x']
+            x2 = ramp_d['x'] + ramp_d['width']
+            y1 = ramp_d['y']
+            if pos == "bottom":
+                y1 += ramp_d['height']
+            y2 = y1
+        elif pos in ["left", "right"]:
+            x1 = ramp_d['x']
+            y1 = ramp_d['y']
+            y2 = ramp_d['y'] + ramp_d['height']
+            if pos == "right":
+                x1 += ramp_d['width']
+            x2 = x1
+
+        x1 = scale_to_export_dpi(x1)
+        y1 = scale_to_export_dpi(y1)
+        x2 = scale_to_export_dpi(x2)
+        y2 = scale_to_export_dpi(y2)
+        # x2/y2 are included in the line, need to remove 'last pixel'
+        if pos in ["left", "right"]:
+            y2 -= 1
+            x1, x2 = x1 - 1, x2 - 1
+        elif pos in ["top", "bottom"]:
+            x2 -= 1
+            y1, y2 = y1 - 1, y2 - 1
+        draw.line([(x1, y1), (x2, y2)], fill=rgb, width=tick_thick_px)
 
     def parse_html(self, html):
         """
