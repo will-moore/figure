@@ -2890,6 +2890,11 @@ class TiffExport(FigureExport):
             x = x - (temp_label.size[0] / 2)
         elif align == "right":
             x = x - temp_label.size[0]
+
+        if align not in ["left-vertical", "right-vertical"]:
+            # The text in TIFF is higher compared to PDF. Add offset
+            y = y + scale_to_export_dpi(1)
+
         x = int(round(x))
         y = int(round(y))
         # Use label as mask, so transparent part is not pasted
