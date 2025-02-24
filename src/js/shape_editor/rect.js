@@ -24,7 +24,7 @@
 */
 
 import Raphael from "raphael";
-import CreateText from "./text";
+import {CreateText} from "./text";
 
 
 const TEMP_SHAPE_ID = -1234;
