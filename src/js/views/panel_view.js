@@ -48,7 +48,6 @@
             if (opts.page_color) {
                 this.page_color = opts.page_color;
             }
-            this.render();
         },
 
         events: {
@@ -373,15 +372,8 @@
 
             // update src, layout etc.
             this.render_image();
-            this.render_labels();
-            this.render_scalebar();     // also calls render_layout()
-
-            // At this point, element is not ready for Raphael svg
-            // If we wait a short time, works fine
-            var self = this;
-            setTimeout(function(){
-                self.render_shapes();
-            }, 10);
+            this.render_scalebar();     // also calls render_layout() -> render_labels()
+            this.render_shapes();
 
             return this;
         }
