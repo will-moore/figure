@@ -1702,6 +1702,8 @@ class FigureExport(object):
         else:
             script_service = self.conn.getScriptService()
             luts = script_service.getScriptsByMimetype("text/x-lut")
+            self.conn.SERVICE_OPTS.setOmeroGroup(  # required to get LUT files
+                self.conn.getEventContext().groupId)
             for lut in luts:
                 if lut.name.val != color:
                     continue
