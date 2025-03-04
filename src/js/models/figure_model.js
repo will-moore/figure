@@ -358,6 +358,15 @@
             return figureJSON;
         },
 
+        load_from_url: function(url) {
+            // load content from a URL
+            console.log("load_from_url...", url);
+            $.getJSON(url, function(data){
+                this.load_from_JSON(data);
+                this.set('unsaved', true);
+            }.bind(this));
+        },
+
         figure_fromJSON: function(data) {
             var parsed = JSON.parse(data);
             delete parsed.fileId;

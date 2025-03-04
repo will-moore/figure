@@ -84,6 +84,15 @@ var FigureRouter = Backbone.Router.extend({
 
   index: function () {
     console.log("index");
+    // Check for ?file=http://...json
+    if (window.location.search.length > 1) {
+      const searchParams = new URLSearchParams(window.location.search.substring(1));
+      if (searchParams.has("file")) {
+        const file = searchParams.get("file");
+        figureModel.load_from_url(file);
+        return;
+      }
+    }
     hideModals();
     var cb = () => {
       showModal("welcomeModal");
