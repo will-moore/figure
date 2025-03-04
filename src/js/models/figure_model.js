@@ -364,7 +364,10 @@
             $.getJSON(url, function(data){
                 this.load_from_JSON(data);
                 this.set('unsaved', true);
-            }.bind(this));
+            }.bind(this))
+            .fail(function(){
+                alert("Failed to load figure from URL: " + url);
+            });
         },
 
         figure_fromJSON: function(data) {
