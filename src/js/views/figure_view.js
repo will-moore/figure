@@ -575,20 +575,26 @@
 
             var self = this;
             options = options || {};
-            var defaultName = this.model.get('figureName');
-            if (!defaultName) {
-                defaultName = this.model.getDefaultFigureName();
+            var figureName = this.model.get('figureName');
+            if (!figureName) {
+                var defaultName = this.model.getDefaultFigureName();
+                figureName = prompt("Enter Figure Name", defaultName);
             }
-            var figureName = prompt("Enter Figure Name", defaultName);
 
             var nav = function(data){
-                console.log("nav", data, self.app);
+                // Update URL to new file (with ID)
                 self.app.navigate("file/"+data);
                 // in case you've Saved a copy of a file you can't edit
                 self.model.set('canEdit', true);
             };
             if (figureName) {
                 options.figureName = figureName;
+
+                if (!APP_SERVED_BY_OMERO) {
+                    this.model.set('figureName', figureName);
+                    this.model.save_to_download(options);
+                    return;
+                }
                 // On save, go to newly saved page, unless we have callback already
                 options.success = options.success || nav;
                 // Save
