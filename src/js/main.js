@@ -73,18 +73,35 @@ var undoManager = new UndoManager({ figureModel: figureModel }),
 // Finally, start listening for changes to panels
 undoManager.listenToCollection(figureModel.panels);
 
+
+let routes = {
+  "": "index",
+  "new(/)": "newFigure",
+  "recover(/)": "recoverFigure",
+  "open(/)": "openFigure",
+  "file/:id(/)": "loadFigure",
+};
+
+if (!APP_SERVED_BY_OMERO) {
+  // vite.config.js has base: "/figure/"
+  // so we deploy with gh-pages to https://ome.github.io/figure/
+  routes = {
+    "figure(/)": "index",
+    "figure/new(/)": "newFigure",
+    "figure/recover(/)": "recoverFigure",
+    "figure/open(/)": "openFigure",
+    // only for development
+    "figure/file/:id(/)": "loadFigure",
+  };
+}
+
 var FigureRouter = Backbone.Router.extend({
-  routes: {
-    "": "index",
-    "new(/)": "newFigure",
-    "recover(/)": "recoverFigure",
-    "open(/)": "openFigure",
-    "file/:id(/)": "loadFigure",
-  },
+  routes: routes,
 
   index: function () {
     console.log("index");
     // Check for ?file=http://...json
+    // TODO: do we ONLY want to do this on index?
     if (window.location.search.length > 1) {
       const searchParams = new URLSearchParams(window.location.search.substring(1));
       if (searchParams.has("file")) {

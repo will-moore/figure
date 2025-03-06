@@ -23,5 +23,6 @@ export default {
     outDir: "../omero_figure/static/omero_figure/"
   },
 
-  assetsInclude: ["**/*.template.html"]
+  assetsInclude: ["**/*.template.html"],
+  base: "/figure/"
 }
