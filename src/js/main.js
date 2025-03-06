@@ -83,15 +83,15 @@ let routes = {
 };
 
 if (!APP_SERVED_BY_OMERO) {
-  // vite.config.js has base: "/figure/"
-  // so we deploy with gh-pages to https://ome.github.io/figure/
+  // vite.config.js has base: "/omero-figure/"
+  // so we deploy with gh-pages to https://ome.github.io/omero-figure/
   routes = {
-    "figure(/)": "index",
-    "figure/new(/)": "newFigure",
-    "figure/recover(/)": "recoverFigure",
-    "figure/open(/)": "openFigure",
+    "omero-figure(/)": "index",
+    "omero-figure/new(/)": "newFigure",
+    "omero-figure/recover(/)": "recoverFigure",
+    "omero-figure/open(/)": "openFigure",
     // only for development
-    "figure/file/:id(/)": "loadFigure",
+    "omero-figure/file/:id(/)": "loadFigure",
   };
 }
 
