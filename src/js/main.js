@@ -106,7 +106,10 @@ var FigureRouter = Backbone.Router.extend({
       const searchParams = new URLSearchParams(window.location.search.substring(1));
       if (searchParams.has("file")) {
         const file = searchParams.get("file");
-        figureModel.load_from_url(file);
+        var cb = function () {
+          figureModel.load_from_url(file);
+        };
+        figureModel.checkSaveAndClear(cb);
         return;
       }
     }
@@ -187,7 +190,8 @@ $(document).on("click", "a", function (ev) {
   // check that links are 'internal' to this app
   if (href.substring(0, BASE_WEBFIGURE_URL.length) === BASE_WEBFIGURE_URL) {
     ev.preventDefault();
-    href = href.replace(BASE_WEBFIGURE_URL, "/");
+    let baseUrl = APP_SERVED_BY_OMERO ? "/" : "/omero-figure/";
+    href = href.replace(BASE_WEBFIGURE_URL, baseUrl);
     app.navigate(href, { trigger: true });
   }
 });

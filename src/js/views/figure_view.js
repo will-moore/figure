@@ -11,6 +11,7 @@
     import {FigureFileList, FileListView} from "./files";
 
     import {AddImagesModalView, DpiModalView, PaperSetupModalView, SetIdModalView } from "./modal_views";
+    import {OpenLocalFileModalView} from "./open_local_file_modal";
 
     import {CropModalView} from "./crop_modal_view";
     import {ChgrpModalView} from "./chgrp_modal_view";
@@ -52,6 +53,7 @@
             new DpiModalView({model: this.model});
             new LegendView({model: this.model});
             new LabelFromMapsModal({model: this.model});
+            new OpenLocalFileModalView({model: this.model, app: this.app});
 
             this.figureFiles = new FigureFileList();
             this.fileListViewModal = new FileListView({model:this.figureFiles, figureModel: this.model});
@@ -511,7 +513,12 @@
             var self = this;
             var callback = function() {
                 // Opening modal will trigger fetch of files
-                self.fileListViewModal.modal.show();
+                if (APP_SERVED_BY_OMERO) {
+                    self.fileListViewModal.modal.show();
+                } else {
+                    // Open local file or URL
+                    showModal("openLocalFileModal");
+                }
             };
 
             if (this.model.get("unsaved")) {
@@ -549,7 +556,7 @@
 
             var fileId = this.model.get('fileId'),
                 canEdit = this.model.get('canEdit');
-            if (fileId && canEdit) {
+            if (fileId && canEdit && APP_SERVED_BY_OMERO) {
                 // Prevent double-click
                 this.$saveBtn.attr('disabled', 'disabled');
                 // Save

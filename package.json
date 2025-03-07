@@ -5,6 +5,7 @@
   "description": "OMERO figure creation app",
   "main": "index.js",
   "scripts": {
+    "dev": "vite",
     "start": "vite",
     "build": "vite build --emptyOutDir && ./deploy_build.sh",
     "ghpages": "vite build --base=./ --outDir ../gh_pages && ./deploy_ghpages.sh",

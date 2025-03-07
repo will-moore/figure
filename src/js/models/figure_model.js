@@ -364,7 +364,7 @@
             console.log("load_from_url...", url);
             $.getJSON(url, function(data){
                 this.load_from_JSON(data);
-                this.set('unsaved', true);
+                this.set('unsaved', false);
             }.bind(this))
             .fail(function(){
                 alert("Failed to load figure from URL: " + url);
