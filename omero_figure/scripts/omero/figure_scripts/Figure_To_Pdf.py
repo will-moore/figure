@@ -2745,7 +2745,7 @@ class TiffExport(FigureExport):
                 x1 = pos_x
                 y1 = pos_y
                 y2 = pos_y
-                y_txt = pos_y - fontsize / 2 + 1
+                y_txt = pos_y - fontsize / 2 + 0.5
 
                 if pos == "left":
                     x2 = pos_x - mark_len
