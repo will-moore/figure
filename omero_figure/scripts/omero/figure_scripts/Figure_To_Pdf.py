@@ -1736,6 +1736,9 @@ class FigureExport(object):
                     color_ramp = numpy.array([r, g, b], dtype=numpy.uint8).T
                 break
 
+            # Set back the group to -1 to make sure we can find all images
+            self.conn.SERVICE_OPTS.setOmeroGroup(-1)
+
         if channel.get("reverseIntensity", False):
             color_ramp = color_ramp[::-1]
 
