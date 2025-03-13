@@ -38,6 +38,7 @@ var LutPickerView = Backbone.View.extend({
     initialize:function () {
         this.lutModal = new bootstrap.Modal('#lutpickerModal');
         this.lut_names = [];
+        this.loadLuts();
     },
 
 

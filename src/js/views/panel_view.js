@@ -384,9 +384,13 @@
                     break;
                 }
             }
-            var lut_url = await FigureLutPicker.loadLuts()  // Ensure lut url and list are loaded
-            var lutBgPos = FigureLutPicker.getLutBackgroundPosition(color);
-            var isLUT = !(/^[0-9a-fA-F]+$/.test(color))  // check if it's a normal color or a LUT
+            var lut_url;
+            var lutBgPos;
+            var isLUT = !(/^[0-9a-fA-F]+$/.test(color));  // check if it's a normal color or a LUT
+            if (isLUT) {
+                lut_url = await FigureLutPicker.loadLuts();  // Ensure lut url and list are loaded
+                lutBgPos = FigureLutPicker.getLutBackgroundPosition(color);
+            }
             var inverted_pos = {  // convenience variable for the colorbar template.
                 "left": "right",
                 "right": "left",
@@ -398,7 +402,7 @@
                 "right": "vertical",
                 "top": "horizontal",
                 "bottom": "horizontal",
-            }
+            };
             if (cb && cb.show) {
                 var cb_json = {
                     position: cb.position,
