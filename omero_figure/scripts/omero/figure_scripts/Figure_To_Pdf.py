@@ -2684,7 +2684,7 @@ class TiffExport(FigureExport):
         width = scale_to_export_dpi(width)
 
         x, x2 = (x2, x) if x > x2 else (x, x2)
-        y, y2 = (y2, y) if y > y2 else (y, 2)
+        y, y2 = (y2, y) if y > y2 else (y, y2)
 
         # the coordinates are included in the line
         draw.line([(x, y), (x2, y2)], fill=rgb, width=width)
