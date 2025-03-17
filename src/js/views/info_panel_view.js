@@ -164,22 +164,24 @@ var InfoPanelView = Backbone.View.extend({
         this.$el.append(this.xywh_template(json));
     },
 
-    getImageLinks: function(remoteUrl, imageIds, imageNames) {
+    getImageLinks: function(imageIds, imageNames) {
         // Link if we have a single remote image, E.g. http://jcb-dataviewer.rupress.org/jcb/img_detail/625679/
+        var selectedObjs = imageIds.map((id, index) => {return {id, name: imageNames[index], type: 'image'}})
+        .filter(function(idWithName){
+            return !isNaN(idWithName.id);
+        });
+        var zarrIds = imageIds.filter(function(id){
+            return typeof id === "string" && id.indexOf('zarr') > -1;
+        });
         var imageLinks = [];
-        if (remoteUrl) {
-            if (imageIds.length == 1) {
-                imageLinks.push({'text': 'Image viewer', 'url': remoteUrl});
-            }
-        // OR all the images are local...
-        } else {
-            imageLinks.push({'text': 'Webclient', 'url': WEBINDEX_URL + "?show=image-" + imageIds.join('|image-')});
+
+        // Handle Image ID links to OMERO...
+        if (selectedObjs.length > 0) {
+            var numberIds = selectedObjs.map(idWithName => idWithName.id);
+            imageLinks.push({'text': 'Webclient', 'url': WEBINDEX_URL + "?show=image-" + numberIds.join('|image-')});
 
             // Handle other 'Open With' options
             OPEN_WITH.forEach(function(v){
-                var selectedObjs = imageIds.map(function(id, i){
-                    return {'id': id, 'name': imageNames[i], 'type': 'image'};
-                });
                 var enabled = false;
                 if (typeof v.isEnabled === "function") {
                     enabled = v.isEnabled(selectedObjs);
@@ -204,6 +206,10 @@ var InfoPanelView = Backbone.View.extend({
                 imageLinks.push({'text': label, 'url': url});
             });
         }
+        // Handle Zarr links to ome-ngff-validator
+        if (zarrIds.length == 1) {
+            imageLinks.push({'text': "ome-ngff-validator", 'url': "https://ome.github.io/ome-ngff-validator/?source=" + zarrIds[0]});
+        }
         return imageLinks;
     },
 
@@ -216,16 +222,11 @@ var InfoPanelView = Backbone.View.extend({
         // Flag to ignore blur events caused by $el.html() below
         this.rendering = true;
         var json,
-            title = this.models.length + " Panels Selected...",
-            remoteUrl;
+            title = this.models.length + " Panels Selected...";
 
         var imageIds = this.models.pluck('imageId');
         var imageNames = this.models.pluck('name');
         this.models.forEach(function(m) {
-            if (m.get('baseUrl')) {
-                // only used when a single image is selected
-                remoteUrl = m.get('baseUrl') + "/img_detail/" + m.get('imageId') + "/";
-            }
             // start with json data from first Panel
             var this_json = m.toJSON();
             // Format floating point values
@@ -274,7 +275,7 @@ var InfoPanelView = Backbone.View.extend({
             json.export_dpi = Math.max(json.export_dpi, json.min_export_dpi);
         }
 
-        json.imageLinks = this.getImageLinks(remoteUrl, imageIds, imageNames);
+        json.imageLinks = this.getImageLinks(imageIds, imageNames);
 
         // all setId if we have a single Id
         json.setImageId = _.uniq(imageIds).length == 1;
