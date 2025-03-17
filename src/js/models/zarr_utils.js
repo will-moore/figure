@@ -121,22 +121,45 @@ export async function loadZarrForPanel(zarrUrl) {
     orig_height: sizeY,
     x: panelX,
     y: panelY,
-    // 'datasetName': data.meta.datasetName,
-    // 'datasetId': data.meta.datasetId,
-    // 'pixel_size_x': data.pixel_size.valueX,
-    // 'pixel_size_y': data.pixel_size.valueY,
-    // 'pixel_size_z': data.pixel_size.valueZ,
-    // 'pixel_size_x_symbol': data.pixel_size.symbolX,
-    // 'pixel_size_z_symbol': data.pixel_size.symbolZ,
-    // 'pixel_size_x_unit': data.pixel_size.unitX,
-    // 'pixel_size_z_unit': data.pixel_size.unitZ,
     // 'deltaT': data.deltaT,
     pixelsType: dtypeToPixelsType(dtype),
     // 'pixel_range': data.pixel_range,
     // let's dump the zarr data into the panel
     zarr: zarr_attrs,
   };
-  console.log("Zarr Panel Model", n);
+
+  // handle pixel sizes if available
+  // Use 'scale' from first 'coordinateTransforms' if available
+  let datasetScale = multiscale.datasets[0].coordinateTransformations?.find(
+    (ct) => ct.type == "scale"
+  );
+  let msScale = multiscale.coordinateTransformations?.find(
+    (ct) => ct.type == "scale"
+  );
+  if (datasetScale) {
+    for (let dimName of ["x", "y", "z"]) {
+      axes.forEach((axis, idx) => {
+        if (axis.name == dimName) {
+          let dimScale = datasetScale.scale[idx];
+          if (msScale) {
+            // also apply any 'scale' on multiscale.coordinateTransformations
+            dimScale = dimScale * msScale.scale[idx];
+          }
+          // One OF: angstrom, attometer, centimeter, decimeter, exameter, femtometer, foot, gigameter, hectometer, inch, kilometer, megameter, meter, micrometer, mile, millimeter, nanometer, parsec, petameter, picometer, terameter, yard, yoctometer, yottameter, zeptometer, zettameter
+          if (axis.unit) {
+            let unitKey = axis.unit.toUpperCase();
+            n['pixel_size_' + dimName] = dimScale;
+            n['pixel_size_' + dimName + '_unit'] = unitKey;
+            if (LENGTH_UNITS[unitKey]) {
+              n['pixel_size_' + dimName + '_symbol'] = LENGTH_UNITS[unitKey].symbol;
+            }
+          }
+        }
+      });
+    }
+  }
+
+  console.log("Zarr Panel Model...", n);
 
   return n;
 }
