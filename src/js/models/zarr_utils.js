@@ -201,7 +201,6 @@ export async function renderZarrToSrc(source, attrs, theZ, theT, channels, rect)
   const MAX_SIZE = 500;
   // use the arrays themselves to determine 'scale', since we might
   // not have 'coordinateTransforms' for pre-v0.4 etc.
-  console.log("Zarr pick size to render...", rect);
   let path;
 
   // size of full-size image
@@ -355,9 +354,6 @@ export async function renderZarrToSrc(source, attrs, theZ, theT, channels, rect)
   });
 
   let ndChunks = await Promise.all(promises);
-  console.log("ndChunk", ndChunks[0].shape);
-  console.log("array_rect", array_rect);
-
   let start = new Date().getTime();
   let rbgData = omezarr.renderTo8bitArray(
     ndChunks,

@@ -989,7 +989,6 @@
                     rect.height = length;
                 }
             }
-            console.log("------> get_zarr_img_src -force_no_padding,  rect", force_no_padding, rect)
             return renderZarrToSrc(this.get('imageId'), this.get('zarr'), this.get('theZ'), this.get('theT'), this.get('channels'), rect);
         },
 
