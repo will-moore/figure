@@ -582,6 +582,9 @@ var CreateRect = function CreateRect(options) {
 };
 
 CreateRect.prototype.startDrag = function startDrag(startX, startY) {
+  // reset the text in the manager
+  this.manager.setText("")
+
   var strokeColor = this.manager.getStrokeColor(),
     strokeWidth = this.manager.getStrokeWidth(),
     fillColor = this.manager.getFillColor(),

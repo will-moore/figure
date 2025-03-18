@@ -822,9 +822,9 @@ ShapeManager.prototype.selectShapes = function selectShapes(shapes) {
     this._fillColor = fillColor;
   }
   if (fillOpacity) {
-      this._fillOpacity = fillOpacity;
+    this._fillOpacity = fillOpacity;
   }
-  if (text) {
+  if (text != undefined) {
     this._text = text;
   }
   if (textPosition) {

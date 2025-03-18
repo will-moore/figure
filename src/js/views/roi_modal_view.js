@@ -73,6 +73,8 @@ export const RoiModalView = Backbone.View.extend({
             });
             Mousetrap(dialog).bind('del', function(event, combo) {
                 if(!self.$el.is(":visible")) return true;
+                var inputText = document.getElementById('label-text');
+                if(inputText === document.activeElement) return true;
                 self.deleteShapes(event);
                 return false;
             });
@@ -443,6 +445,9 @@ export const RoiModalView = Backbone.View.extend({
                 newState = $target.parent().attr('data-state');
             }
             this.shapeManager.setState(newState);
+            if (this.shapeManager.getSelectedShapes().length == 0){
+                this.shapeManager.setText("");
+            }
             this.renderToolbar();
         },
 
