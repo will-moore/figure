@@ -506,12 +506,16 @@ Ellipse.prototype.drawShape = function drawShape() {
   }
 
   if(this._textShape || this.loadTextShape()){
-    this._textShape.setParentShapeCoords({x: this._x, y: this._y, width: this._width, height: this._height})
+    this._textShape.setParentShapeCoords({x: this._x - this._radiusX, y: this._y - this._radiusY, width: 2*this._radiusX, height: 2*this._radiusY})
+    this._textShape.setRotation(this._rotation)
   }
 };
 
 Ellipse.prototype.setSelected = function setSelected(selected) {
   this._selected = !!selected;
+  if(this._textShape || this.loadTextShape()){
+    this._textShape.setSelected(this._selected)
+  }
   this.drawShape();
 };
 
@@ -639,31 +643,17 @@ var CreateEllipse = function CreateEllipse(options) {
 };
 
 CreateEllipse.prototype.startDrag = function startDrag(startX, startY) {
+  // reset the text in the manager
+  this.manager.setText("")
+
   var strokeColor = this.manager.getStrokeColor(),
     strokeWidth = this.manager.getStrokeWidth(),
     fillColor = this.manager.getFillColor(),
     fillOpacity = this.manager.getFillOpacity(),
-    zoom = this.manager.getZoom(),
-    text = this.manager.getText() || "",
-    textPosition = this.manager.getTextPosition(),
-    fontSize = this.manager.getTextFontSize();
-
+    zoom = this.manager.getZoom();
 
   this.startX = startX;
   this.startY = startY;
-
-  this.textShape = (new CreateText({
-    manager: this.manager,
-    paper: this.paper,
-    zoom: zoom,
-    text: text,
-    x: startX,
-    y: startY,
-    strokeColor: strokeColor,
-    fontSize: fontSize,
-    textPosition: textPosition,
-    strokeWidth: strokeWidth,
-  })).getShape();
 
   this.ellipse = new Ellipse({
     manager: this.manager,
@@ -679,24 +669,12 @@ CreateEllipse.prototype.startDrag = function startDrag(startX, startY) {
     strokeColor: strokeColor,
     fillColor: fillColor,
     fillOpacity: fillOpacity,
-    textId: this.textShape._id,
+    textId: -1,
   });
 };
 
 CreateEllipse.prototype.drag = function drag(dragX, dragY, shiftKey) {
   this.ellipse.updateHandle("end", dragX, dragY, shiftKey);
-
-  var dx = this.startX - dragX,
-      dy = this.startY - dragY;
-
-  var newCoords = {
-    x: Math.min(dragX, this.startX),
-    y: Math.min(dragY, this.startY),
-    width: Math.abs(dx),
-    height: Math.abs(dy),
-  }
-
-  this.textShape.setParentShapeCoords(newCoords);
 };
 
 CreateEllipse.prototype.stopDrag = function stopDrag() {
@@ -705,7 +683,6 @@ CreateEllipse.prototype.stopDrag = function stopDrag() {
   if (coords.radiusX < 2) {
     this.ellipse.destroy();
     delete this.ellipse;
-    delete this.textShape;
     return;
   }
   // on the 'new:shape' trigger, this shape will already be selected
