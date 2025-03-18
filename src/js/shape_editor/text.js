@@ -331,7 +331,6 @@ Text.prototype.drawShape = function drawShape() {
   this.element.attr({
     x: this._x * f,
     y: this._y * f,
-    stroke: color,
     fill: color,
     "fill-opacity": 1,
     "font-size": this._fontSize,

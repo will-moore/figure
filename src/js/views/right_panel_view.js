@@ -190,7 +190,7 @@
                 panel.setLastInsetTextIndex(lastInsetTextIndex)
 
                 var new_label = {
-                    text: "**"+String.fromCharCode(lastInsetTextIndex)+"**",
+                    text: String.fromCharCode(lastInsetTextIndex),
                     size: 18,
                     position: "topleft",
                     color: color,

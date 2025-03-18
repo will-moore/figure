@@ -89,7 +89,7 @@
                     let insetLabel = (this.get("labels") || []).find(lbl => lbl.inset == true);
                     if(insetLabel){
                         var lbl_key = this.get_label_key(insetLabel)
-                        var new_txt = "**"+text.text+"**"
+                        var new_txt = text.text
                         if(insetLabel.text !== new_txt){
                             insetLabel.text = new_txt
                             var newlbls = {};
