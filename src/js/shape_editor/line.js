@@ -24,6 +24,10 @@
 */
 
 import Raphael from "raphael";
+import {CreateText} from "./text";
+
+
+const TEMP_SHAPE_ID = -1234;
 
 var Line = function Line(options) {
   var self = this;
@@ -52,6 +56,25 @@ var Line = function Line(options) {
   if (options.zoom) {
     this._zoomFraction = options.zoom / 100;
   }
+
+  this._textId = options.textId || -1;
+  if(this._textId == -1 || this._textId == TEMP_SHAPE_ID){
+    var textShape = (new CreateText({
+      manager: this.manager,
+      paper: this.paper,
+      id: this._textId,
+      zoom: options.zoom,
+      text: "",
+      x: options.x,
+      y: options.y,
+      strokeColor: options.strokeColor,
+      fontSize: 12,
+      textPosition: options.textPosition || "top",
+      strokeWidth: this._strokeWidth,
+    })).getShape();
+    this._textId = textShape._id;
+  }
+  this._textShape = this.manager.getShape(this._textId)
 
   this.element = this.paper.path();
   this.element.attr({ cursor: "pointer" });
@@ -110,6 +133,7 @@ Line.prototype.toJson = function toJson() {
       ) * this._strokeWidth,
     strokeWidth: this._strokeWidth,
     strokeColor: this._strokeColor,
+    textId: this._textId,
   };
   if (this._id) {
     rv.id = this._id;
@@ -205,7 +229,62 @@ Line.prototype.getFillOpacity = function getFillOpacity() {
   return 0;
 };
 
+Line.prototype.loadTextShape = function loadTextShape(){
+  this._textShape = this.manager.getShape(this._textId);
+  return this._textShape;
+};
+
+Line.prototype.setText = function setText(text) {
+  if(this._textShape){
+    this._textShape.setText(text)
+  }
+};
+
+Line.prototype.getText = function getText() {
+  if(this._textShape){
+    return this._textShape.getText()
+  }
+  return "";
+};
+
+Line.prototype.setTextPosition = function setTextPosition(textPosition) {
+  if(this._textShape){
+    this._textShape.setTextPosition(textPosition)
+  }
+};
+
+Line.prototype.getTextPosition = function getTextPosition() {
+  if(this._textShape){
+    return this._textShape.getTextPosition()
+  }
+  return "";
+};
+
+Line.prototype.setFontSize = function setFontSize(fontSize) {
+  if(this._textShape){
+    this._textShape.setFontSize(fontSize)
+  }
+};
+
+Line.prototype.getFontSize = function getFontSize() {
+  if(this._textShape){
+    return this._textShape.getFontSize()
+  }
+  return;
+};
+
+Line.prototype.getTextId = function getTextId() {
+  return this._textId;
+};
+
+Line.prototype.setTextId = function setTextId(textId) {
+  this._textId = textId;
+};
+
 Line.prototype.destroy = function destroy() {
+  if(this._textShape){
+    this.manager.deleteShapesByIds([this._textShape._id])
+  }
   this.element.remove();
   this.handles.remove();
 };
@@ -274,10 +353,21 @@ Line.prototype.drawShape = function drawShape() {
     hy = handleIds[h_id].y;
     hnd.attr({ x: hx - this.handle_wh / 2, y: hy - this.handle_wh / 2 });
   }
+
+  if(this._textShape || this.loadTextShape()){
+    var x = Math.min(this._x1, this._x2)
+    var y = Math.min(this._y1, this._y2)
+    var width = Math.abs(this._x1 - this._x2)
+    var height = Math.abs(this._y1 - this._y2)
+    this._textShape.setParentShapeCoords({x: x, y: y, width: width, height: height})
+  }
 };
 
 Line.prototype.setSelected = function setSelected(selected) {
   this._selected = !!selected;
+  if(this._textShape || this.loadTextShape()){
+    this._textShape.setSelected(this._selected)
+  }
   this.drawShape();
 };
 
@@ -512,6 +602,9 @@ var CreateLine = function CreateLine(options) {
 };
 
 CreateLine.prototype.startDrag = function startDrag(startX, startY) {
+  // reset the text in the manager
+  this.manager.setText("")
+
   var strokeColor = this.manager.getStrokeColor(),
     strokeWidth = this.manager.getStrokeWidth(),
     zoom = this.manager.getZoom();
@@ -530,6 +623,7 @@ CreateLine.prototype.startDrag = function startDrag(startX, startY) {
     strokeWidth: strokeWidth,
     zoom: zoom,
     strokeColor: strokeColor,
+    textId: -1,
   });
 };
 
@@ -575,6 +669,9 @@ var CreateArrow = function CreateArrow(options) {
   var that = new CreateLine(options);
 
   that.startDrag = function startDrag(startX, startY) {
+    // reset the text in the manager
+    this.manager.setText("")
+
     var strokeColor = this.manager.getStrokeColor(),
       strokeWidth = this.manager.getStrokeWidth(),
       zoom = this.manager.getZoom();
@@ -593,6 +690,7 @@ var CreateArrow = function CreateArrow(options) {
       strokeWidth: strokeWidth,
       zoom: zoom,
       strokeColor: strokeColor,
+      textId: -1,
     });
   };
 
