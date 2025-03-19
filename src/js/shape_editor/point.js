@@ -24,7 +24,9 @@
 */
 
 import Raphael from "raphael";
+import {CreateText} from "./text";
 
+const TEMP_SHAPE_ID = -1234;
 const POINT_RADIUS = 5;
 var Point = function Point(options) {
   var self = this;
@@ -73,6 +75,25 @@ var Point = function Point(options) {
     this._area = this._radiusX * this._radiusY * Math.PI;
   }
   this.handle_wh = 6;
+
+  this._textId = options.textId || -1;
+  if(this._textId == -1 || this._textId == TEMP_SHAPE_ID){
+  var textShape = (new CreateText({
+      manager: this.manager,
+      paper: this.paper,
+      id: this._textId,
+      zoom: options.zoom,
+      text: "",
+      x: options.x,
+      y: options.y,
+      strokeColor: options.strokeColor,
+      fontSize: 12,
+      textPosition: options.textPosition || "top",
+      strokeWidth: this._strokeWidth,
+    })).getShape();
+    this._textId = textShape._id;
+  }
+  this._textShape = this.manager.getShape(this._textId)
 
   this.element = this.paper.ellipse();
   this.element.attr({ "fill-opacity": this._fillOpacity, fill: this._fillColor, cursor: "pointer" });
@@ -130,7 +151,8 @@ Point.prototype.toJson = function toJson() {
     strokeWidth: this._strokeWidth,
     strokeColor: this._strokeColor,
     fillColor: this._fillColor,
-    fillOpacity: this._fillOpacity
+    fillOpacity: this._fillOpacity,
+    textId: this._textId,
   };
   if (this._id) {
     rv.id = this._id;
@@ -216,7 +238,62 @@ Point.prototype.getFillOpacity = function getFillOpacity() {
   return this._fillOpacity;
 };
 
+Point.prototype.loadTextShape = function loadTextShape(){
+  this._textShape = this.manager.getShape(this._textId);
+  return this._textShape;
+};
+
+Point.prototype.setText = function setText(text) {
+  if(this._textShape){
+    this._textShape.setText(text)
+  }
+};
+
+Point.prototype.getText = function getText() {
+  if(this._textShape){
+    return this._textShape.getText()
+  }
+  return "";
+};
+
+Point.prototype.setTextPosition = function setTextPosition(textPosition) {
+  if(this._textShape){
+    this._textShape.setTextPosition(textPosition)
+  }
+};
+
+Point.prototype.getTextPosition = function getTextPosition() {
+  if(this._textShape){
+    return this._textShape.getTextPosition()
+  }
+  return "";
+};
+
+Point.prototype.setFontSize = function setFontSize(fontSize) {
+  if(this._textShape){
+    this._textShape.setFontSize(fontSize)
+  }
+};
+
+Point.prototype.getFontSize = function getFontSize() {
+  if(this._textShape){
+    return this._textShape.getFontSize()
+  }
+  return;
+};
+
+Point.prototype.getTextId = function getTextId() {
+  return this._textId;
+};
+
+Point.prototype.setTextId = function setTextId(textId) {
+  this._textId = textId;
+};
+
 Point.prototype.destroy = function destroy() {
+  if(this._textShape){
+    this.manager.deleteShapesByIds([this._textShape._id])
+  }
   this.element.remove();
   this.handles.remove();
 };
@@ -398,10 +475,17 @@ Point.prototype.drawShape = function drawShape() {
     hy = this._handleIds[h_id].y * this._zoomFraction;
     hnd.attr({ x: hx - this.handle_wh / 2, y: hy - this.handle_wh / 2 });
   }
+
+  if(this._textShape || this.loadTextShape()){
+    this._textShape.setParentShapeCoords({x: this._x - this._radiusX, y: this._y - this._radiusY, width: 2*this._radiusX, height: 2*this._radiusY})
+  }
 };
 
 Point.prototype.setSelected = function setSelected(selected) {
   this._selected = !!selected;
+  if(this._textShape || this.loadTextShape()){
+    this._textShape.setSelected(this._selected)
+  }
   this.drawShape();
 };
 
@@ -475,6 +559,9 @@ var CreatePoint = function CreatePoint(options) {
 };
 
 CreatePoint.prototype.startDrag = function startDrag(startX, startY) {
+  // reset the text in the manager
+  this.manager.setText("")
+
   var strokeColor = this.manager.getStrokeColor(),
     strokeWidth = this.manager.getStrokeWidth(),
     fillColor = this.manager.getFillColor(),
@@ -494,7 +581,8 @@ CreatePoint.prototype.startDrag = function startDrag(startX, startY) {
     zoom: zoom,
     strokeColor: strokeColor,
     fillColor: fillColor,
-    fillOpacity: fillOpacity
+    fillOpacity: fillOpacity,
+    textId: -1
   });
 };
 
