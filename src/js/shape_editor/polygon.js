@@ -16,6 +16,11 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import {CreateText} from "./text";
+
+
+const TEMP_SHAPE_ID = -1234;
+
 var Polygon = function Polygon(options) {
   var self = this;
   this.manager = options.manager;
@@ -52,6 +57,25 @@ var Polygon = function Polygon(options) {
     this._zoomFraction = options.zoom / 100;
   }
   this.handle_wh = 6;
+
+  this._textId = options.textId || -1;
+  if(this._textId == -1 || this._textId == TEMP_SHAPE_ID){
+    var textShape = (new CreateText({
+      manager: this.manager,
+      paper: this.paper,
+      id: this._textId,
+      zoom: options.zoom,
+      text: "",
+      x: options.x,
+      y: options.y,
+      strokeColor: options.strokeColor,
+      fontSize: 12,
+      textPosition: options.textPosition || "top",
+      strokeWidth: this._strokeWidth,
+    })).getShape();
+    this._textId = textShape._id;
+  }
+  this._textShape = this.manager.getShape(this._textId)
 
   this.element = this.paper.path("");
   this.element.attr({ "fill-opacity": this._fillOpacity, fill: this._fillColor, cursor: "pointer" });
@@ -125,7 +149,8 @@ Polygon.prototype.toJson = function toJson() {
     strokeWidth: this._strokeWidth,
     strokeColor: this._strokeColor,
     fillColor: this._fillColor,
-    fillOpacity:this._fillOpacity
+    fillOpacity:this._fillOpacity,
+    textId: this._textId,
   };
   if (this._id) {
     rv.id = this._id;
@@ -225,7 +250,62 @@ Polygon.prototype.getFillOpacity = function getFillOpacity() {
   return this._fillOpacity;
 };
 
+Polygon.prototype.loadTextShape = function loadTextShape(){
+  this._textShape = this.manager.getShape(this._textId);
+  return this._textShape;
+};
+
+Polygon.prototype.setText = function setText(text) {
+  if(this._textShape){
+    this._textShape.setText(text)
+  }
+};
+
+Polygon.prototype.getText = function getText() {
+  if(this._textShape){
+    return this._textShape.getText()
+  }
+  return "";
+};
+
+Polygon.prototype.setTextPosition = function setTextPosition(textPosition) {
+  if(this._textShape){
+    this._textShape.setTextPosition(textPosition)
+  }
+};
+
+Polygon.prototype.getTextPosition = function getTextPosition() {
+  if(this._textShape){
+    return this._textShape.getTextPosition()
+  }
+  return "";
+};
+
+Polygon.prototype.setFontSize = function setFontSize(fontSize) {
+  if(this._textShape){
+    this._textShape.setFontSize(fontSize)
+  }
+};
+
+Polygon.prototype.getFontSize = function getFontSize() {
+  if(this._textShape){
+    return this._textShape.getFontSize()
+  }
+  return;
+};
+
+Polygon.prototype.getTextId = function getTextId() {
+  return this._textId;
+};
+
+Polygon.prototype.setTextId = function setTextId(textId) {
+  this._textId = textId;
+};
+
 Polygon.prototype.destroy = function destroy() {
+  if(this._textShape){
+    this.manager.deleteShapesByIds([this._textShape._id])
+  }
   this.element.remove();
   this.handles.remove();
 };
@@ -352,10 +432,21 @@ Polygon.prototype.drawShape = function drawShape() {
       hnd.attr({ x: hx - this.handle_wh / 2, y: hy - this.handle_wh / 2 });
     }.bind(this)
   );
+
+  if(this._textShape || this.loadTextShape()){
+    var x = Math.min(this._bbox.x1, this._bbox.x2)
+    var y = Math.min(this._bbox.y1, this._bbox.y2)
+    var width = Math.abs(this._bbox.x1 - this._bbox.x2)
+    var height = Math.abs(this._bbox.y1 - this._bbox.y2)
+    this._textShape.setParentShapeCoords({x: x, y: y, width: width, height: height})
+  }
 };
 
 Polygon.prototype.setSelected = function setSelected(selected) {
   this._selected = !!selected;
+  if(this._textShape || this.loadTextShape()){
+    this._textShape.setSelected(this._selected)
+  }
   this.drawShape();
 };
 
