@@ -349,11 +349,11 @@ Rect.prototype.setTextId = function setTextId(textId) {
 };
 
 Rect.prototype.destroy = function destroy() {
+  if(this._textShape){
+    this.manager.deleteShapesByIds([this._textShape._id])
+  }
   this.element.remove();
   this.handles.remove();
-  if(this._textShape){
-    this._textShape.destroy()
-  }
 };
 
 Rect.prototype.drawShape = function drawShape() {
@@ -589,27 +589,10 @@ CreateRect.prototype.startDrag = function startDrag(startX, startY) {
     strokeWidth = this.manager.getStrokeWidth(),
     fillColor = this.manager.getFillColor(),
     fillOpacity = this.manager.getFillOpacity(),
-    zoom = this.manager.getZoom(),
-    text = this.manager.getText() || "",
-    textPosition = this.manager.getTextPosition(),
-    fontSize = this.manager.getTextFontSize();
-  // Also need to get strokeWidth and zoom/size etc.
+    zoom = this.manager.getZoom();
 
   this.startX = startX;
   this.startY = startY;
-
-  this.textShape = (new CreateText({
-    manager: this.manager,
-    paper: this.paper,
-    zoom: zoom,
-    text: text,
-    x: startX,
-    y: startY,
-    strokeColor: strokeColor,
-    fontSize: fontSize,
-    textPosition: textPosition,
-    strokeWidth: strokeWidth,
-  })).getShape();
 
   this.rect = new Rect({
     manager: this.manager,
@@ -624,7 +607,7 @@ CreateRect.prototype.startDrag = function startDrag(startX, startY) {
     strokeColor: strokeColor,
     fillColor: fillColor,
     fillOpacity: fillOpacity,
-    textId: this.textShape._id,
+    textId: -1,
   });
 };
 
@@ -659,7 +642,6 @@ CreateRect.prototype.drag = function drag(dragX, dragY, shiftKey) {
   }
 
   this.rect.setCoords(newCoords);
-  this.textShape.setParentShapeCoords(newCoords);
   this.rect._area = Math.abs(dx) * Math.abs(dy);
 };
 
@@ -668,7 +650,6 @@ CreateRect.prototype.stopDrag = function stopDrag() {
   if (coords.width < 2 || coords.height < 2) {
     this.rect.destroy();
     delete this.rect;
-    delete this.textShape;
     return;
   }
   // on the 'new:shape' trigger, this shape will already be selected

@@ -315,11 +315,11 @@ Ellipse.prototype.setTextId = function setTextId(textId) {
 };
 
 Ellipse.prototype.destroy = function destroy() {
+  if(this._textShape){
+    this.manager.deleteShapesByIds([this._textShape._id])
+  }
   this.element.remove();
   this.handles.remove();
-  if(this._textShape){
-    this._textShape.destroy()
-  }
 };
 
 Ellipse.prototype.intersectRegion = function intersectRegion(region) {

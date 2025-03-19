@@ -32,6 +32,7 @@ import { CreateEllipse, Ellipse } from "./ellipse";
 import { CreatePoint, Point } from "./point";
 import { Polygon, Polyline } from "./polygon";
 import { Text } from "./text";
+import { union } from "underscore";
 var ShapeManager = function ShapeManager(elementId, width, height, options) {
   var self = this;
   options = options || {};
@@ -476,7 +477,7 @@ ShapeManager.prototype.addShapeJson = function addShapeJson(
 
 // Create a Shape object from json
 ShapeManager.prototype.createShapeJson = function createShapeJson(jsonShape) {
-  var s = jsonShape,
+  var s = jsonShape, text,
     newShape,
     strokeColor = s.strokeColor || this.getStrokeColor(),
     fillColor = s.fillColor || this.getFillColor(),
@@ -484,7 +485,6 @@ ShapeManager.prototype.createShapeJson = function createShapeJson(jsonShape) {
     strokeWidth = s.strokeWidth || this.getStrokeWidth(),
     fontSize = s.fontSize || this.getTextFontSize(),
     textPosition = s.textPosition || this.getTextPosition(),
-    text = s.text || this.getText(),
     textId = s.textId || -1,
     zoom = this.getZoom(),
     options = {
@@ -497,6 +497,13 @@ ShapeManager.prototype.createShapeJson = function createShapeJson(jsonShape) {
       fillOpacity: parseFloat(fillOpacity).toFixed(1),
       textId: textId,
     };
+
+  if(s.text === undefined){
+    text = this.getText()
+  }else{
+    text = s.text
+  }
+
   if (jsonShape.id) {
     options.id = jsonShape.id;
   }

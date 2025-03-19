@@ -328,7 +328,6 @@ export const RoiModalView = Backbone.View.extend({
             event.preventDefault();
 
             var shapesJson = this.shapeManager.getShapesJson();
-
             shapesJson = shapesJson.filter(function(s){
                 // Remove any temporary shapes (from hovering over OMERO shapes)
                 return (s.id !== this.TEMP_SHAPE_ID);
