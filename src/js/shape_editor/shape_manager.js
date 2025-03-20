@@ -399,13 +399,11 @@ ShapeManager.prototype.pasteShapesJson = function pasteShapesJson(
   jsonShapes.forEach(function (sh) {
     // Create a shape to resolve any transform matrix -> coords
     var csh = $.extend(true, {}, sh);
-    if(csh.type !== "Text"){
-      csh.textId = -1
-    }
     var temp = self.createShapeJson(csh);
     var s = temp.toJson();
     temp.destroy();
     if(s.type !== "Text"){
+      s.textId = -1
       // check if a shape is at the same coordinates...
       var match = self.findShapeAtCoords(s);
       // if so, keep offsetting until we find a spot...
@@ -667,13 +665,27 @@ ShapeManager.prototype.deleteShapesByIds = function deleteShapesByIds(
   shapeIds
 ) {
   var notSelected = [];
+  var intermediateShapes = [];
+  var textToDestroy = [];
   this.getShapes().forEach(function (s) {
     if (shapeIds.indexOf(s._id) > -1) {
+      if(s._textShape){
+        textToDestroy.push(s._textId)
+      }
+      s.destroy();
+    } else {
+      intermediateShapes.push(s);
+    }
+  });
+
+  intermediateShapes.forEach(function (s) {
+    if (textToDestroy.indexOf(s._id) > -1) {
       s.destroy();
     } else {
       notSelected.push(s);
     }
   });
+
   this._shapes = notSelected;
   this.$el.trigger("change:selected");
 };

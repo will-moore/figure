@@ -27,8 +27,6 @@ import Raphael from "raphael";
 import {CreateText} from "./text";
 
 
-const TEMP_SHAPE_ID = -1234;
-
 var Rect = function Rect(options) {
   var self = this;
   this.paper = options.paper;
@@ -70,7 +68,7 @@ var Rect = function Rect(options) {
   this._rotation = options.rotation || 0;
 
   this._textId = options.textId || -1;
-  if(this._textId == -1 || this._textId == TEMP_SHAPE_ID){
+  if(this._textId == -1){
    var textShape = (new CreateText({
       manager: this.manager,
       paper: this.paper,
