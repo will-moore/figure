@@ -19,7 +19,6 @@
 import {CreateText} from "./text";
 
 
-const TEMP_SHAPE_ID = -1234;
 
 var Polygon = function Polygon(options) {
   var self = this;
@@ -59,7 +58,7 @@ var Polygon = function Polygon(options) {
   this.handle_wh = 6;
 
   this._textId = options.textId || -1;
-  if(this._textId == -1 || this._textId == TEMP_SHAPE_ID){
+  if(this._textId == -1){
     var textShape = (new CreateText({
       manager: this.manager,
       paper: this.paper,
@@ -434,10 +433,11 @@ Polygon.prototype.drawShape = function drawShape() {
   );
 
   if(this._textShape || this.loadTextShape()){
-    var x = Math.min(this._bbox.x1, this._bbox.x2)
-    var y = Math.min(this._bbox.y1, this._bbox.y2)
-    var width = Math.abs(this._bbox.x1 - this._bbox.x2)
-    var height = Math.abs(this._bbox.y1 - this._bbox.y2)
+    var bbox = this.getBBox(this._points)
+    var x = Math.min(bbox.x1, bbox.x2)
+    var y = Math.min(bbox.y1, bbox.y2)
+    var width = Math.abs(bbox.x1 - bbox.x2)
+    var height = Math.abs(bbox.y1 - bbox.y2)
     this._textShape.setParentShapeCoords({x: x, y: y, width: width, height: height})
   }
 };

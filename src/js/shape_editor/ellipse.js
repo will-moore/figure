@@ -27,8 +27,6 @@ import Raphael from "raphael";
 import {CreateText} from "./text";
 
 
-const TEMP_SHAPE_ID = -1234;
-
 var Ellipse = function Ellipse(options) {
   var self = this;
   this.manager = options.manager;
@@ -96,7 +94,7 @@ var Ellipse = function Ellipse(options) {
   }
 
   this._textId = options.textId || -1;
-  if(this._textId == -1 || this._textId == TEMP_SHAPE_ID){
+  if(this._textId == -1){
     var textShape = (new CreateText({
       manager: this.manager,
       paper: this.paper,

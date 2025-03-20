@@ -26,7 +26,6 @@
 import Raphael from "raphael";
 import {CreateText} from "./text";
 
-const TEMP_SHAPE_ID = -1234;
 const POINT_RADIUS = 5;
 var Point = function Point(options) {
   var self = this;
@@ -77,7 +76,7 @@ var Point = function Point(options) {
   this.handle_wh = 6;
 
   this._textId = options.textId || -1;
-  if(this._textId == -1 || this._textId == TEMP_SHAPE_ID){
+  if(this._textId == -1){
   var textShape = (new CreateText({
       manager: this.manager,
       paper: this.paper,
