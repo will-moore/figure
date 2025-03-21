@@ -1052,6 +1052,7 @@
         /* NB: when updating png, consider using different name to avoid cache */
         background-size: 100% var(--pngHeight);
         background-image: var(--lutPng);
+        background-position: var(--bgPos);
         background-repeat: no-repeat;
         image-rendering: pixelated;  /* Universal support since 2021 */
     }
