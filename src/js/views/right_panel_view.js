@@ -125,6 +125,10 @@
         createInset: function() {
             let selected = this.model.getSelected();
 
+            var color = $('.inset-color span:first', this.$el).attr('data-color');
+            var position = $('.label-position i:first', this.$el).attr('data-position');
+            var strokeWidth = parseFloat($('button.inset-width span:first', this.$el).attr('data-line-width'));
+
             selected.forEach(panel => {
                 let randomId = getRandomId();
                 // Add Rectangle (square) in centre of viewport
@@ -132,9 +136,6 @@
                 let minSide = Math.min(vp.width, vp.height);
                 // Square is 1/3 size of the viewport
                 let rectSize = minSide / 3;
-                var color = $('.inset-color span:first', this.$el).attr('data-color');
-                var position = $('.label-position i:first', this.$el).attr('data-position');
-                var strokeWidth = parseFloat($('button.inset-width span:first', this.$el).attr('data-line-width'));
                 let rect = {
                     type: "Rectangle",
                     strokeWidth,
