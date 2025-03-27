@@ -415,47 +415,46 @@ class ShapeToPdfExport(ShapeExport):
         text_position = shape['textPosition']
         text_offset_x = stroke_width / 4 + 4
         text_offset_y = size / 2 + stroke_width / 4 + 4
-        outPositions = ["top", "left", "bottom","right"]
-        inPositions = ["topleft", "bottomleft", "bottomright", "topright"]
-        rotationIndex = fmod(floor((360 - rotation + 45) / 90), 4)
-        finalIndex = 0
+        out_positions = ["top", "left", "bottom", "right"]
+        in_positions = ["topleft", "bottomleft", "bottomright", "topright"]
+        rotation_index = fmod(floor((360 - rotation + 45) / 90), 4)
+        final_index = 0
 
-        if text_position in ["bottom", "top", "right", "left"]:
-            posIndex = outPositions.index(text_position)
-            finalIndex = int(fmod((posIndex + rotationIndex), 4))
-            text_position = outPositions[finalIndex]
-        if text_position in ["topleft", "topright", "bottomleft", "bottomright"]:
-            posIndex = inPositions.index(text_position)
-            finalIndex = int(fmod((posIndex + rotationIndex), 4))
-            text_position = inPositions[finalIndex]
+        if text_position in out_positions:
+            pos_index = out_positions.index(text_position)
+            final_index = int(fmod((pos_index + rotation_index), 4))
+            text_position = out_positions[final_index]
+        if text_position in in_positions:
+            pos_index = in_positions.index(text_position)
+            final_index = int(fmod((pos_index + rotation_index), 4))
+            text_position = in_positions[final_index]
 
         if text_position == "bottom":
-            dx = 0;
-            dy = text_offset_y;
+            dx = 0
+            dy = text_offset_y
         if text_position == "left":
-            dx = -text_offset_x;
-            dy = 0;
+            dx = -text_offset_x
+            dy = 0
         if text_position == "right":
-            dx = text_offset_x;
-            dy = 0;
+            dx = text_offset_x
+            dy = 0
         if text_position == "top":
-            dx = 0;
+            dx = 0
             dy = -stroke_width / 2
         if text_position == "topleft":
-            dx = text_offset_x;
-            dy = text_offset_y;
+            dx = text_offset_x
+            dy = text_offset_y
         if text_position == "topright":
-            dx = -text_offset_x;
-            dy = text_offset_y;
+            dx = -text_offset_x
+            dy = text_offset_y
         if text_position == "bottomleft":
-            dx = text_offset_x;
+            dx = text_offset_x
             dy = -stroke_width / 2
         if text_position == "bottomright":
-            dx = -text_offset_x;
+            dx = -text_offset_x
             dy = -stroke_width / 2
 
         para.drawOn(self.canvas, x + dx, y - dy)
-
 
     def draw_line(self, shape):
         start = self.panel_to_page_coords(shape['x1'], shape['y1'])
@@ -783,43 +782,43 @@ class ShapeToPilExport(ShapeExport):
 
         text_position = shape['textPosition']
         text_offset_x = scale_to_export_dpi(stroke_width / 4 + 4)
-        outPositions = ["top", "left", "bottom","right"]
-        inPositions = ["topleft", "bottomleft", "bottomright", "topright"]
-        rotationIndex = fmod(floor((360 - rotation + 45) / 90), 4)
-        finalIndex = 0
+        out_positions = ["top", "left", "bottom", "right"]
+        in_positions = ["topleft", "bottomleft", "bottomright", "topright"]
+        rotation_index = fmod(floor((360 - rotation + 45) / 90), 4)
+        final_index = 0
 
-        if text_position in ["bottom", "top", "right", "left"]:
-            posIndex = outPositions.index(text_position)
-            finalIndex = int(fmod((posIndex + rotationIndex), 4))
-            text_position = outPositions[finalIndex]
-        if text_position in ["topleft", "topright", "bottomleft", "bottomright"]:
-            posIndex = inPositions.index(text_position)
-            finalIndex = int(fmod((posIndex + rotationIndex), 4))
-            text_position = inPositions[finalIndex]
+        if text_position in out_positions:
+            pos_index = out_positions.index(text_position)
+            final_index = int(fmod((pos_index + rotation_index), 4))
+            text_position = out_positions[final_index]
+        if text_position in in_positions:
+            pos_index = in_positions.index(text_position)
+            final_index = int(fmod((pos_index + rotation_index), 4))
+            text_position = in_positions[final_index]
 
         if text_position == "bottom":
-            dx = 0;
+            dx = 0
             dy = stroke_width_dpi / 4
         if text_position == "left":
-            dx = -text_offset_x;
-            dy = -txt_h / 2;
+            dx = -text_offset_x
+            dy = -txt_h / 2
         if text_position == "right":
-            dx = text_offset_x;
-            dy = -txt_h / 2;
+            dx = text_offset_x
+            dy = -txt_h / 2
         if text_position == "top":
-            dx = 0;
+            dx = 0
             dy = -font_size_dpi - stroke_width_dpi / 2
         if text_position == "topleft":
-            dx = text_offset_x;
-            dy = 2;
+            dx = text_offset_x
+            dy = 2
         if text_position == "topright":
-            dx = -text_offset_x;
-            dy = 2;
+            dx = -text_offset_x
+            dy = 2
         if text_position == "bottomleft":
-            dx = text_offset_x;
+            dx = text_offset_x
             dy = -font_size_dpi - stroke_width_dpi / 2
         if text_position == "bottomright":
-            dx = -text_offset_x;
+            dx = -text_offset_x
             dy = -font_size_dpi - stroke_width_dpi / 2
 
         xy = (x + dx, y + dy)
