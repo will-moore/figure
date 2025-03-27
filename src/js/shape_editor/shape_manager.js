@@ -397,12 +397,14 @@ ShapeManager.prototype.pasteShapesJson = function pasteShapesJson(
     allPasted = true;
   // For each shape we want to paste...
   jsonShapes.forEach(function (sh) {
-    // Create a shape to resolve any transform matrix -> coords
     var csh = $.extend(true, {}, sh);
-    var temp = self.createShapeJson(csh);
-    var s = temp.toJson();
-    temp.destroy();
-    if(s.type !== "Text"){
+    if(csh.type !== "Text"){
+      // Create a shape to resolve any transform matrix -> coords
+      csh.textId = -1
+      var temp = self.createShapeJson(csh);
+      var s = temp.toJson();
+      temp.destroy();
+
       s.textId = -1
       // check if a shape is at the same coordinates...
       var match = self.findShapeAtCoords(s);
