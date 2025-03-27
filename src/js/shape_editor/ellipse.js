@@ -79,9 +79,6 @@ var Ellipse = function Ellipse(options) {
       this._fillOpacity = 0;
   }
   this._strokeWidth = options.strokeWidth || 2;
-  this._text = options.text || "";
-  this._fontSize = options.fontSize || 10;
-  this._textPosition = options.textPosition || "top";
   this._selected = false;
   this._zoomFraction = 1;
   if (options.zoom) {
