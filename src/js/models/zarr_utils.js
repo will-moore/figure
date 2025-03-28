@@ -186,13 +186,10 @@ function dtypeToPixelsType(dtype) {
 
 export async function renderZarrToSrc(source, attrs, theZ, theT, channels, rect) {
   let paths = attrs.multiscales[0].datasets.map((d) => d.path);
-  let axes = attrs.multiscales[0].axes?.map((a) => a.name) || [
-    "t",
-    "c",
-    "z",
-    "y",
-    "x",
-  ];
+  // for v0.3 each axes is a string, for v0.4+ it is an object
+  let axes = attrs.multiscales[0].axes?.map((a) => a.name || a);
+  // If no axes (v0.1, v0.2) it must be 5D
+  axes = axes || ["t", "c", "z", "y", "x"];
   let zarrays = attrs.arrays;
 
   // Pick first resolution that is below a max size...
