@@ -28,10 +28,8 @@ export async function loadZarrForPanel(zarrUrl) {
   // 'consolidate' the metadata for all arrays
   for (let ds of datasets) {
     let path = ds.path;
-    let zarray = await fetch(`${zarrUrl}/${path}/.zarray`).then((rsp) =>
-      rsp.json()
-    );
-    zarrays[path] = zarray;
+    let ds_array = await omezarr.getArray(store, path, zarr_version);
+    zarrays[path] = {shape: ds_array.shape, dtype: ds_array.dtype};
   }
   // store under 'arrays' key
   let zarr_attrs = {
