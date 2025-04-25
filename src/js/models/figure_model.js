@@ -318,6 +318,9 @@
                     if (p.scalebar && !p.scalebar.margin) {
                         p.scalebar.margin = 5;
                     }
+                    if (p.scalebar && !p.scalebar.margin_unit) {
+                        p.scalebar.margin_unit = '%';
+                    }
                 });
             }
 
