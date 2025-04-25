@@ -152,14 +152,14 @@
 
         <div class="col-auto  input-group-sm">
             <input type="radio" name="scalebar-margin-unit" id="pixel" class="scalebar_margin_unit"
-            value="px" <% if (is_margin_px) print("checked") %>/>
+            value="px" <% if (margin_unit == "px") print("checked") %>/>
         </div>
         <div class="col-auto input-group-sm" style="margin-right: 10px;">
             <label for="pixel" class="col-form-label col-form-label-sm">px</label>
         </div>
         <div class="col-auto  input-group-sm">
             <input type="radio" name="scalebar-margin-unit" id="percentage" class="scalebar_margin_unit"
-            value="%" <% if (!is_margin_px) print("checked") %>/>
+            value="%" <% if (margin_unit == "%") print("checked") %>/>
         </div>
         <div class="col-auto input-group-sm" style="margin-right: 10px;">
             <label for="percentage" class="col-form-label col-form-label-sm">%</label>
