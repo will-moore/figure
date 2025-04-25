@@ -12,7 +12,7 @@
 
     // Version of the json file we're saving.
     // This only needs to increment when we make breaking changes (not linked to release versions.)
-    var VERSION = 8;
+    var VERSION = 9;
 
 
     // ------------------------- Figure Model -----------------------------------
@@ -309,6 +309,16 @@
                         });
                     });
                 }
+            }
+
+            if (v < 9) {
+                console.log("Transforming to VERSION 9");
+                // Adding the margin parameter to the JSON
+                _.each(json.panels, function(p){
+                    if (p.scalebar && !p.scalebar.margin) {
+                        p.scalebar.margin = 5;
+                    }
+                });
             }
 
             return json;
