@@ -1594,7 +1594,12 @@ class FigureExport(object):
 
         sb = panel['scalebar']
 
-        spacer = 0.05 * max(height, width)
+        margin = sb.get('margin', 5)
+        margin_unit = sb.get('margin_unit', '%')
+        if margin_unit == "px":
+            spacer = margin
+        else:
+            spacer = margin * width / 100
 
         color = sb['color']
         red = int(color[0:2], 16)
