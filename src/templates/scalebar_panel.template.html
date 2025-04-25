@@ -1,5 +1,5 @@
 
-    <div class="scalebar label_<%= position %>" style="background-color: #<%= color %>; height: <%= height %>px; margin: <%= margin %>px">
+    <div class="scalebar label_<%= position %>" style="background-color: #<%= color %>; height: <%= height %>px; margin: <%= margin %><% if(is_margin_px) print('px'); else print('%');%>">
         <% if (show_label) { %>
             <div class='scalebar-label' style='color: #<%= color %>; font-size: <%= font_size %>px;
             <% if(position === "bottomleft"  || position === "bottomright") print("margin-bottom:" + height);%>px;

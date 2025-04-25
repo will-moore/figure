@@ -29,6 +29,7 @@ var ScalebarFormView = Backbone.View.extend({
     events: {
         "submit .scalebar_form": "update_scalebar",
         "click .scalebar_label": "update_scalebar",
+        "click .scalebar_margin_unit": "update_scalebar",
         "change .btn": "dropdown_btn_changed",
         "click .hide_scalebar": "hide_scalebar",
         "click .pixel_size_display": "edit_pixel_size",
@@ -98,7 +99,8 @@ var ScalebarFormView = Backbone.View.extend({
             show_label = $('.scalebar_label', $form).prop('checked'),
             font_size = $('.scalebar_font_size span:first', $form).text().trim(),
             height = parseInt($('.scalebar-height', $form).val()),
-            margin = parseInt($('.scalebar-margin', $form).val());
+            margin = parseInt($('.scalebar-margin', $form).val()),
+            margin_unit = $('input:radio[name=scalebar-margin-unit]:checked').val();
 
         this.models.forEach(function(m){
             var old_sb = m.get('scalebar');
@@ -123,6 +125,11 @@ var ScalebarFormView = Backbone.View.extend({
             if (font_size != '-') sb.font_size = font_size;
             if (height != '-') sb.height = height;
             if (margin != '-') sb.margin = margin;
+            if (margin_unit == 'px') {
+                sb.is_margin_px = true;
+            } else {
+                sb.is_margin_px = false;
+            }
 
             m.save_scalebar(sb);
         });
@@ -182,7 +189,8 @@ var ScalebarFormView = Backbone.View.extend({
                     json.show_label = sb.show_label;
                     json.font_size = sb.font_size;
                     json.height = sb.height,
-                    json.margin = sb.margin;
+                    json.margin = sb.margin,
+                    json.is_margin_px = sb.is_margin_px;
                 }
                 else {
                     // combine attributes. Use '-' if different values found
@@ -194,6 +202,7 @@ var ScalebarFormView = Backbone.View.extend({
                     if (json.font_size != sb.font_size) json.font_size = '-';
                     if (json.height != sb.height) json.height = '-';
                     if (json.margin != sb.margin) json.margin = '-';
+                    if (!sb.is_margin_px) json.is_margin_px = false;
                 }
             }
             // if any panels don't have scalebar - we allow to add
@@ -217,6 +226,7 @@ var ScalebarFormView = Backbone.View.extend({
         json.pixel_size_symbol = json.pixel_size_symbol || '-';
         json.height = json.height || 3;
         json.margin = json.margin || 5;
+        json.is_margin_px = json.is_margin_px || false;
 
         var html = this.template(json);
         this.$el.html(html);
