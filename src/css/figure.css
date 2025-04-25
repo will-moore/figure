@@ -368,7 +368,6 @@
 
     .scalebar {
         position: absolute;
-        margin: 5% !important;
     }
 
     .scalebar-label {
@@ -1368,7 +1367,7 @@
         color: white;
         border-color: #007bff;
     }
-    
+
     .flipping .btn.active i {
         color: white;
     }

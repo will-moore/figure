@@ -38,7 +38,7 @@
             </ul>
         </div>
         <div class="form-group col-sm-auto btn-group">
-            <button type="button" class="label-position btn btn-outline-secondary btn-sm dropdown-toggle" 
+            <button type="button" class="label-position btn btn-outline-secondary btn-sm dropdown-toggle"
                     title="Position" data-bs-toggle="dropdown">
                 <!-- e.g. position 'topleft' -> class 'bi-box-arrow-in-up-left' -->
                 <i data-position="<%= position %>" class="bi-box-arrow-in-<%= position.replace('bottom', 'down-').replace('top', 'up-') %> dropdown_icon"></i>
@@ -112,7 +112,7 @@
             <label class="col-form-label col-form-label-sm" style="width:50px">Height</label>
         </div>
         <div class="form-group col-auto scalebar_length input-group-sm">
-            <input type="number" class="label-text scalebar-height form-control input-sm" 
+            <input type="number" class="label-text scalebar-height form-control input-sm"
             placeholder="Height" value="<%= height %>" style="width:52px" />
         </div>
         <div class="col-auto input-group-sm" style="margin-right: 10px;">
@@ -140,4 +140,19 @@
             <% if (show_label) print("pt") %>
         </div>
     </div>
+
+    <div class="row gy-2 gx-3 align-items-center" style="--bs-gutter-x: 0.3rem;">
+        <div class="col-auto input-group-sm">
+            <label class="col-form-label col-form-label-sm" style="width:50px">Margin</label>
+        </div>
+        <div class="form-group col-auto scalebar_length input-group-sm">
+            <input type="number" class="label-text scalebar-margin form-control input-sm"
+            placeholder="Margin" value="<%= margin %>" style="width:52px" />
+        </div>
+        <div class="col-auto input-group-sm" style="margin-right: 10px;">
+            <label class="col-form-label col-form-label-sm">px</label>
+        </div>
+
+    </div>
+
 </form>

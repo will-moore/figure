@@ -42,7 +42,7 @@ var ScalebarFormView = Backbone.View.extend({
         if (event.which == 13) {
             this.update_scalebar();
         }
-    }, 
+    },
 
     // simply show / hide editing field
     edit_pixel_size: function() {
@@ -97,7 +97,8 @@ var ScalebarFormView = Backbone.View.extend({
             color = $('.label-color span:first', $form).attr('data-color'),
             show_label = $('.scalebar_label', $form).prop('checked'),
             font_size = $('.scalebar_font_size span:first', $form).text().trim(),
-            height = parseInt($('.scalebar-height', $form).val());
+            height = parseInt($('.scalebar-height', $form).val()),
+            margin = parseInt($('.scalebar-margin', $form).val());
 
         this.models.forEach(function(m){
             var old_sb = m.get('scalebar');
@@ -121,6 +122,7 @@ var ScalebarFormView = Backbone.View.extend({
             sb.show_label = show_label;
             if (font_size != '-') sb.font_size = font_size;
             if (height != '-') sb.height = height;
+            if (margin != '-') sb.margin = margin;
 
             m.save_scalebar(sb);
         });
@@ -179,7 +181,8 @@ var ScalebarFormView = Backbone.View.extend({
                     json.color = sb.color;
                     json.show_label = sb.show_label;
                     json.font_size = sb.font_size;
-                    json.height = sb.height;
+                    json.height = sb.height,
+                    json.margin = sb.margin;
                 }
                 else {
                     // combine attributes. Use '-' if different values found
@@ -190,6 +193,7 @@ var ScalebarFormView = Backbone.View.extend({
                     if (!sb.show_label) json.show_label = false;
                     if (json.font_size != sb.font_size) json.font_size = '-';
                     if (json.height != sb.height) json.height = '-';
+                    if (json.margin != sb.margin) json.margin = '-';
                 }
             }
             // if any panels don't have scalebar - we allow to add
@@ -212,6 +216,7 @@ var ScalebarFormView = Backbone.View.extend({
         json.font_size = json.font_size || 10;
         json.pixel_size_symbol = json.pixel_size_symbol || '-';
         json.height = json.height || 3;
+        json.margin = json.margin || 5;
 
         var html = this.template(json);
         this.$el.html(html);
