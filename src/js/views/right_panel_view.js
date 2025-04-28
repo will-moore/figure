@@ -445,7 +445,7 @@
                 'panelCount': panelCount,
                 'color': color ? color.replace('#', '') : 'FFFFFF',
                 'lineWidth': width || 2,
-                'roiCount': roiCount/2,
+                'roiCount': roiCount,
                 'canPaste': canPaste,
                 'borderWidth': border ? border.strokeWidth : 5,
                 'borderColor': border ? border.color.replace('#', '') : 'FFFF00',
