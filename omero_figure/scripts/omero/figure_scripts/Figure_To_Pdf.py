@@ -453,6 +453,9 @@ class ShapeToPdfExport(ShapeExport):
         if text_position == "bottomright":
             dx = -text_offset_x
             dy = -stroke_width / 2
+        if text_position == "freehand":
+            dx = 0
+            dy = 0
 
         para.drawOn(self.canvas, x + dx, y - dy)
 
@@ -820,6 +823,9 @@ class ShapeToPilExport(ShapeExport):
         if text_position == "bottomright":
             dx = -text_offset_x
             dy = -font_size_dpi - stroke_width_dpi / 2
+        if text_position == "freehand":
+            dx = 0
+            dy = 0
 
         xy = (x + dx, y + dy)
 
