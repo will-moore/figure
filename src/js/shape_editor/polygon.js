@@ -16,7 +16,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import {CreateText} from "./text";
+import {Text} from "./text";
 
 
 
@@ -58,22 +58,6 @@ var Polygon = function Polygon(options) {
   this.handle_wh = 6;
 
   this._textId = options.textId || -1;
-  if(this._textId == -1){
-    var textShape = (new CreateText({
-      manager: this.manager,
-      paper: this.paper,
-      id: this._textId,
-      zoom: options.zoom,
-      text: "",
-      x: options.x,
-      y: options.y,
-      strokeColor: options.strokeColor,
-      fontSize: 12,
-      textPosition: options.textPosition || "top",
-      strokeWidth: this._strokeWidth,
-    })).getShape();
-    this._textId = textShape._id;
-  }
   this._textShape = this.manager.getShape(this._textId)
 
   this.element = this.paper.path("");
@@ -255,9 +239,10 @@ Polygon.prototype.loadTextShape = function loadTextShape(){
 };
 
 Polygon.prototype.setText = function setText(text) {
-  if(this._textShape){
-    this._textShape.setText(text)
+  if(!this._textShape){
+    this.createTextShape()
   }
+  this._textShape.setText(text)
 };
 
 Polygon.prototype.getText = function getText() {
@@ -268,9 +253,10 @@ Polygon.prototype.getText = function getText() {
 };
 
 Polygon.prototype.setTextPosition = function setTextPosition(textPosition) {
-  if(this._textShape){
-    this._textShape.setTextPosition(textPosition)
+  if(!this._textShape){
+    this.createTextShape()
   }
+  this._textShape.setTextPosition(textPosition)
 };
 
 Polygon.prototype.getTextPosition = function getTextPosition() {
@@ -281,9 +267,10 @@ Polygon.prototype.getTextPosition = function getTextPosition() {
 };
 
 Polygon.prototype.setFontSize = function setFontSize(fontSize) {
-  if(this._textShape){
-    this._textShape.setFontSize(fontSize)
+  if(!this._textShape){
+    this.createTextShape()
   }
+  this._textShape.setFontSize(fontSize)
 };
 
 Polygon.prototype.getFontSize = function getFontSize() {
@@ -396,6 +383,36 @@ Polygon.prototype.updateHandle = function updateHandle(
     (this._bbox.x2 - this._bbox.x1) * (this._bbox.y2 - this._bbox.y1)
   );
 };
+
+Polygon.prototype.createTextShape = function createTextShape(){
+
+  var textPosition = this.manager.getTextPosition(),
+      fontSize = this.manager.getTextFontSize();
+
+  if(textPosition == "freehand"){
+    textPosition = "top"
+    this.manager.setTextPosition(textPosition)
+  }
+
+  var textShape = new Text({
+      manager: this.manager,
+      paper: this.paper,
+   //   linkedShapeId: this._id,
+      zoom: this._zoomFraction,
+      text: "text",
+      x: this._x,
+      y: this._y,
+      strokeColor: this._strokeColor,
+      fontSize: fontSize,
+      textPosition: textPosition,
+      strokeWidth: this._strokeWidth,
+      parentShapeCoords: {x:this._x, y:this._y, width:this._width, height:this._height}
+    })
+
+    this.manager.addShape(textShape);
+    this._textId = textShape._id;
+    this._textShape = textShape;
+}
 
 Polygon.prototype.drawShape = function drawShape() {
   var strokeColor = this._strokeColor,

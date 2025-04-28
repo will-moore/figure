@@ -68,24 +68,6 @@ var Rect = function Rect(options) {
   this._rotation = options.rotation || 0;
 
   this._textId = options.textId || -1;
-  /*if(this._textId == -1){
-   var textShape = new Text({
-      manager: this.manager,
-      paper: this.paper,
-      id: this._textId,
-      linkedShapeId: this._id,
-      zoom: options.zoom,
-      text: "",
-      x: options.x,
-      y: options.y,
-      strokeColor: options.strokeColor,
-      fontSize: 12,
-      textPosition: options.textPosition || "top",
-      strokeWidth: this._strokeWidth,
-    })
-   // this.manager.addShape(textShape);
-    this._textId = textShape._id;
-  }*/
   this._textShape = this.manager.getShape(this._textId)
 
   this.handle_wh = 6;

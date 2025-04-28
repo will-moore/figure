@@ -76,22 +76,6 @@ var Point = function Point(options) {
   this.handle_wh = 6;
 
   this._textId = options.textId || -1;
-  if(this._textId == -1){
-  var textShape = (new CreateText({
-      manager: this.manager,
-      paper: this.paper,
-      id: this._textId,
-      zoom: options.zoom,
-      text: "",
-      x: options.x,
-      y: options.y,
-      strokeColor: options.strokeColor,
-      fontSize: 12,
-      textPosition: options.textPosition || "top",
-      strokeWidth: this._strokeWidth,
-    })).getShape();
-    this._textId = textShape._id;
-  }
   this._textShape = this.manager.getShape(this._textId)
 
   this.element = this.paper.ellipse();
@@ -243,9 +227,10 @@ Point.prototype.loadTextShape = function loadTextShape(){
 };
 
 Point.prototype.setText = function setText(text) {
-  if(this._textShape){
-    this._textShape.setText(text)
+  if(!this._textShape){
+    this.createTextShape()
   }
+  this._textShape.setText(text)
 };
 
 Point.prototype.getText = function getText() {
@@ -256,9 +241,10 @@ Point.prototype.getText = function getText() {
 };
 
 Point.prototype.setTextPosition = function setTextPosition(textPosition) {
-  if(this._textShape){
-    this._textShape.setTextPosition(textPosition)
+  if(!this._textShape){
+    this.createTextShape()
   }
+  this._textShape.setTextPosition(textPosition)
 };
 
 Point.prototype.getTextPosition = function getTextPosition() {
@@ -269,9 +255,10 @@ Point.prototype.getTextPosition = function getTextPosition() {
 };
 
 Point.prototype.setFontSize = function setFontSize(fontSize) {
-  if(this._textShape){
-    this._textShape.setFontSize(fontSize)
+  if(!this._textShape){
+    this.createTextShape()
   }
+  this._textShape.setFontSize(fontSize)
 };
 
 Point.prototype.getFontSize = function getFontSize() {
@@ -433,6 +420,36 @@ Point.prototype.updateShapeFromHandles = function updateShapeFromHandles(
 
   this.drawShape();
 };
+
+Point.prototype.createTextShape = function createTextShape(){
+
+  var textPosition = this.manager.getTextPosition(),
+      fontSize = this.manager.getTextFontSize();
+
+  if(textPosition == "freehand"){
+    textPosition = "top"
+    this.manager.setTextPosition(textPosition)
+  }
+
+  var textShape = new Text({
+      manager: this.manager,
+      paper: this.paper,
+   //   linkedShapeId: this._id,
+      zoom: this._zoomFraction,
+      text: "text",
+      x: this._x,
+      y: this._y,
+      strokeColor: this._strokeColor,
+      fontSize: fontSize,
+      textPosition: textPosition,
+      strokeWidth: this._strokeWidth,
+      parentShapeCoords: {x:this._x, y:this._y, width:this._width, height:this._height}
+    })
+
+    this.manager.addShape(textShape);
+    this._textId = textShape._id;
+    this._textShape = textShape;
+}
 
 Point.prototype.drawShape = function drawShape() {
   var strokeColor = this._strokeColor,

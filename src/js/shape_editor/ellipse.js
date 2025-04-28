@@ -91,23 +91,6 @@ var Ellipse = function Ellipse(options) {
   }
 
   this._textId = options.textId || -1;
-  if(this._textId == -1){
-    var textShape = new Text({
-      manager: this.manager,
-      paper: this.paper,
-      id: this._textId,
-      zoom: options.zoom,
-      text: "",
-      x: options.x,
-      y: options.y,
-      strokeColor: options.strokeColor,
-      fontSize: 12,
-      textPosition: options.textPosition || "top",
-      strokeWidth: this._strokeWidth,
-    });
-    this.manager.addShape(textShape);
-    this._textId = textShape._id;
-  }
   this._textShape = this.manager.getShape(this._textId)
 
   this.handle_wh = 6;
@@ -264,9 +247,10 @@ Ellipse.prototype.loadTextShape = function loadTextShape(){
 };
 
 Ellipse.prototype.setText = function setText(text) {
-  if(this._textShape){
+    if(!this._textShape){
+      this.createTextShape()
+    }
     this._textShape.setText(text)
-  }
 };
 
 Ellipse.prototype.getText = function getText() {
@@ -277,9 +261,10 @@ Ellipse.prototype.getText = function getText() {
 };
 
 Ellipse.prototype.setTextPosition = function setTextPosition(textPosition) {
-  if(this._textShape){
-    this._textShape.setTextPosition(textPosition)
+  if(!this._textShape){
+    this.createTextShape()
   }
+  this._textShape.setTextPosition(textPosition)
 };
 
 Ellipse.prototype.getTextPosition = function getTextPosition() {
@@ -290,9 +275,10 @@ Ellipse.prototype.getTextPosition = function getTextPosition() {
 };
 
 Ellipse.prototype.setFontSize = function setFontSize(fontSize) {
-  if(this._textShape){
-    this._textShape.setFontSize(fontSize)
+  if(!this._textShape){
+    this.createTextShape()
   }
+  this._textShape.setFontSize(fontSize)
 };
 
 Ellipse.prototype.getFontSize = function getFontSize() {
@@ -459,6 +445,36 @@ Ellipse.prototype.updateShapeFromHandles = function updateShapeFromHandles(
 
   this.drawShape();
 };
+
+Ellipse.prototype.createTextShape = function createTextShape(){
+
+  var textPosition = this.manager.getTextPosition(),
+      fontSize = this.manager.getTextFontSize();
+
+  if(textPosition == "freehand"){
+    textPosition = "top"
+    this.manager.setTextPosition(textPosition)
+  }
+
+  var textShape = new Text({
+      manager: this.manager,
+      paper: this.paper,
+   //   linkedShapeId: this._id,
+      zoom: this._zoomFraction,
+      text: "text",
+      x: this._x,
+      y: this._y,
+      strokeColor: this._strokeColor,
+      fontSize: fontSize,
+      textPosition: textPosition,
+      strokeWidth: this._strokeWidth,
+      parentShapeCoords: {x:this._x, y:this._y, width:this._width, height:this._height}
+    })
+
+    this.manager.addShape(textShape);
+    this._textId = textShape._id;
+    this._textShape = textShape;
+}
 
 Ellipse.prototype.drawShape = function drawShape() {
   var strokeColor = this._strokeColor,
