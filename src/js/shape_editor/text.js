@@ -37,6 +37,7 @@ var Text = function Text(options) {
   this._text = options.text;
   this._strokeWidth = options.strokeWidth || 2;
   this._textPosition = options.textPosition;
+  //this._linkedShapeId = options.linkedShapeId;
 
   this._id = options.id || this.manager.getRandomId();
   if(this._id == -1){
@@ -110,6 +111,7 @@ Text.prototype.toJson = function toJson() {
     textRotation: this._textRotation,
     textPosition: this._textPosition,
     parentShapeCoords: this._parentShapeCoords,
+//    linkedShapeId: this._linkedShapeId,
     strokeWidth: this._strokeWidth,
   };
   if (this._id) {
@@ -564,26 +566,48 @@ Text.prototype.createHandles = function createHandles() {
 
 // Class for creating Text.
 var CreateText = function CreateText(options) {
-  this.manager = options.manager
+  this.paper = options.paper;
+  this.manager = options.manager;
+}
+
+CreateText.prototype.startDrag = function startDrag(startX, startY) {
+  var strokeColor = this.manager.getStrokeColor(),
+      strokeWidth = this.manager.getStrokeWidth(),
+      fontSize = this.manager.getTextFontSize(),
+      zoom = this.manager.getZoom();
+
+  this.manager.setText("Text")
+
+  this.startX = startX;
+  this.startY = startY;
 
   this.text = new Text({
     manager: this.manager,
-    paper: options.paper,
-    zoom: options.zoom,
-    text: options.text,
-    id: options.id,
-    x: options.x,
-    y: options.y,
-    strokeColor: options.strokeColor,
-    fontSize: options.fontSize,
-    textPosition: options.textPosition,
-    strokeWidth: options.strokeWidth,
-    rotation: options.rotation,
-    textRotation: options.textRotation,
+    paper: this.paper,
+    zoom: zoom,
+    text: "Text",
+    linkedShapeId: -404,
+    x: startX,
+    y: startY,
+    strokeColor: strokeColor,
+    fontSize: fontSize,
+    textPosition: "freehand",
+    strokeWidth: strokeWidth,
   })
+
+};
+
+CreateText.prototype.drag = function drag(dragX, dragY, shiftKey) {
+
+};
+
+CreateText.prototype.stopDrag = function stopDrag() {
+  // on the 'new:shape' trigger, this shape will already be selected
   this.text.setSelected(true);
   this.manager.addShape(this.text);
 };
+
+
 
 CreateText.prototype.getShape = function getShape() {
   return this.text;

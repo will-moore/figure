@@ -1289,6 +1289,10 @@
         background-image: url("../images/point-icon-24.png");
         background-position: center;
     }
+    .text-icon{
+        background-image: url("../images/text-icon-24.png");
+        background-position: center;
+    }
     .polygon-icon{
         background-image: url("../images/polygon-icon-16.png");
     }
@@ -1372,7 +1376,7 @@
         color: white;
         border-color: #007bff;
     }
-    
+
     .flipping .btn.active i {
         color: white;
     }

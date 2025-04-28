@@ -24,7 +24,7 @@
 */
 
 import Raphael from "raphael";
-import {CreateText} from "./text";
+import {Text} from "./text";
 
 
 var Ellipse = function Ellipse(options) {
@@ -92,7 +92,7 @@ var Ellipse = function Ellipse(options) {
 
   this._textId = options.textId || -1;
   if(this._textId == -1){
-    var textShape = (new CreateText({
+    var textShape = new Text({
       manager: this.manager,
       paper: this.paper,
       id: this._textId,
@@ -104,7 +104,8 @@ var Ellipse = function Ellipse(options) {
       fontSize: 12,
       textPosition: options.textPosition || "top",
       strokeWidth: this._strokeWidth,
-    })).getShape();
+    });
+    this.manager.addShape(textShape);
     this._textId = textShape._id;
   }
   this._textShape = this.manager.getShape(this._textId)

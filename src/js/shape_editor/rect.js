@@ -24,7 +24,7 @@
 */
 
 import Raphael from "raphael";
-import {CreateText} from "./text";
+import {Text} from "./text";
 
 
 var Rect = function Rect(options) {
@@ -68,11 +68,12 @@ var Rect = function Rect(options) {
   this._rotation = options.rotation || 0;
 
   this._textId = options.textId || -1;
-  if(this._textId == -1){
-   var textShape = (new CreateText({
+  /*if(this._textId == -1){
+   var textShape = new Text({
       manager: this.manager,
       paper: this.paper,
       id: this._textId,
+      linkedShapeId: this._id,
       zoom: options.zoom,
       text: "",
       x: options.x,
@@ -81,9 +82,10 @@ var Rect = function Rect(options) {
       fontSize: 12,
       textPosition: options.textPosition || "top",
       strokeWidth: this._strokeWidth,
-    })).getShape();
+    })
+   // this.manager.addShape(textShape);
     this._textId = textShape._id;
-  }
+  }*/
   this._textShape = this.manager.getShape(this._textId)
 
   this.handle_wh = 6;
@@ -291,9 +293,10 @@ Rect.prototype.getFillOpacity = function getFillOpacity() {
 };
 
 Rect.prototype.setText = function setText(text) {
-  if(this._textShape){
-    this._textShape.setText(text)
+  if(!this._textShape){
+    this.createTextShape()
   }
+  this._textShape.setText(text)
 };
 
 Rect.prototype.getText = function getText() {
@@ -304,9 +307,10 @@ Rect.prototype.getText = function getText() {
 };
 
 Rect.prototype.setTextPosition = function setTextPosition(textPosition) {
-  if(this._textShape){
-    this._textShape.setTextPosition(textPosition)
+  if(!this._textShape){
+    this.createTextShape()
   }
+  this._textShape.setTextPosition(textPosition)
 };
 
 Rect.prototype.getTextPosition = function getTextPosition() {
@@ -317,9 +321,10 @@ Rect.prototype.getTextPosition = function getTextPosition() {
 };
 
 Rect.prototype.setFontSize = function setFontSize(fontSize) {
-  if(this._textShape){
-    this._textShape.setFontSize(fontSize)
+  if(!this._textShape){
+    this.createTextShape()
   }
+  this._textShape.setFontSize(fontSize)
 };
 
 Rect.prototype.getFontSize = function getFontSize() {
@@ -353,6 +358,36 @@ Rect.prototype.destroy = function destroy() {
   this.element.remove();
   this.handles.remove();
 };
+
+Rect.prototype.createTextShape = function createTextShape(){
+
+  var textPosition = this.manager.getTextPosition(),
+      fontSize = this.manager.getTextFontSize();
+
+  if(textPosition == "freehand"){
+    textPosition = "top"
+    this.manager.setTextPosition(textPosition)
+  }
+
+  var textShape = new Text({
+      manager: this.manager,
+      paper: this.paper,
+   //   linkedShapeId: this._id,
+      zoom: this._zoomFraction,
+      text: "text",
+      x: this._x,
+      y: this._y,
+      strokeColor: this._strokeColor,
+      fontSize: fontSize,
+      textPosition: textPosition,
+      strokeWidth: this._strokeWidth,
+      parentShapeCoords: {x:this._x, y:this._y, width:this._width, height:this._height}
+    })
+
+    this.manager.addShape(textShape);
+    this._textId = textShape._id;
+    this._textShape = textShape;
+}
 
 Rect.prototype.drawShape = function drawShape() {
   var strokeColor = this._strokeColor,

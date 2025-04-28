@@ -31,14 +31,14 @@ import { CreateLine, Line, CreateArrow, Arrow } from "./line";
 import { CreateEllipse, Ellipse } from "./ellipse";
 import { CreatePoint, Point } from "./point";
 import { Polygon, Polyline } from "./polygon";
-import { Text } from "./text";
+import { CreateText, Text } from "./text";
 import { union } from "underscore";
 var ShapeManager = function ShapeManager(elementId, width, height, options) {
   var self = this;
   options = options || {};
 
   // Keep track of state, strokeColor etc
-  this.STATES = ["SELECT", "RECT", "LINE", "ARROW", "ELLIPSE", "POLYGON", "POINT"];
+  this.STATES = ["SELECT", "RECT", "LINE", "ARROW", "ELLIPSE", "POLYGON", "POINT", "TEXT"];
   this._state = "SELECT";
   this._strokeColor = "#ff0000";
   this._strokeWidth = 2;
@@ -96,6 +96,7 @@ var ShapeManager = function ShapeManager(elementId, width, height, options) {
       LINE: new CreateLine({ manager: this, paper: this.paper }),
       ARROW: new CreateArrow({ manager: this, paper: this.paper }),
       POINT: new CreatePoint({ manager: this, paper: this.paper }),
+      TEXT: new CreateText({ manager: this, paper: this.paper }),
     };
 
     this.createShape = this.shapeFactories.LINE;
@@ -181,7 +182,7 @@ ShapeManager.prototype.setState = function setState(state) {
     return;
   }
   // When creating shapes, cover existing shapes with newShapeBg
-  var shapes = ["RECT", "LINE", "ARROW", "ELLIPSE", "POLYGON", "POINT"];
+  var shapes = ["RECT", "LINE", "ARROW", "ELLIPSE", "POLYGON", "POINT", "TEXT"];
   if (shapes.indexOf(state) > -1) {
     this.newShapeBg.toFront();
     this.newShapeBg.attr({ cursor: "crosshair" });
