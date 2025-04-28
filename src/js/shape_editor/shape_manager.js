@@ -588,6 +588,13 @@ ShapeManager.prototype.sortShape = function sortShape(shapes) {
   shapes.reverse().forEach(function (s) {
     s.element.toFront();
   });
+
+  shapes.forEach(function (s) {
+    if(s.type == "Text"){
+      s.element.toFront();
+    }
+  });
+
   // If we're in drawing state (not in "SELECT" state) we need to keep
   // the draw layer on top
   if (this.state != "SELECT") {
