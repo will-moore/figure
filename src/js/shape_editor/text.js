@@ -213,7 +213,7 @@ Text.prototype.setFillOpacity = function setFillOpacity(fillOpacity) {
 };
 
 Text.prototype.getFillOpacity = function getFillOpacity() {
-  return 1;
+  return 0; // not 1 as it will automatically set the fill opacity of the toolbar to 1
 };
 
 Text.prototype.setZoom = function setZoom(zoom) {
