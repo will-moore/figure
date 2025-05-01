@@ -38,12 +38,12 @@ var Text = function Text(options) {
   this._strokeWidth = options.strokeWidth || 2;
   this._textPosition = options.textPosition;
   //this._linkedShapeId = options.linkedShapeId;
+  this._inModalView = options.inModalView || false;
 
   this._id = options.id || this.manager.getRandomId();
   if(this._id == -1){
     this._id = this.manager.getRandomId();
   }
-  this._rotateText = options.rotateText || false;
   this._zoomFraction = options.zoom ? options.zoom / 100 : 1
   this._textAnchor = options.textAnchor || "start"
   this._rotation = options.rotation || 0;
@@ -213,7 +213,7 @@ Text.prototype.getFillOpacity = function getFillOpacity() {
 };
 
 Text.prototype.setZoom = function setZoom(zoom) {
-    this._zoomFraction = zoom ? zoom / 100 : 1;
+   this._zoomFraction = zoom ? zoom / 100 : 1;
    this.drawShape();
 };
 
@@ -224,6 +224,11 @@ Text.prototype.setRotation = function setRotation(rotation) {
 
 Text.prototype.setTextRotation = function setTextRotation(textRotation) {
   this._textRotation = textRotation;
+  this.drawShape();
+};
+
+Text.prototype.setInModalView = function setInModalView(inModalView) {
+  this._inModalView = inModalView
   this.drawShape();
 };
 
@@ -406,7 +411,11 @@ Text.prototype.drawShape = function drawShape() {
     "text-anchor": this._textAnchor
   });
 
-  this.element.transform("r" + (-this._textRotation));
+  if(!this._inModalView){
+    this.element.transform("r" + (-this._textRotation));
+  }else{
+    this.element.transform("r" + 0);
+  }
   var bbox = this.element.getBBox();
   this._area = bbox.width * bbox.height;
 
@@ -425,7 +434,6 @@ Text.prototype.drawShape = function drawShape() {
     hx = handleIds[h_id][0];
     hy = handleIds[h_id][1];
     hnd.attr({ x: hx - this.handle_wh / 2, y: hy - this.handle_wh / 2 });
-    hnd.transform("r" + (-this._textRotation));
   }
 
 };
@@ -574,7 +582,9 @@ CreateText.prototype.startDrag = function startDrag(startX, startY) {
   var strokeColor = this.manager.getStrokeColor(),
       strokeWidth = this.manager.getStrokeWidth(),
       fontSize = this.manager.getTextFontSize(),
-      zoom = this.manager.getZoom();
+      zoom = this.manager.getZoom(),
+      inModalView = this.manager.getInModalView(),
+      textRotation = this.manager.getTextRotation();
 
   this.manager.setText("Text")
 
@@ -586,7 +596,9 @@ CreateText.prototype.startDrag = function startDrag(startX, startY) {
     paper: this.paper,
     zoom: zoom,
     text: "Text",
-    linkedShapeId: -404,
+    inModalView: inModalView,
+    textRotation: textRotation,
+   // linkedShapeId: -404,
     x: startX,
     y: startY,
     strokeColor: strokeColor,

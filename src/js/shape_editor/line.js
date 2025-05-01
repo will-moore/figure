@@ -262,6 +262,20 @@ Line.prototype.getTextId = function getTextId() {
   return this._textId;
 };
 
+Line.prototype.setInModalView = function setInModalView(inModalView) {
+  if(!this._textShape){
+    this.createTextShape()
+  }
+  this._textShape.setInModalView(inModalView)
+};
+
+Line.prototype.setTextRotation = function setTextRotation(textRotation) {
+  if(!this._textShape){
+    this.createTextShape()
+  }
+  this._textShape.setTextRotation(textRotation)
+};
+
 Line.prototype.setTextId = function setTextId(textId) {
   this._textId = textId;
 };
@@ -313,7 +327,9 @@ Line.prototype._getLineWidth = function _getLineWidth() {
 Line.prototype.createTextShape = function createTextShape(){
 
   var textPosition = this.manager.getTextPosition(),
-      fontSize = this.manager.getTextFontSize();
+      fontSize = this.manager.getTextFontSize(),
+      inModalView = this.manager.getInModalView(),
+      textRotation = this.manager.getTextRotation();
 
   if(textPosition == "freehand"){
     textPosition = "top"
@@ -323,6 +339,8 @@ Line.prototype.createTextShape = function createTextShape(){
   var textShape = new Text({
       manager: this.manager,
       paper: this.paper,
+      inModalView: inModalView,
+      textRotation: textRotation,
    //   linkedShapeId: this._id,
       zoom: this._zoomFraction,
       text: "text",

@@ -45,6 +45,8 @@ var ShapeManager = function ShapeManager(elementId, width, height, options) {
   this._text = "";
   this._textFontSize = 12;
   this._textPosition = "top";
+  this._textRotation = 0;
+  this._inModalView = false;
   this._rotateText = false;
   this._fillColor = "#ffffff";
   this._fillOpacity = 0;
@@ -282,6 +284,18 @@ ShapeManager.prototype.setFillColor = function setFillColor(fillColor) {
   }
 };
 
+ShapeManager.prototype.getInModalView = function getInModalView() {
+  return this._inModalView;
+};
+
+ShapeManager.prototype.setInModalView = function setInModalView(inModalView) {
+  this._inModalView = inModalView;
+  var selected = this.getSelectedShapes();
+  for (var s=0; s<selected.length; s++) {
+      selected[s].setInModalView(inModalView);
+  }
+};
+
 ShapeManager.prototype.getFillOpacity = function getFillOpacity() {
   return this._fillOpacity;
 };
@@ -333,16 +347,16 @@ ShapeManager.prototype.setTextPosition = function setTextPosition(position) {
   }
 };
 
-ShapeManager.prototype.getTextRotated = function getTextRotated() {
-  return this._rotateText;
+ShapeManager.prototype.getTextRotation = function getTextRotation() {
+  return this._textRotation;
 };
 
-ShapeManager.prototype.setTextRotated = function setTextRotated(rotateText) {
-  this._rotateText = rotateText === "true";
+ShapeManager.prototype.setTextRotation = function setTextRotation(textRotation) {
+  this._textRotation = textRotation;
   var selected = this.getSelectedShapes();
   for (var s = 0; s < selected.length; s++) {
-    selected[s].setTextRotated(rotateText);
-  }
+    selected[s].setTextRotation(textRotation);
+  };
 };
 
 ShapeManager.prototype.getShapesJson = function getShapesJson() {
@@ -486,6 +500,7 @@ ShapeManager.prototype.createShapeJson = function createShapeJson(jsonShape) {
     strokeWidth = s.strokeWidth || this.getStrokeWidth(),
     fontSize = s.fontSize || this.getTextFontSize(),
     textPosition = s.textPosition || this.getTextPosition(),
+    inModalView = s.inModalView || this.getInModalView(),
     textId = s.textId || -1,
     zoom = this.getZoom(),
     options = {
@@ -561,6 +576,7 @@ ShapeManager.prototype.createShapeJson = function createShapeJson(jsonShape) {
     options.parentShapeCoords = s.parentShapeCoords,
     options.rotation = s.rotation,
     options.textRotation = s.textRotation,
+    options.inModalView = inModalView,
     newShape = new Text(options);
   }
   return newShape;

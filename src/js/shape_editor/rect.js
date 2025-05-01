@@ -333,6 +333,20 @@ Rect.prototype.setTextId = function setTextId(textId) {
   this._textId = textId;
 };
 
+Rect.prototype.setInModalView = function setInModalView(inModalView) {
+  if(!this._textShape){
+    this.createTextShape()
+  }
+  this._textShape.setInModalView(inModalView)
+};
+
+Rect.prototype.setTextRotation = function setTextRotation(textRotation) {
+  if(!this._textShape){
+    this.createTextShape()
+  }
+  this._textShape.setTextRotation(textRotation)
+};
+
 Rect.prototype.destroy = function destroy() {
   if(this._textShape){
     this.manager.deleteShapesByIds([this._textShape._id])
@@ -343,8 +357,10 @@ Rect.prototype.destroy = function destroy() {
 
 Rect.prototype.createTextShape = function createTextShape(){
 
-  var textPosition = this.manager.getTextPosition(),
-      fontSize = this.manager.getTextFontSize();
+ var textPosition = this.manager.getTextPosition(),
+      fontSize = this.manager.getTextFontSize(),
+      inModalView = this.manager.getInModalView(),
+      textRotation = this.manager.getTextRotation();
 
   if(textPosition == "freehand"){
     textPosition = "top"
@@ -354,6 +370,8 @@ Rect.prototype.createTextShape = function createTextShape(){
   var textShape = new Text({
       manager: this.manager,
       paper: this.paper,
+      inModalView: inModalView,
+      textRotation: textRotation,
    //   linkedShapeId: this._id,
       zoom: this._zoomFraction,
       text: "text",

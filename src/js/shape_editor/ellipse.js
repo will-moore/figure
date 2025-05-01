@@ -296,6 +296,20 @@ Ellipse.prototype.setTextId = function setTextId(textId) {
   this._textId = textId;
 };
 
+Ellipse.prototype.setInModalView = function setInModalView(inModalView) {
+  if(!this._textShape){
+    this.createTextShape()
+  }
+  this._textShape.setInModalView(inModalView)
+};
+
+Ellipse.prototype.setTextRotation = function setTextRotation(textRotation) {
+  if(!this._textShape){
+    this.createTextShape()
+  }
+  this._textShape.setTextRotation(textRotation)
+};
+
 Ellipse.prototype.destroy = function destroy() {
   if(this._textShape){
     this.manager.deleteShapesByIds([this._textShape._id])
@@ -447,9 +461,10 @@ Ellipse.prototype.updateShapeFromHandles = function updateShapeFromHandles(
 };
 
 Ellipse.prototype.createTextShape = function createTextShape(){
-
-  var textPosition = this.manager.getTextPosition(),
-      fontSize = this.manager.getTextFontSize();
+var textPosition = this.manager.getTextPosition(),
+      fontSize = this.manager.getTextFontSize(),
+      inModalView = this.manager.getInModalView(),
+      textRotation = this.manager.getTextRotation();
 
   if(textPosition == "freehand"){
     textPosition = "top"
@@ -459,6 +474,8 @@ Ellipse.prototype.createTextShape = function createTextShape(){
   var textShape = new Text({
       manager: this.manager,
       paper: this.paper,
+      inModalView: inModalView,
+      textRotation: textRotation,
    //   linkedShapeId: this._id,
       zoom: this._zoomFraction,
       text: "text",
