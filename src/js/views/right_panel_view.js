@@ -1367,7 +1367,6 @@
                 }else{
                     m.save('rotation', val);
                 }
-
             });
         },
 
@@ -1378,7 +1377,17 @@
             const isVerticalFlipped = $button.hasClass('active');
 
             this.models.forEach(function(m) {
-                m.save('vertical_flip', isVerticalFlipped);
+                var shapes = m.get('shapes');
+                if(shapes){
+                    shapes.forEach(function(sh){
+                        if(sh.type == "Text"){
+                            sh.vFlip = isVerticalFlipped ? -1 : 1;
+                        }
+                    })
+                    m.save({'vertical_flip': isVerticalFlipped, 'shapes': shapes});
+                }else{
+                    m.save('vertical_flip', isVerticalFlipped);
+                }
             });
         },
 
@@ -1386,10 +1395,20 @@
             const $button = $(event.currentTarget);
             $button.toggleClass('active');
 
-            const ishorizontalFlipped = $button.hasClass('active');
+            const isHorizontalFlipped = $button.hasClass('active');
 
             this.models.forEach(function(m) {
-                m.save('horizontal_flip', ishorizontalFlipped);
+                var shapes = m.get('shapes');
+                if(shapes){
+                    shapes.forEach(function(sh){
+                        if(sh.type == "Text"){
+                            sh.hFlip = isHorizontalFlipped ? -1 : 1;
+                        }
+                    })
+                    m.save({'horizontal_flip': isHorizontalFlipped, 'shapes': shapes});
+                }else{
+                    m.save('horizontal_flip', isHorizontalFlipped);
+                }
             });
         },
 

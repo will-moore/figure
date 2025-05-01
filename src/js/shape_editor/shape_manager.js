@@ -47,6 +47,8 @@ var ShapeManager = function ShapeManager(elementId, width, height, options) {
   this._textPosition = "top";
   this._textRotation = 0;
   this._inModalView = false;
+  this._vFlip = false;
+  this._hFlip = false;
   this._rotateText = false;
   this._fillColor = "#ffffff";
   this._fillOpacity = 0;
@@ -359,6 +361,30 @@ ShapeManager.prototype.setTextRotation = function setTextRotation(textRotation) 
   };
 };
 
+ShapeManager.prototype.getVerticalFlip = function getVerticalFlip() {
+  return this._vFlip;
+};
+
+ShapeManager.prototype.setVerticalFlip = function setVerticalFlip(vFlip) {
+  this._vFlip = vFlip;
+  var selected = this.getSelectedShapes();
+  for (var s = 0; s < selected.length; s++) {
+    selected[s].setVerticalFlip(vFlip);
+  };
+};
+
+ShapeManager.prototype.getHorizontalFlip = function getHorizontalFlip() {
+  return this._hFlip;
+};
+
+ShapeManager.prototype.setHorizontalFlip = function setHorizontalFlip(hFlip) {
+  this._hFlip = hFlip;
+  var selected = this.getSelectedShapes();
+  for (var s = 0; s < selected.length; s++) {
+    selected[s].setHorizontalFlip(hFlip);
+  };
+};
+
 ShapeManager.prototype.getShapesJson = function getShapesJson() {
   var data = [];
   this.getShapes().forEach(function (s) {
@@ -576,6 +602,8 @@ ShapeManager.prototype.createShapeJson = function createShapeJson(jsonShape) {
     options.parentShapeCoords = s.parentShapeCoords,
     options.rotation = s.rotation,
     options.textRotation = s.textRotation,
+    options.vFlip = s.vFlip,
+    options.hFlip = s.hFlip,
     options.inModalView = inModalView,
     newShape = new Text(options);
   }

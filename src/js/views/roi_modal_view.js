@@ -102,6 +102,8 @@ export const RoiModalView = Backbone.View.extend({
                 // We don't support Shape editing when rotated or flipped!
                 self.rotated = self.m.get('rotation') !== 0 || self.m.get('vertical_flip') || self.m.get('horizontal_flip');
                 self.realRotation = self.m.get('rotation')
+                self.realVFlip = self.m.get('vertical_flip') ? -1 : 1
+                self.realHFlip = self.m.get('horizontal_flip') ? -1 : 1
                 self.m.set('rotation', 0);
                 self.m.set('vertical_flip', false);
                 self.m.set('horizontal_flip', false);
@@ -109,6 +111,8 @@ export const RoiModalView = Backbone.View.extend({
                 self.shapeManager.setState("SELECT");
                 self.shapeManager.deleteAllShapes();
                 self.shapeManager.setInModalView(true)
+                self.shapeManager.setVerticalFlip(this.realVFlip)
+                self.shapeManager.setHorizontalFlip(this.realHFlip)
                 self.shapeManager.setTextRotation(this.realRotation)
 
                 // Load any existing shapes on panel

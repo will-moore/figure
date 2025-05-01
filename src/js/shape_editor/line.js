@@ -276,6 +276,20 @@ Line.prototype.setTextRotation = function setTextRotation(textRotation) {
   this._textShape.setTextRotation(textRotation)
 };
 
+Line.prototype.setVerticalFlip = function setVerticalFlip(vFlip) {
+  if(!this._textShape){
+    this.createTextShape()
+  }
+  this._textShape.setVerticalFlip(vFlip)
+};
+
+Line.prototype.setHorizontalFlip = function setHorizontalFlip(hFlip) {
+  if(!this._textShape){
+    this.createTextShape()
+  }
+  this._textShape.setHorizontalFlip(hFlip)
+};
+
 Line.prototype.setTextId = function setTextId(textId) {
   this._textId = textId;
 };
@@ -329,6 +343,8 @@ Line.prototype.createTextShape = function createTextShape(){
   var textPosition = this.manager.getTextPosition(),
       fontSize = this.manager.getTextFontSize(),
       inModalView = this.manager.getInModalView(),
+      vFlip = this.manager.getVerticalFlip(),
+      hFlip = this.manager.getHorizontalFlip(),
       textRotation = this.manager.getTextRotation();
 
   if(textPosition == "freehand"){
@@ -341,6 +357,8 @@ Line.prototype.createTextShape = function createTextShape(){
       paper: this.paper,
       inModalView: inModalView,
       textRotation: textRotation,
+      vFlip: vFlip,
+      hFlip: hFlip,
    //   linkedShapeId: this._id,
       zoom: this._zoomFraction,
       text: "text",

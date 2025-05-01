@@ -347,6 +347,20 @@ Rect.prototype.setTextRotation = function setTextRotation(textRotation) {
   this._textShape.setTextRotation(textRotation)
 };
 
+Rect.prototype.setVerticalFlip = function setVerticalFlip(vFlip) {
+  if(!this._textShape){
+    this.createTextShape()
+  }
+  this._textShape.setVerticalFlip(vFlip)
+};
+
+Rect.prototype.setHorizontalFlip = function setHorizontalFlip(hFlip) {
+  if(!this._textShape){
+    this.createTextShape()
+  }
+  this._textShape.setHorizontalFlip(hFlip)
+};
+
 Rect.prototype.destroy = function destroy() {
   if(this._textShape){
     this.manager.deleteShapesByIds([this._textShape._id])
@@ -360,6 +374,8 @@ Rect.prototype.createTextShape = function createTextShape(){
  var textPosition = this.manager.getTextPosition(),
       fontSize = this.manager.getTextFontSize(),
       inModalView = this.manager.getInModalView(),
+      vFlip = this.manager.getVerticalFlip(),
+      hFlip = this.manager.getHorizontalFlip(),
       textRotation = this.manager.getTextRotation();
 
   if(textPosition == "freehand"){
@@ -371,6 +387,8 @@ Rect.prototype.createTextShape = function createTextShape(){
       manager: this.manager,
       paper: this.paper,
       inModalView: inModalView,
+      vFlip: vFlip,
+      hFlip: hFlip,
       textRotation: textRotation,
    //   linkedShapeId: this._id,
       zoom: this._zoomFraction,

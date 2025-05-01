@@ -48,6 +48,8 @@ var Text = function Text(options) {
   this._textAnchor = options.textAnchor || "start"
   this._rotation = options.rotation || 0;
   this._textRotation = options.textRotation || 0;
+  this._vFlip = options.vFlip || 1;
+  this._hFlip = options.hFlip || 1;
   this._parentShapeCoords = options.parentShapeCoords || {x:0,y:0,width:0,height:0}
 
   this._selected = false;
@@ -109,6 +111,8 @@ Text.prototype.toJson = function toJson() {
     textAnchor: this._textAnchor,
     rotation: this._rotation,
     textRotation: this._textRotation,
+    hFlip: this._hFlip,
+    vFlip: this._vFlip,
     textPosition: this._textPosition,
     parentShapeCoords: this._parentShapeCoords,
 //    linkedShapeId: this._linkedShapeId,
@@ -224,6 +228,16 @@ Text.prototype.setRotation = function setRotation(rotation) {
 
 Text.prototype.setTextRotation = function setTextRotation(textRotation) {
   this._textRotation = textRotation;
+  this.drawShape();
+};
+
+Text.prototype.setVerticalFlip = function setVerticalFlip(vFlip) {
+  this._vFlip = vFlip;
+  this.drawShape();
+};
+
+Text.prototype.setHorizontalFlip = function setHorizontalFlip(hFlip) {
+  this._hFlip = hFlip;
   this.drawShape();
 };
 
@@ -410,12 +424,13 @@ Text.prototype.drawShape = function drawShape() {
     "text": this._text,
     "text-anchor": this._textAnchor
   });
-
+console.log("r" + (-this._textRotation) + ", s"+(this._hFlip)+", "+(this._vFlip))
   if(!this._inModalView){
-    this.element.transform("r" + (-this._textRotation));
+    this.element.transform("r" + (-this._textRotation) + ", s"+(this._hFlip)+", "+(this._vFlip));
   }else{
     this.element.transform("r" + 0);
   }
+
   var bbox = this.element.getBBox();
   this._area = bbox.width * bbox.height;
 
@@ -584,6 +599,8 @@ CreateText.prototype.startDrag = function startDrag(startX, startY) {
       fontSize = this.manager.getTextFontSize(),
       zoom = this.manager.getZoom(),
       inModalView = this.manager.getInModalView(),
+      vFlip = this.manager.getVerticalFlip(),
+      hFlip = this.manager.getHorizontalFlip(),
       textRotation = this.manager.getTextRotation();
 
   this.manager.setText("Text")
@@ -598,6 +615,8 @@ CreateText.prototype.startDrag = function startDrag(startX, startY) {
     text: "Text",
     inModalView: inModalView,
     textRotation: textRotation,
+    vFlip: vFlip,
+    hFlip: hFlip,
    // linkedShapeId: -404,
     x: startX,
     y: startY,
