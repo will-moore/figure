@@ -239,10 +239,9 @@ Polygon.prototype.loadTextShape = function loadTextShape(){
 };
 
 Polygon.prototype.setText = function setText(text) {
-  if(!this._textShape){
-    this.createTextShape()
+  if(this._textShape){
+    this._textShape.setText(text)
   }
-  this._textShape.setText(text)
 };
 
 Polygon.prototype.getText = function getText() {
@@ -253,10 +252,9 @@ Polygon.prototype.getText = function getText() {
 };
 
 Polygon.prototype.setTextPosition = function setTextPosition(textPosition) {
-  if(!this._textShape){
-    this.createTextShape()
+  if(this._textShape){
+    this._textShape.setTextPosition(textPosition)
   }
-  this._textShape.setTextPosition(textPosition)
 };
 
 Polygon.prototype.getTextPosition = function getTextPosition() {
@@ -267,10 +265,9 @@ Polygon.prototype.getTextPosition = function getTextPosition() {
 };
 
 Polygon.prototype.setFontSize = function setFontSize(fontSize) {
-  if(!this._textShape){
-    this.createTextShape()
+  if(this._textShape){
+    this._textShape.setFontSize(fontSize)
   }
-  this._textShape.setFontSize(fontSize)
 };
 
 Polygon.prototype.getFontSize = function getFontSize() {
@@ -289,40 +286,42 @@ Polygon.prototype.setTextId = function setTextId(textId) {
 };
 
 Polygon.prototype.setInModalView = function setInModalView(inModalView) {
-  if(!this._textShape){
-    this.createTextShape()
+  if(this._textShape){
+    this._textShape.setInModalView(inModalView)
   }
-  this._textShape.setInModalView(inModalView)
 };
 
 Polygon.prototype.setTextRotation = function setTextRotation(textRotation) {
-  if(!this._textShape){
-    this.createTextShape()
+  if(this._textShape){
+    this._textShape.setTextRotation(textRotation)
   }
-  this._textShape.setTextRotation(textRotation)
 };
 
 Polygon.prototype.setVerticalFlip = function setVerticalFlip(vFlip) {
-  if(!this._textShape){
-    this.createTextShape()
+  if(this._textShape){
+    this._textShape.setVerticalFlip(vFlip)
   }
-  this._textShape.setVerticalFlip(vFlip)
 };
 
 Polygon.prototype.setHorizontalFlip = function setHorizontalFlip(hFlip) {
-  if(!this._textShape){
-    this.createTextShape()
+  if(this._textShape){
+    this._textShape.setHorizontalFlip(hFlip)
   }
-  this._textShape.setHorizontalFlip(hFlip)
 };
 
 Polygon.prototype.destroy = function destroy() {
   if(this._textShape){
     this.manager.deleteShapesByIds([this._textShape._id])
+    this.destroyTextShape()
   }
   this.element.remove();
   this.handles.remove();
 };
+
+Polygon.prototype.destroyTextShape = function destroyTextShape() {
+  this._textId = -1
+  this._textShape = undefined;
+}
 
 Polygon.prototype.intersectRegion = function intersectRegion(region) {
   // region is {x, y, width, height} - Model coords (not zoomed)
@@ -412,45 +411,46 @@ Polygon.prototype.updateHandle = function updateHandle(
   );
 };
 
-Polygon.prototype.createTextShape = function createTextShape(){
+Polygon.prototype.createShapeText = function createShapeText(){
+  if(!this._textShape){
+    var textPosition = this.manager.getTextPosition(),
+        fontSize = this.manager.getTextFontSize(),
+        inModalView = this.manager.getInModalView(),
+        vFlip = this.manager.getVerticalFlip(),
+        hFlip = this.manager.getHorizontalFlip(),
+        textRotation = this.manager.getTextRotation();
 
-  var textPosition = this.manager.getTextPosition(),
-      fontSize = this.manager.getTextFontSize(),
-      inModalView = this.manager.getInModalView(),
-      vFlip = this.manager.getVerticalFlip(),
-      hFlip = this.manager.getHorizontalFlip(),
-      textRotation = this.manager.getTextRotation();
+    if(textPosition == "freehand"){
+      textPosition = "top"
+      this.manager.setTextPosition(textPosition)
+    }
 
-  if(textPosition == "freehand"){
-    textPosition = "top"
-    this.manager.setTextPosition(textPosition)
+    var bbox = this.getBBox(this._points)
+
+    var textShape = new Text({
+        manager: this.manager,
+        paper: this.paper,
+        inModalView: inModalView,
+        textRotation: textRotation,
+        vFlip: vFlip,
+        hFlip: hFlip,
+        linkedShapeId: this._id,
+        zoom: this._zoomFraction,
+        text: "text",
+        x: this._x,
+        y: this._y,
+        strokeColor: this._strokeColor,
+        fontSize: fontSize,
+        textPosition: textPosition,
+        strokeWidth: this._strokeWidth,
+        parentShapeCoords: {x:Math.min(bbox.x1, bbox.x2), y:Math.min(bbox.y1, bbox.y2),
+          width:Math.abs(bbox.x1 - bbox.x2), height:Math.abs(bbox.y1 - bbox.y2)}
+      })
+
+      this.manager.addShape(textShape);
+      this._textId = textShape._id;
+      this._textShape = textShape;
   }
-
-  var bbox = this.getBBox(this._points)
-
-  var textShape = new Text({
-      manager: this.manager,
-      paper: this.paper,
-      inModalView: inModalView,
-      textRotation: textRotation,
-      vFlip: vFlip,
-      hFlip: hFlip,
-   //   linkedShapeId: this._id,
-      zoom: this._zoomFraction,
-      text: "text",
-      x: this._x,
-      y: this._y,
-      strokeColor: this._strokeColor,
-      fontSize: fontSize,
-      textPosition: textPosition,
-      strokeWidth: this._strokeWidth,
-      parentShapeCoords: {x:Math.min(bbox.x1, bbox.x2), y:Math.min(bbox.y1, bbox.y2),
-        width:Math.abs(bbox.x1 - bbox.x2), height:Math.abs(bbox.y1 - bbox.y2)}
-    })
-
-    this.manager.addShape(textShape);
-    this._textId = textShape._id;
-    this._textShape = textShape;
 }
 
 Polygon.prototype.drawShape = function drawShape() {

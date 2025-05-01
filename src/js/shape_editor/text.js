@@ -37,7 +37,7 @@ var Text = function Text(options) {
   this._text = options.text;
   this._strokeWidth = options.strokeWidth || 2;
   this._textPosition = options.textPosition;
-  //this._linkedShapeId = options.linkedShapeId;
+  this._linkedShapeId = options.linkedShapeId || -1;
   this._inModalView = options.inModalView || false;
 
   this._id = options.id || this.manager.getRandomId();
@@ -115,7 +115,7 @@ Text.prototype.toJson = function toJson() {
     vFlip: this._vFlip,
     textPosition: this._textPosition,
     parentShapeCoords: this._parentShapeCoords,
-//    linkedShapeId: this._linkedShapeId,
+    linkedShapeId: this._linkedShapeId,
     strokeWidth: this._strokeWidth,
   };
   if (this._id) {
@@ -251,9 +251,19 @@ Text.prototype.setParentShapeCoords = function setParentShapeCoords(coords){
   this.drawShape();
 };
 
+Text.prototype.createShapeText = function createShapeText(){
+  return;
+}
+
 Text.prototype.destroy = function destroy() {
   this.element.remove();
   this.handles.remove();
+  if(this._linkedShapeId != -1){
+    var parentShape = this.manager.getShape(this._linkedShapeId);
+    if(parentShape){
+      parentShape.destroyTextShape()
+    }
+  }
 };
 
 // handle start of drag by selecting this shape

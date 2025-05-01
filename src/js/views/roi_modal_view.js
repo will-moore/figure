@@ -378,6 +378,7 @@ export const RoiModalView = Backbone.View.extend({
         addTextToShape: function(event){
             event.preventDefault()
             var text = $("#label-text").val()
+            this.shapeManager.createShapeText();
             this.shapeManager.setText(text);
             this.shapeManager.setTextPosition(this.shapeManager.getTextPosition());
             this.shapeManager.setTextFontSize(this.shapeManager.getTextFontSize());

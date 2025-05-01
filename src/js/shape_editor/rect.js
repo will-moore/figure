@@ -275,10 +275,9 @@ Rect.prototype.getFillOpacity = function getFillOpacity() {
 };
 
 Rect.prototype.setText = function setText(text) {
-  if(!this._textShape){
-    this.createTextShape()
+  if(this._textShape){
+    this._textShape.setText(text)
   }
-  this._textShape.setText(text)
 };
 
 Rect.prototype.getText = function getText() {
@@ -289,10 +288,9 @@ Rect.prototype.getText = function getText() {
 };
 
 Rect.prototype.setTextPosition = function setTextPosition(textPosition) {
-  if(!this._textShape){
-    this.createTextShape()
+  if(this._textShape){
+    this._textShape.setTextPosition(textPosition)
   }
-  this._textShape.setTextPosition(textPosition)
 };
 
 Rect.prototype.getTextPosition = function getTextPosition() {
@@ -303,10 +301,9 @@ Rect.prototype.getTextPosition = function getTextPosition() {
 };
 
 Rect.prototype.setFontSize = function setFontSize(fontSize) {
-  if(!this._textShape){
-    this.createTextShape()
+  if(this._textShape){
+    this._textShape.setFontSize(fontSize)
   }
-  this._textShape.setFontSize(fontSize)
 };
 
 Rect.prototype.getFontSize = function getFontSize() {
@@ -334,77 +331,84 @@ Rect.prototype.setTextId = function setTextId(textId) {
 };
 
 Rect.prototype.setInModalView = function setInModalView(inModalView) {
-  if(!this._textShape){
-    this.createTextShape()
+  if(this._textShape){
+    this._textShape.setInModalView(inModalView)
   }
-  this._textShape.setInModalView(inModalView)
+
 };
 
 Rect.prototype.setTextRotation = function setTextRotation(textRotation) {
-  if(!this._textShape){
-    this.createTextShape()
+  if(this._textShape){
+    this._textShape.setTextRotation(textRotation)
   }
-  this._textShape.setTextRotation(textRotation)
+
 };
 
 Rect.prototype.setVerticalFlip = function setVerticalFlip(vFlip) {
-  if(!this._textShape){
-    this.createTextShape()
+  if(this._textShape){
+    this._textShape.setVerticalFlip(vFlip)
   }
-  this._textShape.setVerticalFlip(vFlip)
+
 };
 
 Rect.prototype.setHorizontalFlip = function setHorizontalFlip(hFlip) {
-  if(!this._textShape){
-    this.createTextShape()
+  if(this._textShape){
+    this._textShape.setHorizontalFlip(hFlip)
   }
-  this._textShape.setHorizontalFlip(hFlip)
+
 };
 
 Rect.prototype.destroy = function destroy() {
   if(this._textShape){
     this.manager.deleteShapesByIds([this._textShape._id])
+    this.destroyTextShape()
   }
   this.element.remove();
   this.handles.remove();
 };
 
-Rect.prototype.createTextShape = function createTextShape(){
+Rect.prototype.destroyTextShape = function destroyTextShape() {
+  this._textId = -1
+  this._textShape = undefined;
+}
 
- var textPosition = this.manager.getTextPosition(),
-      fontSize = this.manager.getTextFontSize(),
-      inModalView = this.manager.getInModalView(),
-      vFlip = this.manager.getVerticalFlip(),
-      hFlip = this.manager.getHorizontalFlip(),
-      textRotation = this.manager.getTextRotation();
+Rect.prototype.createShapeText = function createShapeText(){
+  if(!this._textShape){
+    var textPosition = this.manager.getTextPosition(),
+          fontSize = this.manager.getTextFontSize(),
+          inModalView = this.manager.getInModalView(),
+          vFlip = this.manager.getVerticalFlip(),
+          hFlip = this.manager.getHorizontalFlip(),
+          textRotation = this.manager.getTextRotation();
 
-  if(textPosition == "freehand"){
-    textPosition = "top"
-    this.manager.setTextPosition(textPosition)
+      if(textPosition == "freehand"){
+        textPosition = "top"
+        this.manager.setTextPosition(textPosition)
+      }
+
+      var textShape = new Text({
+          manager: this.manager,
+          paper: this.paper,
+          inModalView: inModalView,
+          vFlip: vFlip,
+          hFlip: hFlip,
+          textRotation: textRotation,
+          linkedShapeId: this._id,
+          zoom: this._zoomFraction,
+          text: "text",
+          x: this._x,
+          y: this._y,
+          strokeColor: this._strokeColor,
+          fontSize: fontSize,
+          textPosition: textPosition,
+          strokeWidth: this._strokeWidth,
+          parentShapeCoords: {x:this._x, y:this._y, width:this._width, height:this._height}
+        })
+
+        this.manager.addShape(textShape);
+        this._textId = textShape._id;
+        this._textShape = textShape;
   }
-
-  var textShape = new Text({
-      manager: this.manager,
-      paper: this.paper,
-      inModalView: inModalView,
-      vFlip: vFlip,
-      hFlip: hFlip,
-      textRotation: textRotation,
-   //   linkedShapeId: this._id,
-      zoom: this._zoomFraction,
-      text: "text",
-      x: this._x,
-      y: this._y,
-      strokeColor: this._strokeColor,
-      fontSize: fontSize,
-      textPosition: textPosition,
-      strokeWidth: this._strokeWidth,
-      parentShapeCoords: {x:this._x, y:this._y, width:this._width, height:this._height}
-    })
-
-    this.manager.addShape(textShape);
-    this._textId = textShape._id;
-    this._textShape = textShape;
 }
 
 Rect.prototype.drawShape = function drawShape() {

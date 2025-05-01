@@ -247,10 +247,9 @@ Ellipse.prototype.loadTextShape = function loadTextShape(){
 };
 
 Ellipse.prototype.setText = function setText(text) {
-    if(!this._textShape){
-      this.createTextShape()
-    }
+  if(this._textShape){
     this._textShape.setText(text)
+  }
 };
 
 Ellipse.prototype.getText = function getText() {
@@ -261,10 +260,9 @@ Ellipse.prototype.getText = function getText() {
 };
 
 Ellipse.prototype.setTextPosition = function setTextPosition(textPosition) {
-  if(!this._textShape){
-    this.createTextShape()
+  if(this._textShape){
+    this._textShape.setTextPosition(textPosition)
   }
-  this._textShape.setTextPosition(textPosition)
 };
 
 Ellipse.prototype.getTextPosition = function getTextPosition() {
@@ -275,10 +273,9 @@ Ellipse.prototype.getTextPosition = function getTextPosition() {
 };
 
 Ellipse.prototype.setFontSize = function setFontSize(fontSize) {
-  if(!this._textShape){
-    this.createTextShape()
+  if(this._textShape){
+    this._textShape.setFontSize(fontSize)
   }
-  this._textShape.setFontSize(fontSize)
 };
 
 Ellipse.prototype.getFontSize = function getFontSize() {
@@ -297,40 +294,42 @@ Ellipse.prototype.setTextId = function setTextId(textId) {
 };
 
 Ellipse.prototype.setInModalView = function setInModalView(inModalView) {
-  if(!this._textShape){
-    this.createTextShape()
+  if(this._textShape){
+    this._textShape.setInModalView(inModalView)
   }
-  this._textShape.setInModalView(inModalView)
 };
 
 Ellipse.prototype.setTextRotation = function setTextRotation(textRotation) {
-  if(!this._textShape){
-    this.createTextShape()
+  if(this._textShape){
+    this._textShape.setTextRotation(textRotation)
   }
-  this._textShape.setTextRotation(textRotation)
 };
 
 Ellipse.prototype.setVerticalFlip = function setVerticalFlip(vFlip) {
-  if(!this._textShape){
-    this.createTextShape()
+  if(this._textShape){
+    this._textShape.setVerticalFlip(vFlip)
   }
-  this._textShape.setVerticalFlip(vFlip)
 };
 
 Ellipse.prototype.setHorizontalFlip = function setHorizontalFlip(hFlip) {
-  if(!this._textShape){
-    this.createTextShape()
+  if(this._textShape){
+    this._textShape.setHorizontalFlip(hFlip)
   }
-  this._textShape.setHorizontalFlip(hFlip)
 };
 
 Ellipse.prototype.destroy = function destroy() {
   if(this._textShape){
     this.manager.deleteShapesByIds([this._textShape._id])
+    this.destroyTextShape()
   }
   this.element.remove();
   this.handles.remove();
 };
+
+Ellipse.prototype.destroyTextShape = function destroyTextShape() {
+  this._textId = -1
+  this._textShape = undefined;
+}
 
 Ellipse.prototype.intersectRegion = function intersectRegion(region) {
   var path = this.manager.regionToPath(region, this._zoomFraction * 100);
@@ -474,40 +473,42 @@ Ellipse.prototype.updateShapeFromHandles = function updateShapeFromHandles(
   this.drawShape();
 };
 
-Ellipse.prototype.createTextShape = function createTextShape(){
-var textPosition = this.manager.getTextPosition(),
-      fontSize = this.manager.getTextFontSize(),
-      inModalView = this.manager.getInModalView(),
-      vFlip = this.manager.getVerticalFlip(),
-      hFlip = this.manager.getHorizontalFlip(),
-      textRotation = this.manager.getTextRotation();
+Ellipse.prototype.createShapeText = function createShapeText(){
+  if(!this._textShape){
+    var textPosition = this.manager.getTextPosition(),
+          fontSize = this.manager.getTextFontSize(),
+          inModalView = this.manager.getInModalView(),
+          vFlip = this.manager.getVerticalFlip(),
+          hFlip = this.manager.getHorizontalFlip(),
+          textRotation = this.manager.getTextRotation();
 
-  if(textPosition == "freehand"){
-    textPosition = "top"
-    this.manager.setTextPosition(textPosition)
+    if(textPosition == "freehand"){
+      textPosition = "top"
+      this.manager.setTextPosition(textPosition)
+    }
+
+    var textShape = new Text({
+        manager: this.manager,
+        paper: this.paper,
+        inModalView: inModalView,
+        textRotation: textRotation,
+        vFlip: vFlip,
+        hFlip: hFlip,
+        linkedShapeId: this._id,
+        zoom: this._zoomFraction,
+        text: "text",
+        x: this._x,
+        y: this._y,
+        strokeColor: this._strokeColor,
+        fontSize: fontSize,
+        textPosition: textPosition,
+        strokeWidth: this._strokeWidth,
+        parentShapeCoords: {x: this._x - this._radiusX, y: this._y - this._radiusY, width: 2*this._radiusX, height: 2*this._radiusY}
+      })
+      this.manager.addShape(textShape);
+      this._textId = textShape._id;
+      this._textShape = textShape;
   }
-
-  var textShape = new Text({
-      manager: this.manager,
-      paper: this.paper,
-      inModalView: inModalView,
-      textRotation: textRotation,
-      vFlip: vFlip,
-      hFlip: hFlip,
-   //   linkedShapeId: this._id,
-      zoom: this._zoomFraction,
-      text: "text",
-      x: this._x,
-      y: this._y,
-      strokeColor: this._strokeColor,
-      fontSize: fontSize,
-      textPosition: textPosition,
-      strokeWidth: this._strokeWidth,
-      parentShapeCoords: {x: this._x - this._radiusX, y: this._y - this._radiusY, width: 2*this._radiusX, height: 2*this._radiusY}
-    })
-    this.manager.addShape(textShape);
-    this._textId = textShape._id;
-    this._textShape = textShape;
 }
 
 Ellipse.prototype.drawShape = function drawShape() {

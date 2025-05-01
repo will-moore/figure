@@ -217,10 +217,9 @@ Line.prototype.loadTextShape = function loadTextShape(){
 };
 
 Line.prototype.setText = function setText(text) {
-  if(!this._textShape){
-    this.createTextShape()
+  if(this._textShape){
+    this._textShape.setText(text)
   }
-  this._textShape.setText(text)
 };
 
 Line.prototype.getText = function getText() {
@@ -231,10 +230,9 @@ Line.prototype.getText = function getText() {
 };
 
 Line.prototype.setTextPosition = function setTextPosition(textPosition) {
-  if(!this._textShape){
-    this.createTextShape()
+  if(this._textShape){
+    this._textShape.setTextPosition(textPosition)
   }
-  this._textShape.setTextPosition(textPosition)
 };
 
 Line.prototype.getTextPosition = function getTextPosition() {
@@ -245,10 +243,9 @@ Line.prototype.getTextPosition = function getTextPosition() {
 };
 
 Line.prototype.setFontSize = function setFontSize(fontSize) {
-  if(!this._textShape){
-    this.createTextShape()
+  if(this._textShape){
+    this._textShape.setFontSize(fontSize)
   }
-  this._textShape.setFontSize(fontSize)
 };
 
 Line.prototype.getFontSize = function getFontSize() {
@@ -263,31 +260,27 @@ Line.prototype.getTextId = function getTextId() {
 };
 
 Line.prototype.setInModalView = function setInModalView(inModalView) {
-  if(!this._textShape){
-    this.createTextShape()
+  if(this._textShape){
+    this._textShape.setInModalView(inModalView)
   }
-  this._textShape.setInModalView(inModalView)
 };
 
 Line.prototype.setTextRotation = function setTextRotation(textRotation) {
-  if(!this._textShape){
-    this.createTextShape()
+  if(this._textShape){
+    this._textShape.setTextRotation(textRotation)
   }
-  this._textShape.setTextRotation(textRotation)
 };
 
 Line.prototype.setVerticalFlip = function setVerticalFlip(vFlip) {
-  if(!this._textShape){
-    this.createTextShape()
+  if(this._textShape){
+    this._textShape.setVerticalFlip(vFlip)
   }
-  this._textShape.setVerticalFlip(vFlip)
 };
 
 Line.prototype.setHorizontalFlip = function setHorizontalFlip(hFlip) {
-  if(!this._textShape){
-    this.createTextShape()
+  if(this._textShape){
+    this._textShape.setHorizontalFlip(hFlip)
   }
-  this._textShape.setHorizontalFlip(hFlip)
 };
 
 Line.prototype.setTextId = function setTextId(textId) {
@@ -297,10 +290,16 @@ Line.prototype.setTextId = function setTextId(textId) {
 Line.prototype.destroy = function destroy() {
   if(this._textShape){
     this.manager.deleteShapesByIds([this._textShape._id])
+    this.destroyTextShape()
   }
   this.element.remove();
   this.handles.remove();
 };
+
+Line.prototype.destroyTextShape = function destroyTextShape() {
+  this._textId = -1
+  this._textShape = undefined;
+}
 
 Line.prototype.intersectRegion = function intersectRegion(region) {
   var path = this.manager.regionToPath(region, this._zoomFraction * 100);
@@ -338,43 +337,44 @@ Line.prototype._getLineWidth = function _getLineWidth() {
   return this._strokeWidth;
 };
 
-Line.prototype.createTextShape = function createTextShape(){
+Line.prototype.createShapeText = function createShapeText(){
+  if(!this._textShape){
+    var textPosition = this.manager.getTextPosition(),
+        fontSize = this.manager.getTextFontSize(),
+        inModalView = this.manager.getInModalView(),
+        vFlip = this.manager.getVerticalFlip(),
+        hFlip = this.manager.getHorizontalFlip(),
+        textRotation = this.manager.getTextRotation();
 
-  var textPosition = this.manager.getTextPosition(),
-      fontSize = this.manager.getTextFontSize(),
-      inModalView = this.manager.getInModalView(),
-      vFlip = this.manager.getVerticalFlip(),
-      hFlip = this.manager.getHorizontalFlip(),
-      textRotation = this.manager.getTextRotation();
+    if(textPosition == "freehand"){
+      textPosition = "top"
+      this.manager.setTextPosition(textPosition)
+    }
 
-  if(textPosition == "freehand"){
-    textPosition = "top"
-    this.manager.setTextPosition(textPosition)
+    var textShape = new Text({
+        manager: this.manager,
+        paper: this.paper,
+        inModalView: inModalView,
+        textRotation: textRotation,
+        vFlip: vFlip,
+        hFlip: hFlip,
+        linkedShapeId: this._id,
+        zoom: this._zoomFraction,
+        text: "text",
+        x: this._x,
+        y: this._y,
+        strokeColor: this._strokeColor,
+        fontSize: fontSize,
+        textPosition: textPosition,
+        strokeWidth: this._strokeWidth,
+        parentShapeCoords: {x:Math.min(this._x1, this._x2), y: Math.min(this._y1, this._y2),
+          width: Math.abs(this._x1 - this._x2), height: Math.abs(this._y1 - this._y2)}
+      })
+
+      this.manager.addShape(textShape);
+      this._textId = textShape._id;
+      this._textShape = textShape;
   }
-
-  var textShape = new Text({
-      manager: this.manager,
-      paper: this.paper,
-      inModalView: inModalView,
-      textRotation: textRotation,
-      vFlip: vFlip,
-      hFlip: hFlip,
-   //   linkedShapeId: this._id,
-      zoom: this._zoomFraction,
-      text: "text",
-      x: this._x,
-      y: this._y,
-      strokeColor: this._strokeColor,
-      fontSize: fontSize,
-      textPosition: textPosition,
-      strokeWidth: this._strokeWidth,
-      parentShapeCoords: {x:Math.min(this._x1, this._x2), y: Math.min(this._y1, this._y2),
-        width: Math.abs(this._x1 - this._x2), height: Math.abs(this._y1 - this._y2)}
-    })
-
-    this.manager.addShape(textShape);
-    this._textId = textShape._id;
-    this._textShape = textShape;
 }
 
 Line.prototype.drawShape = function drawShape() {
