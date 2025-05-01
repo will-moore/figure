@@ -368,7 +368,8 @@ Line.prototype.createTextShape = function createTextShape(){
       fontSize: fontSize,
       textPosition: textPosition,
       strokeWidth: this._strokeWidth,
-      parentShapeCoords: {x:this._x, y:this._y, width:this._width, height:this._height}
+      parentShapeCoords: {x:Math.min(this._x1, this._x2), y: Math.min(this._y1, this._y2),
+        width: Math.abs(this._x1 - this._x2), height: Math.abs(this._y1 - this._y2)}
     })
 
     this.manager.addShape(textShape);

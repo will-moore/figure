@@ -424,7 +424,7 @@ Text.prototype.drawShape = function drawShape() {
     "text": this._text,
     "text-anchor": this._textAnchor
   });
-console.log("r" + (-this._textRotation) + ", s"+(this._hFlip)+", "+(this._vFlip))
+
   if(!this._inModalView){
     this.element.transform("r" + (-this._textRotation) + ", s"+(this._hFlip)+", "+(this._vFlip));
   }else{

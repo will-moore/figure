@@ -503,9 +503,8 @@ var textPosition = this.manager.getTextPosition(),
       fontSize: fontSize,
       textPosition: textPosition,
       strokeWidth: this._strokeWidth,
-      parentShapeCoords: {x:this._x, y:this._y, width:this._width, height:this._height}
+      parentShapeCoords: {x: this._x - this._radiusX, y: this._y - this._radiusY, width: 2*this._radiusX, height: 2*this._radiusY}
     })
-
     this.manager.addShape(textShape);
     this._textId = textShape._id;
     this._textShape = textShape;

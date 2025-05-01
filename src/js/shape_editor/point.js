@@ -24,7 +24,7 @@
 */
 
 import Raphael from "raphael";
-import {CreateText} from "./text";
+import {Text} from "./text";
 
 const POINT_RADIUS = 5;
 var Point = function Point(options) {
@@ -479,7 +479,7 @@ Point.prototype.createTextShape = function createTextShape(){
       fontSize: fontSize,
       textPosition: textPosition,
       strokeWidth: this._strokeWidth,
-      parentShapeCoords: {x:this._x, y:this._y, width:this._width, height:this._height}
+      parentShapeCoords: {x: this._x - this._radiusX, y: this._y - this._radiusY, width: 2*this._radiusX, height: 2*this._radiusY}
     })
 
     this.manager.addShape(textShape);

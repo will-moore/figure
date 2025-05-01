@@ -426,6 +426,8 @@ Polygon.prototype.createTextShape = function createTextShape(){
     this.manager.setTextPosition(textPosition)
   }
 
+  var bbox = this.getBBox(this._points)
+
   var textShape = new Text({
       manager: this.manager,
       paper: this.paper,
@@ -442,7 +444,8 @@ Polygon.prototype.createTextShape = function createTextShape(){
       fontSize: fontSize,
       textPosition: textPosition,
       strokeWidth: this._strokeWidth,
-      parentShapeCoords: {x:this._x, y:this._y, width:this._width, height:this._height}
+      parentShapeCoords: {x:Math.min(bbox.x1, bbox.x2), y:Math.min(bbox.y1, bbox.y2),
+        width:Math.abs(bbox.x1 - bbox.x2), height:Math.abs(bbox.y1 - bbox.y2)}
     })
 
     this.manager.addShape(textShape);
