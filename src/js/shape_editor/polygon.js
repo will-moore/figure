@@ -435,7 +435,7 @@ Polygon.prototype.createShapeText = function createShapeText(){
         vFlip: vFlip,
         hFlip: hFlip,
         linkedShapeId: this._id,
-        zoom: this._zoomFraction,
+        zoom: this._zoomFraction * 100,
         text: "text",
         x: this._x,
         y: this._y,

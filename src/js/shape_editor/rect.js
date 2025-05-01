@@ -394,7 +394,7 @@ Rect.prototype.createShapeText = function createShapeText(){
           hFlip: hFlip,
           textRotation: textRotation,
           linkedShapeId: this._id,
-          zoom: this._zoomFraction,
+          zoom: this._zoomFraction * 100,
           text: "text",
           x: this._x,
           y: this._y,
@@ -403,11 +403,11 @@ Rect.prototype.createShapeText = function createShapeText(){
           textPosition: textPosition,
           strokeWidth: this._strokeWidth,
           parentShapeCoords: {x:this._x, y:this._y, width:this._width, height:this._height}
-        })
+      })
 
-        this.manager.addShape(textShape);
-        this._textId = textShape._id;
-        this._textShape = textShape;
+      this.manager.addShape(textShape);
+      this._textId = textShape._id;
+      this._textShape = textShape;
   }
 }
 
