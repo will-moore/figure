@@ -23,7 +23,8 @@ const LABEL_POSITION_ICONS = {
     "left": "bi-box-arrow-left",
     "top": "bi-box-arrow-up",
     "right": "bi-box-arrow-right",
-    "bottom": "bi-box-arrow-down"
+    "bottom": "bi-box-arrow-down",
+    "freehand": "bi-arrows-move"
 }
 
 export const RoiModalView = Backbone.View.extend({
