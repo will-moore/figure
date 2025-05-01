@@ -583,7 +583,7 @@ Text.prototype.createHandles = function createHandles() {
         self.handle_wh
       )
       .attr(handle_attrs)
-      .rotate(self._rotation, cx, cy);
+   //   .rotate(self._rotation, cx, cy);
     handle.attr({ cursor: key + "-resize" }); // css, E.g. ne-resize
     handle.h_id = key;
     handle.rect = self;
