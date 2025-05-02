@@ -279,7 +279,12 @@ export const RoiModalView = Backbone.View.extend({
             if (shape) {
                 var viewport = this.m.getViewportAsRect();
                 shape.id = this.TEMP_SHAPE_ID;
-                var ok = this.shapeManager.addShapeJson(shape, viewport);
+                var convertedShape = shape;
+                if(shape.type == "Label"){
+                    convertedShape = this.shapeManager.convertOmeroLabelToFigureText(shape)
+                    convertedShape.id = this.TEMP_SHAPE_ID
+                }
+                var ok = this.shapeManager.addShapeJson(convertedShape, viewport);
             }
         },
 

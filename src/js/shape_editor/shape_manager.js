@@ -435,6 +435,21 @@ ShapeManager.prototype.findShapeAtCoords = function findShapeAtCoords(
   return false;
 };
 
+ShapeManager.prototype.convertOmeroLabelToFigureText = function convertOmeroLabelToFigureText(shape){
+   return {
+      text: shape.Text,
+      fillColor: shape.fillColor,
+      fillOpacity: shape.fillOpacity,
+      strokeColor: shape.strokeColor,
+      type: "Text",
+      x: shape.x,
+      y: shape.y,
+      linkedShapeId: -1,
+      textPosition: "freehand"
+    }
+
+};
+
 // Add new shapes from json but, IF it matches existing shape - offset a bit
 ShapeManager.prototype.pasteShapesJson = function pasteShapesJson(
   jsonShapes,
@@ -446,7 +461,11 @@ ShapeManager.prototype.pasteShapesJson = function pasteShapesJson(
   // For each shape we want to paste...
   jsonShapes.forEach(function (sh) {
     var csh = $.extend(true, {}, sh);
-    if(csh.type != "Text" || csh.linkedShapeId == -1){
+    if(csh.type == "Label"){
+      csh = self.convertOmeroLabelToFigureText(csh)
+    }
+
+    if(csh.type != "Text" || csh.linkedShapeId == undefined || csh.linkedShapeId == -1){
       // Create a shape to resolve any transform matrix -> coords
       csh.textId = -1
       var temp = self.createShapeJson(csh);
