@@ -446,7 +446,7 @@ ShapeManager.prototype.pasteShapesJson = function pasteShapesJson(
   // For each shape we want to paste...
   jsonShapes.forEach(function (sh) {
     var csh = $.extend(true, {}, sh);
-    if(csh.type !== "Text"){
+    if(csh.type != "Text" || csh.linkedShapeId == -1){
       // Create a shape to resolve any transform matrix -> coords
       csh.textId = -1
       var temp = self.createShapeJson(csh);
