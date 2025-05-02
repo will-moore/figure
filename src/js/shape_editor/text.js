@@ -627,7 +627,7 @@ CreateText.prototype.startDrag = function startDrag(startX, startY) {
     textRotation: textRotation,
     vFlip: vFlip,
     hFlip: hFlip,
-   // linkedShapeId: -404,
+    linkedShapeId: -1,
     x: startX,
     y: startY,
     strokeColor: strokeColor,
@@ -647,8 +647,6 @@ CreateText.prototype.stopDrag = function stopDrag() {
   this.text.setSelected(true);
   this.manager.addShape(this.text);
 };
-
-
 
 CreateText.prototype.getShape = function getShape() {
   return this.text;

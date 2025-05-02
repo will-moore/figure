@@ -390,6 +390,10 @@ class ShapeToPdfExport(ShapeExport):
         anchor = shape['textAnchor']
         aligment = TA_LEFT
 
+        h_flip = self.panel.get('horizontal_flip', False)
+        if h_flip and anchor == 'start':
+            anchor = "end"
+
         if (anchor == 'middle'):
             aligment = TA_CENTER
             x = x - (self.page_width / 2)
@@ -746,9 +750,7 @@ class ShapeToPilExport(ShapeExport):
 
     def draw_text(self, shape):
         text_coords = self.get_panel_coords(shape['x'], shape['y'])
-        text = ""
-
-        text = shape.get('text')
+        text = shape.get('text', '')
 
         font_size_dpi = scale_to_export_dpi(shape.get('fontSize', 12))
         stroke_width = shape.get('strokeWidth', 2)
@@ -773,6 +775,10 @@ class ShapeToPilExport(ShapeExport):
         x = text_coords["x"]
         y = text_coords["y"]
         anchor = shape['textAnchor']
+
+        h_flip = self.panel.get('horizontal_flip', False)
+        if h_flip and anchor == 'start':
+            anchor = "end"
 
         if (anchor == 'middle'):
             x = x - txt_w / 2
