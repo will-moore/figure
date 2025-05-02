@@ -178,6 +178,7 @@
                     x: txtX,
                     y: txtY,
                     id: textRandomId,
+                    linkedShapeId: rectRandomId,
                     rotation: vp.rotation || 0,
                     textRotation: -vp.rotation || 0,
                     fontSize: 12,
@@ -1256,6 +1257,17 @@
                     'width': m.get('orig_width'),
                     'height': m.get('orig_height'),
                 });
+
+                var shapes = m.get('shapes');
+                if(shapes){
+                    shapes.forEach(function(sh){
+                        if(sh.type == "Text"){
+                            sh.textRotation = 0;
+                        }
+                    })
+                    m.save('shapes', shapes);
+                    m.trigger('change:vertical_flip')
+                }
             });
         },
 
