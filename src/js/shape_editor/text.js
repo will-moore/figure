@@ -50,7 +50,7 @@ var Text = function Text(options) {
   this._textRotation = options.textRotation || 0;
   this._vFlip = options.vFlip || 1;
   this._hFlip = options.hFlip || 1;
-  this._parentShapeCoords = options.parentShapeCoords || {x:0,y:0,width:0,height:0}
+  this._parentShapeCoords = options.parentShapeCoords// || {x:0,y:0,width:0,height:0}
 
   this._selected = false;
   this._area = 0;
@@ -192,6 +192,9 @@ Text.prototype.getText = function getText() {
 };
 
 Text.prototype.setTextPosition = function setTextPosition(textPosition) {
+    /*if(this._textPosition == "freehand" && this._linkedShapeId == -1){
+      return
+    }*/
     this._textPosition = textPosition;
     this.drawShape();
 };
@@ -370,21 +373,37 @@ Text.prototype.drawShape = function drawShape() {
     case "bottom":
       dx = pw/2;
       dy = ph + textOffsetY;
+      if(this._linkedShapeId == -1){
+        dy = ph - textOffsetY;
+        textAnchor = outAnchors[(finalIndex + 2) % 4]
+      }
       textAnchor = outAnchors[finalIndex]
       break;
   case "left":
       dx = -textOffsetX;
       dy = ph/2;
       textAnchor = outAnchors[finalIndex]
+      if(this._linkedShapeId == -1){
+        dx = textOffsetX;
+        textAnchor = outAnchors[(finalIndex + 2) % 4]
+      }
       break;
   case "right":
       dx = pw + textOffsetX;
       dy = ph/2;
       textAnchor = outAnchors[finalIndex]
+      if(this._linkedShapeId == -1){
+        dx = pw - textOffsetX;
+        textAnchor = outAnchors[(finalIndex + 2) % 4]
+      }
       break;
   case "top":
       dx = pw/2;
       dy = -textOffsetY;
+      if(this._linkedShapeId == -1){
+        dy = + textOffsetY;
+        textAnchor = outAnchors[(finalIndex + 2) % 4]
+      }
       textAnchor = outAnchors[finalIndex]
       break;
   case "topleft":
@@ -611,9 +630,11 @@ CreateText.prototype.startDrag = function startDrag(startX, startY) {
       inModalView = this.manager.getInModalView(),
       vFlip = this.manager.getVerticalFlip(),
       hFlip = this.manager.getHorizontalFlip(),
-      textRotation = this.manager.getTextRotation();
+      textRotation = this.manager.getTextRotation(),
+      originalImageShape = this.manager.getOriginalShape();
 
   this.manager.setText("Text")
+  this.manager.setTextPosition("freehand")
 
   this.startX = startX;
   this.startY = startY;
@@ -634,6 +655,7 @@ CreateText.prototype.startDrag = function startDrag(startX, startY) {
     fontSize: fontSize,
     textPosition: "freehand",
     strokeWidth: strokeWidth,
+    parentShapeCoords: originalImageShape,
   })
 
 };

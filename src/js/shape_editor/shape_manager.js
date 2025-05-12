@@ -245,6 +245,10 @@ ShapeManager.prototype.setZoom = function setZoom(zoomPercent) {
   //                          'top': (currTop - deltaTop) + "px"});
 };
 
+ShapeManager.prototype.getOriginalShape = function getOriginalShape() {
+  return {x:0, y:0, width: this._orig_width, height: this._orig_height};
+};
+
 ShapeManager.prototype.getZoom = function getZoom(zoomPercent) {
   return this._zoom;
 };
@@ -625,7 +629,7 @@ ShapeManager.prototype.createShapeJson = function createShapeJson(jsonShape) {
     options.textPosition = textPosition,
     options.text = text,
     options.textAnchor = s.textAnchor,
-    options.parentShapeCoords = s.parentShapeCoords,
+    options.parentShapeCoords = s.parentShapeCoords || {x:0, y:0, width: this._orig_width, height: this._orig_height},
     options.rotation = s.rotation,
     options.textRotation = s.textRotation,
     options.vFlip = s.vFlip,
