@@ -479,13 +479,13 @@ export const RoiModalView = Backbone.View.extend({
 
         renderToolbar: function() {
             // render toolbar
-            var state = this.shapeManager.getState(),
+            var sel = this.shapeManager.getSelectedShapes().length > 0,
+                state = this.shapeManager.getState(),
                 lineW = this.shapeManager.getStrokeWidth(),
                 color = this.shapeManager.getStrokeColor(),
                 fillColor = this.shapeManager.getFillColor(),
                 opacity = this.shapeManager.getFillOpacity(),
                 scale = this.zoom,
-                sel = this.shapeManager.getSelectedShapes().length > 0,
                 toPaste = this.model.get('clipboard'),
                 windows = navigator.platform.toUpperCase().indexOf('WIN') > -1,
                 lineWidths = [0.25, 0.5, 0.75, 1, 2, 3, 4, 5, 7, 10, 15, 20, 30],
@@ -497,6 +497,7 @@ export const RoiModalView = Backbone.View.extend({
             color = color ? color.replace("#", "") : 'FFFFFF';
             fillColor = fillColor ? fillColor.replace("#", "") : 'FFFFFF';
             toPaste = (toPaste && (toPaste.SHAPES || toPaste.CROP));
+            opacity = opacity <= 0.01 ? parseInt(opacity) : opacity;
 
             var json = {'state': state,
                         'lineWidths': lineWidths,

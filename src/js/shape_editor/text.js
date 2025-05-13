@@ -39,6 +39,8 @@ var Text = function Text(options) {
   this._textPosition = options.textPosition;
   this._linkedShapeId = options.linkedShapeId || -1;
   this._inModalView = options.inModalView || false;
+  this._fillOpacity = options.fillOpacity || 0.01;
+  this._fillColor = options.fillColor || "#fff";
 
   this._id = options.id || this.manager.getRandomId();
   if(this._id == -1){
@@ -55,6 +57,9 @@ var Text = function Text(options) {
   this._selected = false;
   this._area = 0;
   this.handle_wh = 6;
+
+  this.bkgdRect = this.paper.rect();
+  this.bkgdRect.attr({"fill-opacity": this._fillOpacity, fill: this._color});
 
   this.element = this.paper.text();
   this.element.attr({"fill-opacity": 0.01, fill: "#fff"});
@@ -106,6 +111,8 @@ Text.prototype.toJson = function toJson() {
     y: this._y,
     area: this._area,
     fontSize: this._fontSize,
+    fillOpacity: this._fillOpacity,
+    fillColor: this._fillColor,
     strokeColor: this._color,
     text: this._text,
     textAnchor: this._textAnchor,
@@ -192,9 +199,6 @@ Text.prototype.getText = function getText() {
 };
 
 Text.prototype.setTextPosition = function setTextPosition(textPosition) {
-    /*if(this._textPosition == "freehand" && this._linkedShapeId == -1){
-      return
-    }*/
     this._textPosition = textPosition;
     this.drawShape();
 };
@@ -204,19 +208,21 @@ Text.prototype.getTextPosition = function getTextPosition() {
 };
 
 Text.prototype.setFillColor = function setFillColor(fillColor) {
-  return;
+  this._fillColor = fillColor;
+  this.drawShape();
 };
 
 Text.prototype.getFillColor = function getFillColor() {
-  return this._color;
+  return this._fillColor; //this._color to keep in mind
 };
 
 Text.prototype.setFillOpacity = function setFillOpacity(fillOpacity) {
-  return;
+  this._fillOpacity = fillOpacity;
+  this.drawShape();
 };
 
 Text.prototype.getFillOpacity = function getFillOpacity() {
-  return 0; // not 1 as it will automatically set the fill opacity of the toolbar to 1
+  return this._fillOpacity;
 };
 
 Text.prototype.setZoom = function setZoom(zoom) {
@@ -261,6 +267,7 @@ Text.prototype.createShapeText = function createShapeText(){
 Text.prototype.destroy = function destroy() {
   this.element.remove();
   this.handles.remove();
+  this.bkgdRect.remove();
   if(this._linkedShapeId != -1){
     var parentShape = this.manager.getShape(this._linkedShapeId);
     if(parentShape){
@@ -454,13 +461,27 @@ Text.prototype.drawShape = function drawShape() {
     "text-anchor": this._textAnchor
   });
 
+  var bbox = this.element.getBBox();
+
+  this.bkgdRect.attr({
+    x: bbox.x - 3,
+    y: bbox.y - 3,
+    width: bbox.width + 6,
+    height: bbox.height + 6,
+    fill: this._fillColor,
+    "fill-opacity": this._fillOpacity
+  })
+
+  this.element.toFront()
+
   if(!this._inModalView){
     this.element.transform("r" + (-this._textRotation) + ", s"+(this._hFlip)+", "+(this._vFlip));
+    this.bkgdRect.transform("r" + (-this._textRotation) + ", s"+(this._hFlip)+", "+(this._vFlip));
   }else{
     this.element.transform("r" + 0);
+    this.bkgdRect.transform("r" + 0);
   }
 
-  var bbox = this.element.getBBox();
   this._area = bbox.width * bbox.height;
 
   if (this.isSelected()) {
@@ -631,6 +652,8 @@ CreateText.prototype.startDrag = function startDrag(startX, startY) {
       vFlip = this.manager.getVerticalFlip(),
       hFlip = this.manager.getHorizontalFlip(),
       textRotation = this.manager.getTextRotation(),
+      fillOpacity = this.manager.getFillOpacity(),
+      fillColor = this.manager.getFillColor(),
       originalImageShape = this.manager.getOriginalShape();
 
   this.manager.setText("Text")
@@ -648,6 +671,8 @@ CreateText.prototype.startDrag = function startDrag(startX, startY) {
     textRotation: textRotation,
     vFlip: vFlip,
     hFlip: hFlip,
+    fillOpacity: fillOpacity,
+    fillColor: fillColor,
     linkedShapeId: -1,
     x: startX,
     y: startY,

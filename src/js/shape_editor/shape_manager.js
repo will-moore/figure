@@ -308,7 +308,7 @@ ShapeManager.prototype.getFillOpacity = function getFillOpacity() {
 
 ShapeManager.prototype.setFillOpacity = function setFillOpacity(fillOpacity) {
   var fillOpacity = parseFloat(fillOpacity, 10).toFixed(1);
-  if(fillOpacity == 0) fillOpacity = 0.01;
+  if(fillOpacity <= 0.01) fillOpacity = parseInt(fillOpacity);
   this._fillOpacity = fillOpacity;
     var selected = this.getSelectedShapes();
     for (var s=0; s<selected.length; s++) {
