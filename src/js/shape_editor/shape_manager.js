@@ -52,6 +52,9 @@ var ShapeManager = function ShapeManager(elementId, width, height, options) {
   this._rotateText = false;
   this._fillColor = "#ffffff";
   this._fillOpacity = 0;
+  this._textColor = "#ffffff";
+  this._textBackgroundColor = "#ffffff";
+  this._textBackgroundOpacity = 0;
   this._orig_width = width;
   this._orig_height = height;
   this._zoom = 100;
@@ -365,6 +368,44 @@ ShapeManager.prototype.setTextRotation = function setTextRotation(textRotation) 
   };
 };
 
+ShapeManager.prototype.getTextColor = function getTextColor() {
+  return this._textColor;
+};
+
+ShapeManager.prototype.setTextColor = function setTextColor(textColor) {
+  this._textColor = textColor;
+  var selected = this.getSelectedShapes();
+  for (var s=0; s<selected.length; s++) {
+      selected[s].setTextColor(textColor);
+  }
+};
+
+ShapeManager.prototype.getTextBackgroundColor = function getTextBackgroundColor() {
+  return this._textBackgroundColor;
+};
+
+ShapeManager.prototype.setTextBackgroundColor = function setTextBackgroundColor(textBackgroundColor) {
+  this._textBackgroundColor = textBackgroundColor;
+  var selected = this.getSelectedShapes();
+  for (var s=0; s<selected.length; s++) {
+      selected[s].setTextBackgroundColor(textBackgroundColor);
+  }
+};
+
+ShapeManager.prototype.getTextBackgroundOpacity = function getTextBackgroundOpacity() {
+  return this._textBackgroundOpacity;
+};
+
+ShapeManager.prototype.setTextBackgroundOpacity = function setTextBackgroundOpacity(textBackgroundOpacity) {
+  var textBackgroundOpacity = parseFloat(textBackgroundOpacity, 10).toFixed(1);
+  if(textBackgroundOpacity <= 0.01) textBackgroundOpacity = parseInt(textBackgroundOpacity);
+  this._textBackgroundOpacity = textBackgroundOpacity;
+  var selected = this.getSelectedShapes();
+  for (var s=0; s<selected.length; s++) {
+      selected[s].setTextBackgroundOpacity(textBackgroundOpacity);
+  }
+};
+
 ShapeManager.prototype.getVerticalFlip = function getVerticalFlip() {
   return this._vFlip;
 };
@@ -556,6 +597,9 @@ ShapeManager.prototype.createShapeJson = function createShapeJson(jsonShape) {
     strokeWidth = s.strokeWidth || this.getStrokeWidth(),
     fontSize = s.fontSize || this.getTextFontSize(),
     textPosition = s.textPosition || this.getTextPosition(),
+    textColor = s.textColor || this.getTextColor(),
+    textBackgroundColor = s.textBackgroundColor || this.getTextBackgroundColor(),
+    textBackgroundOpacity = s.textBackgroundOpacity == undefined ? this.getTextBackgroundOpacity(): s.textBackgroundOpacity,
     inModalView = s.inModalView || this.getInModalView(),
     textId = s.textId || -1,
     zoom = this.getZoom(),
@@ -632,6 +676,9 @@ ShapeManager.prototype.createShapeJson = function createShapeJson(jsonShape) {
     options.parentShapeCoords = s.parentShapeCoords || {x:0, y:0, width: this._orig_width, height: this._orig_height},
     options.rotation = s.rotation,
     options.textRotation = s.textRotation,
+    options.textColor = textColor,
+    options.textBackgroundColor = textBackgroundColor,
+    options.textBackgroundOpacity = parseFloat(textBackgroundOpacity).toFixed(1),
     options.vFlip = s.vFlip,
     options.hFlip = s.hFlip,
     options.linkedShapeId = s.linkedShapeId,
@@ -845,7 +892,8 @@ ShapeManager.prototype.selectAllShapes = function selectAllShapes(region) {
 
 // select shapes: 'shape' can be shape object or ID
 ShapeManager.prototype.selectShapes = function selectShapes(shapes) {
-  var strokeColor, strokeWidth, fillColor, fillOpacity, text, fontSize, textPosition;
+  var strokeColor, strokeWidth, fillColor, fillOpacity,
+      text, fontSize, textPosition, textColor, textBackgroundColor, textBackgroundOpacity;
 
   // Clear selected with silent:true, since we notify again below
   this.clearSelectedShapes(true);
@@ -926,6 +974,36 @@ ShapeManager.prototype.selectShapes = function selectShapes(shapes) {
         }
       }
 
+      // for first shape, pick color
+      if (textColor === undefined) {
+        textColor = shape.getTextColor();
+      } else {
+        // for subsequent shapes, if colors don't match - set false
+        if (textColor !== shape.getTextColor()) {
+            textColor = false;
+        }
+      }
+
+      // for first shape, pick color
+      if (textBackgroundColor === undefined) {
+        textBackgroundColor = shape.getTextBackgroundColor();
+      } else {
+        // for subsequent shapes, if colors don't match - set false
+        if (textBackgroundColor !== shape.getTextBackgroundColor()) {
+            textBackgroundColor = false;
+        }
+      }
+
+      // for first shape, pick color
+      if (textBackgroundOpacity === undefined) {
+        textBackgroundOpacity = shape.getTextBackgroundOpacity();
+      } else {
+        // for subsequent shapes, if colors don't match - set false
+        if (textBackgroundOpacity !== shape.getTextBackgroundOpacity()) {
+            textBackgroundOpacity = false;
+        }
+      }
+
       shape.setSelected(true);
     }
   });
@@ -940,6 +1018,15 @@ ShapeManager.prototype.selectShapes = function selectShapes(shapes) {
   }
   if (fillOpacity) {
     this._fillOpacity = fillOpacity;
+  }
+  if (textColor) {
+    this._textColor = textColor;
+  }
+  if (textBackgroundColor) {
+    this._textBackgroundColor = textBackgroundColor;
+  }
+  if (textBackgroundOpacity) {
+    this._textBackgroundOpacity = textBackgroundOpacity;
   }
   if (text != undefined) {
     this._text = text;

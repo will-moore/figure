@@ -150,6 +150,9 @@ export const RoiModalView = Backbone.View.extend({
             "change .line-width": "changeLineWidth",
             "change .text-font-size": "changeFontSize",
             "change .text-position": "changeTextPosition",
+            "change .text-color": "changeTextColor",
+            "change .text-background-opacity": "changeTextBackgroundOpacity",
+            "change .text-background-color": "changeTextBackgroundColor",
             "click .add-text":"addTextToShape",
             "submit .add-shape-text-form":"addTextToShape",
             "change .shape-color": "changeColor",
@@ -406,6 +409,22 @@ export const RoiModalView = Backbone.View.extend({
             this.shapeManager.setFillOpacity(opacity);
         },
 
+        changeTextColor: function(event) {
+            var color = $("span:first", event.target).attr('data-text-color');
+            this.shapeManager.setTextColor("#" + color);
+        },
+
+        changeTextBackgroundColor: function(event) {
+            var color = $("span:first", event.target).attr('data-text-background-color');
+            this.shapeManager.setTextBackgroundColor("#" + color);
+        },
+
+        changeTextBackgroundOpacity: function(event) {
+            var opacity = $("span:first", event.target).attr('data-text-background-opacity');
+            opacity = parseFloat(opacity, 10).toFixed(1);
+            this.shapeManager.setTextBackgroundOpacity(opacity);
+        },
+
         // Handles all the various drop-down menus in the toolbar
         select_dropdown_option: function(event) {
             event.preventDefault();
@@ -484,6 +503,9 @@ export const RoiModalView = Backbone.View.extend({
                 lineW = this.shapeManager.getStrokeWidth(),
                 color = this.shapeManager.getStrokeColor(),
                 fillColor = this.shapeManager.getFillColor(),
+                textColor = this.shapeManager.getTextColor(),
+                textBackgroundColor = this.shapeManager.getTextBackgroundColor(),
+                textBackgroundOpacity = this.shapeManager.getTextBackgroundOpacity(),
                 opacity = this.shapeManager.getFillOpacity(),
                 scale = this.zoom,
                 toPaste = this.model.get('clipboard'),
@@ -496,8 +518,11 @@ export const RoiModalView = Backbone.View.extend({
                 text = sel ? this.shapeManager.getText() : "";
             color = color ? color.replace("#", "") : 'FFFFFF';
             fillColor = fillColor ? fillColor.replace("#", "") : 'FFFFFF';
+            textColor = textColor ? textColor.replace("#", "") : 'FFFFFF';
+            textBackgroundColor = textBackgroundColor ? textBackgroundColor.replace("#", "") : 'FFFFFF';
             toPaste = (toPaste && (toPaste.SHAPES || toPaste.CROP));
             opacity = opacity <= 0.01 ? parseInt(opacity) : opacity;
+            textBackgroundOpacity = textBackgroundOpacity <= 0.01 ? parseInt(textBackgroundOpacity) : textBackgroundOpacity;
 
             var json = {'state': state,
                         'lineWidths': lineWidths,
@@ -516,7 +541,11 @@ export const RoiModalView = Backbone.View.extend({
                         'position_icon_cls': LABEL_POSITION_ICONS[textPosition],
                         'fontSizes': fontSizes,
                         'fontSize': fontSize,
+                        'textColor': textColor,
+                        'textBackgroundOpacity': textBackgroundOpacity,
+                        'textBackgroundColor': textBackgroundColor,
                         'text': text};
+
             $(".roi_toolbar", this.$el).html(this.template(json));
         },
 

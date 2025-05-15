@@ -1026,6 +1026,8 @@
     .fill-color span:first-child,
     .label-color span:first-child,
     .border-color span:first-child,
+    .text-color span:first-child,
+    .text-background-color span:first-child,
     .shape-color span:first-child {
         border: solid 1px #bbb;
     }
@@ -1258,6 +1260,11 @@
         overflow: visible;
         margin: 15px;
         margin-bottom: 5px;
+    }
+
+    .text_toolbar {
+        overflow: hidden;
+        margin: 15px;
     }
 
     .roi_toolbar .pressed {

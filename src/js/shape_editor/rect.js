@@ -334,28 +334,60 @@ Rect.prototype.setInModalView = function setInModalView(inModalView) {
   if(this._textShape){
     this._textShape.setInModalView(inModalView)
   }
-
 };
 
 Rect.prototype.setTextRotation = function setTextRotation(textRotation) {
   if(this._textShape){
     this._textShape.setTextRotation(textRotation)
   }
+};
 
+Rect.prototype.setTextBackgroundOpacity = function setTextBackgroundOpacity(textBackgroundOpacity) {
+  if(this._textShape){
+    this._textShape.setTextBackgroundOpacity(textBackgroundOpacity)
+  }
+};
+
+Rect.prototype.getTextBackgroundOpacity = function getTextBackgroundOpacity() {
+  if(this._textShape){
+    this._textShape.getTextBackgroundOpacity()
+  }
+};
+
+Rect.prototype.setTextBackgroundColor = function setTextBackgroundColor(textBackgroundColor) {
+  if(this._textShape){
+    this._textShape.setTextBackgroundColor(textBackgroundColor)
+  }
+};
+
+Rect.prototype.getTextBackgroundColor = function getTextBackgroundColor() {
+  if(this._textShape){
+    this._textShape.getTextBackgroundColor()
+  }
+};
+
+Rect.prototype.setTextColor = function setTextColor(textColor) {
+  if(this._textShape){
+    this._textShape.setTextColor(textColor)
+  }
+};
+
+Rect.prototype.getTextColor = function getTextColor() {
+  if(this._textShape){
+    this._textShape.getTextColor()
+  }
 };
 
 Rect.prototype.setVerticalFlip = function setVerticalFlip(vFlip) {
   if(this._textShape){
     this._textShape.setVerticalFlip(vFlip)
   }
-
 };
 
 Rect.prototype.setHorizontalFlip = function setHorizontalFlip(hFlip) {
   if(this._textShape){
     this._textShape.setHorizontalFlip(hFlip)
   }
-
 };
 
 Rect.prototype.destroy = function destroy() {
@@ -379,6 +411,9 @@ Rect.prototype.createShapeText = function createShapeText(){
           inModalView = this.manager.getInModalView(),
           vFlip = this.manager.getVerticalFlip(),
           hFlip = this.manager.getHorizontalFlip(),
+          textColor = this.manager.getTextColor(),
+          textBackgroundOpacity = this.manager.getTextBackgroundOpacity(),
+          textBackgroundColor = this.manager.getTextBackgroundColor(),
           textRotation = this.manager.getTextRotation();
 
       if(textPosition == "freehand"){
@@ -398,7 +433,9 @@ Rect.prototype.createShapeText = function createShapeText(){
           text: "text",
           x: this._x,
           y: this._y,
-          strokeColor: this._strokeColor,
+          textBackgroundOpacity: textBackgroundOpacity,
+          textBackgroundColor: textBackgroundColor,
+          textColor: textColor,
           fontSize: fontSize,
           textPosition: textPosition,
           strokeWidth: this._strokeWidth,

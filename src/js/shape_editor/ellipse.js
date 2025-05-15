@@ -305,6 +305,42 @@ Ellipse.prototype.setTextRotation = function setTextRotation(textRotation) {
   }
 };
 
+Ellipse.prototype.setTextBackgroundOpacity = function setTextBackgroundOpacity(textBackgroundOpacity) {
+  if(this._textShape){
+    this._textShape.setTextBackgroundOpacity(textBackgroundOpacity)
+  }
+};
+
+Ellipse.prototype.getTextBackgroundOpacity = function getTextBackgroundOpacity() {
+  if(this._textShape){
+    this._textShape.getTextBackgroundOpacity()
+  }
+};
+
+Ellipse.prototype.setTextBackgroundColor = function setTextBackgroundColor(textBackgroundColor) {
+  if(this._textShape){
+    this._textShape.setTextBackgroundColor(textBackgroundColor)
+  }
+};
+
+Ellipse.prototype.getTextBackgroundColor = function getTextBackgroundColor() {
+  if(this._textShape){
+    this._textShape.getTextBackgroundColor()
+  }
+};
+
+Ellipse.prototype.setTextColor = function setTextColor(textColor) {
+  if(this._textShape){
+    this._textShape.setTextColor(textColor)
+  }
+};
+
+Ellipse.prototype.getTextColor = function getTextColor() {
+  if(this._textShape){
+    this._textShape.getTextColor()
+  }
+};
+
 Ellipse.prototype.setVerticalFlip = function setVerticalFlip(vFlip) {
   if(this._textShape){
     this._textShape.setVerticalFlip(vFlip)
@@ -480,6 +516,9 @@ Ellipse.prototype.createShapeText = function createShapeText(){
           inModalView = this.manager.getInModalView(),
           vFlip = this.manager.getVerticalFlip(),
           hFlip = this.manager.getHorizontalFlip(),
+          textColor = this.manager.getTextColor(),
+          textBackgroundOpacity = this.manager.getTextBackgroundOpacity(),
+          textBackgroundColor = this.manager.getTextBackgroundColor(),
           textRotation = this.manager.getTextRotation();
 
     if(textPosition == "freehand"){
@@ -499,7 +538,9 @@ Ellipse.prototype.createShapeText = function createShapeText(){
         text: "text",
         x: this._x,
         y: this._y,
-        strokeColor: this._strokeColor,
+        textBackgroundOpacity: textBackgroundOpacity,
+        textBackgroundColor: textBackgroundColor,
+        textColor: textColor,
         fontSize: fontSize,
         textPosition: textPosition,
         strokeWidth: this._strokeWidth,

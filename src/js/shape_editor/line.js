@@ -271,6 +271,42 @@ Line.prototype.setTextRotation = function setTextRotation(textRotation) {
   }
 };
 
+Line.prototype.setTextBackgroundOpacity = function setTextBackgroundOpacity(textBackgroundOpacity) {
+  if(this._textShape){
+    this._textShape.setTextBackgroundOpacity(textBackgroundOpacity)
+  }
+};
+
+Line.prototype.getTextBackgroundOpacity = function getTextBackgroundOpacity() {
+  if(this._textShape){
+    this._textShape.getTextBackgroundOpacity()
+  }
+};
+
+Line.prototype.setTextBackgroundColor = function setTextBackgroundColor(textBackgroundColor) {
+  if(this._textShape){
+    this._textShape.setTextBackgroundColor(textBackgroundColor)
+  }
+};
+
+Line.prototype.getTextBackgroundColor = function getTextBackgroundColor() {
+  if(this._textShape){
+    this._textShape.getTextBackgroundColor()
+  }
+};
+
+Line.prototype.setTextColor = function setTextColor(textColor) {
+  if(this._textShape){
+    this._textShape.setTextColor(textColor)
+  }
+};
+
+Line.prototype.getTextColor = function getTextColor() {
+  if(this._textShape){
+    this._textShape.getTextColor()
+  }
+};
+
 Line.prototype.setVerticalFlip = function setVerticalFlip(vFlip) {
   if(this._textShape){
     this._textShape.setVerticalFlip(vFlip)
@@ -344,6 +380,9 @@ Line.prototype.createShapeText = function createShapeText(){
         inModalView = this.manager.getInModalView(),
         vFlip = this.manager.getVerticalFlip(),
         hFlip = this.manager.getHorizontalFlip(),
+        textColor = this.manager.getTextColor(),
+        textBackgroundOpacity = this.manager.getTextBackgroundOpacity(),
+        textBackgroundColor = this.manager.getTextBackgroundColor(),
         textRotation = this.manager.getTextRotation();
 
     if(textPosition == "freehand"){
@@ -363,7 +402,9 @@ Line.prototype.createShapeText = function createShapeText(){
         text: "text",
         x: this._x,
         y: this._y,
-        strokeColor: this._strokeColor,
+        textBackgroundOpacity: textBackgroundOpacity,
+        textBackgroundColor: textBackgroundColor,
+        textColor: textColor,
         fontSize: fontSize,
         textPosition: textPosition,
         strokeWidth: this._strokeWidth,
