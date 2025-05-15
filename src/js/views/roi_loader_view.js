@@ -2,7 +2,7 @@
 import $ from "jquery";
 import _ from "underscore";
 import Backbone from "backbone";
-
+import {getRandomId} from "./util";
 import roi_modal_roi_template from '../../templates/modal_dialogs/roi_modal_roi.template.html?raw';
 import roi_modal_shape_template from '../../templates/modal_dialogs/roi_modal_shape.template.html?raw';
 
@@ -48,7 +48,59 @@ var RoiLoaderView = Backbone.View.extend({
             var shapeId = parseInt($tr.attr('data-shapeId'), 10);
             var shape = this.collection.getShape(shapeId);
             var shapeJson = shape.toJSON();
-            this.collection.trigger('shape_add', [shapeJson]);
+            var shapeList = [shapeJson]
+            if(shapeJson.type != "Text" && shapeJson.Text != undefined){
+                var textRandomId = getRandomId();
+                var rectRandomId = getRandomId();
+                shapeJson.id = rectRandomId;
+                shapeJson.textId = textRandomId;
+                shapeJson.isFromOmero = true;
+                var parentShapeCoords = this.getParentShapeCoords(shapeJson)
+                var textShape = {
+                    text: shapeJson.Text,
+                    id: textRandomId,
+                    x: shapeJson.x,
+                    y: shapeJson.y,
+                    type: "Text",
+                    parentShapeCoords: parentShapeCoords,
+                    linkedShapeId: rectRandomId,
+                    textPosition: "top",
+                    isFromOmero: true
+                }
+                shapeList.push(textShape)
+            }
+            this.collection.trigger('shape_add', shapeList.reverse());
+        }
+    },
+
+
+    getParentShapeCoords: function(shape) {
+        if(shape.type == "Point" || shape.type == "Ellipse"){
+            return {x: shape.x - shape.radiusX, y: s.y - shape.radiusY, width: 2*shape.radiusX, height: 2*shape.radiusY}
+        } else if (shape.type == "Rectangle"){
+            return  {x:shape.x, y:shape.y, width:shape.width, height:shape.height}
+        } else if(shape.type == "Line" || shape.type == "Arrow"){
+           return {x:Math.min(shape.x1, shape.x2), y: Math.min(shape.y1, shape.y2),
+          width: Math.abs(shape.x1 - shape.x2), height: Math.abs(shape.y1 - shape.y2)}
+        } else if(shape.type == "Polygon"){
+            var coords = points.split(" ");
+            var xCoords = [];
+            var yCoords = [];
+
+            coords.forEach(function (s) {
+                var point = s.split(",");
+                xCoords.push(parseInt(point[0]));
+                yCoords.push(parseInt(point[1]));
+            });
+
+
+            var x1 = Math.min(...xCoords)
+            var x2 = Math.max(...xCoords)
+            var y1 = Math.min(...yCoords)
+            var y2 = Math.max(...yCoords)
+            return {x:x1, y:y1,width:Math.abs(bbox.x1 - bbox.x2), height:Math.abs(bbox.y1 - bbox.y2)}
+        } else {
+            return undefined;
         }
     },
 

@@ -485,7 +485,8 @@ ShapeManager.prototype.convertOmeroLabelToFigureText = function convertOmeroLabe
       text: shape.Text,
       fillColor: shape.fillColor,
       fillOpacity: shape.fillOpacity,
-      strokeColor: shape.strokeColor,
+      textColor: shape.strokeColor,
+      fontSize: shape.FontSize.Value / 2,
       type: "Text",
       x: shape.x,
       y: shape.y,
@@ -510,14 +511,21 @@ ShapeManager.prototype.pasteShapesJson = function pasteShapesJson(
       csh = self.convertOmeroLabelToFigureText(csh)
     }
 
-    if(csh.type != "Text" || csh.linkedShapeId == undefined || csh.linkedShapeId == -1){
+    if(csh.type != "Text" || csh.linkedShapeId == undefined ||
+      csh.linkedShapeId == -1 || csh.isFromOmero){
       // Create a shape to resolve any transform matrix -> coords
+      var tempTextId = csh.textId
       csh.textId = -1
+
       var temp = self.createShapeJson(csh);
       var s = temp.toJson();
       temp.destroy();
 
-      s.textId = -1
+      if(!csh.isFromOmero)
+        s.textId = -1
+      else
+        s.textId = tempTextId
+
       // check if a shape is at the same coordinates...
       var match = self.findShapeAtCoords(s);
       // if so, keep offsetting until we find a spot...
@@ -615,7 +623,11 @@ ShapeManager.prototype.createShapeJson = function createShapeJson(jsonShape) {
     };
 
   if(s.text === undefined){
-    text = this.getText()
+    if(s.Text === undefined){
+      text = this.getText()
+    }else{
+      text = s.Text
+    }
   }else{
     text = s.text
   }

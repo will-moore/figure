@@ -263,14 +263,14 @@ export const RoiModalView = Backbone.View.extend({
 
         addShapeFromOmero: function(args) {
 
-            var shapeJson = args[0],
+            var shapesJson = args.length == 1 ? [args[0]] : args,
                 shape;
             // Remove the temp shape
             this.shapeManager.deleteShapesByIds([this.TEMP_SHAPE_ID]);
 
             // Paste (will offset if shape exists)
             var viewport = this.m.getViewportAsRect();
-            shape = this.shapeManager.pasteShapesJson([shapeJson], viewport);
+            shape = this.shapeManager.pasteShapesJson(shapesJson, viewport);
             if (!shape) {
                 alert("Couldn't add shape outside of current view. Try zooming out.");
             }
