@@ -24,6 +24,7 @@ const LABEL_POSITION_ICONS = {
     "top": "bi-box-arrow-up",
     "right": "bi-box-arrow-right",
     "bottom": "bi-box-arrow-down",
+    "center": "bi-arrows-fullscreen",
     "freehand": "bi-arrows-move"
 }
 

@@ -457,6 +457,11 @@ Text.prototype.drawShape = function drawShape() {
       dy = ph - textOffsetY;
       textAnchor = inAnchors[finalIndex]
       break;
+  case "center":
+      dx = pw/2;
+      dy = ph/2;
+      textAnchor = "middle";
+      break;
   case "freehand":
       x = this._x;
       y = this._y;
