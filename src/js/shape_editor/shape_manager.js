@@ -331,6 +331,18 @@ ShapeManager.prototype.setText = function setText(text) {
   }
 };
 
+ShapeManager.prototype.getShowText = function getShowText() {
+  return this._showText;
+};
+
+ShapeManager.prototype.setShowText = function setShowText(showText) {
+  this._showText = showText;
+  var selected = this.getSelectedShapes();
+  for (var s = 0; s < selected.length; s++) {
+    selected[s].setShowText(showText);
+  }
+};
+
 ShapeManager.prototype.getTextFontSize = function getTextFontSize() {
   return this._textFontSize;
 };
@@ -605,6 +617,7 @@ ShapeManager.prototype.createShapeJson = function createShapeJson(jsonShape) {
     strokeWidth = s.strokeWidth || this.getStrokeWidth(),
     fontSize = s.fontSize || this.getTextFontSize(),
     textPosition = s.textPosition || this.getTextPosition(),
+    showText = s.showText || this.getShowText(),
     textColor = s.textColor || this.getTextColor(),
     textBackgroundColor = s.textBackgroundColor || this.getTextBackgroundColor(),
     textBackgroundOpacity = s.textBackgroundOpacity == undefined ? this.getTextBackgroundOpacity(): s.textBackgroundOpacity,
@@ -695,6 +708,7 @@ ShapeManager.prototype.createShapeJson = function createShapeJson(jsonShape) {
     options.hFlip = s.hFlip,
     options.linkedShapeId = s.linkedShapeId,
     options.inModalView = inModalView,
+    options.showText = showText,
     newShape = new Text(options);
   }
   return newShape;
@@ -904,7 +918,7 @@ ShapeManager.prototype.selectAllShapes = function selectAllShapes(region) {
 
 // select shapes: 'shape' can be shape object or ID
 ShapeManager.prototype.selectShapes = function selectShapes(shapes) {
-  var strokeColor, strokeWidth, fillColor, fillOpacity,
+  var strokeColor, strokeWidth, fillColor, fillOpacity, showText,
       text, fontSize, textPosition, textColor, textBackgroundColor, textBackgroundOpacity;
 
   // Clear selected with silent:true, since we notify again below
@@ -1016,6 +1030,16 @@ ShapeManager.prototype.selectShapes = function selectShapes(shapes) {
         }
       }
 
+      // for first shape, pick color
+      if (showText === undefined) {
+        showText = shape.getShowText();
+      } else {
+        // for subsequent shapes, if colors don't match - set false
+        if (showText !== shape.getShowText()) {
+            showText = false;
+        }
+      }
+
       shape.setSelected(true);
     }
   });
@@ -1033,6 +1057,9 @@ ShapeManager.prototype.selectShapes = function selectShapes(shapes) {
   }
   if (textColor) {
     this._textColor = textColor;
+  }
+  if (showText) {
+    this._showText = showText;
   }
   if (textBackgroundColor) {
     this._textBackgroundColor = textBackgroundColor;

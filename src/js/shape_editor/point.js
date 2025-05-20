@@ -239,6 +239,19 @@ Point.prototype.getText = function getText() {
   return "";
 };
 
+Point.prototype.setShowText = function setShowText(showText) {
+  if(this._textShape){
+    this._textShape.setShowText(showText)
+  }
+};
+
+Point.prototype.getShowText = function getShowText() {
+   if(this._textShape){
+    return this._textShape.getShowText()
+  }
+  return "";
+};
+
 Point.prototype.setTextPosition = function setTextPosition(textPosition) {
   if(this._textShape){
     this._textShape.setTextPosition(textPosition)
@@ -511,6 +524,7 @@ Point.prototype.createShapeText = function createShapeText(){
         linkedShapeId: this._id,
         zoom: this._zoomFraction * 100,
         text: "text",
+        showText: true,
         x: this._x,
         y: this._y,
         textBackgroundOpacity: textBackgroundOpacity,
@@ -654,6 +668,7 @@ var CreatePoint = function CreatePoint(options) {
 CreatePoint.prototype.startDrag = function startDrag(startX, startY) {
   // reset the text in the manager
   this.manager.setText("")
+  this.manager.setShowText(false)
 
   var strokeColor = this.manager.getStrokeColor(),
     strokeWidth = this.manager.getStrokeWidth(),

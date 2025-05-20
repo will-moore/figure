@@ -154,7 +154,8 @@ export const RoiModalView = Backbone.View.extend({
             "change .text-color": "changeTextColor",
             "change .text-background-opacity": "changeTextBackgroundOpacity",
             "change .text-background-color": "changeTextBackgroundColor",
-            "click .add-text":"addTextToShape",
+            "click .show-text":"showText",
+            "click .hide-text":"hideText",
             "submit .add-shape-text-form":"addTextToShape",
             "change .shape-color": "changeColor",
             "change .fill-color": "changeFillColor",
@@ -385,6 +386,21 @@ export const RoiModalView = Backbone.View.extend({
            this.shapeManager.setTextPosition(position);
         },
 
+        showText: function(event){
+            event.preventDefault()
+            var text = $("#label-text").val()
+            if(text != undefined && text != ""){
+                this.addTextToShape(event)
+                this.shapeManager.setShowText(true);
+                this.renderToolbar();
+            }
+        },
+
+        hideText: function(event){
+            this.shapeManager.setShowText(false);
+            this.renderToolbar();
+        },
+
         addTextToShape: function(event){
             event.preventDefault()
             var text = $("#label-text").val()
@@ -516,7 +532,8 @@ export const RoiModalView = Backbone.View.extend({
                 textPosition = this.shapeManager.getTextPosition(),
                 fontSize = this.shapeManager.getTextFontSize(),
                 fontSizes = [6, 8, 10, 12, 14, 18, 21, 24, 36, 48],
-                text = sel ? this.shapeManager.getText() : "";
+                text = sel ? this.shapeManager.getText() : "",
+                showText = sel ? this.shapeManager.getShowText() : false;
             color = color ? color.replace("#", "") : 'FFFFFF';
             fillColor = fillColor ? fillColor.replace("#", "") : 'FFFFFF';
             textColor = textColor ? textColor.replace("#", "") : 'FFFFFF';
@@ -542,6 +559,7 @@ export const RoiModalView = Backbone.View.extend({
                         'position_icon_cls': LABEL_POSITION_ICONS[textPosition],
                         'fontSizes': fontSizes,
                         'fontSize': fontSize,
+                        'showState': !showText,
                         'textColor': textColor,
                         'textBackgroundOpacity': textBackgroundOpacity,
                         'textBackgroundColor': textBackgroundColor,

@@ -259,6 +259,19 @@ Ellipse.prototype.getText = function getText() {
   return "";
 };
 
+Ellipse.prototype.setShowText = function setShowText(showText) {
+  if(this._textShape){
+    this._textShape.setShowText(showText)
+  }
+};
+
+Ellipse.prototype.getShowText = function getShowText() {
+   if(this._textShape){
+    return this._textShape.getShowText()
+  }
+  return "";
+};
+
 Ellipse.prototype.setTextPosition = function setTextPosition(textPosition) {
   if(this._textShape){
     this._textShape.setTextPosition(textPosition)
@@ -541,6 +554,7 @@ Ellipse.prototype.createShapeText = function createShapeText(){
         textBackgroundOpacity: textBackgroundOpacity,
         textBackgroundColor: textBackgroundColor,
         textColor: textColor,
+        showText: true,
         fontSize: fontSize,
         textPosition: textPosition,
         strokeWidth: this._strokeWidth,
@@ -733,6 +747,7 @@ var CreateEllipse = function CreateEllipse(options) {
 CreateEllipse.prototype.startDrag = function startDrag(startX, startY) {
   // reset the text in the manager
   this.manager.setText("")
+  this.manager.setShowText(false)
 
   var strokeColor = this.manager.getStrokeColor(),
     strokeWidth = this.manager.getStrokeWidth(),

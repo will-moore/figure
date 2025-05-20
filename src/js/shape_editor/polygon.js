@@ -251,6 +251,19 @@ Polygon.prototype.getText = function getText() {
   return "";
 };
 
+Polygon.prototype.setShowText = function setShowText(showText) {
+  if(this._textShape){
+    this._textShape.setShowText(showText)
+  }
+};
+
+Polygon.prototype.getShowText = function getShowText() {
+   if(this._textShape){
+    return this._textShape.getShowText()
+  }
+  return "";
+};
+
 Polygon.prototype.setTextPosition = function setTextPosition(textPosition) {
   if(this._textShape){
     this._textShape.setTextPosition(textPosition)
@@ -476,6 +489,7 @@ Polygon.prototype.createShapeText = function createShapeText(){
         linkedShapeId: this._id,
         zoom: this._zoomFraction * 100,
         text: "text",
+        showText: true,
         x: this._x,
         y: this._y,
         textBackgroundOpacity: textBackgroundOpacity,

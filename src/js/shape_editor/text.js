@@ -35,6 +35,7 @@ var Text = function Text(options) {
   this._textColor = options.textColor;
   this._fontSize = options.fontSize;
   this._text = options.text;
+  this._showText = options.showText;
   this._parentShapeCoords = options.parentShapeCoords;
   this._strokeWidth = options.strokeWidth || 2;
   this._textPosition = options.textPosition;
@@ -115,6 +116,7 @@ Text.prototype.toJson = function toJson() {
     textBackgroundColor: this._textBackgroundColor,
     textColor: this._textColor,
     text: this._text,
+    showText: this._showText,
     textAnchor: this._textAnchor,
     rotation: this._rotation,
     textRotation: this._textRotation,
@@ -167,7 +169,7 @@ Text.prototype.setStrokeColor = function setStrokeColor(color) {
 };
 
 Text.prototype.getStrokeColor = function getStrokeColor() {
-  return;// this.getTextColor();
+  return;
 };
 
 Text.prototype.setTextColor = function setTextColor(color) {
@@ -206,6 +208,15 @@ Text.prototype.getText = function getText() {
   return this._text;
 };
 
+Text.prototype.setShowText = function setShowText(showText) {
+  this._showText = showText;
+  this.drawShape();
+};
+
+Text.prototype.getShowText = function getShowText() {
+  return this._showText;
+};
+
 Text.prototype.setTextPosition = function setTextPosition(textPosition) {
     this._textPosition = textPosition;
     this.drawShape();
@@ -220,7 +231,7 @@ Text.prototype.setFillColor = function setFillColor(fillColor) {
 };
 
 Text.prototype.getFillColor = function getFillColor() {
-  return;// this.getTextColor();
+  return;
 };
 
 Text.prototype.setTextBackgroundColor = function setTextBackgroundColor(textBackgroundColor) {
@@ -513,11 +524,18 @@ Text.prototype.drawShape = function drawShape() {
 
   this._area = bbox.width * bbox.height;
 
-  if (this.isSelected()) {
-    this.handles.show().toFront();
-  } else {
+  if(!this._showText && this._linkedShapeId != -1){
+    this.element.hide()
     this.handles.hide();
+  }else{
+    this.element.show();
+    if (this.isSelected()) {
+      this.handles.show().toFront();
+    } else {
+      this.handles.hide();
+    }
   }
+
 
   // update Handles
   var handleIds = this.getHandleCoords();
@@ -686,6 +704,7 @@ CreateText.prototype.startDrag = function startDrag(startX, startY) {
       originalImageShape = this.manager.getOriginalShape();
 
   this.manager.setText("Text")
+  this.manager.setShowText(true)
   this.manager.setTextPosition("freehand")
 
   this.startX = startX;
@@ -696,6 +715,7 @@ CreateText.prototype.startDrag = function startDrag(startX, startY) {
     paper: this.paper,
     zoom: zoom,
     text: "Text",
+    showText: true,
     inModalView: inModalView,
     textRotation: textRotation,
     vFlip: vFlip,

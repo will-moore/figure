@@ -238,8 +238,12 @@
         </ul>
     </div>
 
-    <button type="submit" class="btn btn-success add-text" title="Add text">
-        <span >Add</span></button>
+
+     <% if (showState){ %>
+        <button type="submit" class="show-text btn btn-sm btn-success "><span >Show</span></button>
+    <% } else { %>
+        <button type="submit" class="hide-text btn btn-outline-secondary btn-sm"><span >Hide</span></button>
+    <% } %>
 </div>
 
 

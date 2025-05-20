@@ -174,7 +174,7 @@
                 let text = {
                     type: "Text",
                     strokeWidth: strokeWidth,
-                    strokeColor: "#" + color,
+                    textColor: "#" + color,
                     x: txtX,
                     y: txtY,
                     id: textRandomId,
@@ -185,6 +185,7 @@
                     textPosition: "topleft",
                     text: String.fromCharCode(lastInsetTextIndex),
                     textAnchor: "start",
+                    showText: true,
                     parentShapeCoords: {x: x, y: y, width: rectSize, height: rectSize},
                 }
                 panel.add_shapes([rect, text]);

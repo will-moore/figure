@@ -229,6 +229,19 @@ Line.prototype.getText = function getText() {
   return "";
 };
 
+Line.prototype.setShowText = function setShowText(showText) {
+  if(this._textShape){
+    this._textShape.setShowText(showText)
+  }
+};
+
+Line.prototype.getShowText = function getShowText() {
+   if(this._textShape){
+    return this._textShape.getShowText()
+  }
+  return "";
+};
+
 Line.prototype.setTextPosition = function setTextPosition(textPosition) {
   if(this._textShape){
     this._textShape.setTextPosition(textPosition)
@@ -400,6 +413,7 @@ Line.prototype.createShapeText = function createShapeText(){
         linkedShapeId: this._id,
         zoom: this._zoomFraction * 100,
         text: "text",
+        showText: true,
         x: this._x,
         y: this._y,
         textBackgroundOpacity: textBackgroundOpacity,
@@ -697,6 +711,7 @@ var CreateLine = function CreateLine(options) {
 CreateLine.prototype.startDrag = function startDrag(startX, startY) {
   // reset the text in the manager
   this.manager.setText("")
+  this.manager.setShowText(false)
 
   var strokeColor = this.manager.getStrokeColor(),
     strokeWidth = this.manager.getStrokeWidth(),
