@@ -1258,8 +1258,9 @@
 
     .roi_toolbar {
         overflow: visible;
-        margin: 15px;
+        margin: 25px;
         margin-bottom: 5px;
+        margin-top: 15px;
     }
 
     .text_toolbar {
