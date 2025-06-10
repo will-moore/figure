@@ -372,6 +372,10 @@ class ShapeToPdfExport(ShapeExport):
             self.canvas, center[0] - w / 2, center[1] - h / 2 + size / 4)
 
     def draw_text(self, shape):
+        print(shape)
+        if not shape.get('showText', True):
+            return
+
         text_coords = self.panel_to_page_coords(shape['x'], shape['y'])
         text = ""
 
@@ -381,30 +385,34 @@ class ShapeToPdfExport(ShapeExport):
 
         size = shape.get('fontSize', 12)
         stroke_width = shape.get('strokeWidth', 2)
-        r, g, b, a = self.get_rgba(shape['strokeColor'])
+        r, g, b, a = self.get_rgba(shape['textColor'])
         # bump up alpha a bit to make text more readable
         rgba = (r, g, b, 0.5 + a / 2.0)
+
+        if float(shape.get('textBackgroundOpacity', 0)) > 0:
+            # self.canvas.setFillColorRGB(r, g, b, alpha=a) ==> need to use it to get the right opacity and color
+            text = f"<font backColor={shape['textBackgroundColor']}>{text}</font>"
 
         x = text_coords["x"]
         y = self.page_height - text_coords["y"]
         anchor = shape['textAnchor']
-        aligment = TA_LEFT
+        alignment = TA_LEFT
 
         h_flip = self.panel.get('horizontal_flip', False)
         if h_flip and anchor == 'start':
             anchor = "end"
 
         if (anchor == 'middle'):
-            aligment = TA_CENTER
+            alignment = TA_CENTER
             x = x - (self.page_width / 2)
         elif (anchor == "end"):
-            aligment = TA_RIGHT
+            alignment = TA_RIGHT
             x = x - self.page_width
 
         style = ParagraphStyle(
             'label',
             parent=getSampleStyleSheet()['Normal'],
-            alignment=aligment,
+            alignment=alignment,
             textColor=Color(*rgba),
             fontSize=size,
             leading=size,
@@ -457,9 +465,15 @@ class ShapeToPdfExport(ShapeExport):
         if text_position == "bottomright":
             dx = -text_offset_x
             dy = -stroke_width / 2
+        if text_position == "center":
+            dx = 0
+            dy = size / 4
         if text_position == "freehand":
             dx = 0
             dy = 0
+
+        if float(shape.get('textBackgroundOpacity', 0)) > 0:
+            self.canvas.setFillColorRGB(r, g, b, alpha=float(shape['textBackgroundOpacity']))
 
         para.drawOn(self.canvas, x + dx, y - dy)
 
@@ -749,6 +763,10 @@ class ShapeToPilExport(ShapeExport):
         self.draw.text(xy, text, fill=rgba, font=font)
 
     def draw_text(self, shape):
+        print(shape)
+        if not shape.get('showText', True):
+            return
+
         text_coords = self.get_panel_coords(shape['x'], shape['y'])
         text = shape.get('text', '')
 
@@ -756,7 +774,7 @@ class ShapeToPilExport(ShapeExport):
         stroke_width = shape.get('strokeWidth', 2)
         stroke_width_dpi = scale_to_export_dpi(float(stroke_width))
 
-        r, g, b, a = self.get_rgba_int(shape['strokeColor'])
+        r, g, b, a = self.get_rgba_int(shape['textColor'])
         # bump up alpha a bit to make text more readable
         rgba = (r, g, b, int(128 + a / 2))
         font_name = "FreeSans.ttf"
@@ -780,9 +798,9 @@ class ShapeToPilExport(ShapeExport):
         if h_flip and anchor == 'start':
             anchor = "end"
 
-        if (anchor == 'middle'):
+        if anchor == 'middle':
             x = x - txt_w / 2
-        elif (anchor == "end"):
+        elif anchor == "end":
             x = x - txt_w
 
         rotation = shape.get('textRotation', 0)
@@ -829,11 +847,28 @@ class ShapeToPilExport(ShapeExport):
         if text_position == "bottomright":
             dx = -text_offset_x
             dy = -font_size_dpi - stroke_width_dpi / 2
+        if text_position == "center":
+            dx = 0
+            dy = - 3 * font_size_dpi / 4
         if text_position == "freehand":
             dx = 0
             dy = 0
 
         xy = (x + dx, y + dy)
+
+        if float(shape.get('textBackgroundOpacity', 0)) > 0:
+            txt_offset = scale_to_export_dpi(3)
+            text_bbox = self.draw.textbbox(xy, text, font=font)
+            r, g, b, a = self.get_rgba_int(shape.get('textBackgroundColor', '#00000000'))
+            a = int(float(shape['textBackgroundOpacity']) * 255)
+            rgba_fill = (r, g, b, a)
+            temp_image = Image.new('RGBA', (int(text_bbox[2] - text_bbox[0] + 2 * txt_offset),
+                                            int(text_bbox[3] - text_bbox[1] + 2 * txt_offset)))
+            temp_draw = ImageDraw.Draw(temp_image)
+            temp_draw.rectangle((0,0,int(text_bbox[2] - text_bbox[0] + 2 * txt_offset),
+                                            int(text_bbox[3] - text_bbox[1] + 2 * txt_offset)), fill=rgba_fill)
+            self.pil_img.paste(
+                temp_image, (int(text_bbox[0]) - txt_offset, int(text_bbox[1] - txt_offset)), mask=temp_image)
 
         self.draw.text(xy, text, fill=rgba, font=font)
 
