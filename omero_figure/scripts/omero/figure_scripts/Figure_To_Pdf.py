@@ -901,9 +901,9 @@ class ShapeToPilExport(ShapeExport):
             box_height = int(text_bbox[3] - text_bbox[1] + 2 * txt_offset)
             box_x = int(text_bbox[0] - txt_offset)
             box_y = int(text_bbox[1] - txt_offset)
-            temp_image = Image.new('RGBA',(box_width, box_height))
+            temp_image = Image.new('RGBA', (box_width, box_height))
             temp_draw = ImageDraw.Draw(temp_image)
-            temp_draw.rectangle((0, 0, box_width,box_height), fill=rgba_fill)
+            temp_draw.rectangle((0, 0, box_width, box_height), fill=rgba_fill)
             self.pil_img.paste(temp_image, (box_x, box_y), mask=temp_image)
 
         # draw text
