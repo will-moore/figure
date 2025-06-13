@@ -450,10 +450,12 @@ class ShapeToPdfExport(ShapeExport):
             padding_y = - 2 * dy
         if text_position == "left":
             dx = -text_offset_x
-            dy = 0
+            dy = size * 0.4
+            padding_y = - 2 * dy
         if text_position == "right":
             dx = text_offset_x
-            dy = 0
+            dy = size * 0.4
+            padding_y = - 2 * dy
         if text_position == "top":
             dx = 0
             dy = -stroke_width / 2
@@ -473,7 +475,7 @@ class ShapeToPdfExport(ShapeExport):
             dy = -stroke_width / 2
         if text_position == "center":
             dx = 0
-            dy = size / 4
+            dy = size * 0.4
             padding_y = - 2 * dy
         if text_position == "freehand":
             dx = 0
@@ -851,10 +853,10 @@ class ShapeToPilExport(ShapeExport):
             dy = stroke_width_dpi / 4
         if text_position == "left":
             dx = -text_offset_x
-            dy = -txt_h / 2
+            dy = -txt_h * 0.8
         if text_position == "right":
             dx = text_offset_x
-            dy = -txt_h / 2
+            dy = -txt_h * 0.8
         if text_position == "top":
             dx = 0
             dy = -font_size_dpi - stroke_width_dpi / 2
@@ -872,10 +874,10 @@ class ShapeToPilExport(ShapeExport):
             dy = -font_size_dpi - stroke_width_dpi / 2
         if text_position == "center":
             dx = 0
-            dy = - 3 * font_size_dpi / 4
+            dy = -txt_h * 0.8
         if text_position == "freehand":
             dx = 0
-            dy = 0
+            dy = -txt_h * 0.8
 
         xy = (x + dx, y + dy)
 
