@@ -899,13 +899,12 @@ class ShapeToPilExport(ShapeExport):
             rgba_fill = (r, g, b, a)
             box_width = int(text_bbox[2] - text_bbox[0] + 2 * txt_offset)
             box_height = int(text_bbox[3] - text_bbox[1] + 2 * txt_offset)
-            temp_image = Image.new('RGBA',(box_width,box_height))
+            box_x = int(text_bbox[0] - txt_offset)
+            box_y = int(text_bbox[1] - txt_offset)
+            temp_image = Image.new('RGBA',(box_width, box_height))
             temp_draw = ImageDraw.Draw(temp_image)
             temp_draw.rectangle((0, 0, box_width,box_height), fill=rgba_fill)
-            self.pil_img.paste(
-                temp_image,
-                (int(text_bbox[0]) - txt_offset, int(text_bbox[1] - txt_offset)),
-                mask=temp_image)
+            self.pil_img.paste(temp_image, (box_x, box_y), mask=temp_image)
 
         # draw text
         self.draw.text(xy, text, fill=rgba, font=font)
