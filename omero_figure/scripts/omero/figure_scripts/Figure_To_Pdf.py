@@ -38,7 +38,6 @@ from omero.model.enums import UnitsLength
 
 from io import BytesIO
 
-from reportlab.lib import colors
 from reportlab.pdfbase.pdfmetrics import stringWidth
 
 try:
@@ -62,7 +61,7 @@ try:
     from reportlab.pdfgen import canvas
     from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
     from reportlab.lib.colors import Color
-    from reportlab.platypus import Paragraph, Table, TableStyle
+    from reportlab.platypus import Paragraph
     from reportlab.lib.enums import TA_LEFT, TA_CENTER, TA_RIGHT
 
     reportlab_installed = True
@@ -894,16 +893,15 @@ class ShapeToPilExport(ShapeExport):
         if float(shape.get('textBackgroundOpacity', 0)) > 0:
             txt_offset = scale_to_export_dpi(3)
             text_bbox = self.draw.textbbox(xy, text, font=font)
-            r, g, b, a = self.get_rgba_int(shape.get('textBackgroundColor', '#00000000'))
+            bkgd_color = shape.get('textBackgroundColor', '#00000000')
+            r, g, b, a = self.get_rgba_int(bkgd_color)
             a = int(float(shape['textBackgroundOpacity']) * 255)
             rgba_fill = (r, g, b, a)
-            temp_image = Image.new('RGBA',
-                                   (int(text_bbox[2] - text_bbox[0] + 2 * txt_offset),
-                                        int(text_bbox[3] - text_bbox[1] + 2 * txt_offset)))
+            box_width = int(text_bbox[2] - text_bbox[0] + 2 * txt_offset)
+            box_height = int(text_bbox[3] - text_bbox[1] + 2 * txt_offset)
+            temp_image = Image.new('RGBA',(box_width,box_height))
             temp_draw = ImageDraw.Draw(temp_image)
-            temp_draw.rectangle((0,0,int(text_bbox[2] - text_bbox[0] + 2 * txt_offset),
-                                        int(text_bbox[3] - text_bbox[1] + 2 * txt_offset)),
-                                fill=rgba_fill)
+            temp_draw.rectangle((0, 0, box_width,box_height), fill=rgba_fill)
             self.pil_img.paste(
                 temp_image,
                 (int(text_bbox[0]) - txt_offset, int(text_bbox[1] - txt_offset)),
