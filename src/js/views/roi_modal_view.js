@@ -397,8 +397,15 @@ export const RoiModalView = Backbone.View.extend({
         },
 
         hideText: function(event){
-            this.shapeManager.setShowText(false);
-            this.renderToolbar();
+            var previousText = this.shapeManager.getText();
+            var text = $("#label-text").val()
+            if(text == previousText){
+                this.shapeManager.setShowText(false);
+                this.renderToolbar();
+            }else{
+                this.addTextToShape(event)
+                this.renderToolbar();
+            }
         },
 
         addTextToShape: function(event){

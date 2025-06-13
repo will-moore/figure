@@ -509,7 +509,8 @@ Text.prototype.drawShape = function drawShape() {
     width: bbox.width + 6,
     height: bbox.height + 6,
     fill: this._textBackgroundColor,
-    "fill-opacity": this._textBackgroundOpacity
+    "fill-opacity": this._textBackgroundOpacity,
+    "stroke-width": 0,
   })
 
   this.element.toFront()
@@ -525,10 +526,12 @@ Text.prototype.drawShape = function drawShape() {
   this._area = bbox.width * bbox.height;
 
   if(!this._showText && this._linkedShapeId != -1){
-    this.element.hide()
+    this.element.hide();
     this.handles.hide();
+    this.bkgdRect.hide();
   }else{
     this.element.show();
+    this.bkgdRect.show();
     if (this.isSelected()) {
       this.handles.show().toFront();
     } else {
