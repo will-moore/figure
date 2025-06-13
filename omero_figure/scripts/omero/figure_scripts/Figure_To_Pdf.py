@@ -379,12 +379,12 @@ class ShapeToPdfExport(ShapeExport):
             return
 
         text_coords = self.panel_to_page_coords(shape['x'], shape['y'])
-        text0 = shape.get('text')
+        raw_text = shape.get('text')
         text = ""
 
         if markdown_imported:
             # convert markdown to html
-            text = markdown.markdown(text0)
+            text = markdown.markdown(raw_text)
 
         size = shape.get('fontSize', 12)
         stroke_width = shape.get('strokeWidth', 2)
@@ -397,10 +397,12 @@ class ShapeToPdfExport(ShapeExport):
         anchor = shape['textAnchor']
         alignment = TA_LEFT
 
+        # handle flipping
         h_flip = self.panel.get('horizontal_flip', False)
         if h_flip and anchor == 'start':
             anchor = "end"
 
+        # handle shifting according to the test anchor
         x = x0
         if anchor == 'middle':
             alignment = TA_CENTER
@@ -426,6 +428,7 @@ class ShapeToPdfExport(ShapeExport):
         panel_rotation = shape.get('rotation', 0)
         rotation = rotation + panel_rotation
 
+        # preparing offsets according to text position
         text_position = shape['textPosition']
         text_offset_x = stroke_width / 4 + 4
         text_offset_y = size / 2 + stroke_width / 4 + 4
@@ -481,13 +484,15 @@ class ShapeToPdfExport(ShapeExport):
             dx = 0
             dy = 0
 
+        # draw the text background color
         if float(shape.get('textBackgroundOpacity', 0)) > 0:
             r, g, b, a = self.get_rgba(shape['textBackgroundColor'])
             a = float(shape['textBackgroundOpacity'])
             self.canvas.setFillColorRGB(r, g, b, alpha=a)
-            text_width = stringWidth(text0, font_name, size)
+            text_width = stringWidth(raw_text, font_name, size)
 
-            padding_h, padding_v = 3, size/4 + 1  # padding inside the background box
+            # padding inside the background box
+            padding_h, padding_v = 3, size/4 + 1
             padding_x = 0
             if anchor == 'middle':
                 padding_x = -(text_width / 2 + padding_h)
@@ -497,9 +502,10 @@ class ShapeToPdfExport(ShapeExport):
             box_width = text_width + padding_h * 2
             box_height = size + padding_v
 
-            # Draw semi-transparent background box
-            self.canvas.rect(x0 + padding_x, y0 + dy + padding_y - padding_v, box_width, box_height, fill=1, stroke=0)
+            self.canvas.rect(x0 + padding_x, y0 + dy + padding_y - padding_v,
+                             box_width, box_height, fill=1, stroke=0)
 
+        # draw text
         para.drawOn(self.canvas, x + dx, y0 - dy)
 
     def draw_line(self, shape):
@@ -819,10 +825,12 @@ class ShapeToPilExport(ShapeExport):
         y = text_coords["y"]
         anchor = shape['textAnchor']
 
+        # handle flipping
         h_flip = self.panel.get('horizontal_flip', False)
         if h_flip and anchor == 'start':
             anchor = "end"
 
+        # handle horizontal offset according to text anchor
         if anchor == 'middle':
             x = x - txt_w / 2
         elif anchor == "end":
@@ -832,6 +840,7 @@ class ShapeToPilExport(ShapeExport):
         panel_rotation = shape.get('rotation', 0)
         rotation = rotation + panel_rotation
 
+        # Adjusting x/y offsets according to text position
         text_position = shape['textPosition']
         text_offset_x = scale_to_export_dpi(stroke_width / 4 + 4)
         out_positions = ["top", "left", "bottom", "right"]
@@ -881,20 +890,26 @@ class ShapeToPilExport(ShapeExport):
 
         xy = (x + dx, y + dy)
 
+        # draw background color
         if float(shape.get('textBackgroundOpacity', 0)) > 0:
             txt_offset = scale_to_export_dpi(3)
             text_bbox = self.draw.textbbox(xy, text, font=font)
             r, g, b, a = self.get_rgba_int(shape.get('textBackgroundColor', '#00000000'))
             a = int(float(shape['textBackgroundOpacity']) * 255)
             rgba_fill = (r, g, b, a)
-            temp_image = Image.new('RGBA', (int(text_bbox[2] - text_bbox[0] + 2 * txt_offset),
-                                            int(text_bbox[3] - text_bbox[1] + 2 * txt_offset)))
+            temp_image = Image.new('RGBA',
+                                   (int(text_bbox[2] - text_bbox[0] + 2 * txt_offset),
+                                        int(text_bbox[3] - text_bbox[1] + 2 * txt_offset)))
             temp_draw = ImageDraw.Draw(temp_image)
             temp_draw.rectangle((0,0,int(text_bbox[2] - text_bbox[0] + 2 * txt_offset),
-                                            int(text_bbox[3] - text_bbox[1] + 2 * txt_offset)), fill=rgba_fill)
+                                        int(text_bbox[3] - text_bbox[1] + 2 * txt_offset)),
+                                fill=rgba_fill)
             self.pil_img.paste(
-                temp_image, (int(text_bbox[0]) - txt_offset, int(text_bbox[1] - txt_offset)), mask=temp_image)
+                temp_image,
+                (int(text_bbox[0]) - txt_offset, int(text_bbox[1] - txt_offset)),
+                mask=temp_image)
 
+        # draw text
         self.draw.text(xy, text, fill=rgba, font=font)
 
     def draw_arrow(self, shape):
