@@ -292,8 +292,9 @@ Line.prototype.setTextBackgroundOpacity = function setTextBackgroundOpacity(text
 
 Line.prototype.getTextBackgroundOpacity = function getTextBackgroundOpacity() {
   if(this._textShape){
-    this._textShape.getTextBackgroundOpacity()
+    return this._textShape.getTextBackgroundOpacity()
   }
+  return;
 };
 
 Line.prototype.setTextBackgroundColor = function setTextBackgroundColor(textBackgroundColor) {
@@ -304,8 +305,9 @@ Line.prototype.setTextBackgroundColor = function setTextBackgroundColor(textBack
 
 Line.prototype.getTextBackgroundColor = function getTextBackgroundColor() {
   if(this._textShape){
-    this._textShape.getTextBackgroundColor()
+    return this._textShape.getTextBackgroundColor()
   }
+  return;
 };
 
 Line.prototype.setTextColor = function setTextColor(textColor) {
@@ -316,8 +318,9 @@ Line.prototype.setTextColor = function setTextColor(textColor) {
 
 Line.prototype.getTextColor = function getTextColor() {
   if(this._textShape){
-    this._textShape.getTextColor()
+    return this._textShape.getTextColor()
   }
+  return;
 };
 
 Line.prototype.setVerticalFlip = function setVerticalFlip(vFlip) {

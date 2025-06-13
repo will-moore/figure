@@ -306,8 +306,9 @@ Point.prototype.setTextBackgroundOpacity = function setTextBackgroundOpacity(tex
 
 Point.prototype.getTextBackgroundOpacity = function getTextBackgroundOpacity() {
   if(this._textShape){
-    this._textShape.getTextBackgroundOpacity()
+    return this._textShape.getTextBackgroundOpacity()
   }
+  return;
 };
 
 Point.prototype.setTextBackgroundColor = function setTextBackgroundColor(textBackgroundColor) {
@@ -318,8 +319,9 @@ Point.prototype.setTextBackgroundColor = function setTextBackgroundColor(textBac
 
 Point.prototype.getTextBackgroundColor = function getTextBackgroundColor() {
   if(this._textShape){
-    this._textShape.getTextBackgroundColor()
+    return this._textShape.getTextBackgroundColor()
   }
+  return;
 };
 
 Point.prototype.setTextColor = function setTextColor(textColor) {
@@ -330,8 +332,9 @@ Point.prototype.setTextColor = function setTextColor(textColor) {
 
 Point.prototype.getTextColor = function getTextColor() {
   if(this._textShape){
-    this._textShape.getTextColor()
+    return this._textShape.getTextColor()
   }
+  return;
 };
 
 Point.prototype.setVerticalFlip = function setVerticalFlip(vFlip) {

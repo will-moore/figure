@@ -326,8 +326,9 @@ Ellipse.prototype.setTextBackgroundOpacity = function setTextBackgroundOpacity(t
 
 Ellipse.prototype.getTextBackgroundOpacity = function getTextBackgroundOpacity() {
   if(this._textShape){
-    this._textShape.getTextBackgroundOpacity()
+    return this._textShape.getTextBackgroundOpacity()
   }
+  return;
 };
 
 Ellipse.prototype.setTextBackgroundColor = function setTextBackgroundColor(textBackgroundColor) {
@@ -338,8 +339,9 @@ Ellipse.prototype.setTextBackgroundColor = function setTextBackgroundColor(textB
 
 Ellipse.prototype.getTextBackgroundColor = function getTextBackgroundColor() {
   if(this._textShape){
-    this._textShape.getTextBackgroundColor()
+    return this._textShape.getTextBackgroundColor()
   }
+  return;
 };
 
 Ellipse.prototype.setTextColor = function setTextColor(textColor) {
@@ -350,8 +352,9 @@ Ellipse.prototype.setTextColor = function setTextColor(textColor) {
 
 Ellipse.prototype.getTextColor = function getTextColor() {
   if(this._textShape){
-    this._textShape.getTextColor()
+    return this._textShape.getTextColor()
   }
+  return;
 };
 
 Ellipse.prototype.setVerticalFlip = function setVerticalFlip(vFlip) {

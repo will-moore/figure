@@ -363,8 +363,9 @@ Rect.prototype.setTextBackgroundOpacity = function setTextBackgroundOpacity(text
 
 Rect.prototype.getTextBackgroundOpacity = function getTextBackgroundOpacity() {
   if(this._textShape){
-    this._textShape.getTextBackgroundOpacity()
+    return this._textShape.getTextBackgroundOpacity()
   }
+  return;
 };
 
 Rect.prototype.setTextBackgroundColor = function setTextBackgroundColor(textBackgroundColor) {
@@ -375,8 +376,9 @@ Rect.prototype.setTextBackgroundColor = function setTextBackgroundColor(textBack
 
 Rect.prototype.getTextBackgroundColor = function getTextBackgroundColor() {
   if(this._textShape){
-    this._textShape.getTextBackgroundColor()
+    return this._textShape.getTextBackgroundColor()
   }
+  return;
 };
 
 Rect.prototype.setTextColor = function setTextColor(textColor) {
@@ -387,8 +389,9 @@ Rect.prototype.setTextColor = function setTextColor(textColor) {
 
 Rect.prototype.getTextColor = function getTextColor() {
   if(this._textShape){
-    this._textShape.getTextColor()
+    return this._textShape.getTextColor()
   }
+  return;
 };
 
 Rect.prototype.setVerticalFlip = function setVerticalFlip(vFlip) {

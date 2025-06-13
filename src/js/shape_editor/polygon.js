@@ -318,8 +318,9 @@ Polygon.prototype.setTextBackgroundOpacity = function setTextBackgroundOpacity(t
 
 Polygon.prototype.getTextBackgroundOpacity = function getTextBackgroundOpacity() {
   if(this._textShape){
-    this._textShape.getTextBackgroundOpacity()
+    return this._textShape.getTextBackgroundOpacity()
   }
+  return;
 };
 
 Polygon.prototype.setTextBackgroundColor = function setTextBackgroundColor(textBackgroundColor) {
@@ -330,8 +331,9 @@ Polygon.prototype.setTextBackgroundColor = function setTextBackgroundColor(textB
 
 Polygon.prototype.getTextBackgroundColor = function getTextBackgroundColor() {
   if(this._textShape){
-    this._textShape.getTextBackgroundColor()
+    return this._textShape.getTextBackgroundColor()
   }
+  return;
 };
 
 Polygon.prototype.setTextColor = function setTextColor(textColor) {
@@ -342,8 +344,9 @@ Polygon.prototype.setTextColor = function setTextColor(textColor) {
 
 Polygon.prototype.getTextColor = function getTextColor() {
   if(this._textShape){
-    this._textShape.getTextColor()
+    return this._textShape.getTextColor()
   }
+  return;
 };
 
 Polygon.prototype.setVerticalFlip = function setVerticalFlip(vFlip) {
