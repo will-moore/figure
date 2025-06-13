@@ -38,6 +38,9 @@ from omero.model.enums import UnitsLength
 
 from io import BytesIO
 
+from reportlab.lib import colors
+from reportlab.pdfbase.pdfmetrics import stringWidth
+
 try:
     from PIL import Image, ImageDraw, ImageFont
 except ImportError:
@@ -59,7 +62,7 @@ try:
     from reportlab.pdfgen import canvas
     from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
     from reportlab.lib.colors import Color
-    from reportlab.platypus import Paragraph
+    from reportlab.platypus import Paragraph, Table, TableStyle
     from reportlab.lib.enums import TA_LEFT, TA_CENTER, TA_RIGHT
 
     reportlab_installed = True
@@ -372,16 +375,16 @@ class ShapeToPdfExport(ShapeExport):
             self.canvas, center[0] - w / 2, center[1] - h / 2 + size / 4)
 
     def draw_text(self, shape):
-        print(shape)
         if not shape.get('showText', True):
             return
 
         text_coords = self.panel_to_page_coords(shape['x'], shape['y'])
+        text0 = shape.get('text')
         text = ""
 
         if markdown_imported:
             # convert markdown to html
-            text = markdown.markdown(shape.get('text'))
+            text = markdown.markdown(text0)
 
         size = shape.get('fontSize', 12)
         stroke_width = shape.get('strokeWidth', 2)
@@ -389,12 +392,8 @@ class ShapeToPdfExport(ShapeExport):
         # bump up alpha a bit to make text more readable
         rgba = (r, g, b, 0.5 + a / 2.0)
 
-        if float(shape.get('textBackgroundOpacity', 0)) > 0:
-            # self.canvas.setFillColorRGB(r, g, b, alpha=a) ==> need to use it to get the right opacity and color
-            text = f"<font backColor={shape['textBackgroundColor']}>{text}</font>"
-
-        x = text_coords["x"]
-        y = self.page_height - text_coords["y"]
+        x0 = text_coords["x"]
+        y0 = self.page_height - text_coords["y"]
         anchor = shape['textAnchor']
         alignment = TA_LEFT
 
@@ -402,23 +401,26 @@ class ShapeToPdfExport(ShapeExport):
         if h_flip and anchor == 'start':
             anchor = "end"
 
-        if (anchor == 'middle'):
+        x = x0
+        if anchor == 'middle':
             alignment = TA_CENTER
-            x = x - (self.page_width / 2)
-        elif (anchor == "end"):
+            x = x0 - (self.page_width / 2)
+        elif anchor == "end":
             alignment = TA_RIGHT
-            x = x - self.page_width
+            x = x0 - self.page_width
 
+        font_name = "Helvetica"
         style = ParagraphStyle(
             'label',
             parent=getSampleStyleSheet()['Normal'],
             alignment=alignment,
             textColor=Color(*rgba),
             fontSize=size,
+            font_name=font_name,
             leading=size,
         )
         para = Paragraph(text, style)
-        w, h = para.wrap(self.page_width, y)
+        w, h = para.wrap(self.page_width, y0)
 
         rotation = shape.get('textRotation', 0)
         panel_rotation = shape.get('rotation', 0)
@@ -441,9 +443,11 @@ class ShapeToPdfExport(ShapeExport):
             final_index = int(fmod((pos_index + rotation_index), 4))
             text_position = in_positions[final_index]
 
+        dx, dy, padding_y = 0, 0, 0
         if text_position == "bottom":
             dx = 0
             dy = text_offset_y
+            padding_y = - 2 * dy
         if text_position == "left":
             dx = -text_offset_x
             dy = 0
@@ -456,9 +460,11 @@ class ShapeToPdfExport(ShapeExport):
         if text_position == "topleft":
             dx = text_offset_x
             dy = text_offset_y
+            padding_y = - 2 * dy
         if text_position == "topright":
             dx = -text_offset_x
             dy = text_offset_y
+            padding_y = - 2 * dy
         if text_position == "bottomleft":
             dx = text_offset_x
             dy = -stroke_width / 2
@@ -468,14 +474,31 @@ class ShapeToPdfExport(ShapeExport):
         if text_position == "center":
             dx = 0
             dy = size / 4
+            padding_y = - 2 * dy
         if text_position == "freehand":
             dx = 0
             dy = 0
 
         if float(shape.get('textBackgroundOpacity', 0)) > 0:
-            self.canvas.setFillColorRGB(r, g, b, alpha=float(shape['textBackgroundOpacity']))
+            r, g, b, a = self.get_rgba(shape['textBackgroundColor'])
+            a = float(shape['textBackgroundOpacity'])
+            self.canvas.setFillColorRGB(r, g, b, alpha=a)
+            text_width = stringWidth(text0, font_name, size)
 
-        para.drawOn(self.canvas, x + dx, y - dy)
+            padding_h, padding_v = 3, size/4 + 1  # padding inside the background box
+            padding_x = 0
+            if anchor == 'middle':
+                padding_x = -(text_width / 2 + padding_h)
+            elif anchor == "end":
+                padding_x = -(text_width + 2 * padding_h)
+
+            box_width = text_width + padding_h * 2
+            box_height = size + padding_v
+
+            # Draw semi-transparent background box
+            self.canvas.rect(x0 + padding_x, y0 + dy + padding_y - padding_v, box_width, box_height, fill=1, stroke=0)
+
+        para.drawOn(self.canvas, x + dx, y0 - dy)
 
     def draw_line(self, shape):
         start = self.panel_to_page_coords(shape['x1'], shape['y1'])
