@@ -83,7 +83,7 @@ var RoiLoaderView = Backbone.View.extend({
            return {x:Math.min(shape.x1, shape.x2), y: Math.min(shape.y1, shape.y2),
           width: Math.abs(shape.x1 - shape.x2), height: Math.abs(shape.y1 - shape.y2)}
         } else if(shape.type == "Polygon"){
-            var coords = points.split(" ");
+            var coords = shape.points.split(" ");
             var xCoords = [];
             var yCoords = [];
 
@@ -98,7 +98,7 @@ var RoiLoaderView = Backbone.View.extend({
             var x2 = Math.max(...xCoords)
             var y1 = Math.min(...yCoords)
             var y2 = Math.max(...yCoords)
-            return {x:x1, y:y1,width:Math.abs(bbox.x1 - bbox.x2), height:Math.abs(bbox.y1 - bbox.y2)}
+            return {x:x1, y:y1,width:Math.abs(x1 - x2), height:Math.abs(y1 - y2)}
         } else {
             return undefined;
         }
