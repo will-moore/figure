@@ -515,7 +515,10 @@ ShapeManager.prototype.pasteShapesJson = function pasteShapesJson(
 ) {
   var self = this,
     newShapes = [],
-    allPasted = true;
+    pastedShapes = [],
+    allPasted = true,
+    idsMap = new Map();
+
   // For each shape we want to paste...
   jsonShapes.forEach(function (sh) {
     var csh = $.extend(true, {}, sh);
@@ -523,38 +526,57 @@ ShapeManager.prototype.pasteShapesJson = function pasteShapesJson(
       csh = self.convertOmeroLabelToFigureText(csh)
     }
 
-    if(csh.type != "Text" || csh.linkedShapeId == undefined ||
-      csh.linkedShapeId == -1 || csh.isFromOmero){
-      // Create a shape to resolve any transform matrix -> coords
-      var tempTextId = csh.textId
-      csh.textId = -1
+    // get the ids before cloning/deleteing temp shape
+    var tempTextId = csh.textId
+    var tempLinkedShapeId = csh.linkedShapeId
+    var oldId = csh.id
+    csh.textId = -1
+    csh.linkedShapeId = -1
+    csh.id = self.getRandomId()
 
-      var temp = self.createShapeJson(csh);
-      var s = temp.toJson();
-      temp.destroy();
+    // create the new JSON shape
+    var temp = self.createShapeJson(csh);
+    var s = temp.toJson();
+    temp.destroy();
 
-      if(!csh.isFromOmero)
-        s.textId = -1
-      else
-        s.textId = tempTextId
+    // reset ids
+    s.textId = tempTextId
+    s.linkedShapeId = tempLinkedShapeId
 
-      // check if a shape is at the same coordinates...
-      var match = self.findShapeAtCoords(s);
-      // if so, keep offsetting until we find a spot...
-      while (match) {
-        s = $.extend({}, s);
-        s = match.offsetCoords(s, 20, 10);
-        match = self.findShapeAtCoords(s);
-      }
-      // Create shape and test if it's in the specified region
-      var added = self.addShapeJson(s, constrainRegion);
-      if (added) {
-        newShapes.push(added);
-      } else {
-        allPasted = false;
-      }
+    // check if a shape is at the same coordinates...
+    var match = self.findShapeAtCoords(s);
+    // if so, keep offsetting until we find a spot...
+    while (match) {
+      s = $.extend({}, s);
+      s = match.offsetCoords(s, 20, 10);
+      match = self.findShapeAtCoords(s);
     }
+
+    pastedShapes.push(s);
+    idsMap.set(s.id, oldId)
   });
+
+  // reassign right text & shape ids to link text to the right shape
+  pastedShapes.forEach(function(s){
+    if(s.textId != undefined && s.textId != -1){
+      var oldShapeId = idsMap.get(s.id)
+        pastedShapes.forEach(function(s2){
+          if(s2.linkedShapeId == oldShapeId){
+            s2.linkedShapeId = s.id
+            s.textId = s2.id
+          }
+        })
+    }
+
+    // add the news shapes to the manager
+    var added = self.addShapeJson(s, constrainRegion);
+    if (added) {
+      newShapes.push(added);
+    } else {
+      allPasted = false;
+    }
+  })
+
   // Select the newly added shapes
   this.selectShapes(newShapes);
   return allPasted;
