@@ -49,7 +49,7 @@ var RoiLoaderView = Backbone.View.extend({
             var shape = this.collection.getShape(shapeId);
             var shapeJson = shape.toJSON();
             var shapeList = [shapeJson]
-            if(shapeJson.type != "Text" && shapeJson.Text != undefined){
+            if(shapeJson.type != "Label" && shapeJson.Text != undefined){
                 var textRandomId = getRandomId();
                 var rectRandomId = getRandomId();
                 shapeJson.id = rectRandomId;
