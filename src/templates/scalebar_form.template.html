@@ -17,7 +17,7 @@
 <form class="scalebar_form">
     <div class="row gy-2 gx-3 align-items-center" style="--bs-gutter-x: 0.3rem;">
         <div class="col-auto input-group-sm">
-            <label class="col-form-label col-form-label-sm" style="width:50px">Length</label>
+            <label class="col-form-label col-form-label-sm" style="width:40px">Length</label>
         </div>
         <div class="col-auto input-group-sm">
           <input type="number" class="scalebar-length input-sm form-control"
@@ -109,14 +109,31 @@
     </div>
     <div class="row gy-2 gx-3 align-items-center" style="--bs-gutter-x: 0.3rem;">
         <div class="col-auto input-group-sm">
-            <label class="col-form-label col-form-label-sm" style="width:50px">Height</label>
+            <label class="col-form-label col-form-label-sm" style="width:40px">Height</label>
         </div>
         <div class="form-group col-auto scalebar_length input-group-sm">
             <input type="number" class="label-text scalebar-height form-control input-sm"
-            placeholder="Height" value="<%= height %>" style="width:52px" />
+            placeholder="Height" value="<%= height %>" style="width:30px" />
         </div>
-        <div class="col-auto input-group-sm" style="margin-right: 10px;">
+        <div class="col-auto input-group-sm" style="margin-right: 5px;">
             <label class="col-form-label col-form-label-sm">px</label>
+        </div>
+
+        <div class="col-auto input-group-sm">
+            <label class="col-form-label col-form-label-sm" style="width:40px">Margin</label>
+        </div>
+        <div class="form-group col-auto scalebar_length input-group-sm">
+            <input type="number" class="label-text scalebar-margin form-control input-sm"
+            placeholder="Margin" value="<%= margin %>" style="width:30px" />
+        </div>
+
+        <div class="col-auto  input-group-sm">
+            <input type="radio" name="scalebar-margin-unit" id="pixel" style="vertical-align: bottom;" class="scalebar_margin_unit"
+            value="px" <% if (margin_unit == "px") print("checked") %>/>
+            <label for="pixel" class="col-form-label col-form-label-sm" style="margin-bottom: -5px;">px</label><br/>
+            <input type="radio" name="scalebar-margin-unit" id="percentage" style="vertical-align: top;" class="scalebar_margin_unit"
+            value="%" <% if (margin_unit == "%") print("checked") %>/>
+            <label for="percentage" class="col-form-label col-form-label-sm" style="vertical-align: top; margin-top: -8px; font-size: 12px;">%</label><br/>
         </div>
 
         <div class="col-auto input-group-sm">
@@ -124,7 +141,7 @@
             <input type="checkbox" class="scalebar_label form-check-input" <% if (show_label) print("checked") %> />
         </div>
 
-        <div class="col-auto btn-group" style="padding: 0; width: 50px;">
+        <div class="col-auto btn-group" style="padding: 0; width: 40px;">
             <button type="button" class="scalebar_font_size btn btn-outline-secondary btn-sm dropdown-toggle" title="Font Size"
             data-bs-toggle="dropdown" style="width:33px; <% if (!show_label) print("display:none") %>">
                 <span class='dropdown_icon'><%= font_size %></span>
@@ -140,31 +157,4 @@
             <% if (show_label) print("pt") %>
         </div>
     </div>
-
-    <div class="row gy-2 gx-3 align-items-center" style="--bs-gutter-x: 0.3rem;">
-        <div class="col-auto input-group-sm">
-            <label class="col-form-label col-form-label-sm" style="width:50px">Margin</label>
-        </div>
-        <div class="form-group col-auto scalebar_length input-group-sm">
-            <input type="number" class="label-text scalebar-margin form-control input-sm"
-            placeholder="Margin" value="<%= margin %>" style="width:52px" />
-        </div>
-
-        <div class="col-auto  input-group-sm">
-            <input type="radio" name="scalebar-margin-unit" id="pixel" class="scalebar_margin_unit"
-            value="px" <% if (margin_unit == "px") print("checked") %>/>
-        </div>
-        <div class="col-auto input-group-sm" style="margin-right: 10px;">
-            <label for="pixel" class="col-form-label col-form-label-sm">px</label>
-        </div>
-        <div class="col-auto  input-group-sm">
-            <input type="radio" name="scalebar-margin-unit" id="percentage" class="scalebar_margin_unit"
-            value="%" <% if (margin_unit == "%") print("checked") %>/>
-        </div>
-        <div class="col-auto input-group-sm" style="margin-right: 10px;">
-            <label for="percentage" class="col-form-label col-form-label-sm">%</label>
-        </div>
-
-    </div>
-
 </form>
