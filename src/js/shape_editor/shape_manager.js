@@ -1080,7 +1080,7 @@ ShapeManager.prototype.selectShapes = function selectShapes(shapes) {
   if (textColor) {
     this._textColor = textColor;
   }
-  if (showText) {
+  if (showText != undefined) {
     this._showText = showText;
   }
   if (textBackgroundColor) {
