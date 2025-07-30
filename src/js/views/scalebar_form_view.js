@@ -105,7 +105,7 @@ var ScalebarFormView = Backbone.View.extend({
         this.models.forEach(function(m){
             var old_sb = m.get('scalebar');
             var sb = {show: true};
-            if (length != '-') sb.length = parseFloat(length, 10);
+            if (length != '-' && length != "") sb.length = parseFloat(length, 10);
             if (units != '-') {
                 sb.units = units;
             } else {
@@ -123,8 +123,8 @@ var ScalebarFormView = Backbone.View.extend({
             if (color != '-') sb.color = color;
             sb.show_label = show_label;
             if (font_size != '-') sb.font_size = font_size;
-            if (height != '-') sb.height = height;
-            if (margin != '-') sb.margin = margin;
+            if (height != '-' && !isNaN(height)) sb.height = height;
+            if (margin != '-' && !isNaN(margin)) sb.margin = margin;
             if (margin_unit != '-') sb.margin_unit = margin_unit;
 
             m.save_scalebar(sb);
