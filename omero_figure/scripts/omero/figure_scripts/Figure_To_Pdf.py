@@ -550,7 +550,7 @@ class ShapeToPdfExport(ShapeExport):
         g = float(rgb[1]) / 255
         b = float(rgb[2]) / 255
         self.canvas.setStrokeColorRGB(r, g, b)
-        self.canvas.setFillColorRGB(r, g, b)
+        self.canvas.setFillColorRGB(r, g, b, alpha=1)
 
         head_size = (stroke_width * 4) + 5
         dx = x2 - x1
