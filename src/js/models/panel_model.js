@@ -292,6 +292,20 @@
             this.save('scalebar', sb);
         },
 
+        hide_colorbar: function() {
+            // keep all colorbar properties, except 'show'
+            var cb = $.extend(true, {}, this.get('colorbar'));
+            cb.show = false;
+            this.save('colorbar', cb);
+        },
+
+        save_colorbar: function(new_cb) {
+            // update only the attributes of colorbar we're passed
+            var old_cb = $.extend(true, {}, this.get('colorbar') || {});
+            var cb = $.extend(true, old_cb, new_cb);
+            this.save('colorbar', cb);
+        },
+
         show_border: function(color, strokeWidth){
             var border = {
                 'color': '#'+color,
@@ -1148,40 +1162,120 @@
             var y = this.get('y');
             // get labels by position
             var top_labels = labels.filter(function(l) {return l.position === 'top'});
-            // offset by font-size of each
-            y = top_labels.reduce(function(prev, l){
-                return prev - (LINE_HEIGHT * l.size);
-            }, y);
-            return y;
+            // calculate offset by font-size of each
+            var shift = 0;
+            shift = top_labels.reduce(function(prev, l){
+                return prev + (LINE_HEIGHT * l.size);
+            }, shift);
+
+            var shift_cbar = 0;
+            var cb = this.get("colorbar");
+            if (cb && cb.show) {
+                var size = Number(cb.font_size);
+                if (cb.position == "top") {
+                    shift_cbar = (cb.gap + cb.thickness +
+                        size + cb.mark_len + cb.tick_margin);
+                    shift_cbar = Math.max(0, shift_cbar);
+                } else if (cb.position == "left" || cb.position == "right") {
+                    // get height of topmost tick label and take half of it
+                    shift_cbar = size / 2;
+                }
+            }
+            return y - Math.max(shift, shift_cbar);
         },
 
         getBoundingBoxLeft: function() {
-            // get left of panel including 'leftvert' labels (ignore
-            // left horizontal labels - hard to calculate width)
             var labels = this.get("labels");
             var x = this.get('x');
             // get labels by position
             var left_labels = labels.filter(function(l) {return l.position === 'leftvert'});
-            // offset by font-size of each
-            x = left_labels.reduce(function(prev, l){
-                return prev - (LINE_HEIGHT * l.size);
-            }, x);
-            return x;
+            // calculate offset by font-size of each vertical label
+            var shift = 0;
+            shift = left_labels.reduce(function(prev, l){
+                return prev + (LINE_HEIGHT * l.size);
+            }, shift);
+
+            left_labels = labels.filter(function(l) {return l.position === 'left'});
+            // compare offset of each horizontal label
+            for (const l of left_labels) {
+                const width = this.measureTextSize(l.text, l.size + "px");
+                shift = Math.max(shift, width);
+            }
+
+            var start = "";
+            var end = "";
+            for (const chann of this.get('channels')) {
+                if(chann.active) {
+                    start = chann.window?.start;
+                    end = chann.window?.end;
+                    break;
+                }
+            }
+            var shift_cbar = 0;
+            var cb = this.get("colorbar");
+            if (cb && cb.show) {
+                let rounding = Math.max(0, Math.ceil(-Math.log10((end - start) / cb.num_ticks)));
+                start = start.toFixed(rounding);
+                end = end.toFixed(rounding);
+                if (cb.position == "left") {
+                    const width = this.measureTextSize(end, cb.font_size + "px");
+                    shift_cbar = (cb.gap + cb.thickness +
+                        width + cb.mark_len + cb.tick_margin);
+                    shift_cbar = Math.max(0, shift_cbar);
+                } else if (cb.position == "top" || cb.position == "bottom"){
+                    shift_cbar = this.measureTextSize(start, cb.font_size + "px");
+                    shift_cbar = shift_cbar / 2;
+                }
+            }
+
+            return x - Math.max(shift, shift_cbar);
         },
 
         getBoundingBoxRight: function() {
-            // Ignore right (horizontal) labels since we don't know how long they are
-            // but include right vertical labels
             var labels = this.get("labels");
             var x = this.get('x') + this.get('width');
             // get labels by position
             var right_labels = labels.filter(function(l) {return l.position === 'rightvert'});
-            // offset by font-size of each
-            x = right_labels.reduce(function(prev, l){
+            // calculate offset by font-size of each vertical label
+            var shift = 0;
+            shift = right_labels.reduce(function(prev, l){
                 return prev + (LINE_HEIGHT * l.size);
-            }, x);
+            }, shift);
 
-            return x;
+            right_labels = labels.filter(function(l) {return l.position === 'right'});
+            // compare offset of each horizontal label
+            for (const l of right_labels) {
+                const width = this.measureTextSize(l.text, l.size + "px");
+                shift = Math.max(shift, width);
+            }
+
+            var start = "";
+            var end = "";
+            for (const chann of this.get('channels')) {
+                if(chann.active) {
+                    start = chann.window?.start;
+                    end = chann.window?.end;
+                    break;
+                }
+            }
+            var shift_cbar = 0;
+            var cb = this.get("colorbar");
+            if (cb && cb.show) {
+                let rounding = Math.max(0, Math.ceil(-Math.log10((end - start) / cb.num_ticks)));
+                start = start.toFixed(rounding);
+                end = end.toFixed(rounding);
+                if (cb.position == "right") {
+                    const width = this.measureTextSize(end, cb.font_size + "px");
+                    shift_cbar = (cb.gap + cb.thickness +
+                        width + cb.mark_len + cb.tick_margin);
+                    shift_cbar = Math.max(0, shift_cbar);
+                } else if (cb.position == "top" || cb.position == "bottom"){
+                    shift_cbar = this.measureTextSize(end, cb.font_size + "px");
+                    shift_cbar = shift_cbar / 2;
+                }
+            }
+
+            return x + Math.max(shift, shift_cbar);
         },
 
         getBoundingBoxBottom: function() {
@@ -1190,11 +1284,42 @@
             var y = this.get('y') + this.get('height');
             // get labels by position
             var bottom_labels = labels.filter(function(l) {return l.position === 'bottom'});
-            // offset by font-size of each
-            y = bottom_labels.reduce(function(prev, l){
+            // calculate offset by font-size of each
+            var shift = 0;
+            shift = bottom_labels.reduce(function(prev, l){
                 return prev + (LINE_HEIGHT * l.size);
-            }, y);
-            return y;
+            }, shift);
+
+            var shift_cbar = 0;
+            var cb = this.get("colorbar");
+            if (cb && cb.show) {
+                var size = Number(cb.font_size);
+                if (cb.position == "bottom") {
+                    shift_cbar = (cb.gap + cb.thickness +
+                        size + cb.mark_len + cb.tick_margin);
+                    shift_cbar = Math.max(0, shift_cbar);
+                } else if (cb.position == "left" || cb.position == "right") {
+                    // get height of topmost tick label and take half of it
+                    shift_cbar = size / 2;
+                }
+            }
+            return y + Math.max(shift, shift_cbar);
+        },
+
+        measureTextSize: function(text, fontSize) {
+            var fontFamily = "bs-font-sans-serif";
+            // Create a canvas element
+            var canvas = document.createElement('canvas');
+            var context = canvas.getContext('2d');
+
+            // Set the font properties
+            context.font = `${fontSize} ${fontFamily}`;
+            var metrics = context.measureText(text);
+
+            context = null;
+            canvas = null;
+
+            return metrics.width;
         },
 
         // True if coords (x,y,width, height) overlap with panel

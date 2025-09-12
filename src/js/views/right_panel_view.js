@@ -15,6 +15,7 @@
     import InfoPanelView from "./info_panel_view";
     import ChannelSliderView from "./channel_slider_view";
     import ScalebarFormView from "./scalebar_form_view";
+    import ColorbarFormView from "./colorbar_form_view";
     import ZtSlidersView from "./zt_sliders_view";
 
     import image_display_options_template from '../../templates/image_display_options.template.html?raw';
@@ -646,6 +647,18 @@
             }
             if (old_sb) {
                 old_sb.remove();
+            }
+            // show colorbar form for selected panels
+            var old_cb = this.colorbar_form;
+            var $colorbar_form = $("#colorbar_form");
+
+            if (selected.length > 0) {
+                this.colorbar_form = new ColorbarFormView({models: selected});
+                this.colorbar_form.render();
+                $colorbar_form.empty().append(this.colorbar_form.$el);
+            }
+            if (old_cb) {
+                old_cb.remove();
             }
 
             return this;

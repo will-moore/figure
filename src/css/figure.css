@@ -1046,7 +1046,7 @@
     }
 
     .ch_slider .ui-slider-range {
-        background-size: 100% 50px;
+        background-size: 100% 1000px;
         background-position: 0 0;
         background-repeat: no-repeat;
     }
@@ -1056,6 +1056,7 @@
         background-size: 100% var(--pngHeight);
         background-image: var(--lutPng);
         background-repeat: no-repeat;
+        image-rendering: pixelated;  /* Universal support since 2021 */
     }
 
     .ch_start_slider::before {
@@ -1069,6 +1070,7 @@
         background-repeat: no-repeat;
         transform: scaleX(var(--scaleX));
         background-position: var(--bgPos);
+        image-rendering: pixelated;
       }
 
     .channel-btn {
@@ -1386,4 +1388,133 @@
 
     .flipping .btn.active i {
         color: white;
+    }
+
+    .colorbar_form .input-group {
+        width:80px;
+        margin-right: 4px;
+    }
+
+    .colorbar_form .form-group {
+        margin-bottom: 0;
+    }
+
+    .colorbar_form .row {
+        align-items: center;
+        display: flex;
+        gap: 3px;
+        margin-top: 3px;
+    }
+
+    .colorbar {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+    }
+
+    .colorbar_left, .colorbar_right{
+        position: absolute;
+        top: 0%;
+        width: 100%;
+        height: 100%;
+    }
+
+    .colorbar_left{
+        right: 0%;
+        -webkit-transform: scaleX(-1) rotate(-90deg);
+        transform: scaleX(-1) rotate(-90deg);
+    }
+
+    .colorbar_right{
+        -webkit-transform: rotate(-90deg);
+        transform: rotate(-90deg);
+    }
+
+    .colorbar_top, .colorbar_bottom {
+        position: absolute;
+        width: 100%;
+        left: 0%;
+    }
+
+    .colorbar_top {
+        bottom: 0%;
+    }
+
+    .colorbar_bottom {
+        top: 0%;
+    }
+
+    .colorbar_bg {
+        background-size: 100% var(--pngHeight);
+        background-repeat: no-repeat;
+        margin-right: 0px;
+        margin-left: 0px;
+        display: flex;
+        position: relative;
+        image-rendering: pixelated;
+    }
+
+    .colorbar_ticks_right, .colorbar_ticks_left {
+        height: 100%;
+        display: flex;
+        flex-direction: column-reverse;
+        justify-content: space-between;
+        position: absolute;
+    }
+
+    .colorbar_ticks_right {
+        align-items: left;
+    }
+
+    .colorbar_ticks_left {
+        right: 0%;
+        align-items: flex-end;
+    }
+
+    .colorbar_ticks_top, .colorbar_ticks_bottom {
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: flex-end;
+        position: absolute;
+    }
+
+    .colorbar_ticks_top {
+        bottom: 0%;
+    }
+
+    .colorbar_ticks_bottom {
+        top: 0%;
+    }
+
+    .colorbar_label_horizontal {
+        line-height: 1;
+    }
+
+    .colorbar_label_vertical {
+        height: 0px;
+        line-height: 1px;
+    }
+
+    .colorbar_dash_horizontal {
+        width: 1px;
+        position: relative;
+    }
+
+    .colorbar_dash_vertical {
+        height: 1px;
+        position: relative;
+    }
+
+    .colorbar_tick_horizontal {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 1px;
+        position: relative;
+    }
+
+    .colorbar_tick_vertical {
+        display: flex;
     }
