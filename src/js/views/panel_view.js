@@ -12,6 +12,8 @@
     import label_right_vertical_template from '../../templates/labels/label_right_vertical.template.html?raw';
     import label_table_template from '../../templates/labels/label_table.template.html?raw';
     import scalebar_panel_template from '../../templates/scalebar_panel.template.html?raw';
+    import colorbar_panel_template from '../../templates/colorbar.template.html?raw';
+    import FigureLutPicker from "../views/lutpicker";
 
     // -------------------------Panel View -----------------------------------
     // A Panel is a <div>, added to the #paper by the FigureView below.
@@ -24,7 +26,7 @@
         label_right_vertical_template: _.template(label_right_vertical_template),
         label_table_template: _.template(label_table_template),
         scalebar_template: _.template(scalebar_panel_template),
-
+        colorbar_template: _.template(colorbar_panel_template),
 
         initialize: function(opts) {
             // we render on Changes in the model OR selected shape etc.
@@ -33,6 +35,7 @@
                 'change:x change:y change:width change:height change:zoom change:dx change:dy change:rotation change:vertical_flip change:horizontal_flip',
                 this.render_layout);
             this.listenTo(this.model, 'change:scalebar change:pixel_size_x', this.render_scalebar);
+            this.listenTo(this.model, 'change:colorbar change:channels', this.render_colorbar);
             this.listenTo(this.model,
                 'change:zoom change:dx change:dy change:width change:height change:channels change:theZ change:theT change:z_start change:z_end change:z_projection change:min_export_dpi change:pixel_range change:vertical_flip change:horizontal_flip',
                 this.render_image);
@@ -152,6 +155,11 @@
                 var sb_pixels = convert_factor * physical_length / this.model.get('pixel_size_x');
                 var sb_width = panel_scale * sb_pixels;
                 this.$scalebar.css('width', sb_width);
+            }
+            var cb = this.model.get('colorbar');
+            if (cb && cb.show && (cb.position == "left" || cb.position == "right") && this.$colorbar) {
+                this.$colorbar.css('width', h);
+                this.$colorbar.css('height', h);
             }
         },
 
@@ -354,6 +362,74 @@
             this.render_layout();
         },
 
+        render_colorbar: async function() {
+
+            if (this.$colorbar) {
+                this.$colorbar.remove();
+            }
+            var cb = this.model.get('colorbar');
+            var start = 0,
+                end = 125,
+                reverseIntensity = false,
+                color = "";
+            for (const chann of this.model.get('channels')) {
+                if(chann.active) {
+                    color = chann.color;
+                    start = chann.window?.start;
+                    end = chann.window?.end;
+                    reverseIntensity = chann.reverseIntensity;
+                    break;
+                }
+            }
+            var lut_url;
+            var lutBgPos;
+            var isLUT = !(/^[0-9a-fA-F]+$/.test(color));  // check if it's a normal color or a LUT
+            if (isLUT) {
+                lut_url = await FigureLutPicker.loadLuts();  // Ensure lut url and list are loaded
+                lutBgPos = FigureLutPicker.getLutBackgroundPosition(color);
+            }
+            var inverted_pos = {  // convenience variable for the colorbar template.
+                "left": "right",
+                "right": "left",
+                "top": "bottom",
+                "bottom": "top",
+            };
+            var orientation = {  // convenience variable for the colorbar template.
+                "left": "vertical",
+                "right": "vertical",
+                "top": "horizontal",
+                "bottom": "horizontal",
+            };
+            if (cb && cb.show) {
+                var cb_json = {
+                    position: cb.position,
+                    inv_position: inverted_pos[cb.position],
+                    orientation: orientation[cb.position],
+                    show: cb.show,
+                    thickness: cb.thickness,
+                    font_size: cb.font_size,
+                    axis_color: cb.axis_color,
+                    num_ticks: cb.num_ticks,
+                    mark_len: cb.mark_len,
+                    gap: cb.gap,
+                    tick_margin: cb.tick_margin,
+                    start: start,
+                    end: end,
+                    color: color,
+                    isLUT: isLUT,
+                    lutBgPos: lutBgPos,
+                    lut_url: lut_url,
+                    reverseIntensity: reverseIntensity,
+                };
+                var cb_html = this.colorbar_template(cb_json);
+                this.$el.append(cb_html);
+            }
+            this.$colorbar = $(".colorbar", this.$el);
+
+            // update colorbar size wrt current sizes
+            this.render_layout();
+        },
+
         render: function() {
             // This render() is only called when the panel is first created
             // to set up the elements. It then calls other render methods to
@@ -373,7 +449,15 @@
             // update src, layout etc.
             this.render_image();
             this.render_scalebar();     // also calls render_layout() -> render_labels()
-            this.render_shapes();
+            this.render_colorbar();
+
+            // At this point, element is not ready for Raphael svg
+            // If we wait a short time, works fine
+            var self = this;
+            setTimeout(function(){
+                self.render_shapes();
+            }, 10);
+            this.render_scalebar();     // also calls render_layout() -> render_labels()
 
             return this;
         }

@@ -1,0 +1,137 @@
+<form class="colorbar_form">
+    <div class="row gy-2 gx-3 align-items-center" style="--bs-gutter-x: 0.3rem;">
+
+        <div class="col-auto input-group-sm" style="padding-right: 0px;">
+            <label class="col-form-label col-form-label-sm" style="width: 60px;">Thickness</label>
+        </div>
+        <div class="col-auto input-group-sm"  style="padding-right: 0px;">
+            <input type="number" class="colorbar-thickness input-sm form-control"
+            value="<%= thickness %>" style="width:42px;" min="1" max="1000" />
+        </div>
+        <div class="col-auto input-group-sm"  style="padding-left: 0px; margin-right: 3px;">
+            <label class="col-form-label col-form-label-sm">px</label>
+        </div>
+
+        <div class="col-auto input-group-sm" style="padding-right: 0px;">
+            <label class="col-form-label col-form-label-sm">Gap</label>
+        </div>
+        <div class="col-auto input-group-sm"  style="padding-right: 0px;" title="Distance between panel and colorbar (negative value allowed)">
+            <input type="number" class="colorbar-gap input-sm form-control"
+            value="<%= gap %>" style="width:42px" />
+        </div>
+        <div class="col-auto input-group-sm"  style="padding-left: 0px; margin-right: 3px;">
+            <label class="col-form-label col-form-label-sm">px</label>
+        </div>
+
+        <div class="form-group col-sm-auto btn-group">
+            <button type="button" class="label-position btn btn-outline-secondary btn-sm dropdown-toggle"
+                    title="Position" data-bs-toggle="dropdown">
+                <i data-position="<%= position %>" class="bi-box-arrow-in-<%= position.replace('bottom', 'down').replace('top', 'up') %> dropdown_icon"></i>
+                <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" role="menu">
+                <li><a class="dropdown-item" href="#">
+                    <i data-position="right" class="bi-box-arrow-right dropdown_icon"></i> Right</a>
+                </li>
+                <li><a class="dropdown-item" href="#">
+                    <i data-position="left" class="bi-box-arrow-left dropdown_icon"></i> Left</a>
+                </li>
+                <li><a class="dropdown-item" href="#">
+                    <i data-position="top" class="bi-box-arrow-up dropdown_icon"></i> Top</a>
+                </li>
+                <li><a class="dropdown-item" href="#">
+                    <i data-position="bottom" class="bi-box-arrow-down dropdown_icon"></i> Bottom</a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="col-auto input-group-sm" style="flex: 1 1 auto; padding-right: 0">
+            <% if (show){ %>
+                <button type="submit" class="show_colorbar btn btn-sm btn-success float-end">Show</button>
+            <% } else { %>
+                <button type="button" class="hide_colorbar btn btn-outline-secondary btn-sm float-end">Hide</button>
+            <% } %>
+        </div>
+
+    </div>
+    <div class="row gy-2 gx-3 align-items-center" style="--bs-gutter-x: 0.3rem;">
+
+        <div class="col-auto input-group-sm" style="padding-right: 0px;" title="Number of ticks">
+            <input type="number" class="colorbar-num-ticks input-sm form-control"
+            value="<%= num_ticks %>" style="width:33px" min="2"/>
+        </div>
+        <div class="col-auto input-group-sm" style="padding-left: 0px;">
+            <label class="col-form-label col-form-label-sm">Ticks</label>
+        </div>
+
+        <div class="form-group col-sm-auto btn-group">
+            <button type="button" class="colorbar-axis-color btn btn-outline-secondary btn-sm dropdown-toggle" title="Tick Color"
+                data-bs-toggle="dropdown">
+                <span class="dropdown_icon" data-axis-color="<%= axis_color %>" style="background-color:#<%= axis_color %>">&nbsp &nbsp &nbsp</span>
+                <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu colorpicker" role="menu">
+                <!-- NB: dropdown_icon is picked on choosing dropdown, replaces icon in button above -->
+                <li><a class="dropdown-item" href="#">
+                    <span class="dropdown_icon" data-axis-color="000000" style="background-color:#000">&nbsp &nbsp &nbsp</span>&nbsp Black
+                </a></li>
+                <li><a class="dropdown-item" href="#">
+                    <span class="dropdown_icon" data-axis-color="0000FF" style="background-color:#00f">&nbsp &nbsp &nbsp</span>&nbsp Blue
+                </a></li>
+                <li><a class="dropdown-item" href="#">
+                    <span class="dropdown_icon" data-axis-color="00FF00" style="background-color:#0f0">&nbsp &nbsp &nbsp</span>&nbsp Green
+                </a></li>
+                <li><a class="dropdown-item" href="#">
+                    <span class="dropdown_icon" data-axis-color="FF0000" style="background-color:#f00">&nbsp &nbsp &nbsp</span>&nbsp Red
+                </a></li>
+                <li><a class="dropdown-item" href="#">
+                    <span class="dropdown_icon" data-axis-color="FFFF00" style="background-color:#ff0">&nbsp &nbsp &nbsp</span>&nbsp Yellow
+                </a></li>
+                <li><a class="dropdown-item" href="#">
+                    <span class="dropdown_icon" data-axis-color="FFFFFF" style="background-color:#fff">&nbsp &nbsp &nbsp</span>&nbsp White
+                </a></li>
+                <li><a class="dropdown-item" href="#">
+                    <span class="dropdown_icon" data-axis-color="FF00FF" style="background-color:#f0f">&nbsp &nbsp &nbsp</span>&nbsp Magenta
+                </a></li>
+                <li><a class="dropdown-item" href="#">
+                    <span class="dropdown_icon" data-axis-color="00FFFF" style="background-color:#0ff">&nbsp &nbsp &nbsp</span>&nbsp Cyan
+                </a></li>
+            </ul>
+        </div>
+
+        <div class="col-auto btn-group" style="padding: 0;">
+            <button type="button" class="colorbar_font_size btn btn-outline-secondary btn-sm dropdown-toggle" title="Font Size"
+            data-bs-toggle="dropdown">
+                <span class='dropdown_icon'><%= font_size %></span>
+                <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" role="menu">
+            <% _.each([6,8,10,12,14,18,21,24,36,48],function(p){
+                print ("<li><a class='dropdown-item' href='#'><span class='dropdown_icon'>"+p+"</span></a></li>")
+            }); %>
+            </ul>
+        </div>
+
+        <!-- <div class="col-auto input-group-sm">
+            <label class="col-form-label col-form-label-sm">Length</label>
+        </div> -->
+        <div class="col-auto input-group-sm" style="padding-right: 0px;">
+          <input type="number" class="colorbar-mark-length input-sm form-control"
+            value="<%= mark_len %>" style="width:35px" min="0" title="Tick mark length"/>
+        </div>
+        <div class="col-auto input-group-sm" style="padding-left: 0px; margin-right: 3px;">
+            <label class="col-form-label col-form-label-sm">px</label>
+        </div>
+
+        <div class="col-auto input-group-sm" style="padding-right: 0px;">
+            <label class="col-form-label col-form-label-sm">Margin</label>
+        </div>
+        <div class="col-auto input-group-sm" style="padding-right: 0px;" title="Margin between the ticks mark and label">
+            <input type="number" class="colorbar-tick-margin input-sm form-control"
+            value="<%= tick_margin %>" style="width:35px" />
+        </div>
+        <div class="col-auto input-group-sm" style="padding-left: 0px;">
+            <label class="col-form-label col-form-label-sm">px</label>
+        </div>
+    </div>
+</form>
