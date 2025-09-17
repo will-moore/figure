@@ -30,6 +30,7 @@ var Text = function Text(options) {
   var self = this;
   this.manager = options.manager;
   this.paper = options.paper;
+  this._fontZoom = 100;
   this._x = options.x;
   this._y = options.y;
   this._textColor = options.textColor;
@@ -104,6 +105,11 @@ var Text = function Text(options) {
 
   this.drawShape();
 };
+
+Text.prototype.setFontZoom = function setFontZoom(zoomPercent) {
+  this._fontZoom = zoomPercent ? zoomPercent : 100;
+  this.drawShape();
+}
 
 Text.prototype.toJson = function toJson() {
   var rv = {
@@ -496,7 +502,7 @@ Text.prototype.drawShape = function drawShape() {
     y: final_y * f,
     fill: color,
     "fill-opacity": 1,
-    "font-size": this._fontSize,
+    "font-size": this._fontSize * (this._fontZoom / 100),
     "text": this._text,
     "text-anchor": this._textAnchor
   });

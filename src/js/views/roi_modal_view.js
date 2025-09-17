@@ -697,10 +697,13 @@ export const RoiModalView = Backbone.View.extend({
                 frame_w = maxSize,
                 frame_h = maxSize,
                 wh = this.m.get('width') / this.m.get('height');
+            var sc = 1;
             if (wh <= 1) {
+                sc = maxSize / this.m.get('height');
                 frame_h = maxSize;
                 frame_w = maxSize * wh;
             } else {
+                sc = maxSize / this.m.get('width');
                 frame_w = maxSize;
                 frame_h = maxSize / wh;
             }
@@ -718,6 +721,7 @@ export const RoiModalView = Backbone.View.extend({
             this.shapeManager._orig_width = w;
             this.shapeManager._orig_height = h;
             this.shapeManager.setZoom(scale * 100);
+            this.shapeManager.setFontZoom(sc * 100);
             $("#roi_paper").css(svg_css);
 
             $("#roiViewer").css({'width': frame_w + 'px', 'height': frame_h + 'px'});

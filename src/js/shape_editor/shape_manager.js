@@ -248,6 +248,14 @@ ShapeManager.prototype.setZoom = function setZoom(zoomPercent) {
   //                          'top': (currTop - deltaTop) + "px"});
 };
 
+ShapeManager.prototype.setFontZoom = function setFontZoom(zoomPercent) {
+  this._shapes.forEach(function (shape) {
+    if (shape.setFontZoom) {
+      shape.setFontZoom(zoomPercent);
+    }
+  });
+}
+
 ShapeManager.prototype.getOriginalShape = function getOriginalShape() {
   return {x:0, y:0, width: this._orig_width, height: this._orig_height};
 };
