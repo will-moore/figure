@@ -374,11 +374,11 @@ class ShapeToPdfExport(ShapeExport):
             self.canvas, center[0] - w / 2, center[1] - h / 2 + size / 4)
 
     def draw_text(self, shape):
-        if not shape.get('showText', True):
+        raw_text = shape.get('text', '')
+        if not shape.get('showText', True) or raw_text == '':
             return
 
         text_coords = self.panel_to_page_coords(shape['x'], shape['y'])
-        raw_text = shape.get('text')
         text = ""
 
         if markdown_imported:
@@ -793,12 +793,12 @@ class ShapeToPilExport(ShapeExport):
         self.draw.text(xy, text, fill=rgba, font=font)
 
     def draw_text(self, shape):
-        print(shape)
-        if not shape.get('showText', True):
+        text = shape.get('text', '')
+        if not shape.get('showText', True) or text == '':
             return
 
         text_coords = self.get_panel_coords(shape['x'], shape['y'])
-        text = shape.get('text', '')
+
 
         font_size_dpi = scale_to_export_dpi(shape.get('fontSize', 12))
         stroke_width = shape.get('strokeWidth', 2)
