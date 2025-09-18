@@ -379,10 +379,11 @@ Text.prototype.getPath = function getPath() {
 Text.prototype.drawShape = function drawShape() {
   var color = this._textColor,
       f = this._zoomFraction,
+      shapeScalingFactor = this._shapeScalingFactor / 100,
       fontSize = this._fontSize,
       textAnchor = "middle",
-      textOffsetX = (this._strokeWidth/2 + 6) / f,
-      textOffsetY = (this._strokeWidth/2 + (fontSize > 12 ? fontSize/2 : 6) + 4) / f,
+      textOffsetX = (this._strokeWidth/2 + 6) / f * shapeScalingFactor,
+      textOffsetY = (this._strokeWidth/2 + (fontSize > 12 ? fontSize/2 : 6) + 4) / f * shapeScalingFactor,
       px = this._parentShapeCoords.x,
       py = this._parentShapeCoords.y,
       pw = this._parentShapeCoords.width,
@@ -502,7 +503,7 @@ Text.prototype.drawShape = function drawShape() {
     y: final_y * f,
     fill: color,
     "fill-opacity": 1,
-    "font-size": this._fontSize * (this._shapeScalingFactor / 100),
+    "font-size": this._fontSize * shapeScalingFactor,
     "text": this._text,
     "text-anchor": this._textAnchor
   });
