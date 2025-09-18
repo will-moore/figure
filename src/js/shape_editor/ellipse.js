@@ -533,6 +533,7 @@ Ellipse.prototype.createShapeText = function createShapeText(){
           vFlip = this.manager.getVerticalFlip(),
           hFlip = this.manager.getHorizontalFlip(),
           textColor = this.manager.getTextColor(),
+          shapeScalingFactor = this.manager.getShapeScalingFactor(),
           textBackgroundOpacity = this.manager.getTextBackgroundOpacity(),
           textBackgroundColor = this.manager.getTextBackgroundColor(),
           textRotation = this.manager.getTextRotation();
@@ -559,6 +560,7 @@ Ellipse.prototype.createShapeText = function createShapeText(){
         textColor: textColor,
         showText: true,
         fontSize: fontSize,
+        shapeScalingFactor: shapeScalingFactor,
         textPosition: textPosition,
         strokeWidth: this._strokeWidth,
         parentShapeCoords: {x: this._x - this._radiusX, y: this._y - this._radiusY, width: 2*this._radiusX, height: 2*this._radiusY}

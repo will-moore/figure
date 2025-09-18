@@ -30,7 +30,7 @@ var Text = function Text(options) {
   var self = this;
   this.manager = options.manager;
   this.paper = options.paper;
-  this._fontZoom = 100;
+  this._shapeScalingFactor = options.shapeScalingFactor || 100;
   this._x = options.x;
   this._y = options.y;
   this._textColor = options.textColor;
@@ -106,8 +106,8 @@ var Text = function Text(options) {
   this.drawShape();
 };
 
-Text.prototype.setFontZoom = function setFontZoom(zoomPercent) {
-  this._fontZoom = zoomPercent ? zoomPercent : 100;
+Text.prototype.setShapeScalingFactor = function setShapeScalingFactor(zoomPercent) {
+  this._shapeScalingFactor = zoomPercent ? zoomPercent : 100;
   this.drawShape();
 }
 
@@ -502,7 +502,7 @@ Text.prototype.drawShape = function drawShape() {
     y: final_y * f,
     fill: color,
     "fill-opacity": 1,
-    "font-size": this._fontSize * (this._fontZoom / 100),
+    "font-size": this._fontSize * (this._shapeScalingFactor / 100),
     "text": this._text,
     "text-anchor": this._textAnchor
   });
@@ -704,6 +704,7 @@ CreateText.prototype.startDrag = function startDrag(startX, startY) {
       strokeWidth = this.manager.getStrokeWidth(),
       fontSize = this.manager.getTextFontSize(),
       zoom = this.manager.getZoom(),
+      shapeScalingFactor = this.manager.getShapeScalingFactor(),
       inModalView = this.manager.getInModalView(),
       vFlip = this.manager.getVerticalFlip(),
       hFlip = this.manager.getHorizontalFlip(),
@@ -723,6 +724,7 @@ CreateText.prototype.startDrag = function startDrag(startX, startY) {
     manager: this.manager,
     paper: this.paper,
     zoom: zoom,
+    shapeScalingFactor: shapeScalingFactor,
     text: "Text",
     showText: true,
     inModalView: inModalView,

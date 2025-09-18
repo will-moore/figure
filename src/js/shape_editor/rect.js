@@ -428,6 +428,7 @@ Rect.prototype.createShapeText = function createShapeText(){
           vFlip = this.manager.getVerticalFlip(),
           hFlip = this.manager.getHorizontalFlip(),
           textColor = this.manager.getTextColor(),
+          shapeScalingFactor = this.manager.getShapeScalingFactor(),
           textBackgroundOpacity = this.manager.getTextBackgroundOpacity(),
           textBackgroundColor = this.manager.getTextBackgroundColor(),
           textRotation = this.manager.getTextRotation();
@@ -450,6 +451,7 @@ Rect.prototype.createShapeText = function createShapeText(){
           showText: true,
           x: this._x,
           y: this._y,
+          shapeScalingFactor: shapeScalingFactor,
           textBackgroundOpacity: textBackgroundOpacity,
           textBackgroundColor: textBackgroundColor,
           textColor: textColor,
