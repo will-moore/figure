@@ -156,7 +156,6 @@ export const RoiModalView = Backbone.View.extend({
             "change .text-background-color": "changeTextBackgroundColor",
             "click .show-text":"showText",
             "click .hide-text":"hideText",
-            "submit .add-shape-text-form":"addTextToShape",
             "keyup .label-text": "labelInputKeyup",
             "change .shape-color": "changeColor",
             "change .fill-color": "changeFillColor",
@@ -411,7 +410,7 @@ export const RoiModalView = Backbone.View.extend({
 
         labelInputKeyup: function(event){
             // This will update text on the currently selected shape
-            this.addTextToShape();
+            this.addTextToShape(event);
         },
 
         addTextToShape: function(event){
@@ -421,6 +420,12 @@ export const RoiModalView = Backbone.View.extend({
             }
             var text = $("#label-text").val();
             this.shapeManager.createShapeText();
+
+            // request focus again as when we add new shapes, it looses the focus
+            // on the text placeholder
+            $("#label-text").val(text);
+            $("#label-text").trigger("focus");
+
             this.shapeManager.setText(text);
             this.shapeManager.setTextPosition(this.shapeManager.getTextPosition());
             this.shapeManager.setTextFontSize(this.shapeManager.getTextFontSize());
