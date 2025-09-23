@@ -101,6 +101,9 @@
             } else if (IS_ADMIN) {
                 $(".script_version_warning").show()
                     .attr("title", "Script missing! Click to Upload...");
+            } else {
+                $(".script_version_warning").show()
+                    .attr("title", "Export script not installed. Contact your OMERO administrator.");
             }
 
             // respond to zoom changes
