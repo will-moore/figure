@@ -796,7 +796,9 @@
         addOne: function(panel) {
             var page_color = this.model.get('page_color');
             var view = new PanelView({model:panel, page_color:page_color});
-            this.$figure.append(view.render().el);
+            this.$figure.append(view.el);
+            // render works better AFTER attaching element to the DOM
+            view.render();
         },
 
         renderLoadingSpinner: function() {

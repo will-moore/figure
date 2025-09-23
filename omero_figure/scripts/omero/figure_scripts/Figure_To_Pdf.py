@@ -1548,14 +1548,13 @@ class FigureExport(object):
         y = panel['y']
         width = panel['width']
         height = panel['height']
+        border = panel.get('border')
 
         viewport_region = self.get_crop_region(panel)
 
         # Handle page offsets
         x = x - page['x']
         y = y - page['y']
-
-        spacer = 5
 
         # group by 'position':
         positions = {'top': [], 'bottom': [], 'left': [],
@@ -1749,6 +1748,13 @@ class FigureExport(object):
             self.draw_text(text, lx, ly, fontsize, rgb, align=align)
             return label_h
 
+        spacer = 5
+        border_width = 0
+        if border is not None and border['showBorder']:
+            border_width = border['strokeWidth']
+
+        border_spacer = spacer + border_width
+
         # Render each position:
         for key, labels in positions.items():
             if key == 'topleft':
@@ -1779,19 +1785,19 @@ class FigureExport(object):
                     draw_lab(label, lx, ly, align='right')
             elif key == 'top':
                 lx = x + (width / 2)
-                ly = y
+                ly = y - border_width
                 labels.reverse()
                 for label in labels:
                     ly = ly - label['size'] - spacer
                     draw_lab(label, lx, ly, align='center')
             elif key == 'bottom':
                 lx = x + (width / 2)
-                ly = y + height + spacer
+                ly = y + height + border_spacer
                 for label in labels:
                     label_h = draw_lab(label, lx, ly, align='center')
                     ly += label_h + spacer
             elif key == 'left':
-                lx = x - spacer
+                lx = x - border_spacer
                 sizes = [label['size'] for label in labels]
                 total_h = sum(sizes) + spacer * (len(labels) - 1)
                 ly = y + (height - total_h) / 2
@@ -1799,7 +1805,7 @@ class FigureExport(object):
                     label_h = draw_lab(label, lx, ly, align='right')
                     ly += label_h + spacer
             elif key == 'right':
-                lx = x + width + spacer
+                lx = x + width + border_spacer
                 sizes = [label['size'] for label in labels]
                 total_h = sum(sizes) + spacer * (len(labels) - 1)
                 ly = y + (height - total_h) / 2
@@ -1807,14 +1813,14 @@ class FigureExport(object):
                     label_h = draw_lab(label, lx, ly)
                     ly += label_h + spacer
             elif key == 'leftvert':
-                lx = x - spacer
+                lx = x - border_spacer
                 ly = y + (height / 2)
                 labels.reverse()
                 for label in labels:
                     lx = lx - label['size'] - spacer
                     draw_lab(label, lx, ly, align='left-vertical')
             elif key == 'rightvert':
-                lx = x + width + spacer
+                lx = x + width + border_spacer
                 ly = y + (height / 2)
                 labels.reverse()
                 for label in labels:

@@ -1167,6 +1167,10 @@
             shift = top_labels.reduce(function(prev, l){
                 return prev + (LINE_HEIGHT * l.size);
             }, shift);
+            var border = this.get("border");
+            if (border && border["showBorder"]) {
+                shift = shift + border["strokeWidth"];
+            }
 
             var shift_cbar = 0;
             var cb = this.get("colorbar");
@@ -1200,6 +1204,10 @@
             for (const l of left_labels) {
                 const width = this.measureTextSize(l.text, l.size + "px");
                 shift = Math.max(shift, width);
+            }
+            var border = this.get("border");
+            if (border && border["showBorder"]) {
+                shift = shift + border["strokeWidth"];
             }
 
             var start = "";
@@ -1248,6 +1256,10 @@
                 const width = this.measureTextSize(l.text, l.size + "px");
                 shift = Math.max(shift, width);
             }
+            var border = this.get("border");
+            if (border && border["showBorder"]) {
+                shift = shift + border["strokeWidth"];
+            }
 
             var start = "";
             var end = "";
@@ -1289,6 +1301,10 @@
             shift = bottom_labels.reduce(function(prev, l){
                 return prev + (LINE_HEIGHT * l.size);
             }, shift);
+            var border = this.get("border");
+            if (border && border["showBorder"]) {
+                shift = shift + border["strokeWidth"];
+            }
 
             var shift_cbar = 0;
             var cb = this.get("colorbar");
