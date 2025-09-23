@@ -51,7 +51,6 @@
             if (opts.page_color) {
                 this.page_color = opts.page_color;
             }
-            this.render();
         },
 
         events: {
@@ -104,7 +103,7 @@
                 x = x - sw;
                 y = y - sw;
                 page_w = w + (sw * 2);
-               page_h = h + (sw * 2);
+                page_h = h + (sw * 2);
             } else {
                 this.$el.css({'border': ''})
             }
@@ -314,23 +313,21 @@
             $('.right_vlabels', self.$el).css('width', 3 * self.$el.height() + 'px');
 
             var border = this.model.get('border')
-            if(border != undefined){
+            if(border?.showBorder){
                 var margin =  5 + border.strokeWidth
                 $('.left_vlabels>div', self.$el).css('margin-bottom', margin + 'px');
                 $('.right_vlabels>div', self.$el).css('margin-bottom', margin + 'px');
-                margin =  3 + border.strokeWidth
                 $('.label_top', self.$el).css('margin-bottom', margin + 'px');
-                margin =  border.strokeWidth
                 $('.label_bottom', self.$el).css('margin-top', margin + 'px');
                 $('.label_left', self.$el).css('margin-right', margin + 'px');
                 $('.label_right', self.$el).css('margin-left', margin + 'px');
             }else{
-                $('.left_vlabels>div', self.$el).css('mSargin-bottom', '5px');
+                $('.left_vlabels>div', self.$el).css('margin-bottom', '5px');
                 $('.right_vlabels>div', self.$el).css('margin-bottom', '5px');
-                $('.label_top', self.$el).css('margin-bottom', '3px');
-                $('.label_bottom', self.$el).css('margin-top', '');
-                $('.label_left', self.$el).css('margin-right', '');
-                $('.label_right', self.$el).css('margin-left', '');
+                $('.label_top', self.$el).css('margin-bottom', '5px');
+                $('.label_bottom', self.$el).css('margin-top', '5px');
+                $('.label_left', self.$el).css('margin-right', '5px');
+                $('.label_right', self.$el).css('margin-left', '5px');
             }
 
             return this;
@@ -453,8 +450,7 @@
 
             // update src, layout etc.
             this.render_image();
-            this.render_labels();
-            this.render_scalebar();     // also calls render_layout()
+            this.render_scalebar();     // also calls render_layout() -> render_labels()
             this.render_colorbar();
 
             // At this point, element is not ready for Raphael svg
@@ -463,6 +459,7 @@
             setTimeout(function(){
                 self.render_shapes();
             }, 10);
+            this.render_scalebar();     // also calls render_layout() -> render_labels()
 
             return this;
         }
