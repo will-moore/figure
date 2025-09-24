@@ -26,6 +26,7 @@
         hideModals,
         hideModal,
         updateRoiIds} from "./util";
+    const RELEASE_VERSION = import.meta.env.VITE_VERSION;
 
     // This extends Backbone to support keyboardEvents
     backboneMousetrap(_, Backbone, Mousetrap);
@@ -92,6 +93,17 @@
             // enable export (script is available)
             if (EXPORT_ENABLED) {
                 $("button.export_pdf").removeAttr("disabled");
+                // check script version
+                if (SCRIPT_VERSION != RELEASE_VERSION) {
+                    $(".script_version_warning").show()
+                    .attr("title", "Script Version Warning");
+                }
+            } else if (IS_ADMIN) {
+                $(".script_version_warning").show()
+                    .attr("title", "Script missing! Click to Upload...");
+            } else {
+                $(".script_version_warning").show()
+                    .attr("title", "Export script not installed. Contact your OMERO administrator.");
             }
 
             // respond to zoom changes
@@ -117,6 +129,8 @@
 
         events: {
             "click .export_pdf": "export_pdf",
+            "click .script_version_warning": "script_version_warning",
+            "click .upload_omero_script": "upload_omero_script",
             "click .export_options li": "export_options",
             "click .add_panel": "addPanel",
             "click .delete_panel": "deleteSelectedPanels",
@@ -220,6 +234,49 @@
 
             // clear file list (will be re-fetched when needed)
             this.figureFiles.reset();
+        },
+
+        script_version_warning: function(event) {
+            // Show the script manager (warning/upload) dialog
+            document.getElementById("figure_app_version").innerHTML = RELEASE_VERSION;
+            let script_version = SCRIPT_VERSION.length > 0 ? SCRIPT_VERSION : "unknown";
+            document.getElementById("export_script_version").innerHTML = script_version;
+
+            if (EXPORT_ENABLED) {
+                $(".script_version_mismatch").show();
+                $(".script_missing").hide();
+            } else {
+                $(".script_version_mismatch").hide();
+                $(".script_missing").show();
+            }
+            if (IS_ADMIN) {
+                $("#admin_script_message").show();
+            } else {
+                $("#non_admin_script_message").show();
+            }
+            $("#script_upload_message").hide();
+            showModal("scriptManagerDialog");
+        },
+
+        upload_omero_script: function(event) {
+            let $btn = $(".upload_omero_script");
+            let $spinner = $(".spinner", $btn);
+            $btn.attr("disabled", "disabled");
+            $spinner.show();
+            $.post(UPLOAD_OMERO_SCRIPT_URL)
+             .done(function( data ) {
+                console.log("rsp", data);
+                $btn.removeAttr("disabled");
+                $spinner.hide();
+                let message = data.Error ? "Error: " + data.Error : data.Message;
+                if (data.script_id) {
+                    // success! Hide warning button and enable export.
+                    $(".script_version_warning").hide();
+                    $(".export_pdf").removeAttr("disabled");
+                    message += ". Script ID: " + data.script_id;
+                }
+                $("#script_upload_message").text(message).show();
+            });
         },
 
         // Heavy lifting of PDF generation handled by OMERO.script...

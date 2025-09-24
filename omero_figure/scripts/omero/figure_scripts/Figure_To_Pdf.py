@@ -67,6 +67,7 @@ except ImportError:
     reportlab_installed = False
     logger.error("Reportlab not installed.")
 
+VERSION = "7.2.2.dev0"
 DEFAULT_OFFSET = 0
 
 ORIGINAL_DIR = "1_originals"
@@ -3070,7 +3071,11 @@ def run_script():
                        description="Name of the Pdf Figure"),
 
         scripts.String("Figure_URI",
-                       description="URL to the Figure")
+                       description="URL to the Figure"),
+
+        # This allows clients to query the script version
+        # by listing script params and getting default value
+        scripts.String("FIGURE_VERSION", default=VERSION)
     )
 
     try:
