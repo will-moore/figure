@@ -316,10 +316,7 @@
                 // Adding the margin parameter to the JSON
                 _.each(json.panels, function(p){
                     if (p.scalebar && !p.scalebar.margin) {
-                        p.scalebar.margin = 5;
-                    }
-                    if (p.scalebar && !p.scalebar.margin_unit) {
-                        p.scalebar.margin_unit = '%';
+                        p.scalebar.margin = 10;
                     }
                 });
             }
