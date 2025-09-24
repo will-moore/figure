@@ -315,7 +315,7 @@
                 console.log("Transforming to VERSION 9");
                 // Adding the margin parameter to the JSON
                 _.each(json.panels, function(p){
-                    if (p.scalebar && !p.scalebar.margin) {
+                    if (p.scalebar && p.scalebar.margin == undefined) {
                         p.scalebar.margin = 10;
                     }
                 });

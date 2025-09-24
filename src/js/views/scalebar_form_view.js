@@ -216,7 +216,7 @@ var ScalebarFormView = Backbone.View.extend({
         json.font_size = json.font_size || 10;
         json.pixel_size_symbol = json.pixel_size_symbol || '-';
         json.height = json.height || 3;
-        json.margin = json.margin || 10;
+        json.margin = json.margin ?? 10;
 
         var html = this.template(json);
         this.$el.html(html);
