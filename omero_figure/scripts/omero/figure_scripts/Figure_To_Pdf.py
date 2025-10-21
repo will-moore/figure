@@ -398,8 +398,10 @@ class ShapeToPdfExport(ShapeExport):
 
         # handle flipping
         h_flip = self.panel.get('horizontal_flip', False)
-        if h_flip and anchor == 'start':
-            anchor = "end"
+        v_flip = self.panel.get('vertical_flip', False)
+        anchor_dic = {"start": "end", "end": "start", "middle": "middle"}
+        if h_flip:
+            anchor = anchor_dic[anchor]
 
         # handle shifting according to the test anchor
         x = x0
@@ -433,6 +435,24 @@ class ShapeToPdfExport(ShapeExport):
         text_offset_y = size / 2 + stroke_width / 4 + 4
         out_positions = ["top", "left", "bottom", "right"]
         in_positions = ["topleft", "bottomleft", "bottomright", "topright"]
+        h_flip_dic = {"top": "top",
+                    "left": "right",
+                    "right": "left",
+                    "bottom": "bottom",
+                    "topleft": "topright",
+                    "topright": "topleft",
+                    "bottomleft": "bottomright",
+                    "bottomright": "bottomleft"
+                    }
+        v_flip_dic = {"top": "bottom",
+                    "left": "left",
+                    "right": "right",
+                    "bottom": "top",
+                    "topleft": "bottomleft",
+                    "topright": "bottomright",
+                    "bottomleft": "topleft",
+                    "bottomright": "topright"
+                    }
         rotation_index = fmod(floor((360 - rotation + 45) / 90), 4)
         final_index = 0
 
@@ -444,6 +464,12 @@ class ShapeToPdfExport(ShapeExport):
             pos_index = in_positions.index(text_position)
             final_index = int(fmod((pos_index + rotation_index), 4))
             text_position = in_positions[final_index]
+
+        # handle flipping
+        if h_flip:
+            text_position = h_flip_dic[text_position]
+        if v_flip:
+            text_position = v_flip_dic[text_position]
 
         dx, dy, padding_y = 0, 0, 0
         if text_position == "bottom":
