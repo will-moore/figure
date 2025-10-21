@@ -382,16 +382,16 @@ Text.prototype.drawShape = function drawShape() {
       shapeScalingFactor = this._shapeScalingFactor / 100,
       fontSize = this._fontSize,
       textAnchor = "middle",
-      textOffsetX = (this._strokeWidth/2 + 6) / f * shapeScalingFactor,
-      textOffsetY = (this._strokeWidth/2 + (fontSize > 12 ? fontSize/2 : 6) + 4) / f * shapeScalingFactor,
+      textOffsetX = (this._strokeWidth/2 + 6) / f,
+      textOffsetY = (this._strokeWidth/2 + (fontSize > 12 ? fontSize/2 : 6) + 4) / f,
       px = this._parentShapeCoords.x,
       py = this._parentShapeCoords.y,
       pw = this._parentShapeCoords.width,
       ph = this._parentShapeCoords.height,
       x = px,
       y = py,
-      dx = 0,
-      dy = 0,
+      dx, dxScaled = 0,
+      dy, dyScaled = 0,
       final_x = undefined,
       final_y = undefined,
       outPositions = ["top", "left", "bottom","right"],
@@ -421,12 +421,15 @@ Text.prototype.drawShape = function drawShape() {
   switch(this._textPosition){
     case "bottom":
       dx = pw/2;
-      dy = ph + textOffsetY;
+      dy = textOffsetY;
       if(this._linkedShapeId == -1){
-        dy = ph - textOffsetY;
+        dy = -textOffsetY;
         textAnchor = outAnchors[(finalIndex + 2) % 4]
       }
       textAnchor = outAnchors[finalIndex]
+      dyScaled = ph + dy * shapeScalingFactor
+      dxScaled = dx;
+      dy = ph + dy
       break;
   case "left":
       dx = -textOffsetX;
@@ -436,48 +439,65 @@ Text.prototype.drawShape = function drawShape() {
         dx = textOffsetX;
         textAnchor = outAnchors[(finalIndex + 2) % 4]
       }
+      dxScaled = dx * shapeScalingFactor;
+      dyScaled = dy
       break;
   case "right":
-      dx = pw + textOffsetX;
+      dx = textOffsetX;
       dy = ph/2;
       textAnchor = outAnchors[finalIndex]
       if(this._linkedShapeId == -1){
-        dx = pw - textOffsetX;
+        dx = -textOffsetX;
         textAnchor = outAnchors[(finalIndex + 2) % 4]
       }
+      dxScaled = pw + dx * shapeScalingFactor;
+      dyScaled = dy
+      dx = pw + dx
       break;
   case "top":
       dx = pw/2;
       dy = -textOffsetY;
       if(this._linkedShapeId == -1){
-        dy = + textOffsetY;
+        dy = textOffsetY;
         textAnchor = outAnchors[(finalIndex + 2) % 4]
       }
       textAnchor = outAnchors[finalIndex]
+      dxScaled = dx
+      dyScaled = dy * shapeScalingFactor
       break;
   case "topleft":
       dx = textOffsetX;
       dy = textOffsetY;
+      dxScaled = dx * shapeScalingFactor
+      dyScaled = dy * shapeScalingFactor
       textAnchor = inAnchors[finalIndex]
       break;
   case "topright":
       dx = pw - textOffsetX;
       dy = textOffsetY;
+      dxScaled = pw - textOffsetX * shapeScalingFactor
+      dyScaled = dy * shapeScalingFactor
       textAnchor = inAnchors[finalIndex]
       break;
   case "bottomleft":
       dx = textOffsetX;
       dy = ph - textOffsetY;
+      dxScaled = dx * shapeScalingFactor
+      dyScaled = ph - textOffsetY * shapeScalingFactor
       textAnchor = inAnchors[finalIndex]
       break;
   case "bottomright":
       dx = pw - textOffsetX;
       dy = ph - textOffsetY;
+      dxScaled = pw - textOffsetX * shapeScalingFactor
+      dyScaled = ph - textOffsetY * shapeScalingFactor
       textAnchor = inAnchors[finalIndex]
       break;
   case "center":
       dx = pw/2;
       dy = ph/2;
+      dxScaled = dx
+      dyScaled = dy
       textAnchor = "middle";
       break;
   case "freehand":
@@ -489,6 +509,7 @@ Text.prototype.drawShape = function drawShape() {
       break;
   }
 
+  // real shape coordinates
   var rotatedCoords = this.applyShapeRotation(px + pw/2, py + ph/2, x + dx, y + dy, this._rotation);
   if(final_x == undefined || final_y == undefined){
     final_x = rotatedCoords.x
@@ -498,9 +519,12 @@ Text.prototype.drawShape = function drawShape() {
   this._x = final_x;
   this._y = final_y;
 
+  // for modal display only
+  var scaledRotatedCoords = this.applyShapeRotation(px + pw/2, py + ph/2, x + dxScaled, y + dyScaled, this._rotation); 
+
   this.element.attr({
-    x: final_x * f,
-    y: final_y * f,
+    x: scaledRotatedCoords.x * f,
+    y: scaledRotatedCoords.y * f,
     fill: color,
     "fill-opacity": 1,
     "font-size": this._fontSize * shapeScalingFactor,
