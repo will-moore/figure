@@ -476,6 +476,9 @@ Line.prototype.drawShape = function drawShape() {
 };
 
 Line.prototype.setSelected = function setSelected(selected) {
+  if((selected && this._selected) || (!selected && !this._selected)){
+    return
+  }
   this._selected = !!selected;
   if(this._textShape || this.loadTextShape()){
     this._textShape.setSelected(this._selected)

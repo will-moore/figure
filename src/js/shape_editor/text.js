@@ -79,8 +79,6 @@ var Text = function Text(options) {
         this.prevX = dx;
         this.prevY = dy;
 
-        self._textPosition = "freehand"
-
         // Manager handles move and redraw
         self.manager.moveSelectedShapes(offsetX, offsetY, true);
       },
@@ -330,7 +328,16 @@ Text.prototype.isSelected = function isSelected() {
 };
 
 Text.prototype.setSelected = function setSelected(selected) {
-  this._selected = selected;
+  if((selected && this._selected) || (!selected && !this._selected)){
+    return
+  }
+  this._selected = !!selected;
+  if(this._linkedShapeId != -1){
+    var parentShape = this.manager.getShape(this._linkedShapeId);
+    if(parentShape){
+      parentShape.setSelected(selected)
+    }
+  }
   this.drawShape();
 };
 
