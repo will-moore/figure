@@ -1277,6 +1277,8 @@
                     shapes.forEach(function(sh){
                         if(sh.type == "Text"){
                             sh.textRotation = 0;
+                            sh.hFlip = 1;
+                            sh.vFlip = 1;
                         }
                     })
                     m.save('shapes', shapes);
