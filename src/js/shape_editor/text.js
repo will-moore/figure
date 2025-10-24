@@ -173,6 +173,12 @@ Text.prototype.setStrokeColor = function setStrokeColor(color) {
 };
 
 Text.prototype.getStrokeColor = function getStrokeColor() {
+  if(this._linkedShapeId != -1){
+    var parentShape = this.manager.getShape(this._linkedShapeId);
+    if(parentShape){
+      return parentShape.getStrokeColor()
+    }
+  }
   return;
 };
 
@@ -235,6 +241,12 @@ Text.prototype.setFillColor = function setFillColor(fillColor) {
 };
 
 Text.prototype.getFillColor = function getFillColor() {
+  if(this._linkedShapeId != -1){
+    var parentShape = this.manager.getShape(this._linkedShapeId);
+    if(parentShape){
+      return parentShape.getFillColor()
+    }
+  }
   return;
 };
 
@@ -252,6 +264,12 @@ Text.prototype.setFillOpacity = function setFillOpacity(fillOpacity) {
 };
 
 Text.prototype.getFillOpacity = function getFillOpacity() {
+  if(this._linkedShapeId != -1){
+    var parentShape = this.manager.getShape(this._linkedShapeId);
+    if(parentShape){
+      return parentShape.getFillOpacity()
+    }
+  }
   return 0;
 };
 
