@@ -1386,12 +1386,13 @@
             this.models.forEach(function(m){
                 var shapes = m.get('shapes');
                 if(shapes){
-                    shapes.forEach(function(sh){
-                        if(sh.type == "Text"){
-                            sh.textRotation = val;
-                        }
-                    })
-                    m.save({'rotation': val, 'shapes': shapes});
+                    let newShapes = shapes.map(sh => {
+                        if (sh.type === "Text") {
+                            return {...sh, textRotation: val};
+                         }
+                        return sh;
+                    });
+                    m.save({'rotation': val, 'shapes': newShapes});
                 }else{
                     m.save('rotation', val);
                 }
@@ -1407,12 +1408,13 @@
             this.models.forEach(function(m) {
                 var shapes = m.get('shapes');
                 if(shapes){
-                    shapes.forEach(function(sh){
-                        if(sh.type == "Text"){
-                            sh.vFlip = isVerticalFlipped ? -1 : 1;
-                        }
-                    })
-                    m.save({'vertical_flip': isVerticalFlipped, 'shapes': shapes});
+                    let newShapes = shapes.map(sh => {
+                        if (sh.type === "Text") {
+                            return {...sh, vFlip: isVerticalFlipped ? -1 : 1};
+                         }
+                        return sh;
+                    });
+                    m.save({'vertical_flip': isVerticalFlipped, 'shapes': newShapes});
                 }else{
                     m.save('vertical_flip', isVerticalFlipped);
                 }
@@ -1428,12 +1430,13 @@
             this.models.forEach(function(m) {
                 var shapes = m.get('shapes');
                 if(shapes){
-                    shapes.forEach(function(sh){
-                        if(sh.type == "Text"){
-                            sh.hFlip = isHorizontalFlipped ? -1 : 1;
-                        }
-                    })
-                    m.save({'horizontal_flip': isHorizontalFlipped, 'shapes': shapes});
+                    let newShapes = shapes.map(sh => {
+                        if (sh.type === "Text") {
+                            return {...sh, hFlip: isHorizontalFlipped ? -1 : 1};
+                         }
+                        return sh;
+                    });
+                    m.save({'horizontal_flip': isHorizontalFlipped, 'shapes': newShapes});
                 }else{
                     m.save('horizontal_flip', isHorizontalFlipped);
                 }
