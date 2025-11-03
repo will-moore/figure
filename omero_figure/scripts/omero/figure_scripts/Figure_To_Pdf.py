@@ -188,7 +188,16 @@ class ShapeExport(object):
 
     def __init__(self, panel):
         self.panel = panel
+        sorted_shapes = []
+
+        # sort shapes to draw text first
         for s in panel.get("shapes", ()):
+            if s['type'].lower() == "text":
+                sorted_shapes.insert(0, s)
+            else:
+                sorted_shapes.append(s)
+
+        for s in sorted_shapes:
             getattr(self, 'draw_%s' % s['type'].lower(), lambda s: None)(s)
 
     @staticmethod
@@ -826,7 +835,6 @@ class ShapeToPilExport(ShapeExport):
             return
 
         text_coords = self.get_panel_coords(shape['x'], shape['y'])
-
 
         font_size_dpi = scale_to_export_dpi(shape.get('fontSize', 12))
         stroke_width = shape.get('strokeWidth', 2)
