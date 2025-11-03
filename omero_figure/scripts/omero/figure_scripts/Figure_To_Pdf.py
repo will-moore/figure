@@ -498,6 +498,7 @@ class ShapeToPdfExport(ShapeExport):
         if text_position == "top":
             dx = 0
             dy = -stroke_width / 2
+            padding_y = - 2 * dy
         if text_position == "topleft":
             dx = text_offset_x
             dy = text_offset_y
@@ -509,9 +510,11 @@ class ShapeToPdfExport(ShapeExport):
         if text_position == "bottomleft":
             dx = text_offset_x
             dy = -stroke_width / 2
+            padding_y = - 2 * dy
         if text_position == "bottomright":
             dx = -text_offset_x
             dy = -stroke_width / 2
+            padding_y = - 2 * dy
         if text_position == "center":
             dx = 0
             dy = size * 0.4
@@ -529,11 +532,13 @@ class ShapeToPdfExport(ShapeExport):
 
             # padding inside the background box
             padding_h, padding_v = 3, size/4 + 1
-            padding_x = padding_h/2
+
             if anchor == 'middle':
                 padding_x = -(text_width / 2 + padding_h)
             elif anchor == "end":
-                padding_x = -(text_width + 2.5*padding_h)
+                padding_x = -(text_width + padding_h + text_offset_x)
+            else:
+                padding_x = text_offset_x - padding_h
 
             box_width = text_width + padding_h * 2
             box_height = size + padding_v
