@@ -520,11 +520,11 @@ class ShapeToPdfExport(ShapeExport):
 
             # padding inside the background box
             padding_h, padding_v = 3, size/4 + 1
-            padding_x = 0
+            padding_x = padding_h/2
             if anchor == 'middle':
                 padding_x = -(text_width / 2 + padding_h)
             elif anchor == "end":
-                padding_x = -(text_width + 2 * padding_h)
+                padding_x = -(text_width + 2.5*padding_h)
 
             box_width = text_width + padding_h * 2
             box_height = size + padding_v
