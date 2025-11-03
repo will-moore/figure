@@ -442,7 +442,8 @@ class ShapeToPdfExport(ShapeExport):
                     "topleft": "topright",
                     "topright": "topleft",
                     "bottomleft": "bottomright",
-                    "bottomright": "bottomleft"
+                    "bottomright": "bottomleft",
+                    "center": "center"
                     }
         v_flip_dic = {"top": "bottom",
                     "left": "left",
@@ -451,7 +452,8 @@ class ShapeToPdfExport(ShapeExport):
                     "topleft": "bottomleft",
                     "topright": "bottomright",
                     "bottomleft": "topleft",
-                    "bottomright": "topright"
+                    "bottomright": "topright",
+                    "center": "center"
                     }
         rotation_index = fmod(floor((360 - rotation + 45) / 90), 4)
         final_index = 0
@@ -852,8 +854,10 @@ class ShapeToPilExport(ShapeExport):
 
         # handle flipping
         h_flip = self.panel.get('horizontal_flip', False)
-        if h_flip and anchor == 'start':
-            anchor = "end"
+        v_flip = self.panel.get('vertical_flip', False)
+        anchor_dic = {"start": "end", "end": "start", "middle": "middle"}
+        if h_flip:
+            anchor = anchor_dic[anchor]
 
         # handle horizontal offset according to text anchor
         if anchor == 'middle':
@@ -870,6 +874,26 @@ class ShapeToPilExport(ShapeExport):
         text_offset_x = scale_to_export_dpi(stroke_width / 4 + 4)
         out_positions = ["top", "left", "bottom", "right"]
         in_positions = ["topleft", "bottomleft", "bottomright", "topright"]
+        h_flip_dic = {"top": "top",
+                    "left": "right",
+                    "right": "left",
+                    "bottom": "bottom",
+                    "topleft": "topright",
+                    "topright": "topleft",
+                    "bottomleft": "bottomright",
+                    "bottomright": "bottomleft",
+                    "center": "center"
+                    }
+        v_flip_dic = {"top": "bottom",
+                    "left": "left",
+                    "right": "right",
+                    "bottom": "top",
+                    "topleft": "bottomleft",
+                    "topright": "bottomright",
+                    "bottomleft": "topleft",
+                    "bottomright": "topright",
+                    "center": "center"
+                    }
         rotation_index = fmod(floor((360 - rotation + 45) / 90), 4)
         final_index = 0
 
@@ -881,6 +905,12 @@ class ShapeToPilExport(ShapeExport):
             pos_index = in_positions.index(text_position)
             final_index = int(fmod((pos_index + rotation_index), 4))
             text_position = in_positions[final_index]
+
+        # handle flipping
+        if h_flip:
+            text_position = h_flip_dic[text_position]
+        if v_flip:
+            text_position = v_flip_dic[text_position]
 
         if text_position == "bottom":
             dx = 0
