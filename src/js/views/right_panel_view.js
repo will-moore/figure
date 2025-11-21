@@ -517,7 +517,7 @@
             }
 
             // If we need SPW info and we don't have it, load...
-            if (label_text.includes('[plate.name]') || label_text.includes('well.name') || label_text.includes('field.index')) {
+            if (/\[(plate|well|wellsample)\./.test(label_text)) {
                 // Load Plate Name for images...
                 console.log("label_text", label_text);
                 selected.addLabelsFromPlatesWellsFields({
