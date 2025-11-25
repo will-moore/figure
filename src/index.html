@@ -10,10 +10,13 @@
       // These are updated by views.py when serving this page...
       const BASE_OMEROWEB_URL = dev_omeroweb_url;
       const EXPORT_ENABLED = false;
+      const SCRIPT_VERSION = "";
+      const IS_ADMIN = false;
       const WEBINDEX_URL = BASE_OMEROWEB_URL + "webclient/";
       const BASE_WEBFIGURE_URL = BASE_OMEROWEB_URL + "figure/";
       const WEBGATEWAYINDEX = BASE_OMEROWEB_URL + "webgateway/";
       const MAKE_WEBFIGURE_URL = BASE_WEBFIGURE_URL + "make_web_figure/";
+      const UPLOAD_OMERO_SCRIPT_URL = BASE_WEBFIGURE_URL + "upload_omero_script/";
       const ACTIVITIES_JSON_URL = WEBINDEX_URL + "activities_json/";
       const API_BASE_URL_V0 = BASE_OMEROWEB_URL + "api/v0/"
       const STATIC_DIR = "";
@@ -1178,6 +1181,8 @@
       </div>
     </div>
 
+    <load src="html/dialogs/scriptManagerDialog.html" />
+
     <!-- -- END OF MODAL DIALOGS -- -->
 
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -1548,14 +1553,6 @@
                 <i class="bi-exclamation-triangle"></i>
             </a>
 
-            <button
-              type="button"
-              style="display: none"
-              class="btn btn-danger btn-sm"
-            >
-              <i class="bi-exclamation-triangle"></i>
-            </button>
-
             <div class="btn-group">
               <!-- button enabled if EXPORT_ENABLED is true -->
               <button
@@ -1565,6 +1562,13 @@
                 class="btn btn-success btn-sm export_pdf"
               >
                 Export PDF
+              </button>
+              <!-- script warning shown in FigureView.initialise() if needed -->
+              <button
+                type="button" style="display: none"
+                class="btn btn-danger btn-sm script_version_warning"
+              >
+                <i class="bi-exclamation-circle"></i>
               </button>
               <button
                 type="button"
