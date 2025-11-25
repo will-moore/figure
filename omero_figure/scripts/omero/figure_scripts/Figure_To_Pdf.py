@@ -897,7 +897,8 @@ class ShapeToPilExport(ShapeExport):
                     "topright": "topleft",
                     "bottomleft": "bottomright",
                     "bottomright": "bottomleft",
-                    "center": "center"
+                    "center": "center",
+                    "freehand": "freehand"
                     }
         v_flip_dic = {"top": "bottom",
                     "left": "left",
@@ -907,7 +908,8 @@ class ShapeToPilExport(ShapeExport):
                     "topright": "bottomright",
                     "bottomleft": "topleft",
                     "bottomright": "topright",
-                    "center": "center"
+                    "center": "center",
+                    "freehand": "freehand"
                     }
         rotation_index = fmod(floor((360 - rotation + 45) / 90), 4)
         final_index = 0
