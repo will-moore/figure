@@ -517,8 +517,8 @@
             }
 
             // If we need SPW info and we don't have it, load...
-            // Use regex to check if label_text contains "plate", "well", or "wellsample"
-            if (/\[(plate|well|wellsample)\./.test(label_text)) {
+            // Use regex to check if label_text contains "plate", "well", "wellsample", or "field" 
+            if (/\[(plate|well|wellsample|field)\./.test(label_text)) {
                 // Load Plate Name for images...
                 console.log("label_text", label_text);
                 selected.addLabelsFromPlatesWellsFields({
