@@ -1377,6 +1377,52 @@ class FigureExport(object):
                     # Escaping "_" for markdown
                     label_value = label_value.replace("_", "\\_")
 
+                # Handle well, field/wellsample, run/acquisition, plate, screen labels when figure is created
+                elif prop_nf[0] == "well":
+                    format = prop_nf[1] if len(prop_nf) > 1 else "label"
+                    if format == "label":
+                        label_value = str(panel.get('well', {}).get('label', ''))
+                    elif format == "id":
+                        label_value = str(panel.get('well', {}).get('id', ''))
+                    else:
+                        label_value = ''
+
+                elif prop_nf[0] in ["field", "wellsample"]:
+                    format = prop_nf[1] if len(prop_nf) > 1 else "index"
+                    if format == "index":
+                        label_value = str(panel.get('wellsample', {}).get('index', ''))
+                    elif format == "id":
+                        label_value = str(panel.get('wellsample', {}).get('id', ''))
+                    else:
+                        label_value = ''
+
+                elif prop_nf[0] in ["run", "acquisition"]:
+                    format = prop_nf[1] if len(prop_nf) > 1 else "name"
+                    if format == "name":
+                        label_value = str(panel.get('acquisition', {}).get('name', ''))
+                    elif format == "id":
+                        label_value = str(panel.get('acquisition', {}).get('id', ''))
+                    else:
+                        label_value = ''
+
+                elif prop_nf[0] == "plate":
+                    format = prop_nf[1] if len(prop_nf) > 1 else "name"
+                    if format == "name":
+                        label_value = str(panel.get('plate', {}).get('name', ''))
+                    elif format == "id":
+                        label_value = str(panel.get('plate', {}).get('id', ''))
+                    else:
+                        label_value = ''
+                
+                elif prop_nf[0] == "screen":
+                    format = prop_nf[1] if len(prop_nf) > 1 else "name"
+                    if format == "name":
+                        label_value = str(panel.get('screen', {}).get('name', ''))
+                    elif format == "id":
+                        label_value = str(panel.get('screen', {}).get('id', ''))
+                    else:
+                        label_value = ''
+                    
                 elif prop_nf[0] in ['x', 'y', 'z', 'width', 'height',
                                     'w', 'h', 'rotation', 'rot']:
                     format = prop_nf[1] if len(prop_nf) > 1 else "pixel"
