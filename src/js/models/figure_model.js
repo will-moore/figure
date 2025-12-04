@@ -837,7 +837,7 @@
             for (var [r, y] of Object.entries(rows_position)){
                 var row = grid[r];
                 var closest_column = this.get_closest_column(row[0], reference_grid, last_panel_width)
-                if(closest_column > 0){
+                if(closest_column >= 0){
                     new_x = reference_grid[closest_column]
                 }else{
                     var lastRefColumn = Object.keys(reference_grid).length - 1
@@ -870,7 +870,6 @@
             if(closest_col == Object.keys(reference_row).length - 1 && min_x_distance > last_ref_panel_width){
                 closest_col = -1
             }
-
             return closest_col
         },
 
