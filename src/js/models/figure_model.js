@@ -754,24 +754,18 @@
                 bottom_y = bottom.get('y') + bottom.get('height'),
                 grid = [],
                 row = [],
-                next_panel = left,
-                c0 = {'x': left_x + left.get('width')/2, 'y': top_y + top.get('height')/2},
-                c = c0;
-            console.log(left)
-            console.log(right)
-            console.log(top)
-            console.log(bottom)
-            console.log("bottom y : "+bottom_y)
-            console.log("right x : "+right_x)
+                next_panel,
+                c = {'x': left_x + left.get('width')/2, 'y': top_y + top.get('height')/2};
+
+            // loop over the rows, starting by the top panel row
             while(c.y < bottom_y){
-                console.log("going to another row")
-                console.log(c)
                 row = []
+                // loop over the columns, starting by the left panel column
                 while(c.x < right_x){
-                    console.log("going to another column")
-                    console.log(c)
                     next_panel = this.get_panel_at(c.x , c.y, sel);
-                    console.log(next_panel)
+                    
+                    // if a panel doesn't exist at the current position c
+                    // just go to the next position until it reaches the selection boundaries
                     if (next_panel) {
                         row.push(next_panel);
                         c = next_panel.get_centre();
@@ -783,34 +777,30 @@
                 grid.push(row);
                 c = {'x': left_x + left.get('width')/2, 'y': c.y + row[0].get('height')}
             }
-            console.log(grid.length)
-            console.log(grid)
-            // get the row number of the panel to the very left
-            var leftPanelRow = 0
-            var min_x = Number.MAX_VALUE
-            for(var i = 0; i <grid.length; i++){
-                var row = grid[i]
-                 console.log("rowid: "+i)
-                console.log("row: "+row.length)
-                if(row[0].get('x') < min_x){
-                    leftPanelRow = i
-                    min_x = row[0].get('x')
-                }
-            }
-            console.log(leftPanelRow)
+
+            // get the row id of the most left panel
+            var left_panel_row = grid
+                .map((row, index) => ({ index, x: row[0].get('x') }))
+                .reduce((min, curr) => curr.x < min.x ? curr : min)
+                .index;
+
+            // define the spacer between images
             var spacer = left.get('width')/20;
             if (!isNaN(parseFloat(gridGap))) {
                 spacer = parseFloat(gridGap);
             }
+
             var new_x = left_x,
                 new_y = left.get('y'),
                 max_h = 0,
-                ref_row = grid[leftPanelRow],
+                ref_row = grid[left_panel_row],
                 last_panel_width = 0,
-                panel_pos_dic = {},
                 reference_grid = {};
-            console.log
-            for (var c=0; c<ref_row.length; c++) {
+
+            // start aligning the row with the most left panel
+            // This row is considered as a reference to align
+            // the rest of the panels
+            for (var c = 0; c < ref_row.length; c++) {
                 let panel = ref_row[c];
                 panel.save({'x':new_x, 'y':new_y});
                 reference_grid[c] = new_x
@@ -819,107 +809,69 @@
                 last_panel_width = panel.get('width')
             }
 
-            var ref_y_offset = max_h
-
-            console.log("reference grid ")
-            console.log(reference_grid)
-            for (var r=leftPanelRow-1; r>=0; r--) {
-                console.log("goiing there")
+            // set the row position (i.e. y coordinate) of each row
+            var ref_y_offset = max_h    
+            var rows_position = {}
+            // for rows above the reference row
+            for (var r = left_panel_row - 1; r >= 0; r--) {
                 var row = grid[r];
-                var closest_column = this.get_closest_column(row, reference_grid, last_panel_width)
-                if(closest_column > 0){
-                    new_x = reference_grid[closest_column]
-                }else{
-                    var lastRefColumn = Object.keys(reference_grid).length - 1
-                    new_x = reference_grid[lastRefColumn] + last_panel_width + spacer
-                }
-                console.log("closest column : "+closest_column)
                 new_y = new_y - spacer - max_h;
-
-                for (var c=0; c<row.length; c++) {
-                    let panel = row[c];
-                    panel.save({'x':new_x, 'y':new_y});
-                    max_h = Math.max(max_h, panel.get('height'));
-                    new_x = new_x + spacer + panel.get('width');
+                rows_position[r] = new_y
+                for (var c = 0; c < row.length; c++) {
+                    max_h = Math.max(max_h,  row[c].get('height'));
                 }
             }
             max_h = ref_y_offset
             new_y = left.get('y')
-            for (var r=leftPanelRow+1; r<grid.length; r++) {
-
+            // for rows below the reference row
+            for (var r = left_panel_row + 1; r < grid.length; r++) {
                 var row = grid[r];
-                var closest_column = this.get_closest_column(row, reference_grid, last_panel_width)
+                new_y = new_y + spacer + max_h;
+                rows_position[r] = new_y
+                for (var c = 0; c < row.length; c++) {
+                    max_h = Math.max(max_h,  row[c].get('height'));
+                }
+            }
+            
+            // update position of panels 
+            for (var [r, y] of Object.entries(rows_position)){
+                var row = grid[r];
+                var closest_column = this.get_closest_column(row[0], reference_grid, last_panel_width)
                 if(closest_column > 0){
                     new_x = reference_grid[closest_column]
                 }else{
                     var lastRefColumn = Object.keys(reference_grid).length - 1
                     new_x = reference_grid[lastRefColumn] + last_panel_width + spacer
                 }
-                new_y = new_y + spacer + max_h;
 
                 for (var c=0; c<row.length; c++) {
                     let panel = row[c];
-                    panel.save({'x':new_x, 'y':new_y});
-                    max_h = Math.max(max_h, panel.get('height'));
+                    panel.save({'x':new_x, 'y':y});
                     new_x = new_x + spacer + panel.get('width');
                 }
             }
-            
-           /*// populate the grid, getting neighbouring panel each time
-            while (next_panel) {
-                c = next_panel.get_centre();
-                next_panel = this.get_panel_at(c.x + next_panel.get('width'), c.y, sel);
-
-                // if next_panel is not found, reached end of row. Try start new row...
-                if (typeof next_panel == 'undefined') {
-                    grid.push(row);
-                    // next_panel is below the first of the current row
-                    c = row[0].get_centre();
-                    next_panel = this.get_panel_at(c.x, c.y + row[0].get('height'), sel);
-                    row = [];
-                }
-                if (next_panel) {
-                    row.push(next_panel);
-                }
-            }
-
-            var spacer = top_left.get('width')/20;
-            if (!isNaN(parseFloat(gridGap))) {
-                spacer = parseFloat(gridGap);
-            }
-            var new_x = top_x,
-                new_y = top_y,
-                max_h = 0;
-            for (var r=0; r<grid.length; r++) {
-                row = grid[r];
-                for (var c=0; c<row.length; c++) {
-                    let panel = row[c];
-                    panel.save({'x':new_x, 'y':new_y});
-                    max_h = Math.max(max_h, panel.get('height'));
-                    new_x = new_x + spacer + panel.get('width');
-                }
-                new_y = new_y + spacer + max_h;
-                new_x = top_x;
-            }*/
         },
 
-        get_closest_column: function(row, reference_grid, last_panel_width){
-            // get the closest column in the reference row to start with
- 
-            var closest_column = 0;
+        get_closest_column: function(panel, reference_row, last_ref_panel_width){
+            // look at the reference row (i.e. the one with the most left panel)
+            // and find the closest column to the current panel
+            var closest_col = 0;
             var min_x_distance = Number.MAX_VALUE
-            for (var [col, row_x] of Object.entries(reference_grid)){
-                var current_distance = Math.abs(row_x - row[0].get('x'))
-                console.log("current distance for column "+col+" : "+current_distance)
+            for (var [col_id, col_x] of Object.entries(reference_row)){
+                var current_distance = Math.abs(col_x - panel.get('x'))
                 if(current_distance < min_x_distance){
-                    closest_column = col
+                    closest_col = col_id
                     min_x_distance = current_distance
                 } 
             }
 
-            if(closest_column == Object.keys(reference_grid).length - 1 && min_x_distance > last_panel_width)
-                closest_column = -1
-            return closest_column
+            // if the panel is located far away from the last reference column,
+            // just return -1 to indicate that we should stick the panel to a next column
+            if(closest_col == Object.keys(reference_row).length - 1 && min_x_distance > last_ref_panel_width){
+                closest_col = -1
+            }
+
+            return closest_col
         },
 
         get_panel_at: function(x, y, panels) {
@@ -929,19 +881,8 @@
             });
         },
 
-        /*get_top_left_panel: function(panels) {
-            // top-left panel is one where x + y is least
-            return panels.reduce(function(top_left, p){
-                if ((p.get('x') + p.get('y')) < (top_left.get('x') + top_left.get('y'))) {
-                    return p;
-                } else {
-                    return top_left;
-                }
-            });
-        },*/
-
         get_top_panel: function(panels) {
-            // top-left panel is one where x + y is least
+            // top panel is one where y is least
             return panels.reduce(function(top, p){
                 if (p.get('y') < top.get('y')) {
                     return p;
@@ -952,7 +893,7 @@
         },
 
         get_bottom_panel: function(panels) {
-            // top-left panel is one where x + y is least
+            // bottom panel is one where y is greater
             return panels.reduce(function(bottom, p){
                 if (p.get('y') > bottom.get('y')) {
                     return p;
@@ -963,29 +904,18 @@
         },
 
         get_left_panel: function(panels) {
-            var left
-            var min_x = Number.MAX_VALUE
-            panels.forEach((panel)=>{
-               // console.log(panel)
-                if(panel.get('x') < min_x){
-                    left = panel
-                    min_x = panel.get('x')
-                }
-            })
-            return left
-
-            // top-left panel is one where x + y is least
-           /* return panels.reduce(function(left, p){
+            // left panel is one where x is least
+            return panels.reduce(function(left, p){
                 if (p.get('x') < left.get('x')) {
                     return p;
                 } else {
                     return left;
                 }
-            });*/
+            });
         },
 
         get_right_panel: function(panels) {
-            // top-left panel is one where x + y is least
+            // right panel is one where x is greater
             return panels.reduce(function(right, p){
                 if (p.get('x') > right.get('x')) {
                     return p;
