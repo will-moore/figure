@@ -445,28 +445,30 @@ class ShapeToPdfExport(ShapeExport):
         text_offset_y = size / 2 + stroke_width / 4 + 4
         out_positions = ["top", "left", "bottom", "right"]
         in_positions = ["topleft", "bottomleft", "bottomright", "topright"]
-        h_flip_dic = {"top": "top",
-                      "left": "right",
-                      "right": "left",
-                      "bottom": "bottom",
-                      "topleft": "topright",
-                      "topright": "topleft",
-                      "bottomleft": "bottomright",
-                      "bottomright": "bottomleft",
-                      "center": "center",
-                      "freehand": "freehand"
-                     }
-        v_flip_dic = {"top": "bottom",
-                      "left": "left",
-                      "right": "right",
-                      "bottom": "top",
-                      "topleft": "bottomleft",
-                      "topright": "bottomright",
-                      "bottomleft": "topleft",
-                      "bottomright": "topright",
-                      "center": "center",
-                      "freehand": "freehand"
-                     }
+        h_flip_dic = {
+            "top": "top",
+            "left": "right",
+            "right": "left",
+            "bottom": "bottom",
+            "topleft": "topright",
+            "topright": "topleft",
+            "bottomleft": "bottomright",
+            "bottomright": "bottomleft",
+            "center": "center",
+            "freehand": "freehand"
+        }
+        v_flip_dic = {
+            "top": "bottom",
+            "left": "left",
+            "right": "right",
+            "bottom": "top",
+            "topleft": "bottomleft",
+            "topright": "bottomright",
+            "bottomleft": "topleft",
+            "bottomright": "topright",
+            "center": "center",
+            "freehand": "freehand"
+        }
         rotation_index = fmod(floor((360 - rotation + 45) / 90), 4)
         final_index = 0
 
@@ -890,28 +892,30 @@ class ShapeToPilExport(ShapeExport):
         text_offset_x = scale_to_export_dpi(stroke_width / 4 + 4)
         out_positions = ["top", "left", "bottom", "right"]
         in_positions = ["topleft", "bottomleft", "bottomright", "topright"]
-        h_flip_dic = {"top": "top",
-                      "left": "right",
-                      "right": "left",
-                      "bottom": "bottom",
-                      "topleft": "topright",
-                      "topright": "topleft",
-                      "bottomleft": "bottomright",
-                      "bottomright": "bottomleft",
-                      "center": "center",
-                      "freehand": "freehand"
-                     }
-        v_flip_dic = {"top": "bottom",
-                      "left": "left",
-                      "right": "right",
-                      "bottom": "top",
-                      "topleft": "bottomleft",
-                      "topright": "bottomright",
-                      "bottomleft": "topleft",
-                      "bottomright": "topright",
-                      "center": "center",
-                      "freehand": "freehand"
-                     }
+        h_flip_dic = {
+            "top": "top",
+            "left": "right",
+            "right": "left",
+            "bottom": "bottom",
+            "topleft": "topright",
+            "topright": "topleft",
+            "bottomleft": "bottomright",
+            "bottomright": "bottomleft",
+            "center": "center",
+            "freehand": "freehand"
+        }
+        v_flip_dic = {
+            "top": "bottom",
+            "left": "left",
+            "right": "right",
+            "bottom": "top",
+            "topleft": "bottomleft",
+            "topright": "bottomright",
+            "bottomleft": "topleft",
+            "bottomright": "topright",
+            "center": "center",
+            "freehand": "freehand"
+        }
         rotation_index = fmod(floor((360 - rotation + 45) / 90), 4)
         final_index = 0
 
