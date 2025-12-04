@@ -774,16 +774,24 @@
                     }
                     c = {'x': c.x + next_panel.get('width'), 'y': c.y}
                 }
-                grid.push(row);
-                c = {'x': left_x + left.get('width')/2, 'y': c.y + row[0].get('height')}
+
+                // check that there is effecitvely a panel in the current row
+                if(row.length == 0){
+                    c = {'x': left_x + left.get('width')/2, 'y': c.y + left.get('height')}
+                }else{
+                    c = {'x': left_x + left.get('width')/2, 'y': c.y + row[0].get('height')}
+                    grid.push(row);
+                }               
             }
 
             // get the row id of the most left panel
-            var left_panel_row = grid
-                .map((row, index) => ({ index, x: row[0].get('x') }))
-                .reduce((min, curr) => curr.x < min.x ? curr : min)
-                .index;
-
+            var left_panel_row = 0;
+            grid.forEach((row, i) => {
+                if (row.some(panel => panel.cid === left.cid)) {
+                    left_panel_row = i;
+                }
+            });
+            
             // define the spacer between images
             var spacer = left.get('width')/20;
             if (!isNaN(parseFloat(gridGap))) {
@@ -812,14 +820,15 @@
             // set the row position (i.e. y coordinate) of each row
             var ref_y_offset = max_h    
             var rows_position = {}
+            max_h = 0
             // for rows above the reference row
             for (var r = left_panel_row - 1; r >= 0; r--) {
                 var row = grid[r];
-                new_y = new_y - spacer - max_h;
-                rows_position[r] = new_y
                 for (var c = 0; c < row.length; c++) {
                     max_h = Math.max(max_h,  row[c].get('height'));
                 }
+                new_y = new_y - spacer - max_h;
+                rows_position[r] = new_y
             }
             max_h = ref_y_offset
             new_y = left.get('y')
