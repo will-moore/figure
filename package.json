@@ -27,7 +27,7 @@
   "homepage": "https://github.com/ome/omero-figure",
   "devDependencies": {
     "sass": "^1.54.1",
-    "vite": "^6.2.6",
+    "vite": "^6.4.1",
     "watch": "^0.13.0"
   },
   "dependencies": {
@@ -41,6 +41,7 @@
     "mousetrap": "^1.6.5",
     "raphael": "^2.3.0",
     "sortablejs": "^1.15.2",
-    "underscore": "^1.13.4"
+    "underscore": "^1.13.4",
+    "vite-plugin-html-inject": "^1.1.2"
   }
 }
