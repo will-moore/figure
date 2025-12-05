@@ -1,6 +1,6 @@
 
     import Backbone from "backbone";
-    import _ from 'underscore';
+    import _, { last } from 'underscore';
     import $ from "jquery";
 
     import {PanelList, Panel} from "./panel_model";
@@ -808,13 +808,22 @@
             // start aligning the row with the most left panel
             // This row is considered as a reference to align
             // the rest of the panels
+            var global_index = 0
             for (var c = 0; c < ref_row.length; c++) {
                 let panel = ref_row[c];
+                var current_x = panel.get('x')
+                var gap = Math.floor(Math.abs(current_x - new_x) / last_panel_width)
+                for(var i = 0; i < gap; i++){
+                    reference_grid[global_index] = new_x
+                    new_x = new_x + spacer + last_panel_width;
+                    global_index++
+                }
                 panel.save({'x':new_x, 'y':new_y});
-                reference_grid[c] = new_x
+                reference_grid[global_index] = new_x
                 max_h = Math.max(max_h, panel.get('height'));
                 new_x = new_x + spacer + panel.get('width');
                 last_panel_width = panel.get('width')
+                global_index++
             }
 
             // set the row position (i.e. y coordinate) of each row
@@ -845,16 +854,32 @@
             // update position of panels 
             for (var [r, y] of Object.entries(rows_position)){
                 var row = grid[r];
-                var closest_column = this.get_closest_column(row[0], reference_grid, last_panel_width)
-                if(closest_column >= 0){
-                    new_x = reference_grid[closest_column]
-                }else{
-                    var lastRefColumn = Object.keys(reference_grid).length - 1
-                    new_x = reference_grid[lastRefColumn] + last_panel_width + spacer
-                }
-
+                var last_column_id = -1
                 for (var c=0; c<row.length; c++) {
                     let panel = row[c];
+                    var closest_column = this.get_closest_column(panel, reference_grid, last_panel_width)
+										
+                    if(closest_column >= 0){
+                        // update closest_column id to take into account spare panel positions
+						if(last_column_id == closest_column){
+							closest_column = last_column_id + 1
+							if(closest_column == reference_grid.length){
+								new_x = reference_grid[closest_column-1] + last_panel_width + spacer
+							}else{
+								new_x = reference_grid[closest_column]
+							}
+						}else{
+							new_x = reference_grid[closest_column]
+						}
+                    }else{
+                        // update closest_column id to take into account spare panel positions
+						if(last_column_id == reference_grid.length - 1 - closest_column){
+							closest_column--
+						}
+                        var lastRefColumn = Object.keys(reference_grid).length - 1
+                        new_x = reference_grid[lastRefColumn] -closest_column*(last_panel_width + spacer)
+                    }
+					last_column_id++
                     panel.save({'x':new_x, 'y':y});
                     new_x = new_x + spacer + panel.get('width');
                 }
@@ -875,9 +900,9 @@
             }
 
             // if the panel is located far away from the last reference column,
-            // just return -1 to indicate that we should stick the panel to a next column
+            // return the number of extra columns where to put the panel as a negative number
             if(closest_col == Object.keys(reference_row).length - 1 && min_x_distance > last_ref_panel_width){
-                closest_col = -1
+                closest_col = - Math.floor(min_x_distance/last_ref_panel_width)
             }
             return closest_col
         },
