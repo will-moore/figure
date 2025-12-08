@@ -28,7 +28,6 @@
   "devDependencies": {
     "sass": "^1.54.1",
     "vite": "^6.4.1",
-    "vite-plugin-html-inject": "^1.1.2",
     "watch": "^0.13.0"
   },
   "dependencies": {
