@@ -914,6 +914,17 @@
             });
         },
 
+        get_top_left_panel: function(panels) {
+            // top-left panel is one where x + y is least
+            return panels.reduce(function(top_left, p){
+                if ((p.get('x') + p.get('y')) < (top_left.get('x') + top_left.get('y'))) {
+                    return p;
+                } else {
+                    return top_left;
+                }                
+            });
+        },
+
         get_top_panel: function(panels) {
             // top panel is one where y is least
             return panels.reduce(function(top, p){
