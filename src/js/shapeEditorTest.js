@@ -28,6 +28,17 @@
 
 import $ from "jquery";
 import ShapeManager from "./shape_editor/shape_manager";
+// import { rotatePoint } from "./views/util"
+// Get coordinates for point x, y rotated around cx, cy, by rotation degrees
+export function rotatePoint(x, y, cx, cy, rotation) {
+    let length = Math.sqrt(Math.pow((x - cx), 2) + Math.pow((y - cy), 2));
+    let rot = Math.atan2((y - cy), (x - cx));
+    rot = rot + (rotation * (Math.PI / 180));  // degrees to rad
+    let dx = Math.cos(rot) * length;
+    let dy = Math.sin(rot) * length;
+    return { x: cx + dx, y: cy + dy };
+}
+
 
 $(function () {
   var WIDTH = 512,
@@ -84,9 +95,15 @@ $(function () {
     shapeManager.setTextPosition(textPosition);
   });
 
-  $("select[name='rotateText']").change(function () {
-    var rotateText = $(this).val();
-    shapeManager.setTextRotated(rotateText);
+//   $("select[name='rotateText']").change(function () {
+//     var rotateText = $(this).val();
+//     shapeManager.setTextRotated(rotateText);
+//   });
+
+  $("input[name='shapeScaleFactor']").on("input change", function () {
+    let factor = parseFloat($(this).val());
+    $("#shapeScaleFactorDisplay").text(factor);
+    shapeManager.setShapeScalingFactor(factor);
   });
 
   var updateZoom = function updateZoom() {
@@ -208,6 +225,13 @@ $(function () {
     var fillOpacity = shapeManager.getFillOpacity() || 0.01;
     fillOpacity = (fillOpacity == 1 ? "1" : fillOpacity + ""); // to match string values in select
     $("select[name='fillOpacity']").val(fillOpacity);
+
+    var text = shapeManager.getText() || "";
+    $("input[name='shapeText']").val(text);
+
+    var fontSize = shapeManager.getFontSize() || 12;
+    $("select[name='fontSize']").val(fontSize);
+    console.log({text: text, fontSize: fontSize, strokeColor, fillColor});
   });
 
   $("#shapesCanvas").bind("change:shape", function (event, shapes) {
@@ -219,10 +243,10 @@ $(function () {
     console.log("selected", shapeManager.getSelectedShapesJson());
   });
 
+  let lastInsetTextIndex = 65;
   $("button[name='createInset']").on("click", function () {
-    let textRandomId = 12345678;
-    let rectRandomId = 4567890;
-
+    let textRandomId = parseInt(Math.random() * 1000);
+    let rectRandomId = parseInt(Math.random() * 1000);
     // Add Rectangle - WITH Id of Text shape
     let rectSize = WIDTH / 3;
     let x = (WIDTH - rectSize) / 2;
@@ -248,10 +272,54 @@ $(function () {
         y: y + MARGIN,
         textAnchor: "middle",
         id: textRandomId,
-        text: "A",
-    })
+        text: String.fromCharCode(lastInsetTextIndex),
+    });
+    lastInsetTextIndex += 1;
   });
 
+  $("input[name='shapeText']").on("input change", function () {
+    let text = $(this).val();
+    shapeManager.setText(text);
+  });
+
+
+  $("input[name='rotateImage']").on("input change", function () {
+    let angle = $(this).val();
+    $("#shapesCanvas").css({
+      "transform-origin": "50% 50%",
+      transform: "rotate(" + angle + "deg)"
+    });
+    shapeManager.setTextRotation(angle);
+  });
+
+  $("input[name='rotateInset']").on("input change", function () {
+    let angle = $(this).val();
+    // We assume that any Rectangle with textId is an "inset" rectangle
+    let shapes = shapeManager.getShapes();
+    shapes.forEach(function (shape) {
+      let json = shape.toJson();
+      let prevRotation = shape._rotation || 0;
+      if (json.type === "Rectangle" && json.textId > 0) {
+        // Rotate the rectangle
+        shape._rotation = angle;
+        shape.drawShape();
+
+        // Now also rotate any "text" shape - just apply the CHANGE in rotation
+        let textShape = shapeManager.getShape(json.textId);
+        if (textShape) {
+          let txtX = textShape._x;
+          let txtY = textShape._y;
+          let centerX = json.x + json.width / 2;
+          let centerY = json.y + json.height / 2;
+          console.log("Rotating text shape around ", centerX, centerY);
+          let rotatedPoint = rotatePoint(txtX, txtY, centerX, centerY, angle - prevRotation);
+          textShape._x = rotatedPoint.x;
+          textShape._y = rotatedPoint.y;
+          textShape.drawShape();
+        }
+      }
+    });
+  });
 
   // Add some shapes to display
   // shapeManager.addShapeJson({"type": "Polygon",

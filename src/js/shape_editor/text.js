@@ -576,7 +576,8 @@ Text.prototype.drawShape = function drawShape() {
     "text-anchor": this._textAnchor
   });
 
-  // console.log("this.element", this.element)
+  // remove transform before getting bbox
+  this.element.transform("r0");
   var bbox = this.element.getBBox();
   // console.log("bbox", bbox)
 
@@ -593,10 +594,11 @@ Text.prototype.drawShape = function drawShape() {
 
   this.element.toFront()
 
-  // console.log("this._inModalView", this._inModalView)
   if(!this._inModalView){
-    this.element.transform("r" + (-this._textRotation) + ", s"+(this._hFlip)+", "+(this._vFlip));
-    this.bkgdRect.transform("r" + (-this._textRotation) + ", s"+(this._hFlip)+", "+(this._vFlip));
+    let rotOriginX = (this._textAnchor === "start") ? (bbox.x) : (this._textAnchor === "end") ? (bbox.x + bbox.width) : (bbox.x + bbox.width/2);
+    let rotOriginY = (y * f);
+    this.element.transform(`r${-this._textRotation},${rotOriginX},${rotOriginY} s${this._hFlip}, ${this._vFlip}`);
+    this.bkgdRect.transform(`r${-this._textRotation},${rotOriginX},${rotOriginY} s${this._hFlip}, ${this._vFlip}`);
   }else{
     this.element.transform("r" + 0);
     this.bkgdRect.transform("r" + 0);
