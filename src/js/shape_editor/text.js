@@ -34,11 +34,8 @@ var Text = function Text(options) {
   this._shapeScalingFactor = options.shapeScalingFactor || 100;
   this._x = options.x;
   this._y = options.y;
-  // this._textColor = options.textColor;
   this._fontSize = options.fontSize;
   this._text = options.text;
-  // this._showText = options.showText;
-  // this._parentShapeCoords = options.parentShapeCoords;
   this._strokeWidth = options.strokeWidth || 2;
   this._strokeColor = options.strokeColor || "#ffffff";
   
@@ -131,23 +128,15 @@ Text.prototype.toJson = function toJson() {
     y: this._y,
     area: this._area,
     fontSize: this._fontSize,
-    // textBackgroundOpacity: this._textBackgroundOpacity,
-    // textBackgroundColor: this._textBackgroundColor,
-    // textColor: this._textColor,
     strokeColor: this._strokeColor,
     fillColor: this._fillColor,
     fillOpacity: this._fillOpacity,
     text: this._text,
-    // showText: this._showText,
     textAnchor: this._textAnchor,
     rotation: this._rotation,
     textRotation: this._textRotation,
     hFlip: this._hFlip,
     vFlip: this._vFlip,
-    // textPosition: this._textPosition,
-    // parentShapeCoords: this._parentShapeCoords,
-    // linkedShapeId: this._linkedShapeId,
-    // strokeWidth: this._strokeWidth,
   };
   if (this._id) {
     rv.id = this._id;
@@ -192,13 +181,6 @@ Text.prototype.setStrokeColor = function setStrokeColor(color) {
 };
 
 Text.prototype.getStrokeColor = function getStrokeColor() {
-  // if(this._linkedShapeId != -1){
-  //   var parentShape = this.manager.getShape(this._linkedShapeId);
-  //   if(parentShape){
-  //     return parentShape.getStrokeColor()
-  //   }
-  // }
-  // return;
   return this._strokeColor;
 };
 
@@ -238,15 +220,6 @@ Text.prototype.getText = function getText() {
   return this._text;
 };
 
-// Text.prototype.setShowText = function setShowText(showText) {
-//   this._showText = showText;
-//   this.drawShape();
-// };
-
-// Text.prototype.getShowText = function getShowText() {
-//   return this._showText;
-// };
-
 Text.prototype.setFillColor = function setFillColor(fillColor) {
   this._fillColor = fillColor;
   this.drawShape();
@@ -256,15 +229,6 @@ Text.prototype.getFillColor = function getFillColor() {
   return this._fillColor;
 };
 
-Text.prototype.setTextBackgroundColor = function setTextBackgroundColor(textBackgroundColor) {
-  this._textBackgroundColor = textBackgroundColor;
-  this.drawShape();
-};
-
-Text.prototype.getTextBackgroundColor = function getTextBackgroundColor() {
-  return this._textBackgroundColor;
-};
-
 Text.prototype.setFillOpacity = function setFillOpacity(fillOpacity) {
   this._fillOpacity = fillOpacity;
   this.drawShape();
@@ -272,15 +236,6 @@ Text.prototype.setFillOpacity = function setFillOpacity(fillOpacity) {
 
 Text.prototype.getFillOpacity = function getFillOpacity() {
   return this._fillOpacity;
-};
-
-Text.prototype.setTextBackgroundOpacity = function setTextBackgroundOpacity(textBackgroundOpacity) {
-  this._textBackgroundOpacity = textBackgroundOpacity;
-  this.drawShape();
-};
-
-Text.prototype.getTextBackgroundOpacity = function getTextBackgroundOpacity() {
-  return this._textBackgroundOpacity;
 };
 
 Text.prototype.setZoom = function setZoom(zoom) {
@@ -403,172 +358,14 @@ Text.prototype.getPath = function getPath() {
 
 
 Text.prototype.drawShape = function drawShape() {
-  // var color = this._textColor,
   var f = this._zoomFraction,
       shapeScalingFactor = this._shapeScalingFactor / 100,
-      // fontSize = this._fontSize,
-      // textAnchor = "start",
-      // textAnchor = this._textAnchor,
-      // textOffsetX = (this._strokeWidth/2 + 6) / f,
-      // textOffsetY = (this._strokeWidth/2 + (fontSize > 12 ? fontSize/2 : 6) + 4) / f,
-      // px = this._parentShapeCoords.x,
-      // py = this._parentShapeCoords.y,
-      // pw = this._parentShapeCoords.width,
-      // ph = this._parentShapeCoords.height,
-      x = this._x,   //px,
-      y = this._y;   //py,
-      // dx, dxScaled = 0,
-      // dy, dyScaled = 0,
-      // final_x = undefined,
-      // final_y = undefined;
-      // outPositions = ["top", "left", "bottom","right"],
-      // inPositions = ["topleft", "bottomleft", "bottomright", "topright"],
-      // outAnchors = ["middle", "end", "middle", "start"],
-      // inAnchors = ["start", "start", "end", "end"],
-      // rotationIndex = Math.floor(((360 - this._rotation + 45) / 90)) % 4;
-      // finalIndex
-
-  // switch(this._textPosition){
-  //   case "bottom":
-  //   case "left":
-  //   case "right":
-  //   case "top":
-  //       var posIndex = outPositions.indexOf(this._textPosition)
-  //       finalIndex = (posIndex + rotationIndex) % 4
-  //       break;
-  //   case "topleft":
-  //   case "topright":
-  //   case "bottomleft":
-  //   case "bottomright":
-  //       var posIndex = inPositions.indexOf(this._textPosition)
-  //       finalIndex = (posIndex + rotationIndex) % 4
-  //       break;
-  // }
-
-  // console.log("textPosition", this._textPosition); // "top" default
-  // this._textPosition = undefined;
-  // console.log("panel coords", {px, py, pw, ph})
-  // console.log("x, y", {x, y})
-  // console.log({textAnchor, px, py, dx, dy, dxScaled, dyScaled});
-  // console.log("finalIndex", finalIndex)
-  // switch(this._textPosition){
-  //   case "bottom":
-  //     dx = pw/2;
-  //     dy = textOffsetY;
-  //     if(this._linkedShapeId == -1){
-  //       dy = -textOffsetY;
-  //       textAnchor = outAnchors[(finalIndex + 2) % 4]
-  //     }
-  //     textAnchor = outAnchors[finalIndex]
-  //     dyScaled = ph + dy * shapeScalingFactor
-  //     dxScaled = dx;
-  //     dy = ph + dy
-  //     break;
-  // case "left":
-  //     dx = -textOffsetX;
-  //     dy = ph/2;
-  //     textAnchor = outAnchors[finalIndex]
-  //     if(this._linkedShapeId == -1){
-  //       dx = textOffsetX;
-  //       textAnchor = outAnchors[(finalIndex + 2) % 4]
-  //     }
-  //     dxScaled = dx * shapeScalingFactor;
-  //     dyScaled = dy
-  //     break;
-  // case "right":
-  //     dx = textOffsetX;
-  //     dy = ph/2;
-  //     textAnchor = outAnchors[finalIndex]
-  //     if(this._linkedShapeId == -1){
-  //       dx = -textOffsetX;
-  //       textAnchor = outAnchors[(finalIndex + 2) % 4]
-  //     }
-  //     dxScaled = pw + dx * shapeScalingFactor;
-  //     dyScaled = dy
-  //     dx = pw + dx
-  //     break;
-  // case "top":
-  //     dx = pw/2;
-  //     dy = -textOffsetY;
-  //     if(this._linkedShapeId == -1){
-  //       dy = textOffsetY;
-  //       textAnchor = outAnchors[(finalIndex + 2) % 4]
-  //     }
-  //     textAnchor = outAnchors[finalIndex]
-  //     dxScaled = dx
-  //     dyScaled = dy * shapeScalingFactor
-  //     break;
-  // case "topleft":
-  //     dx = textOffsetX;
-  //     dy = textOffsetY;
-  //     dxScaled = dx * shapeScalingFactor
-  //     dyScaled = dy * shapeScalingFactor
-  //     textAnchor = inAnchors[finalIndex]
-  //     break;
-  // case "topright":
-  //     dx = pw - textOffsetX;
-  //     dy = textOffsetY;
-  //     dxScaled = pw - textOffsetX * shapeScalingFactor
-  //     dyScaled = dy * shapeScalingFactor
-  //     textAnchor = inAnchors[finalIndex]
-  //     break;
-  // case "bottomleft":
-  //     dx = textOffsetX;
-  //     dy = ph - textOffsetY;
-  //     dxScaled = dx * shapeScalingFactor
-  //     dyScaled = ph - textOffsetY * shapeScalingFactor
-  //     textAnchor = inAnchors[finalIndex]
-  //     break;
-  // case "bottomright":
-  //     dx = pw - textOffsetX;
-  //     dy = ph - textOffsetY;
-  //     dxScaled = pw - textOffsetX * shapeScalingFactor
-  //     dyScaled = ph - textOffsetY * shapeScalingFactor
-  //     textAnchor = inAnchors[finalIndex]
-  //     break;
-  // case "center":
-  //     dx = pw/2;
-  //     dy = ph/2;
-  //     dxScaled = dx
-  //     dyScaled = dy
-  //     textAnchor = "middle";
-  //     break;
-  // case "freehand":
-  //     x = this._x;
-  //     y = this._y;
-  //     final_x = x;
-  //     final_y = y;
-  //     textAnchor = this._textAnchor
-  //     break;
-  // }
-
-  // real shape coordinates
-  // console.log("this._rotation", this._rotation)
-  // var rotatedCoords = this.applyShapeRotation(px + pw/2, py + ph/2, x + dx, y + dy, this._rotation);
-  // if(final_x == undefined || final_y == undefined){
-  //   final_x = rotatedCoords.x
-  //   final_y = rotatedCoords.y
-  // }
-  // this._textAnchor = textAnchor;
-  // NaN if dx or dy undefined
-  // this._x = final_x;
-  // this._y = final_y;
-
-  // for modal display only
-  // var scaledRotatedCoords = this.applyShapeRotation(px + pw/2, py + ph/2, x + dxScaled, y + dyScaled, this._rotation); 
-
-  // console.log("scaledRotatedCoords", scaledRotatedCoords)
-  // console.log("_textAnchor", this._textAnchor)
+      y = this._y;
 
   this.element.attr({
-    // x: scaledRotatedCoords.x * f,
-    // y: scaledRotatedCoords.y * f,
-    x: x * f,
-    y: y * f,
-    // stroke: this._strokeColor,
-    // "stroke-width": 0,
+    x: this._x * f,
+    y: this._y * f,
     fill: this._strokeColor,
-    // fill: color,
     "fill-opacity": 1,
     "font-size": this._fontSize * shapeScalingFactor,
     "text": this._text,
@@ -579,7 +376,6 @@ Text.prototype.drawShape = function drawShape() {
   // remove transform before getting bbox
   this.element.transform("r0");
   var bbox = this.element.getBBox();
-  // console.log("bbox", bbox)
 
   const PADDING = 3;
   this.bkgdRect.attr({
@@ -606,21 +402,11 @@ Text.prototype.drawShape = function drawShape() {
 
   this._area = bbox.width * bbox.height;
 
-  // console.log("Text drawShape selected?", this.isSelected())
-  // if(!this._showText && this._linkedShapeId != -1){
-  //   this.element.hide();
-  //   this.handles.hide();
-  //   this.bkgdRect.hide();
-  // }else{
-  //   this.element.show();
-    this.bkgdRect.show();
-    if (this.isSelected()) {
-      this.handles.show().toFront();
-    } else {
-      this.handles.hide();
-    }
-  // }
-
+  if (this.isSelected()) {
+    this.handles.show().toFront();
+  } else {
+    this.handles.hide();
+  }
 
   // update Handles
   var handleIds = this.getHandleCoords();
@@ -632,9 +418,6 @@ Text.prototype.drawShape = function drawShape() {
     hy = handleIds[h_id][1];
     hnd.attr({ x: hx - this.handle_wh / 2, y: hy - this.handle_wh / 2 });
   }
-
-  console.log("drawShape complete", this.toJson())
-
 };
 
 Text.prototype.applyShapeRotation = function applyShapeRotation(cx, cy, x, y, rotation){
@@ -787,13 +570,8 @@ CreateText.prototype.startDrag = function startDrag(startX, startY) {
       vFlip = this.manager.getVerticalFlip(),
       hFlip = this.manager.getHorizontalFlip(),
       textRotation = this.manager.getTextRotation();
-      // textBackgroundOpacity = this.manager.getTextBackgroundOpacity(),
-      // textBackgroundColor = this.manager.getTextBackgroundColor(),
-      // originalImageShape = this.manager.getOriginalShape();
 
-  this.manager.setText("Text")
-  // this.manager.setShowText(true)
-  // this.manager.setTextPosition("freehand")
+  this.manager.setText("Text");
 
   this.startX = startX;
   this.startY = startY;
@@ -809,16 +587,10 @@ CreateText.prototype.startDrag = function startDrag(startX, startY) {
     textRotation: textRotation,
     vFlip: vFlip,
     hFlip: hFlip,
-    // textBackgroundOpacity: textBackgroundOpacity,
-    // textBackgroundColor: textBackgroundColor,
-    // textColor: textColor,
     linkedShapeId: -1,
     x: startX,
     y: startY,
     fontSize: fontSize,
-    // textPosition: "freehand",
-    // strokeWidth: strokeWidth,
-    // parentShapeCoords: originalImageShape,
   })
 
 };

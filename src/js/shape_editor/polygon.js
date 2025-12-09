@@ -16,10 +16,6 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import {Text} from "./text";
-
-
-
 var Polygon = function Polygon(options) {
   var self = this;
   this.manager = options.manager;
@@ -56,9 +52,6 @@ var Polygon = function Polygon(options) {
     this._zoomFraction = options.zoom / 100;
   }
   this.handle_wh = 6;
-
-  this._textId = options.textId || -1;
-  this._textShape = this.manager.getShape(this._textId)
 
   this.element = this.paper.path("");
   this.element.attr({ "fill-opacity": this._fillOpacity, fill: this._fillColor, cursor: "pointer" });
@@ -132,8 +125,7 @@ Polygon.prototype.toJson = function toJson() {
     strokeWidth: this._strokeWidth,
     strokeColor: this._strokeColor,
     fillColor: this._fillColor,
-    fillOpacity:this._fillOpacity,
-    textId: this._textId,
+    fillOpacity:this._fillOpacity
   };
   if (this._id) {
     rv.id = this._id;
@@ -233,147 +225,10 @@ Polygon.prototype.getFillOpacity = function getFillOpacity() {
   return this._fillOpacity;
 };
 
-Polygon.prototype.loadTextShape = function loadTextShape(){
-  this._textShape = this.manager.getShape(this._textId);
-  return this._textShape;
-};
-
-Polygon.prototype.setText = function setText(text) {
-  if(this._textShape){
-    this._textShape.setText(text)
-  }
-};
-
-Polygon.prototype.getText = function getText() {
-  if(this._textShape){
-    return this._textShape.getText()
-  }
-  return "";
-};
-
-Polygon.prototype.setShowText = function setShowText(showText) {
-  if(this._textShape){
-    this._textShape.setShowText(showText)
-  }
-};
-
-Polygon.prototype.getShowText = function getShowText() {
-   if(this._textShape){
-    return this._textShape.getShowText()
-  }
-  return "";
-};
-
-Polygon.prototype.setTextPosition = function setTextPosition(textPosition) {
-  if(this._textShape){
-    this._textShape.setTextPosition(textPosition)
-  }
-};
-
-Polygon.prototype.getTextPosition = function getTextPosition() {
-  if(this._textShape){
-    return this._textShape.getTextPosition()
-  }
-  return "";
-};
-
-Polygon.prototype.setFontSize = function setFontSize(fontSize) {
-  if(this._textShape){
-    this._textShape.setFontSize(fontSize)
-  }
-};
-
-Polygon.prototype.getFontSize = function getFontSize() {
-  if(this._textShape){
-    return this._textShape.getFontSize()
-  }
-  return;
-};
-
-Polygon.prototype.getTextId = function getTextId() {
-  return this._textId;
-};
-
-Polygon.prototype.setTextId = function setTextId(textId) {
-  this._textId = textId;
-};
-
-Polygon.prototype.setInModalView = function setInModalView(inModalView) {
-  if(this._textShape){
-    this._textShape.setInModalView(inModalView)
-  }
-};
-
-Polygon.prototype.setTextRotation = function setTextRotation(textRotation) {
-  if(this._textShape){
-    this._textShape.setTextRotation(textRotation)
-  }
-};
-
-Polygon.prototype.setTextBackgroundOpacity = function setTextBackgroundOpacity(textBackgroundOpacity) {
-  if(this._textShape){
-    this._textShape.setTextBackgroundOpacity(textBackgroundOpacity)
-  }
-};
-
-Polygon.prototype.getTextBackgroundOpacity = function getTextBackgroundOpacity() {
-  if(this._textShape){
-    return this._textShape.getTextBackgroundOpacity()
-  }
-  return;
-};
-
-Polygon.prototype.setTextBackgroundColor = function setTextBackgroundColor(textBackgroundColor) {
-  if(this._textShape){
-    this._textShape.setTextBackgroundColor(textBackgroundColor)
-  }
-};
-
-Polygon.prototype.getTextBackgroundColor = function getTextBackgroundColor() {
-  if(this._textShape){
-    return this._textShape.getTextBackgroundColor()
-  }
-  return;
-};
-
-Polygon.prototype.setTextColor = function setTextColor(textColor) {
-  if(this._textShape){
-    this._textShape.setTextColor(textColor)
-  }
-};
-
-Polygon.prototype.getTextColor = function getTextColor() {
-  if(this._textShape){
-    return this._textShape.getTextColor()
-  }
-  return;
-};
-
-Polygon.prototype.setVerticalFlip = function setVerticalFlip(vFlip) {
-  if(this._textShape){
-    this._textShape.setVerticalFlip(vFlip)
-  }
-};
-
-Polygon.prototype.setHorizontalFlip = function setHorizontalFlip(hFlip) {
-  if(this._textShape){
-    this._textShape.setHorizontalFlip(hFlip)
-  }
-};
-
 Polygon.prototype.destroy = function destroy() {
-  if(this._textShape){
-    this.manager.deleteShapesByIds([this._textShape._id])
-    this.destroyTextShape()
-  }
   this.element.remove();
   this.handles.remove();
 };
-
-Polygon.prototype.destroyTextShape = function destroyTextShape() {
-  this._textId = -1
-  this._textShape = undefined;
-}
 
 Polygon.prototype.intersectRegion = function intersectRegion(region) {
   // region is {x, y, width, height} - Model coords (not zoomed)
@@ -463,56 +318,6 @@ Polygon.prototype.updateHandle = function updateHandle(
   );
 };
 
-Polygon.prototype.createShapeText = function createShapeText(){
-  if(!this._textShape){
-    var textPosition = this.manager.getTextPosition(),
-        fontSize = this.manager.getTextFontSize(),
-        inModalView = this.manager.getInModalView(),
-        vFlip = this.manager.getVerticalFlip(),
-        hFlip = this.manager.getHorizontalFlip(),
-        textColor = this.manager.getTextColor(),
-        shapeScalingFactor = this.manager.getShapeScalingFactor(),
-        textBackgroundOpacity = this.manager.getTextBackgroundOpacity(),
-        textBackgroundColor = this.manager.getTextBackgroundColor(),
-        textRotation = this.manager.getTextRotation();
-
-    if(textPosition == "freehand"){
-      textPosition = "top"
-      this.manager.setTextPosition(textPosition)
-    }
-
-    var bbox = this.getBBox(this._points)
-
-    var textShape = new Text({
-        manager: this.manager,
-        paper: this.paper,
-        inModalView: inModalView,
-        textRotation: textRotation,
-        vFlip: vFlip,
-        hFlip: hFlip,
-        linkedShapeId: this._id,
-        zoom: this._zoomFraction * 100,
-        text: "text",
-        showText: true,
-        x: this._x,
-        y: this._y,
-        shapeScalingFactor: shapeScalingFactor,
-        textBackgroundOpacity: textBackgroundOpacity,
-        textBackgroundColor: textBackgroundColor,
-        textColor: textColor,
-        fontSize: fontSize,
-        textPosition: textPosition,
-        strokeWidth: this._strokeWidth,
-        parentShapeCoords: {x:Math.min(bbox.x1, bbox.x2), y:Math.min(bbox.y1, bbox.y2),
-          width:Math.abs(bbox.x1 - bbox.x2), height:Math.abs(bbox.y1 - bbox.y2)}
-      })
-
-      this.manager.addShape(textShape);
-      this._textId = textShape._id;
-      this._textShape = textShape;
-  }
-}
-
 Polygon.prototype.drawShape = function drawShape() {
   var strokeColor = this._strokeColor,
     strokeW = this._strokeWidth,
@@ -547,25 +352,10 @@ Polygon.prototype.drawShape = function drawShape() {
       hnd.attr({ x: hx - this.handle_wh / 2, y: hy - this.handle_wh / 2 });
     }.bind(this)
   );
-
-  if(this._textShape || this.loadTextShape()){
-    var bbox = this.getBBox(this._points)
-    var x = Math.min(bbox.x1, bbox.x2)
-    var y = Math.min(bbox.y1, bbox.y2)
-    var width = Math.abs(bbox.x1 - bbox.x2)
-    var height = Math.abs(bbox.y1 - bbox.y2)
-    this._textShape.setParentShapeCoords({x: x, y: y, width: width, height: height})
-  }
 };
 
 Polygon.prototype.setSelected = function setSelected(selected) {
-  if((selected && this._selected) || (!selected && !this._selected)){
-    return
-  }
   this._selected = !!selected;
-  if(this._textShape || this.loadTextShape()){
-    this._textShape.setSelected(this._selected)
-  }
   this.drawShape();
 };
 

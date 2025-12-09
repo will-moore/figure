@@ -24,7 +24,6 @@
 */
 
 import Raphael from "raphael";
-import {Text} from "./text";
 
 const POINT_RADIUS = 5;
 var Point = function Point(options) {
@@ -74,9 +73,6 @@ var Point = function Point(options) {
     this._area = this._radiusX * this._radiusY * Math.PI;
   }
   this.handle_wh = 6;
-
-  this._textId = options.textId || -1;
-  this._textShape = this.manager.getShape(this._textId)
 
   this.element = this.paper.ellipse();
   this.element.attr({ "fill-opacity": this._fillOpacity, fill: this._fillColor, cursor: "pointer" });
@@ -134,8 +130,7 @@ Point.prototype.toJson = function toJson() {
     strokeWidth: this._strokeWidth,
     strokeColor: this._strokeColor,
     fillColor: this._fillColor,
-    fillOpacity: this._fillOpacity,
-    textId: this._textId,
+    fillOpacity: this._fillOpacity
   };
   if (this._id) {
     rv.id = this._id;
@@ -221,147 +216,10 @@ Point.prototype.getFillOpacity = function getFillOpacity() {
   return this._fillOpacity;
 };
 
-Point.prototype.loadTextShape = function loadTextShape(){
-  this._textShape = this.manager.getShape(this._textId);
-  return this._textShape;
-};
-
-Point.prototype.setText = function setText(text) {
-  if(this._textShape){
-    this._textShape.setText(text)
-  }
-};
-
-Point.prototype.getText = function getText() {
-  if(this._textShape){
-    return this._textShape.getText()
-  }
-  return "";
-};
-
-Point.prototype.setShowText = function setShowText(showText) {
-  if(this._textShape){
-    this._textShape.setShowText(showText)
-  }
-};
-
-Point.prototype.getShowText = function getShowText() {
-   if(this._textShape){
-    return this._textShape.getShowText()
-  }
-  return "";
-};
-
-Point.prototype.setTextPosition = function setTextPosition(textPosition) {
-  if(this._textShape){
-    this._textShape.setTextPosition(textPosition)
-  }
-};
-
-Point.prototype.getTextPosition = function getTextPosition() {
-  if(this._textShape){
-    return this._textShape.getTextPosition()
-  }
-  return "";
-};
-
-Point.prototype.setFontSize = function setFontSize(fontSize) {
-  if(this._textShape){
-    this._textShape.setFontSize(fontSize)
-  }
-};
-
-Point.prototype.getFontSize = function getFontSize() {
-  if(this._textShape){
-    return this._textShape.getFontSize()
-  }
-  return;
-};
-
-Point.prototype.getTextId = function getTextId() {
-  return this._textId;
-};
-
-Point.prototype.setTextId = function setTextId(textId) {
-  this._textId = textId;
-};
-
-Point.prototype.setInModalView = function setInModalView(inModalView) {
-  if(this._textShape){
-    this._textShape.setInModalView(inModalView)
-  }
-};
-
-Point.prototype.setTextRotation = function setTextRotation(textRotation) {
-  if(this._textShape){
-    this._textShape.setTextRotation(textRotation)
-  }
-};
-
-Point.prototype.setTextBackgroundOpacity = function setTextBackgroundOpacity(textBackgroundOpacity) {
-  if(this._textShape){
-    this._textShape.setTextBackgroundOpacity(textBackgroundOpacity)
-  }
-};
-
-Point.prototype.getTextBackgroundOpacity = function getTextBackgroundOpacity() {
-  if(this._textShape){
-    return this._textShape.getTextBackgroundOpacity()
-  }
-  return;
-};
-
-Point.prototype.setTextBackgroundColor = function setTextBackgroundColor(textBackgroundColor) {
-  if(this._textShape){
-    this._textShape.setTextBackgroundColor(textBackgroundColor)
-  }
-};
-
-Point.prototype.getTextBackgroundColor = function getTextBackgroundColor() {
-  if(this._textShape){
-    return this._textShape.getTextBackgroundColor()
-  }
-  return;
-};
-
-Point.prototype.setTextColor = function setTextColor(textColor) {
-  if(this._textShape){
-    this._textShape.setTextColor(textColor)
-  }
-};
-
-Point.prototype.getTextColor = function getTextColor() {
-  if(this._textShape){
-    return this._textShape.getTextColor()
-  }
-  return;
-};
-
-Point.prototype.setVerticalFlip = function setVerticalFlip(vFlip) {
-  if(this._textShape){
-    this._textShape.setVerticalFlip(vFlip)
-  }
-};
-
-Point.prototype.setHorizontalFlip = function setHorizontalFlip(hFlip) {
-  if(this._textShape){
-    this._textShape.setHorizontalFlip(hFlip)
-  }
-};
-
 Point.prototype.destroy = function destroy() {
-  if(this._textShape){
-    this.manager.deleteShapesByIds([this._textShape._id])
-    this.destroyTextShape()
-  }
   this.element.remove();
   this.handles.remove();
 };
-
-Point.prototype.destroyTextShape = function destroyTextShape() {
-  this._textId = -1
-  this._textShape = undefined;
-}
 
 Point.prototype.intersectRegion = function intersectRegion(region) {
   var path = this.manager.regionToPath(region, this._zoomFraction * 100);
@@ -500,53 +358,6 @@ Point.prototype.updateShapeFromHandles = function updateShapeFromHandles(
   this.drawShape();
 };
 
-Point.prototype.createShapeText = function createShapeText(){
-  if(!this._textShape){
-    var textPosition = this.manager.getTextPosition(),
-        fontSize = this.manager.getTextFontSize(),
-        inModalView = this.manager.getInModalView(),
-        vFlip = this.manager.getVerticalFlip(),
-        hFlip = this.manager.getHorizontalFlip(),
-        textColor = this.manager.getTextColor(),
-        shapeScalingFactor = this.manager.getShapeScalingFactor(),
-        textBackgroundOpacity = this.manager.getTextBackgroundOpacity(),
-        textBackgroundColor = this.manager.getTextBackgroundColor(),
-        textRotation = this.manager.getTextRotation();
-
-    if(textPosition == "freehand"){
-      textPosition = "top"
-      this.manager.setTextPosition(textPosition)
-    }
-
-    var textShape = new Text({
-        manager: this.manager,
-        paper: this.paper,
-        inModalView: inModalView,
-        textRotation: textRotation,
-        vFlip: vFlip,
-        hFlip: hFlip,
-        linkedShapeId: this._id,
-        zoom: this._zoomFraction * 100,
-        text: "text",
-        showText: true,
-        x: this._x,
-        y: this._y,
-        shapeScalingFactor: shapeScalingFactor,
-        textBackgroundOpacity: textBackgroundOpacity,
-        textBackgroundColor: textBackgroundColor,
-        textColor: textColor,
-        fontSize: fontSize,
-        textPosition: textPosition,
-        strokeWidth: this._strokeWidth,
-        parentShapeCoords: {x: this._x - this._radiusX, y: this._y - this._radiusY, width: 2*this._radiusX, height: 2*this._radiusY}
-      })
-
-      this.manager.addShape(textShape);
-      this._textId = textShape._id;
-      this._textShape = textShape;
-  }
-}
-
 Point.prototype.drawShape = function drawShape() {
   var strokeColor = this._strokeColor,
     strokeW = this._strokeWidth,
@@ -587,20 +398,10 @@ Point.prototype.drawShape = function drawShape() {
     hy = this._handleIds[h_id].y * this._zoomFraction;
     hnd.attr({ x: hx - this.handle_wh / 2, y: hy - this.handle_wh / 2 });
   }
-
-  if(this._textShape || this.loadTextShape()){
-    this._textShape.setParentShapeCoords({x: this._x - this._radiusX, y: this._y - this._radiusY, width: 2*this._radiusX, height: 2*this._radiusY})
-  }
 };
 
 Point.prototype.setSelected = function setSelected(selected) {
-  if((selected && this._selected) || (!selected && !this._selected)){
-    return
-  }
   this._selected = !!selected;
-  if(this._textShape || this.loadTextShape()){
-    this._textShape.setSelected(this._selected)
-  }
   this.drawShape();
 };
 
@@ -674,10 +475,6 @@ var CreatePoint = function CreatePoint(options) {
 };
 
 CreatePoint.prototype.startDrag = function startDrag(startX, startY) {
-  // reset the text in the manager
-  this.manager.setText("")
-  this.manager.setShowText(false)
-
   var strokeColor = this.manager.getStrokeColor(),
     strokeWidth = this.manager.getStrokeWidth(),
     fillColor = this.manager.getFillColor(),
@@ -697,8 +494,7 @@ CreatePoint.prototype.startDrag = function startDrag(startX, startY) {
     zoom: zoom,
     strokeColor: strokeColor,
     fillColor: fillColor,
-    fillOpacity: fillOpacity,
-    textId: -1
+    fillOpacity: fillOpacity
   });
 };
 

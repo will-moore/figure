@@ -262,10 +262,6 @@ ShapeManager.prototype.getShapeScalingFactor = function getShapeScalingFactor() 
   return this._shapeScalingFactor;
 };
 
-// ShapeManager.prototype.getOriginalShape = function getOriginalShape() {
-//   return {x:0, y:0, width: this._orig_width, height: this._orig_height};
-// };
-
 ShapeManager.prototype.getZoom = function getZoom(zoomPercent) {
   return this._zoom;
 };
@@ -374,18 +370,6 @@ ShapeManager.prototype.setFontSize = function setFontSize(fontSize) {
   }
 };
 
-// ShapeManager.prototype.getTextPosition = function getTextPosition() {
-//   return this._textPosition;
-// };
-
-// ShapeManager.prototype.setTextPosition = function setTextPosition(position) {
-//   this._textPosition = position;
-//   var selected = this.getSelectedShapes();
-//   for (var s = 0; s < selected.length; s++) {
-//     selected[s].setTextPosition(position);
-//   }
-// };
-
 ShapeManager.prototype.getTextRotation = function getTextRotation() {
   return this._textRotation;
 };
@@ -394,8 +378,10 @@ ShapeManager.prototype.setTextRotation = function setTextRotation(textRotation) 
   this._textRotation = textRotation;
   var selected = this.getShapes();
   for (var s = 0; s < selected.length; s++) {
-    selected[s].setTextRotation(textRotation);
-  };
+    if (selected[s].setTextRotation) {
+      selected[s].setTextRotation(textRotation);
+    }
+  }
 };
 
 ShapeManager.prototype.getTextColor = function getTextColor() {
@@ -410,32 +396,6 @@ ShapeManager.prototype.setTextColor = function setTextColor(textColor) {
   }
 };
 
-// ShapeManager.prototype.getTextBackgroundColor = function getTextBackgroundColor() {
-//   return this._textBackgroundColor;
-// };
-
-// ShapeManager.prototype.setTextBackgroundColor = function setTextBackgroundColor(textBackgroundColor) {
-//   this._textBackgroundColor = textBackgroundColor;
-//   var selected = this.getSelectedShapes();
-//   for (var s=0; s<selected.length; s++) {
-//       selected[s].setTextBackgroundColor(textBackgroundColor);
-//   }
-// };
-
-// ShapeManager.prototype.getTextBackgroundOpacity = function getTextBackgroundOpacity() {
-//   return this._textBackgroundOpacity;
-// };
-
-// ShapeManager.prototype.setTextBackgroundOpacity = function setTextBackgroundOpacity(textBackgroundOpacity) {
-//   var textBackgroundOpacity = parseFloat(textBackgroundOpacity, 10).toFixed(1);
-//   if(textBackgroundOpacity <= 0.01) textBackgroundOpacity = parseInt(textBackgroundOpacity);
-//   this._textBackgroundOpacity = textBackgroundOpacity;
-//   var selected = this.getSelectedShapes();
-//   for (var s=0; s<selected.length; s++) {
-//       selected[s].setTextBackgroundOpacity(textBackgroundOpacity);
-//   }
-// };
-
 ShapeManager.prototype.getVerticalFlip = function getVerticalFlip() {
   return this._vFlip;
 };
@@ -447,13 +407,6 @@ ShapeManager.prototype.setVerticalFlip = function setVerticalFlip(vFlip) {
     selected[s].setVerticalFlip(vFlip);
   };
 };
-
-// ShapeManager.prototype.createShapeText = function createShapeText() {
-//   var selected = this.getSelectedShapes();
-//   for (var s = 0; s < selected.length; s++) {
-//     selected[s].createShapeText();
-//   };
-// };
 
 ShapeManager.prototype.getHorizontalFlip = function getHorizontalFlip() {
   return this._hFlip;
