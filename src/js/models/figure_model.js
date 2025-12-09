@@ -643,7 +643,7 @@
                     .then(rsp => rsp.json())
                     .then(data => {
 
-                        // values returned here are caught below
+                        // values returned here are caught below in the Promise.all handler
                         if (data.Exception || data.ConcurrencyException) {
                             return {id: iid, error: true, msg: data.Exception || "ConcurrencyException", url: imgDataUrl};
                         }
@@ -688,6 +688,7 @@
                     });
                 });
             });
+            this.set('unsaved', true);
         },
 
         // Used to position the #figure within canvas and also to coordinate svg layout.
