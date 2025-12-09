@@ -27,23 +27,36 @@
 import Raphael from "raphael";
 
 var Text = function Text(options) {
+  console.log("TEXT options", options);
   var self = this;
   this.manager = options.manager;
   this.paper = options.paper;
   this._shapeScalingFactor = options.shapeScalingFactor || 100;
   this._x = options.x;
   this._y = options.y;
-  this._textColor = options.textColor;
+  // this._textColor = options.textColor;
   this._fontSize = options.fontSize;
   this._text = options.text;
-  this._showText = options.showText;
-  this._parentShapeCoords = options.parentShapeCoords;
+  // this._showText = options.showText;
+  // this._parentShapeCoords = options.parentShapeCoords;
   this._strokeWidth = options.strokeWidth || 2;
-  this._textPosition = options.textPosition;
-  this._linkedShapeId = options.linkedShapeId || -1;
+  this._strokeColor = options.strokeColor || "#ffffff";
+  
+  if(options.fillColor){
+    this._fillColor = options.fillColor;
+  }else{
+      this._fillColor = "#000000";
+  }
+  if(options.fillOpacity){
+      this._fillOpacity = options.fillOpacity;
+  }else{
+      this._fillOpacity = 0;
+  }
+  // this._textPosition = options.textPosition;
+  // this._linkedShapeId = options.linkedShapeId || -1;
   this._inModalView = options.inModalView || false;
-  this._textBackgroundOpacity = options.textBackgroundOpacity || 0.01;
-  this._textBackgroundColor = options.textBackgroundColor || "#fff";
+  // this._textBackgroundOpacity = options.textBackgroundOpacity || 0.01;
+  // this._textBackgroundColor = options.textBackgroundColor || "#fff";
 
   this._id = options.id || this.manager.getRandomId();
   if(this._id == -1){
@@ -61,10 +74,12 @@ var Text = function Text(options) {
   this.handle_wh = 6;
 
   this.bkgdRect = this.paper.rect();
-  this.bkgdRect.attr({"fill-opacity": this._textBackgroundOpacity, fill: this._textBackgroundColor});
+  this.bkgdRect.attr({"fill-opacity": this._fillOpacity, fill: this._fillColor});
 
   this.element = this.paper.text();
   this.element.attr({"fill-opacity": 0.01, fill: "#fff"});
+
+  // console.log("Text, this._textPosition", this._textPosition)
 
   if (this.manager.canEdit) {
     // Drag handling of element
@@ -116,20 +131,23 @@ Text.prototype.toJson = function toJson() {
     y: this._y,
     area: this._area,
     fontSize: this._fontSize,
-    textBackgroundOpacity: this._textBackgroundOpacity,
-    textBackgroundColor: this._textBackgroundColor,
-    textColor: this._textColor,
+    // textBackgroundOpacity: this._textBackgroundOpacity,
+    // textBackgroundColor: this._textBackgroundColor,
+    // textColor: this._textColor,
+    strokeColor: this._strokeColor,
+    fillColor: this._fillColor,
+    fillOpacity: this._fillOpacity,
     text: this._text,
-    showText: this._showText,
+    // showText: this._showText,
     textAnchor: this._textAnchor,
     rotation: this._rotation,
     textRotation: this._textRotation,
     hFlip: this._hFlip,
     vFlip: this._vFlip,
-    textPosition: this._textPosition,
-    parentShapeCoords: this._parentShapeCoords,
-    linkedShapeId: this._linkedShapeId,
-    strokeWidth: this._strokeWidth,
+    // textPosition: this._textPosition,
+    // parentShapeCoords: this._parentShapeCoords,
+    // linkedShapeId: this._linkedShapeId,
+    // strokeWidth: this._strokeWidth,
   };
   if (this._id) {
     rv.id = this._id;
@@ -169,17 +187,19 @@ Text.prototype.offsetCoords = function offsetCoords(json, dx, dy) {
 };
 
 Text.prototype.setStrokeColor = function setStrokeColor(color) {
-  return;
+  this._strokeColor = color;
+  this.drawShape();
 };
 
 Text.prototype.getStrokeColor = function getStrokeColor() {
-  if(this._linkedShapeId != -1){
-    var parentShape = this.manager.getShape(this._linkedShapeId);
-    if(parentShape){
-      return parentShape.getStrokeColor()
-    }
-  }
-  return;
+  // if(this._linkedShapeId != -1){
+  //   var parentShape = this.manager.getShape(this._linkedShapeId);
+  //   if(parentShape){
+  //     return parentShape.getStrokeColor()
+  //   }
+  // }
+  // return;
+  return this._strokeColor;
 };
 
 Text.prototype.setTextColor = function setTextColor(color) {
@@ -218,36 +238,22 @@ Text.prototype.getText = function getText() {
   return this._text;
 };
 
-Text.prototype.setShowText = function setShowText(showText) {
-  this._showText = showText;
+// Text.prototype.setShowText = function setShowText(showText) {
+//   this._showText = showText;
+//   this.drawShape();
+// };
+
+// Text.prototype.getShowText = function getShowText() {
+//   return this._showText;
+// };
+
+Text.prototype.setFillColor = function setFillColor(fillColor) {
+  this._fillColor = fillColor;
   this.drawShape();
 };
 
-Text.prototype.getShowText = function getShowText() {
-  return this._showText;
-};
-
-Text.prototype.setTextPosition = function setTextPosition(textPosition) {
-    this._textPosition = textPosition;
-    this.drawShape();
-};
-
-Text.prototype.getTextPosition = function getTextPosition() {
-  return this._textPosition;
-};
-
-Text.prototype.setFillColor = function setFillColor(fillColor) {
-  return;
-};
-
 Text.prototype.getFillColor = function getFillColor() {
-  if(this._linkedShapeId != -1){
-    var parentShape = this.manager.getShape(this._linkedShapeId);
-    if(parentShape){
-      return parentShape.getFillColor()
-    }
-  }
-  return;
+  return this._fillColor;
 };
 
 Text.prototype.setTextBackgroundColor = function setTextBackgroundColor(textBackgroundColor) {
@@ -260,17 +266,12 @@ Text.prototype.getTextBackgroundColor = function getTextBackgroundColor() {
 };
 
 Text.prototype.setFillOpacity = function setFillOpacity(fillOpacity) {
-  return;
+  this._fillOpacity = fillOpacity;
+  this.drawShape();
 };
 
 Text.prototype.getFillOpacity = function getFillOpacity() {
-  if(this._linkedShapeId != -1){
-    var parentShape = this.manager.getShape(this._linkedShapeId);
-    if(parentShape){
-      return parentShape.getFillOpacity()
-    }
-  }
-  return 0;
+  return this._fillOpacity;
 };
 
 Text.prototype.setTextBackgroundOpacity = function setTextBackgroundOpacity(textBackgroundOpacity) {
@@ -312,10 +313,10 @@ Text.prototype.setInModalView = function setInModalView(inModalView) {
   this.drawShape();
 };
 
-Text.prototype.setParentShapeCoords = function setParentShapeCoords(coords){
-  this._parentShapeCoords = coords;
-  this.drawShape();
-};
+// Text.prototype.setParentShapeCoords = function setParentShapeCoords(coords){
+//   this._parentShapeCoords = coords;
+//   this.drawShape();
+// };
 
 Text.prototype.createShapeText = function createShapeText(){
   return;
@@ -350,12 +351,12 @@ Text.prototype.setSelected = function setSelected(selected) {
     return
   }
   this._selected = !!selected;
-  if(this._linkedShapeId != -1){
-    var parentShape = this.manager.getShape(this._linkedShapeId);
-    if(parentShape){
-      parentShape.setSelected(selected)
-    }
-  }
+  // if(this._linkedShapeId != -1){
+  //   var parentShape = this.manager.getShape(this._linkedShapeId);
+  //   if(parentShape){
+  //     parentShape.setSelected(selected)
+  //   }
+  // }
   this.drawShape();
 };
 
@@ -402,175 +403,197 @@ Text.prototype.getPath = function getPath() {
 
 
 Text.prototype.drawShape = function drawShape() {
-  var color = this._textColor,
-      f = this._zoomFraction,
+  // var color = this._textColor,
+  var f = this._zoomFraction,
       shapeScalingFactor = this._shapeScalingFactor / 100,
-      fontSize = this._fontSize,
-      textAnchor = "middle",
-      textOffsetX = (this._strokeWidth/2 + 6) / f,
-      textOffsetY = (this._strokeWidth/2 + (fontSize > 12 ? fontSize/2 : 6) + 4) / f,
-      px = this._parentShapeCoords.x,
-      py = this._parentShapeCoords.y,
-      pw = this._parentShapeCoords.width,
-      ph = this._parentShapeCoords.height,
-      x = px,
-      y = py,
-      dx, dxScaled = 0,
-      dy, dyScaled = 0,
-      final_x = undefined,
-      final_y = undefined,
-      outPositions = ["top", "left", "bottom","right"],
-      inPositions = ["topleft", "bottomleft", "bottomright", "topright"],
-      outAnchors = ["middle", "end", "middle", "start"],
-      inAnchors = ["start", "start", "end", "end"],
-      rotationIndex = Math.floor(((360 - this._rotation + 45) / 90)) % 4,
-      finalIndex
+      // fontSize = this._fontSize,
+      // textAnchor = "start",
+      // textAnchor = this._textAnchor,
+      // textOffsetX = (this._strokeWidth/2 + 6) / f,
+      // textOffsetY = (this._strokeWidth/2 + (fontSize > 12 ? fontSize/2 : 6) + 4) / f,
+      // px = this._parentShapeCoords.x,
+      // py = this._parentShapeCoords.y,
+      // pw = this._parentShapeCoords.width,
+      // ph = this._parentShapeCoords.height,
+      x = this._x,   //px,
+      y = this._y;   //py,
+      // dx, dxScaled = 0,
+      // dy, dyScaled = 0,
+      // final_x = undefined,
+      // final_y = undefined;
+      // outPositions = ["top", "left", "bottom","right"],
+      // inPositions = ["topleft", "bottomleft", "bottomright", "topright"],
+      // outAnchors = ["middle", "end", "middle", "start"],
+      // inAnchors = ["start", "start", "end", "end"],
+      // rotationIndex = Math.floor(((360 - this._rotation + 45) / 90)) % 4;
+      // finalIndex
 
-  switch(this._textPosition){
-    case "bottom":
-    case "left":
-    case "right":
-    case "top":
-        var posIndex = outPositions.indexOf(this._textPosition)
-        finalIndex = (posIndex + rotationIndex) % 4
-        break;
-    case "topleft":
-    case "topright":
-    case "bottomleft":
-    case "bottomright":
-        var posIndex = inPositions.indexOf(this._textPosition)
-        finalIndex = (posIndex + rotationIndex) % 4
-        break;
-  }
+  // switch(this._textPosition){
+  //   case "bottom":
+  //   case "left":
+  //   case "right":
+  //   case "top":
+  //       var posIndex = outPositions.indexOf(this._textPosition)
+  //       finalIndex = (posIndex + rotationIndex) % 4
+  //       break;
+  //   case "topleft":
+  //   case "topright":
+  //   case "bottomleft":
+  //   case "bottomright":
+  //       var posIndex = inPositions.indexOf(this._textPosition)
+  //       finalIndex = (posIndex + rotationIndex) % 4
+  //       break;
+  // }
 
-  switch(this._textPosition){
-    case "bottom":
-      dx = pw/2;
-      dy = textOffsetY;
-      if(this._linkedShapeId == -1){
-        dy = -textOffsetY;
-        textAnchor = outAnchors[(finalIndex + 2) % 4]
-      }
-      textAnchor = outAnchors[finalIndex]
-      dyScaled = ph + dy * shapeScalingFactor
-      dxScaled = dx;
-      dy = ph + dy
-      break;
-  case "left":
-      dx = -textOffsetX;
-      dy = ph/2;
-      textAnchor = outAnchors[finalIndex]
-      if(this._linkedShapeId == -1){
-        dx = textOffsetX;
-        textAnchor = outAnchors[(finalIndex + 2) % 4]
-      }
-      dxScaled = dx * shapeScalingFactor;
-      dyScaled = dy
-      break;
-  case "right":
-      dx = textOffsetX;
-      dy = ph/2;
-      textAnchor = outAnchors[finalIndex]
-      if(this._linkedShapeId == -1){
-        dx = -textOffsetX;
-        textAnchor = outAnchors[(finalIndex + 2) % 4]
-      }
-      dxScaled = pw + dx * shapeScalingFactor;
-      dyScaled = dy
-      dx = pw + dx
-      break;
-  case "top":
-      dx = pw/2;
-      dy = -textOffsetY;
-      if(this._linkedShapeId == -1){
-        dy = textOffsetY;
-        textAnchor = outAnchors[(finalIndex + 2) % 4]
-      }
-      textAnchor = outAnchors[finalIndex]
-      dxScaled = dx
-      dyScaled = dy * shapeScalingFactor
-      break;
-  case "topleft":
-      dx = textOffsetX;
-      dy = textOffsetY;
-      dxScaled = dx * shapeScalingFactor
-      dyScaled = dy * shapeScalingFactor
-      textAnchor = inAnchors[finalIndex]
-      break;
-  case "topright":
-      dx = pw - textOffsetX;
-      dy = textOffsetY;
-      dxScaled = pw - textOffsetX * shapeScalingFactor
-      dyScaled = dy * shapeScalingFactor
-      textAnchor = inAnchors[finalIndex]
-      break;
-  case "bottomleft":
-      dx = textOffsetX;
-      dy = ph - textOffsetY;
-      dxScaled = dx * shapeScalingFactor
-      dyScaled = ph - textOffsetY * shapeScalingFactor
-      textAnchor = inAnchors[finalIndex]
-      break;
-  case "bottomright":
-      dx = pw - textOffsetX;
-      dy = ph - textOffsetY;
-      dxScaled = pw - textOffsetX * shapeScalingFactor
-      dyScaled = ph - textOffsetY * shapeScalingFactor
-      textAnchor = inAnchors[finalIndex]
-      break;
-  case "center":
-      dx = pw/2;
-      dy = ph/2;
-      dxScaled = dx
-      dyScaled = dy
-      textAnchor = "middle";
-      break;
-  case "freehand":
-      x = this._x;
-      y = this._y;
-      final_x = x;
-      final_y = y;
-      textAnchor = this._textAnchor
-      break;
-  }
+  // console.log("textPosition", this._textPosition); // "top" default
+  // this._textPosition = undefined;
+  // console.log("panel coords", {px, py, pw, ph})
+  // console.log("x, y", {x, y})
+  // console.log({textAnchor, px, py, dx, dy, dxScaled, dyScaled});
+  // console.log("finalIndex", finalIndex)
+  // switch(this._textPosition){
+  //   case "bottom":
+  //     dx = pw/2;
+  //     dy = textOffsetY;
+  //     if(this._linkedShapeId == -1){
+  //       dy = -textOffsetY;
+  //       textAnchor = outAnchors[(finalIndex + 2) % 4]
+  //     }
+  //     textAnchor = outAnchors[finalIndex]
+  //     dyScaled = ph + dy * shapeScalingFactor
+  //     dxScaled = dx;
+  //     dy = ph + dy
+  //     break;
+  // case "left":
+  //     dx = -textOffsetX;
+  //     dy = ph/2;
+  //     textAnchor = outAnchors[finalIndex]
+  //     if(this._linkedShapeId == -1){
+  //       dx = textOffsetX;
+  //       textAnchor = outAnchors[(finalIndex + 2) % 4]
+  //     }
+  //     dxScaled = dx * shapeScalingFactor;
+  //     dyScaled = dy
+  //     break;
+  // case "right":
+  //     dx = textOffsetX;
+  //     dy = ph/2;
+  //     textAnchor = outAnchors[finalIndex]
+  //     if(this._linkedShapeId == -1){
+  //       dx = -textOffsetX;
+  //       textAnchor = outAnchors[(finalIndex + 2) % 4]
+  //     }
+  //     dxScaled = pw + dx * shapeScalingFactor;
+  //     dyScaled = dy
+  //     dx = pw + dx
+  //     break;
+  // case "top":
+  //     dx = pw/2;
+  //     dy = -textOffsetY;
+  //     if(this._linkedShapeId == -1){
+  //       dy = textOffsetY;
+  //       textAnchor = outAnchors[(finalIndex + 2) % 4]
+  //     }
+  //     textAnchor = outAnchors[finalIndex]
+  //     dxScaled = dx
+  //     dyScaled = dy * shapeScalingFactor
+  //     break;
+  // case "topleft":
+  //     dx = textOffsetX;
+  //     dy = textOffsetY;
+  //     dxScaled = dx * shapeScalingFactor
+  //     dyScaled = dy * shapeScalingFactor
+  //     textAnchor = inAnchors[finalIndex]
+  //     break;
+  // case "topright":
+  //     dx = pw - textOffsetX;
+  //     dy = textOffsetY;
+  //     dxScaled = pw - textOffsetX * shapeScalingFactor
+  //     dyScaled = dy * shapeScalingFactor
+  //     textAnchor = inAnchors[finalIndex]
+  //     break;
+  // case "bottomleft":
+  //     dx = textOffsetX;
+  //     dy = ph - textOffsetY;
+  //     dxScaled = dx * shapeScalingFactor
+  //     dyScaled = ph - textOffsetY * shapeScalingFactor
+  //     textAnchor = inAnchors[finalIndex]
+  //     break;
+  // case "bottomright":
+  //     dx = pw - textOffsetX;
+  //     dy = ph - textOffsetY;
+  //     dxScaled = pw - textOffsetX * shapeScalingFactor
+  //     dyScaled = ph - textOffsetY * shapeScalingFactor
+  //     textAnchor = inAnchors[finalIndex]
+  //     break;
+  // case "center":
+  //     dx = pw/2;
+  //     dy = ph/2;
+  //     dxScaled = dx
+  //     dyScaled = dy
+  //     textAnchor = "middle";
+  //     break;
+  // case "freehand":
+  //     x = this._x;
+  //     y = this._y;
+  //     final_x = x;
+  //     final_y = y;
+  //     textAnchor = this._textAnchor
+  //     break;
+  // }
 
   // real shape coordinates
-  var rotatedCoords = this.applyShapeRotation(px + pw/2, py + ph/2, x + dx, y + dy, this._rotation);
-  if(final_x == undefined || final_y == undefined){
-    final_x = rotatedCoords.x
-    final_y = rotatedCoords.y
-  }
-  this._textAnchor = textAnchor;
-  this._x = final_x;
-  this._y = final_y;
+  // console.log("this._rotation", this._rotation)
+  // var rotatedCoords = this.applyShapeRotation(px + pw/2, py + ph/2, x + dx, y + dy, this._rotation);
+  // if(final_x == undefined || final_y == undefined){
+  //   final_x = rotatedCoords.x
+  //   final_y = rotatedCoords.y
+  // }
+  // this._textAnchor = textAnchor;
+  // NaN if dx or dy undefined
+  // this._x = final_x;
+  // this._y = final_y;
 
   // for modal display only
-  var scaledRotatedCoords = this.applyShapeRotation(px + pw/2, py + ph/2, x + dxScaled, y + dyScaled, this._rotation); 
+  // var scaledRotatedCoords = this.applyShapeRotation(px + pw/2, py + ph/2, x + dxScaled, y + dyScaled, this._rotation); 
+
+  // console.log("scaledRotatedCoords", scaledRotatedCoords)
+  // console.log("_textAnchor", this._textAnchor)
 
   this.element.attr({
-    x: scaledRotatedCoords.x * f,
-    y: scaledRotatedCoords.y * f,
-    fill: color,
+    // x: scaledRotatedCoords.x * f,
+    // y: scaledRotatedCoords.y * f,
+    x: x * f,
+    y: y * f,
+    // stroke: this._strokeColor,
+    // "stroke-width": 0,
+    fill: this._strokeColor,
+    // fill: color,
     "fill-opacity": 1,
     "font-size": this._fontSize * shapeScalingFactor,
     "text": this._text,
+    // text-anchor: [“start”, “middle”, “end”], default is “middle”
     "text-anchor": this._textAnchor
   });
 
+  // console.log("this.element", this.element)
   var bbox = this.element.getBBox();
+  // console.log("bbox", bbox)
 
+  const PADDING = 3;
   this.bkgdRect.attr({
-    x: bbox.x - 3,
-    y: bbox.y - 3,
-    width: bbox.width + 6,
-    height: bbox.height + 6,
-    fill: this._textBackgroundColor,
-    "fill-opacity": this._textBackgroundOpacity,
+    x: bbox.x - PADDING,
+    y: bbox.y - PADDING,
+    width: bbox.width + 2 * PADDING,
+    height: bbox.height + 2 * PADDING,
+    fill: this._fillColor,
+    "fill-opacity": this._fillOpacity,
     "stroke-width": 0,
   })
 
   this.element.toFront()
 
+  // console.log("this._inModalView", this._inModalView)
   if(!this._inModalView){
     this.element.transform("r" + (-this._textRotation) + ", s"+(this._hFlip)+", "+(this._vFlip));
     this.bkgdRect.transform("r" + (-this._textRotation) + ", s"+(this._hFlip)+", "+(this._vFlip));
@@ -581,19 +604,20 @@ Text.prototype.drawShape = function drawShape() {
 
   this._area = bbox.width * bbox.height;
 
-  if(!this._showText && this._linkedShapeId != -1){
-    this.element.hide();
-    this.handles.hide();
-    this.bkgdRect.hide();
-  }else{
-    this.element.show();
+  // console.log("Text drawShape selected?", this.isSelected())
+  // if(!this._showText && this._linkedShapeId != -1){
+  //   this.element.hide();
+  //   this.handles.hide();
+  //   this.bkgdRect.hide();
+  // }else{
+  //   this.element.show();
     this.bkgdRect.show();
     if (this.isSelected()) {
       this.handles.show().toFront();
     } else {
       this.handles.hide();
     }
-  }
+  // }
 
 
   // update Handles
@@ -606,6 +630,8 @@ Text.prototype.drawShape = function drawShape() {
     hy = handleIds[h_id][1];
     hnd.attr({ x: hx - this.handle_wh / 2, y: hy - this.handle_wh / 2 });
   }
+
+  console.log("drawShape complete", this.toJson())
 
 };
 
@@ -715,8 +741,8 @@ Text.prototype.createHandles = function createHandles() {
     };
   };
 
-  let cx = handleIds['n'][0];
-  let cy = handleIds['e'][1];
+  // let cx = handleIds['n'][0];
+  // let cy = handleIds['e'][1];
 
   for (var key in handleIds) {
     var hx = handleIds[key][0];
@@ -752,20 +778,20 @@ var CreateText = function CreateText(options) {
 CreateText.prototype.startDrag = function startDrag(startX, startY) {
   var textColor = this.manager.getTextColor(),
       strokeWidth = this.manager.getStrokeWidth(),
-      fontSize = this.manager.getTextFontSize(),
+      fontSize = this.manager.getFontSize(),
       zoom = this.manager.getZoom(),
       shapeScalingFactor = this.manager.getShapeScalingFactor(),
       inModalView = this.manager.getInModalView(),
       vFlip = this.manager.getVerticalFlip(),
       hFlip = this.manager.getHorizontalFlip(),
-      textRotation = this.manager.getTextRotation(),
-      textBackgroundOpacity = this.manager.getTextBackgroundOpacity(),
-      textBackgroundColor = this.manager.getTextBackgroundColor(),
-      originalImageShape = this.manager.getOriginalShape();
+      textRotation = this.manager.getTextRotation();
+      // textBackgroundOpacity = this.manager.getTextBackgroundOpacity(),
+      // textBackgroundColor = this.manager.getTextBackgroundColor(),
+      // originalImageShape = this.manager.getOriginalShape();
 
   this.manager.setText("Text")
-  this.manager.setShowText(true)
-  this.manager.setTextPosition("freehand")
+  // this.manager.setShowText(true)
+  // this.manager.setTextPosition("freehand")
 
   this.startX = startX;
   this.startY = startY;
@@ -781,16 +807,16 @@ CreateText.prototype.startDrag = function startDrag(startX, startY) {
     textRotation: textRotation,
     vFlip: vFlip,
     hFlip: hFlip,
-    textBackgroundOpacity: textBackgroundOpacity,
-    textBackgroundColor: textBackgroundColor,
-    textColor: textColor,
+    // textBackgroundOpacity: textBackgroundOpacity,
+    // textBackgroundColor: textBackgroundColor,
+    // textColor: textColor,
     linkedShapeId: -1,
     x: startX,
     y: startY,
     fontSize: fontSize,
-    textPosition: "freehand",
-    strokeWidth: strokeWidth,
-    parentShapeCoords: originalImageShape,
+    // textPosition: "freehand",
+    // strokeWidth: strokeWidth,
+    // parentShapeCoords: originalImageShape,
   })
 
 };

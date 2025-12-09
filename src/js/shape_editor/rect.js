@@ -67,8 +67,8 @@ var Rect = function Rect(options) {
   }
   this._rotation = options.rotation || 0;
 
-  this._textId = options.textId || -1;
-  this._textShape = this.manager.getShape(this._textId)
+  this._textId = options.textId || undefined;
+  // this._textShape = this.manager.getShape(this._textId)
 
   this.handle_wh = 6;
 
@@ -218,8 +218,10 @@ Rect.prototype.setSelected = function setSelected(selected) {
     return
   }
   this._selected = !!selected;
-  if(this._textShape || this.loadTextShape()){
-    this._textShape.setSelected(this._selected)
+  // IF there is a text shape, set its selected state too
+  let textShape = this.loadTextShape();
+  if (textShape) {
+    textShape.setSelected(this._selected);
   }
   this.drawShape();
 };
@@ -230,6 +232,7 @@ Rect.prototype.isSelected = function isSelected() {
 
 Rect.prototype.loadTextShape = function loadTextShape(){
   this._textShape = this.manager.getShape(this._textId);
+  console.log("loadTextShape", this._textId, this._textShape);
   return this._textShape;
 };
 
@@ -277,57 +280,57 @@ Rect.prototype.getFillOpacity = function getFillOpacity() {
   return this._fillOpacity;
 };
 
-Rect.prototype.setText = function setText(text) {
-  if(this._textShape){
-    this._textShape.setText(text)
-  }
-};
+// Rect.prototype.setText = function setText(text) {
+//   if(this._textShape){
+//     this._textShape.setText(text)
+//   }
+// };
 
-Rect.prototype.getText = function getText() {
-  if(this._textShape){
-    return this._textShape.getText()
-  }
-  return "";
-};
+// Rect.prototype.getText = function getText() {
+//   if(this._textShape){
+//     return this._textShape.getText()
+//   }
+//   return "";
+// };
 
-Rect.prototype.setShowText = function setShowText(showText) {
-  if(this._textShape){
-    this._textShape.setShowText(showText)
-  }
-};
+// Rect.prototype.setShowText = function setShowText(showText) {
+//   if(this._textShape){
+//     this._textShape.setShowText(showText)
+//   }
+// };
 
-Rect.prototype.getShowText = function getShowText() {
-   if(this._textShape){
-    return this._textShape.getShowText()
-  }
-  return "";
-};
+// Rect.prototype.getShowText = function getShowText() {
+//    if(this._textShape){
+//     return this._textShape.getShowText()
+//   }
+//   return "";
+// };
 
-Rect.prototype.setTextPosition = function setTextPosition(textPosition) {
-  if(this._textShape){
-    this._textShape.setTextPosition(textPosition)
-  }
-};
+// Rect.prototype.setTextPosition = function setTextPosition(textPosition) {
+//   if(this._textShape){
+//     this._textShape.setTextPosition(textPosition)
+//   }
+// };
 
-Rect.prototype.getTextPosition = function getTextPosition() {
-  if(this._textShape){
-    return this._textShape.getTextPosition()
-  }
-  return "";
-};
+// Rect.prototype.getTextPosition = function getTextPosition() {
+//   if(this._textShape){
+//     return this._textShape.getTextPosition()
+//   }
+//   return "";
+// };
 
-Rect.prototype.setFontSize = function setFontSize(fontSize) {
-  if(this._textShape){
-    this._textShape.setFontSize(fontSize)
-  }
-};
+// Rect.prototype.setFontSize = function setFontSize(fontSize) {
+//   if(this._textShape){
+//     this._textShape.setFontSize(fontSize)
+//   }
+// };
 
-Rect.prototype.getFontSize = function getFontSize() {
-  if(this._textShape){
-    return this._textShape.getFontSize()
-  }
-  return;
-};
+// Rect.prototype.getFontSize = function getFontSize() {
+//   if(this._textShape){
+//     return this._textShape.getFontSize()
+//   }
+//   return;
+// };
 
 Rect.prototype.setStrokeWidth = function setStrokeWidth(strokeWidth) {
   this._strokeWidth = strokeWidth;
@@ -513,9 +516,9 @@ Rect.prototype.drawShape = function drawShape() {
     hnd.transform("r" + this._rotation + "," + (x + (w/2)) + "," + (y + (h/2)));
   }
 
-  if(this._textShape || this.loadTextShape()){
-    this._textShape.setParentShapeCoords({x: this._x, y: this._y, width: this._width, height: this._height})
-  }
+  // if(this._textShape || this.loadTextShape()){
+  //   this._textShape.setParentShapeCoords({x: this._x, y: this._y, width: this._width, height: this._height})
+  // }
 };
 
 Rect.prototype.getHandleCoords = function getHandleCoords() {
@@ -571,6 +574,7 @@ Rect.prototype.createHandles = function createHandles() {
   self.handles = this.paper.set();
   var _handle_drag = function () {
     return function (dx, dy, mouseX, mouseY, event) {
+      let textShape = self.loadTextShape();
       dx = dx / self._zoomFraction;
       dy = dy / self._zoomFraction;
       // need to handle rotation...
@@ -619,15 +623,27 @@ Rect.prototype.createHandles = function createHandles() {
         // if we're dragging an 'NORTH' handle, update y and height
         newRect.y = new_y + self.handle_wh / 2;
         newRect.height = this.oheight - dy;
+        // if we have a text shape, assume it is positioned relative to the rect
+        if (textShape) {
+          textShape._y = this.text_offset_y + newRect.y;
+        }
       }
       if (this.h_id.indexOf("w") > -1) {
         // if we're dragging an 'WEST' handle, update x and width
         newRect.x = new_x + self.handle_wh / 2;
         newRect.width = this.owidth - dx;
+        console.log("newRect.width textShape", textShape);
+        if (textShape) {
+          textShape._x = this.text_offset_x + newRect.x;
+        }
       }
       // Don't allow zero sized rect.
       if (newRect.width < 1 || newRect.height < 1) {
         return false;
+      }
+
+      if (textShape) {
+        textShape.drawShape();
       }
 
       self._x = newRect.x;
@@ -647,6 +663,12 @@ Rect.prototype.createHandles = function createHandles() {
       this.owidth = self._width;
       this.oheight = self._height;
       this.aspect = self._width / self._height;
+      // Also note textShape position if relevant
+      let textShape = self.loadTextShape();
+      if (textShape) {
+        this.text_offset_x = textShape._x - self._zoomFraction - this.ox;
+        this.text_offset_y = textShape._y - self._zoomFraction - this.oy;
+      }
       return false;
     };
   };

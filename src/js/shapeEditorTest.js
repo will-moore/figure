@@ -29,266 +29,368 @@
 import $ from "jquery";
 import ShapeManager from "./shape_editor/shape_manager";
 
+$(function () {
+  var WIDTH = 512,
+    HEIGHT = 512;
 
-$(function() {
+  var options = {};
 
-    var WIDTH = 512,
-        HEIGHT = 512;
+  var shapesClipboard = [];
 
-    var options = {};
+  // We can choose to display shapes only - No editing
+  // options = {'readOnly': true};
 
-    var shapesClipboard = [];
+  var shapeManager = new ShapeManager("shapesCanvas", WIDTH, HEIGHT, options);
 
-    // We can choose to display shapes only - No editing
-    // options = {'readOnly': true};
+  var zoomPercent = 100;
 
-    var shapeManager = new ShapeManager("shapesCanvas",
-                                        WIDTH, HEIGHT,
-                                        options);
+  // set state depending on what we want to do,
+  // for example to create Rectangle
 
-    var zoomPercent = 100;
+  $("input[name='state']").click(function () {
+    var state = $(this).val();
+    shapeManager.setState(state);
+  });
 
-    // set state depending on what we want to do,
-    // for example to create Rectangle
+  $("input[name='strokeColor']").click(function () {
+    var strokeColor = $(this).val();
+    shapeManager.setStrokeColor(strokeColor);
+  });
 
-    $("input[name='state']").click(function(){
-        var state = $(this).val();
-        shapeManager.setState(state);
+  $("input[name='fillColor']").click(function () {
+    var fillColor = $(this).val();
+    var fillOpacity = $("select[name='fillOpacity']").val();
+    shapeManager.setFillColor(fillColor);
+    shapeManager.setFillOpacity(fillOpacity);
+  });
+
+  $("select[name='strokeWidth']").change(function () {
+    var strokeWidth = $(this).val();
+    shapeManager.setStrokeWidth(strokeWidth);
+  });
+
+  $("select[name='fillOpacity']").change(function () {
+    var fillOpacity = $(this).val();
+    shapeManager.setFillOpacity(fillOpacity);
+  });
+
+  $("select[name='fontSize']").change(function () {
+    var fontSize = $(this).val();
+    shapeManager.setFontSize(fontSize);
+  });
+
+  $("select[name='textPosition']").change(function () {
+    var textPosition = $(this).val();
+    shapeManager.setTextPosition(textPosition);
+  });
+
+  $("select[name='rotateText']").change(function () {
+    var rotateText = $(this).val();
+    shapeManager.setTextRotated(rotateText);
+  });
+
+  var updateZoom = function updateZoom() {
+    $("#zoomDisplay").text(zoomPercent + " %");
+    shapeManager.setZoom(zoomPercent);
+    var w = (WIDTH * zoomPercent) / 100,
+      h = (HEIGHT * zoomPercent) / 100;
+    $(".imageWrapper img").css({ width: w, height: h });
+  };
+
+  $("button[name='zoomIn']").click(function () {
+    zoomPercent += 20;
+    updateZoom();
+  });
+  $("button[name='zoomOut']").click(function () {
+    zoomPercent -= 20;
+    updateZoom();
+  });
+
+  $("button[name='deleteSelected']").click(function () {
+    shapeManager.deleteSelectedShapes();
+  });
+
+  $("button[name='deleteAll']").click(function () {
+    shapeManager.deleteAllShapes();
+  });
+
+  $("button[name='selectAll']").click(function () {
+    shapeManager.selectAllShapes();
+  });
+
+  $("button[name='copyShapes']").click(function () {
+    shapesClipboard = shapeManager.getSelectedShapesJson();
+  });
+
+  $("button[name='setText']").click(function () {
+    shapeManager.setText("A");
+  });
+
+  $("button[name='clearText']").click(function () {
+    shapeManager.setText("");
+  });
+
+  $("button[name='pasteShapes']").click(function () {
+    // paste shapes, constraining to the image coords
+    var p = shapeManager.pasteShapesJson(shapesClipboard, true);
+    if (!p) {
+      console.log("Shape could not be pasted: outside view port");
+    }
+  });
+
+  $("button[name='getShapes']").click(function () {
+    var json = shapeManager.getShapesJson();
+    console.log(json);
+  });
+
+  $("button[name='getBBoxes']").click(function () {
+    var shapes = shapeManager.getShapesJson();
+    shapes.forEach(function (shape) {
+      var bbox = shapeManager.getShapeBoundingBox(shape.id);
+      // Add each bbox as a Rectangle to image
+      bbox.type = "Rectangle";
+      bbox.strokeColor = "#ffffff";
+      shapeManager.addShapeJson(bbox);
     });
+  });
 
-    $("input[name='strokeColor']").click(function(){
-        var strokeColor = $(this).val();
-        shapeManager.setStrokeColor(strokeColor);
+  $("button[name='selectShape']").click(function () {
+    shapeManager.selectShapesById(1234);
+  });
+
+  var lastShapeId;
+  $("button[name='deleteShapesByIds']").click(function () {
+    shapeManager.deleteShapesByIds([lastShapeId]);
+  });
+
+  $("button[name='setShapes']").click(function () {
+    var shapesJson = [
+      {
+        type: "Rectangle",
+        strokeColor: "#ff00ff",
+        strokeWidth: 10,
+        x: 100,
+        y: 250,
+        width: 325,
+        height: 250,
+      },
+      {
+        type: "Ellipse",
+        x: 300,
+        y: 250,
+        radiusX: 125,
+        radiusY: 250,
+        rotation: 100,
+      },
+    ];
+    shapeManager.setShapesJson(shapesJson);
+  });
+
+  $("#shapesCanvas").bind("change:selected", function () {
+    var strokeColor = shapeManager.getStrokeColor();
+    if (strokeColor) {
+      $("input[name='strokeColor'][value='" + strokeColor + "']").prop(
+        "checked",
+        "checked"
+      );
+    } else {
+      $("input[name='strokeColor']").removeProp("checked");
+    }
+    var fillColor = shapeManager.getFillColor();
+    if (fillColor) {
+      $("input[name='fillColor'][value='" + fillColor + "']").prop('checked', 'checked');
+    } else {
+       $("input[name='fillColor']").removeProp('checked');
+    }
+    var strokeWidth = shapeManager.getStrokeWidth() || 1;
+    $("select[name='strokeWidth']").val(strokeWidth);
+
+    var fillOpacity = shapeManager.getFillOpacity() || 0.01;
+    fillOpacity = (fillOpacity == 1 ? "1" : fillOpacity + ""); // to match string values in select
+    $("select[name='fillOpacity']").val(fillOpacity);
+  });
+
+  $("#shapesCanvas").bind("change:shape", function (event, shapes) {
+    console.log("changed", shapes);
+  });
+
+  $("#shapesCanvas").bind("new:shape", function (event, shape) {
+    console.log("new", shape.toJson());
+    console.log("selected", shapeManager.getSelectedShapesJson());
+  });
+
+  $("button[name='createInset']").on("click", function () {
+    let textRandomId = 12345678;
+    let rectRandomId = 4567890;
+
+    // Add Rectangle - WITH Id of Text shape
+    let rectSize = WIDTH / 3;
+    let x = (WIDTH - rectSize) / 2;
+    let y = (HEIGHT - rectSize) / 2;
+    shapeManager.addShapeJson({
+        type: "Rectangle",
+        strokeColor: "#ffffff",
+        strokeWidth: 2,
+        x: x,
+        y: y,
+        width: rectSize,
+        height: rectSize,
+        textId: textRandomId,
+        id: rectRandomId
     });
+    // Add Text
+    const MARGIN = 20;
+    shapeManager.addShapeJson({
+        type: "Text",
+        fontSize: 12,
+        strokeColor: "#ffffff",
+        x: x + MARGIN,
+        y: y + MARGIN,
+        textAnchor: "middle",
+        id: textRandomId,
+        text: "A",
+    })
+  });
 
-    $("input[name='fillColor']").click(function(){
-        var fillColor = $(this).val();
-        var fillOpacity = $("select[name='fillOpacity']").val();
-        shapeManager.setFillColor(fillColor);
-        shapeManager.setFillOpacity(fillOpacity);
-    });
 
-    $("select[name='strokeWidth']").change(function(){
-        var strokeWidth = $(this).val();
-        shapeManager.setStrokeWidth(strokeWidth);
-    });
+  // Add some shapes to display
+  // shapeManager.addShapeJson({"type": "Polygon",
+  //                            "points": "329,271 295,314 295,365 333,432 413,400 452,350 432,292 385,256",
+  //                            "strokeColor": "#ffffff",
+  //                            "strokeWidth": 0.5});
 
-    $("select[name='fillOpacity']").change(function(){
-        var fillOpacity = $(this).val();
-        shapeManager.setFillOpacity(fillOpacity);
-    });
+  // shapeManager.addShapeJson({"type": "Polyline",
+  //                            "points": "29,71 95,14 95,65 33,132 113,100 152,50",
+  //                            "strokeColor": "#00ffdd",
+  //                            "strokeWidth": 4});
 
-    $("select[name='fontSize']").change(function(){
-        var fontSize = $(this).val();
-        shapeManager.setTextFontSize(fontSize);
-    });
+  // shapeManager.addShapeJson({"id": 1234,
+  //                            "rotation": 25,
+  //                            "type": "Rectangle",
+  //                            "strokeColor": "#ff00ff",
+  //                            "strokeWidth": 6,
+  //                            "x": 200, "y": 150,
+  //                            "width": 125, "height": 150});
 
-    $("select[name='textPosition']").change(function(){
-        var textPosition = $(this).val();
-        shapeManager.setTextPosition(textPosition);
-    });
+  // shapeManager.addShapeJson({"type": "Rectangle",
+  //                            "strokeColor": "#ffffff",
+  //                            "strokeWidth": 3,
+  //                            "x": 50, "y": 300,
+  //                            "width": 50, "height": 100});
 
-    $("select[name='rotateText']").change(function(){
-        var rotateText = $(this).val();
-        shapeManager.setTextRotated(rotateText);
-    });
+  // shapeManager.addShapeJson({"type": "Ellipse",
+  //                            "x": 200, "y": 150,
+  //                            "radiusX": 125, "radiusY": 50,
+  //                            "rotation": 45});
 
-    var updateZoom = function updateZoom() {
-        $("#zoomDisplay").text(zoomPercent + " %");
-        shapeManager.setZoom(zoomPercent);
-        var w = WIDTH * zoomPercent / 100,
-            h = HEIGHT * zoomPercent / 100;
-        $(".imageWrapper img").css({'width': w, 'height': h});
-    };
+  // shapeManager.addShapeJson({"type": "Ellipse",
+  //                            "strokeColor": "#ffffff",
+  //                            "x": 204, "y": 260,
+  //                            "radiusX": 95, "radiusY": 55,
+  //                            "transform": "matrix(0.82 0.56 -0.56 0.82 183.0 -69.7)"});
 
-    $("button[name='zoomIn']").click(function(){
-        zoomPercent += 20;
-        updateZoom();
-    });
-    $("button[name='zoomOut']").click(function(){
-        zoomPercent -= 20;
-        updateZoom();
-    });
+  // shapeManager.addShapeJson({"type": "Arrow",
+  //                            "strokeColor": "#ffff00",
+  //                            "strokeWidth": 4,
+  //                            "x1": 25, "y1": 450,
+  //                            "x2": 200, "y2": 400});
 
-    $("button[name='deleteSelected']").click(function(){
-        shapeManager.deleteSelectedShapes();
-    });
+  // shapeManager.addShapeJson({"type": "Arrow",
+  //                            "strokeColor": "#ffff00",
+  //                            "strokeWidth": 10,
+  //                            "x1": 25, "y1": 250,
+  //                            "x2": 200, "y2": 200});
 
-    $("button[name='deleteAll']").click(function(){
-        shapeManager.deleteAllShapes();
-    });
+  // shapeManager.addShapeJson({"type": "Ellipse",
+  //                           "strokeColor": "#00ff00",
+  //                           "radiusY": 31.5,
+  //                           "radiusX": 91,
+  //                           "transform": "matrix(2.39437435854 -0.644012141633 2.14261951162 0.765696311828 -1006.17788921 153.860479773)",
+  //                           "strokeWidth": 2,
+  //                           "y": 297.5,
+  //                           "x": 258});
 
-    $("button[name='selectAll']").click(function(){
-        shapeManager.selectAllShapes();
-    });
+  // shapeManager.addShapeJson({"type": "Ellipse",
+  //                       "strokeColor": "#ffff00",
+  //                       "radiusY": 71.5,
+  //                       "radiusX": 41,
+  //                       "transform": "matrix(0.839800601976 0.542894970432 -0.542894970432 0.839800601976 111.894472287 -140.195845758)",
+  //                       "strokeWidth": 2,
+  //                       "y": 260.5,
+  //                       "x": 419});
 
-    $("button[name='copyShapes']").click(function(){
-        shapesClipboard = shapeManager.getSelectedShapesJson();
-    });
+  // shapeManager.addShapeJson({"type": "Point",
+  //                       "strokeWidth": 2,
+  //                       "y": 30,
+  //                       "x": 30});
 
-    $("button[name='setText']").click(function(){
-        shapeManager.setText("A");
-    });
+  // var s = shapeManager.addShapeJson({"type": "Line",
+  //                            "strokeColor": "#00ff00",
+  //                            "strokeWidth": 2,
+  //                            "x1": 400, "y1": 400,
+  //                            "x2": 250, "y2": 310});
+  // lastShapeId = s.toJson().id;
 
-    $("button[name='clearText']").click(function(){
-        shapeManager.setText("");
-    });
+  shapeManager.addShapeJson({
+    type: "Arrow",
+    strokeColor: "#ffff00",
+    strokeWidth: 10,
+    x1: 0,
+    y1: 0,
+    x2: 100,
+    y2: 100,
+  });
 
-    $("button[name='pasteShapes']").click(function(){
-        // paste shapes, constraining to the image coords
-        var p = shapeManager.pasteShapesJson(shapesClipboard, true);
-        if (!p) {
-            console.log("Shape could not be pasted: outside view port");
-        }
-    });
+  shapeManager.addShapeJson({
+    fontSize: 18,
+    hFlip: 1,
+    rotation: 0,
+    showText: true,
+    // strokeWidth: 5, // not used for Text shape
+    text: "textAnchor start",
+    textAnchor: "start",
+    // textBackgroundColor: "#FF0000",
+    // textBackgroundOpacity: "1.0",
+    // textColor: "#FFFFFF",
+    fillColor: "#00ff00",
+    fillOpacity: 1,
+    strokeColor: "#ffffff",
+    // textPosition: "bottom",   // default is 'top' in ShapeManager() this._textPosition = "top";
+    textRotation: 0,
+    type: "Text",
+    vFlip: 1,
+    x: 100,
+    y: 100,
+  });
 
-    $("button[name='getShapes']").click(function(){
-      var json = shapeManager.getShapesJson();
-      console.log(json);
-    });
 
-    $("button[name='getBBoxes']").click(function(){
-      var shapes = shapeManager.getShapesJson();
-      shapes.forEach(function(shape){
-        var bbox = shapeManager.getShapeBoundingBox(shape.id);
-        // Add each bbox as a Rectangle to image
-        bbox.type = "Rectangle";
-        bbox.strokeColor = "#ffffff";
-        shapeManager.addShapeJson(bbox);
-      });
-    });
+  shapeManager.addShapeJson({
+    type: "Arrow",
+    strokeColor: "#ffff00",
+    strokeWidth: 10,
+    x1: 0,
+    y1: 100,
+    x2: 100,
+    y2: 200,
+  });
 
-    $("button[name='selectShape']").click(function(){
-      shapeManager.selectShapesById(1234);
-    });
 
-    var lastShapeId;
-    $("button[name='deleteShapesByIds']").click(function(){
-      shapeManager.deleteShapesByIds([lastShapeId]);
-    });
+  var s = shapeManager.addShapeJson({
+    fontSize: 18,
+    text: "textAnchor middle",
+    textAnchor: "middle",
+    fillColor: "#ff0000",
+    fillOpacity: 0.5,
+    strokeColor: "#ffff00",
+    textRotation: 0,
+    type: "Text",
+    x: 100,
+    y: 200,
+    // If the panel is rotated, we can calculate new x,y (text is NOT rotated)
+    rotation: 0,
+  });
+  lastShapeId = s.toJson().id;
 
-    $("button[name='setShapes']").click(function(){
-        var shapesJson = [
-          {"type": "Rectangle",
-            "strokeColor": "#ff00ff",
-            "strokeWidth": 10,
-            "x": 100, "y": 250,
-            "width": 325, "height": 250},
-          {"type": "Ellipse",
-            "x": 300, "y": 250,
-            "radiusX": 125, "radiusY": 250,
-            "rotation": 100}
-          ];
-        shapeManager.setShapesJson(shapesJson);
-    });
-
-    $("#shapesCanvas").bind("change:selected", function(){
-        var strokeColor = shapeManager.getStrokeColor();
-        if (strokeColor) {
-            $("input[name='strokeColor'][value='" + strokeColor + "']").prop('checked', 'checked');
-        } else {
-           $("input[name='strokeColor']").removeProp('checked');
-        }
-        // var fillColor = shapeManager.getFillColor();
-        // if (fillColor) {
-        //   $("input[name='fillColor'][value='" + fillColor + "']").prop('checked', 'checked');
-        // } else {
-        //    $("input[name='fillColor']").removeProp('checked');
-        // }
-        var strokeWidth = shapeManager.getStrokeWidth() || 1;
-        $("select[name='strokeWidth']").val(strokeWidth);
-
-        // var fillOpacity = shapeManager.getFillOpacity() || 0.01;
-        // $("select[name='fillOpacity']").val(fillOpacity);
-    });
-
-    $("#shapesCanvas").bind("change:shape", function(event, shapes){
-        console.log("changed", shapes);
-    });
-
-    $("#shapesCanvas").bind("new:shape", function(event, shape){
-        console.log("new", shape.toJson());
-        console.log("selected", shapeManager.getSelectedShapesJson());
-    });
-
-    // Add some shapes to display
-    shapeManager.addShapeJson({"type": "Polygon",
-                               "points": "329,271 295,314 295,365 333,432 413,400 452,350 432,292 385,256",
-                               "strokeColor": "#ffffff",
-                               "strokeWidth": 0.5});
-
-    shapeManager.addShapeJson({"type": "Polyline",
-                               "points": "29,71 95,14 95,65 33,132 113,100 152,50",
-                               "strokeColor": "#00ffdd",
-                               "strokeWidth": 4});
-
-    shapeManager.addShapeJson({"id": 1234,
-                               "rotation": 25,
-                               "type": "Rectangle",
-                               "strokeColor": "#ff00ff",
-                               "strokeWidth": 6,
-                               "x": 200, "y": 150,
-                               "width": 125, "height": 150});
-
-    shapeManager.addShapeJson({"type": "Rectangle",
-                               "strokeColor": "#ffffff",
-                               "strokeWidth": 3,
-                               "x": 50, "y": 300,
-                               "width": 50, "height": 100});
-
-    shapeManager.addShapeJson({"type": "Ellipse",
-                               "x": 200, "y": 150,
-                               "radiusX": 125, "radiusY": 50,
-                               "rotation": 45});
-
-    shapeManager.addShapeJson({"type": "Ellipse",
-                               "strokeColor": "#ffffff",
-                               "x": 204, "y": 260,
-                               "radiusX": 95, "radiusY": 55,
-                               "transform": "matrix(0.82 0.56 -0.56 0.82 183.0 -69.7)"});
-
-    shapeManager.addShapeJson({"type": "Arrow",
-                               "strokeColor": "#ffff00",
-                               "strokeWidth": 4,
-                               "x1": 25, "y1": 450,
-                               "x2": 200, "y2": 400});
-
-    shapeManager.addShapeJson({"type": "Arrow",
-                               "strokeColor": "#ffff00",
-                               "strokeWidth": 10,
-                               "x1": 25, "y1": 250,
-                               "x2": 200, "y2": 200});
-
-    shapeManager.addShapeJson({"type": "Ellipse",
-                              "strokeColor": "#00ff00",
-                              "radiusY": 31.5,
-                              "radiusX": 91,
-                              "transform": "matrix(2.39437435854 -0.644012141633 2.14261951162 0.765696311828 -1006.17788921 153.860479773)",
-                              "strokeWidth": 2,
-                              "y": 297.5,
-                              "x": 258});
-
-    shapeManager.addShapeJson({"type": "Ellipse",
-                          "strokeColor": "#ffff00",
-                          "radiusY": 71.5,
-                          "radiusX": 41,
-                          "transform": "matrix(0.839800601976 0.542894970432 -0.542894970432 0.839800601976 111.894472287 -140.195845758)",
-                          "strokeWidth": 2,
-                          "y": 260.5,
-                          "x": 419});
-
-    shapeManager.addShapeJson({"type": "Point",
-                          "strokeWidth": 2,
-                          "y": 30,
-                          "x": 30});
-
-    var s = shapeManager.addShapeJson({"type": "Line",
-                               "strokeColor": "#00ff00",
-                               "strokeWidth": 2,
-                               "x1": 400, "y1": 400,
-                               "x2": 250, "y2": 310});
-    lastShapeId = s.toJson().id;
-
-    // We start off in the 'SELECT' mode
-    shapeManager.setState("SELECT");
+  // We start off in the 'SELECT' mode
+  shapeManager.setState("SELECT");
 });

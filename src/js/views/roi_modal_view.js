@@ -428,7 +428,7 @@ export const RoiModalView = Backbone.View.extend({
 
             this.shapeManager.setText(text);
             this.shapeManager.setTextPosition(this.shapeManager.getTextPosition());
-            this.shapeManager.setTextFontSize(this.shapeManager.getTextFontSize());
+            this.shapeManager.setTextFontSize(this.shapeManager.getFontSize());
          },
 
         changeColor: function(event) {
@@ -541,7 +541,7 @@ export const RoiModalView = Backbone.View.extend({
                 lineW = this.shapeManager.getStrokeWidth(),
                 color = this.shapeManager.getStrokeColor(),
                 fillColor = this.shapeManager.getFillColor(),
-                textColor = this.shapeManager.getTextColor(),
+                // textColor = this.shapeManager.getTextColor(),
                 textBackgroundColor = this.shapeManager.getTextBackgroundColor(),
                 textBackgroundOpacity = this.shapeManager.getTextBackgroundOpacity(),
                 opacity = this.shapeManager.getFillOpacity(),
@@ -551,10 +551,10 @@ export const RoiModalView = Backbone.View.extend({
                 lineWidths = [0.25, 0.5, 0.75, 1, 2, 3, 4, 5, 7, 10, 15, 20, 30],
                 opacities = ["0", "0.1", "0.2", "0.3", "0.4", "0.5", "0.6", "0.7", "0.8", "0.9", "1"],
                 textPosition = this.shapeManager.getTextPosition(),
-                fontSize = this.shapeManager.getTextFontSize(),
+                fontSize = this.shapeManager.getFontSize(),
                 fontSizes = [6, 8, 10, 12, 14, 18, 21, 24, 36, 48],
-                text = sel ? this.shapeManager.getText() : "",
-                showText = sel ? this.shapeManager.getShowText() : false;
+                text = sel ? this.shapeManager.getText() : "";
+                // showText = sel ? this.shapeManager.getShowText() : false;
             color = color ? color.replace("#", "") : 'FFFFFF';
             fillColor = fillColor ? fillColor.replace("#", "") : 'FFFFFF';
             textColor = textColor ? textColor.replace("#", "") : 'FFFFFF';
@@ -580,7 +580,6 @@ export const RoiModalView = Backbone.View.extend({
                         'position_icon_cls': LABEL_POSITION_ICONS[textPosition],
                         'fontSizes': fontSizes,
                         'fontSize': fontSize,
-                        'showState': !showText,
                         'textColor': textColor,
                         'textBackgroundOpacity': textBackgroundOpacity,
                         'textBackgroundColor': textBackgroundColor,
