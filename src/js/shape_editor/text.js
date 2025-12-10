@@ -313,11 +313,11 @@ Text.prototype.intersectRegion = function intersectRegion(region) {
 };
 
 Text.prototype.getPath = function getPath() {
-  var f = this._zoomFraction,
-    x = parseInt(this._x * f, 10),
-    y = parseInt(this._y * f, 10),
-    width = parseInt(this._width * f, 10),
-    height = parseInt(this._height * f, 10);
+  var f = this._zoomFraction;
+  var x = this.bkgdRect.attr("x"),
+      y = this.bkgdRect.attr("y"),
+      width = this.bkgdRect.attr("width"),
+      height = this.bkgdRect.attr("height");
 
   var cornerPoints = [
     [x, y],
