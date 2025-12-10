@@ -78,7 +78,7 @@ var ShapeManager = function ShapeManager(elementId, width, height, options) {
   this.selectRegion = this.paper.rect(0, 0, width, height);
   this.selectRegion
     .hide()
-    .attr({ stroke: "#ddd", "stroke-width": 0, "stroke-dasharray": "- " });
+    .attr({ stroke: "#ddd", "stroke-width": 1, "stroke-dasharray": "- " });
   if (this.canEdit) {
     this.newShapeBg.drag(
       function () {
@@ -884,9 +884,6 @@ ShapeManager.prototype.clearSelectedShapes = function clearSelectedShapes(
 ShapeManager.prototype.selectShapesByRegion = function selectShapesByRegion(
   region
 ) {
-  // Clear selected with silent:true, since we notify again below
-  this.clearSelectedShapes(true);
-
   var toSelect = [];
   this.getShapes().forEach(function (shape) {
     if (shape.intersectRegion(region)) {
