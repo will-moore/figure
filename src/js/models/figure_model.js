@@ -1,6 +1,6 @@
 
     import Backbone from "backbone";
-    import _, { last } from 'underscore';
+    import _ from 'underscore';
     import $ from "jquery";
 
     import {PanelList, Panel} from "./panel_model";
