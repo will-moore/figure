@@ -416,16 +416,11 @@ $(function () {
     hFlip: 1,
     rotation: 0,
     showText: true,
-    // strokeWidth: 5, // not used for Text shape
     text: "textAnchor start",
     textAnchor: "start",
-    // textBackgroundColor: "#FF0000",
-    // textBackgroundOpacity: "1.0",
-    // textColor: "#FFFFFF",
     fillColor: "#00ff00",
     fillOpacity: 1,
     strokeColor: "#ffffff",
-    // textPosition: "bottom",   // default is 'top' in ShapeManager() this._textPosition = "top";
     textRotation: 0,
     type: "Text",
     vFlip: 1,

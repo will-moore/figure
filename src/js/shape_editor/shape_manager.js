@@ -610,11 +610,6 @@ ShapeManager.prototype.createShapeJson = function createShapeJson(jsonShape) {
     fillOpacity = s.fillOpacity == undefined ? this.getFillOpacity() : s.fillOpacity,
     strokeWidth = s.strokeWidth || this.getStrokeWidth(),
     fontSize = s.fontSize || this.getFontSize(),
-    // textPosition = s.textPosition || this.getTextPosition(),
-    // showText = s.showText || this.getShowText(),
-    // textColor = s.textColor || this.getTextColor(),
-    // textBackgroundColor = s.textBackgroundColor || this.getTextBackgroundColor(),
-    // textBackgroundOpacity = s.textBackgroundOpacity == undefined ? this.getTextBackgroundOpacity(): s.textBackgroundOpacity,
     inModalView = s.inModalView || this.getInModalView(),
     textId = s.textId || -1,
     shapeScalingFactor = s.shapeScalingFactor || this.getShapeScalingFactor(),
@@ -691,20 +686,13 @@ ShapeManager.prototype.createShapeJson = function createShapeJson(jsonShape) {
     options.x = s.x || 0,
     options.y = s.y || 0,
     options.fontSize = fontSize,
-    // options.textPosition = textPosition,
     options.text = text,
     options.textAnchor = s.textAnchor,
-    // options.parentShapeCoords = s.parentShapeCoords || {x:0, y:0, width: this._orig_width, height: this._orig_height},
     options.rotation = s.rotation,
     options.textRotation = s.textRotation,
-    // options.textColor = textColor,
-    // options.textBackgroundColor = textBackgroundColor,
-    // options.textBackgroundOpacity = parseFloat(textBackgroundOpacity).toFixed(1),
     options.vFlip = s.vFlip,
     options.hFlip = s.hFlip,
-    // options.linkedShapeId = s.linkedShapeId,
     options.inModalView = inModalView,
-    // options.showText = showText,
     newShape = new Text(options);
   }
   return newShape;
@@ -886,7 +874,6 @@ ShapeManager.prototype.clearSelectedShapes = function clearSelectedShapes(
   silent
 ) {
   for (var i = 0; i < this._shapes.length; i++) {
-    console.log("Clearing selection for shape ", i, this._shapes[i]);
     this._shapes[i].setSelected(false);
   }
   if (!silent) {
@@ -997,58 +984,6 @@ ShapeManager.prototype.selectShapes = function selectShapes(shapes) {
           fontSize = false;
         }
       }
-      console.log("selectShapes() fontSize after", i, fontSize, shape.getFontSize);
-      // // for first shape, pick text position
-      // if (textPosition === undefined) {
-      //   textPosition = shape.getTextPosition();
-      // } else {
-      //   // for subsequent shapes, if text position don't match - set false
-      //   if (textPosition !== shape.getTextPosition()) {
-      //     textPosition = false;
-      //   }
-      // }
-
-      // // for first shape, pick color
-      // if (textColor === undefined) {
-      //   textColor = shape.getTextColor();
-      // } else {
-      //   // for subsequent shapes, if colors don't match - set false
-      //   if (textColor !== shape.getTextColor()) {
-      //       textColor = false;
-      //   }
-      // }
-
-      // // for first shape, pick color
-      // if (textBackgroundColor === undefined) {
-      //   textBackgroundColor = shape.getTextBackgroundColor();
-      // } else {
-      //   // for subsequent shapes, if colors don't match - set false
-      //   if (textBackgroundColor !== shape.getTextBackgroundColor()) {
-      //       textBackgroundColor = false;
-      //   }
-      // }
-
-      // // for first shape, pick color
-      // if (textBackgroundOpacity === undefined) {
-      //   textBackgroundOpacity = shape.getTextBackgroundOpacity();
-      // } else {
-      //   // for subsequent shapes, if colors don't match - set false
-      //   if (textBackgroundOpacity !== shape.getTextBackgroundOpacity()) {
-      //       textBackgroundOpacity = false;
-      //   }
-      // }
-
-      // // for first shape, pick color
-      // if (showText === undefined) {
-      //   showText = shape.getShowText();
-      // } else {
-      //   // for subsequent shapes, if colors don't match - set false
-      //   if (showText !== shape.getShowText()) {
-      //       showText = false;
-      //   }
-      // }
-
-      // shape.setSelected(true);
     }
   });
   if (strokeColor) {
@@ -1066,24 +1001,9 @@ ShapeManager.prototype.selectShapes = function selectShapes(shapes) {
   if (text) {
     this._text = text;
   }
-  // if (textColor) {
-  //   this._textColor = textColor;
-  // }
-  // if (showText != undefined) {
-  //   this._showText = showText;
-  // }
-  // if (textBackgroundColor) {
-  //   this._textBackgroundColor = textBackgroundColor;
-  // }
-  // if (textBackgroundOpacity) {
-  //   this._textBackgroundOpacity = textBackgroundOpacity;
-  // }
   if (text != undefined) {
     this._text = text;
   }
-  // if (textPosition) {
-  //   this._textPosition = textPosition;
-  // }
   if (fontSize) {
     this._textFontSize = fontSize;
   }

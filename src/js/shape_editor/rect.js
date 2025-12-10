@@ -280,58 +280,6 @@ Rect.prototype.getFillOpacity = function getFillOpacity() {
   return this._fillOpacity;
 };
 
-// Rect.prototype.setText = function setText(text) {
-//   if(this._textShape){
-//     this._textShape.setText(text)
-//   }
-// };
-
-// Rect.prototype.getText = function getText() {
-//   if(this._textShape){
-//     return this._textShape.getText()
-//   }
-//   return "";
-// };
-
-// Rect.prototype.setShowText = function setShowText(showText) {
-//   if(this._textShape){
-//     this._textShape.setShowText(showText)
-//   }
-// };
-
-// Rect.prototype.getShowText = function getShowText() {
-//    if(this._textShape){
-//     return this._textShape.getShowText()
-//   }
-//   return "";
-// };
-
-// Rect.prototype.setTextPosition = function setTextPosition(textPosition) {
-//   if(this._textShape){
-//     this._textShape.setTextPosition(textPosition)
-//   }
-// };
-
-// Rect.prototype.getTextPosition = function getTextPosition() {
-//   if(this._textShape){
-//     return this._textShape.getTextPosition()
-//   }
-//   return "";
-// };
-
-// Rect.prototype.setFontSize = function setFontSize(fontSize) {
-//   if(this._textShape){
-//     this._textShape.setFontSize(fontSize)
-//   }
-// };
-
-// Rect.prototype.getFontSize = function getFontSize() {
-//   if(this._textShape){
-//     return this._textShape.getFontSize()
-//   }
-//   return;
-// };
-
 Rect.prototype.setStrokeWidth = function setStrokeWidth(strokeWidth) {
   this._strokeWidth = strokeWidth;
   this.drawShape();
@@ -355,50 +303,11 @@ Rect.prototype.setInModalView = function setInModalView(inModalView) {
   }
 };
 
-Rect.prototype.setTextRotation = function setTextRotation(textRotation) {
-  if(this._textShape){
-    this._textShape.setTextRotation(textRotation)
-  }
-};
-
-Rect.prototype.setTextBackgroundOpacity = function setTextBackgroundOpacity(textBackgroundOpacity) {
-  if(this._textShape){
-    this._textShape.setTextBackgroundOpacity(textBackgroundOpacity)
-  }
-};
-
-Rect.prototype.getTextBackgroundOpacity = function getTextBackgroundOpacity() {
-  if(this._textShape){
-    return this._textShape.getTextBackgroundOpacity()
-  }
-  return;
-};
-
-Rect.prototype.setTextBackgroundColor = function setTextBackgroundColor(textBackgroundColor) {
-  if(this._textShape){
-    this._textShape.setTextBackgroundColor(textBackgroundColor)
-  }
-};
-
-Rect.prototype.getTextBackgroundColor = function getTextBackgroundColor() {
-  if(this._textShape){
-    return this._textShape.getTextBackgroundColor()
-  }
-  return;
-};
-
-Rect.prototype.setTextColor = function setTextColor(textColor) {
-  if(this._textShape){
-    this._textShape.setTextColor(textColor)
-  }
-};
-
-Rect.prototype.getTextColor = function getTextColor() {
-  if(this._textShape){
-    return this._textShape.getTextColor()
-  }
-  return;
-};
+// Rect.prototype.setTextRotation = function setTextRotation(textRotation) {
+//   if(this._textShape){
+//     this._textShape.setTextRotation(textRotation)
+//   }
+// };
 
 Rect.prototype.setVerticalFlip = function setVerticalFlip(vFlip) {
   if(this._textShape){
@@ -424,53 +333,6 @@ Rect.prototype.destroy = function destroy() {
 Rect.prototype.destroyTextShape = function destroyTextShape() {
   this._textId = -1
   this._textShape = undefined;
-}
-
-Rect.prototype.createShapeText = function createShapeText(){
-  if(!this._textShape){
-    var textPosition = this.manager.getTextPosition(),
-          fontSize = this.manager.getTextFontSize(),
-          inModalView = this.manager.getInModalView(),
-          vFlip = this.manager.getVerticalFlip(),
-          hFlip = this.manager.getHorizontalFlip(),
-          textColor = this.manager.getTextColor(),
-          shapeScalingFactor = this.manager.getShapeScalingFactor(),
-          textBackgroundOpacity = this.manager.getTextBackgroundOpacity(),
-          textBackgroundColor = this.manager.getTextBackgroundColor(),
-          textRotation = this.manager.getTextRotation();
-
-      if(textPosition == "freehand"){
-        textPosition = "top"
-        this.manager.setTextPosition(textPosition)
-      }
-
-      var textShape = new Text({
-          manager: this.manager,
-          paper: this.paper,
-          inModalView: inModalView,
-          vFlip: vFlip,
-          hFlip: hFlip,
-          textRotation: textRotation,
-          linkedShapeId: this._id,
-          zoom: this._zoomFraction * 100,
-          text: "text",
-          showText: true,
-          x: this._x,
-          y: this._y,
-          shapeScalingFactor: shapeScalingFactor,
-          textBackgroundOpacity: textBackgroundOpacity,
-          textBackgroundColor: textBackgroundColor,
-          textColor: textColor,
-          fontSize: fontSize,
-          textPosition: textPosition,
-          strokeWidth: this._strokeWidth,
-          parentShapeCoords: {x:this._x, y:this._y, width:this._width, height:this._height}
-      })
-
-      this.manager.addShape(textShape);
-      this._textId = textShape._id;
-      this._textShape = textShape;
-  }
 }
 
 Rect.prototype.drawShape = function drawShape() {

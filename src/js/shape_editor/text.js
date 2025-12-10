@@ -49,11 +49,7 @@ var Text = function Text(options) {
   }else{
       this._fillOpacity = 0;
   }
-  // this._textPosition = options.textPosition;
-  // this._linkedShapeId = options.linkedShapeId || -1;
   this._inModalView = options.inModalView || false;
-  // this._textBackgroundOpacity = options.textBackgroundOpacity || 0.01;
-  // this._textBackgroundColor = options.textBackgroundColor || "#fff";
 
   this._id = options.id || this.manager.getRandomId();
   if(this._id == -1){
@@ -143,10 +139,6 @@ Text.prototype.toJson = function toJson() {
   }
   return rv;
 };
-
-Text.prototype.intersectRegion = function intersectRegion(region) {
-  return;
-}
 
 Text.prototype.offsetShape = function offsetShape(dx, dy) {
   this._x = this._x + dx;
@@ -267,15 +259,6 @@ Text.prototype.setInModalView = function setInModalView(inModalView) {
   this._inModalView = inModalView
   this.drawShape();
 };
-
-// Text.prototype.setParentShapeCoords = function setParentShapeCoords(coords){
-//   this._parentShapeCoords = coords;
-//   this.drawShape();
-// };
-
-Text.prototype.createShapeText = function createShapeText(){
-  return;
-}
 
 Text.prototype.destroy = function destroy() {
   this.element.remove();
