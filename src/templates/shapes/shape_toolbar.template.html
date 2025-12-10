@@ -184,59 +184,6 @@
             </ul>
         </div>
     </div>
-
-
-    <div class="btn-group me-2 col-sm-2" role="group"  aria-label="...">
-        <div class="btn-group">
-            <button type="button" class="text-background-color btn btn-outline-secondary dropdown-toggle" title="Text background color"
-                data-bs-toggle="dropdown">
-                <span data-text-background-color="<%= textBackgroundColor %>" style="background-color:#<%= textBackgroundColor %>">&nbsp &nbsp &nbsp</span>
-                <span class="caret"></span>
-            </button>
-            <ul class="dropdown-menu dropdownSelect colorpicker" role="menu">
-                <li><a class="dropdown-item" href="#">
-                    <span data-text-background-color="000000" style="background-color:#000">&nbsp &nbsp &nbsp</span>&nbsp Black
-                </a></li>
-                <li><a class="dropdown-item" href="#">
-                    <span data-text-background-color="0000FF" style="background-color:#00f">&nbsp &nbsp &nbsp</span>&nbsp Blue
-                </a></li>
-                <li><a class="dropdown-item" href="#">
-                    <span data-text-background-color="00FF00" style="background-color:#0f0">&nbsp &nbsp &nbsp</span>&nbsp Green
-                </a></li>
-                <li><a class="dropdown-item" href="#">
-                    <span data-text-background-color="FF0000" style="background-color:#f00">&nbsp &nbsp &nbsp</span>&nbsp Red
-                </a></li>
-                <li><a class="dropdown-item" href="#">
-                    <span data-text-background-color="FFFF00" style="background-color:#ff0">&nbsp &nbsp &nbsp</span>&nbsp Yellow
-                </a></li>
-                <li><a class="dropdown-item" href="#">
-                    <span data-text-background-color="FFFFFF" style="background-color:#fff">&nbsp &nbsp &nbsp</span>&nbsp White
-                </a></li>
-                <li><a class="dropdown-item" href="#">
-                    <span data-text-background-color="FF00FF" style="background-color:#f0f">&nbsp &nbsp &nbsp</span>&nbsp Magenta
-                </a></li>
-                <li><a class="dropdown-item" href="#">
-                    <span data-text-background-color="00FFFF" style="background-color:#0ff">&nbsp &nbsp &nbsp</span>&nbsp Cyan
-                </a></li>
-                <li class="dropdown-divider"></li>
-                <li><a class="dropdown-item" data-text-background-color="colorpicker" data-oldcolor="<%= textBackgroundColor %>" href="#">
-                    <span class="colorpickerOption">&nbsp &nbsp &nbsp</span>&nbsp More Colors...
-                </a></li>
-            </ul>
-        </div>
-        <div class="btn-group">
-            <button type="button" class="text-background-opacity btn btn-outline-secondary dropdown-toggle" title="Text background opacity: <%= textBackgroundOpacity %>"
-                data-bs-toggle="dropdown">
-                <span data-text-background-opacity="<%= textBackgroundOpacity %>"><%= textBackgroundOpacity %></span>
-                <span class="caret"></span>
-            </button>
-            <ul class="dropdown-menu dropdownSelect opacity" style="min-width: 0" role="menu">
-                <% _.each(opacities,function(p){ %>
-                    <li><a class="dropdown-item" href='#'><span data-text-background-opacity='<%= p %>'><%= p %></span></a></li>
-                <% }); %>
-            </ul>
-        </div>
-    </div>
 </li>
 
 <div style="flex: auto 1 1"></div>
