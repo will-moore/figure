@@ -164,15 +164,18 @@
     </ul>
 </div>
 
- <li style="list-style-type: none;">
+<!-- Text controls -->
+<li style="list-style-type: none;">
     <div class="btn-group me-2" role="group" aria-label="...">
         <div class="input-group input-group-sm float-start">
             <input id="label-text" type="text" class="label-text form-control"
+               <% if (!textControlsEnabled) print('disabled') %>
                     placeholder="Label" value="<% print(_.escape(text)) %>" />
         </div>
 
         <div class="btn-group">
             <button type="button" class="text-font-size btn btn-outline-secondary dropdown-toggle" title="Font Size: <%= fontSize %>"
+                <% if (!textControlsEnabled) print('disabled') %>
                 data-bs-toggle="dropdown">
                 <span data-font-size="<%= fontSize %>"><%= fontSize %></span>
                 <span class="caret"></span>

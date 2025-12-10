@@ -372,11 +372,12 @@ export const RoiModalView = Backbone.View.extend({
         changeFontSize: function(event) {
             var fontSize = $("span:first", event.target).attr('data-font-size');
             fontSize = parseFloat(fontSize, 10);
-            this.shapeManager.setTextFontSize(fontSize);
+            this.shapeManager.setFontSize(fontSize);
         },
 
         labelInputKeyup: function(event){
             // This will update text on any currently selected Text shapes
+            // and/or set the default text for new Text shapes
             var text = event.target.value;
             this.shapeManager.setText(text);
         },
@@ -470,7 +471,9 @@ export const RoiModalView = Backbone.View.extend({
 
         renderToolbar: function() {
             // render toolbar
-            var sel = this.shapeManager.getSelectedShapes().length > 0,
+            let shapes = this.shapeManager.getSelectedShapesJson();
+            let textShapes = shapes.filter(s => s.type === "Text");
+            var sel = shapes.length > 0,
                 state = this.shapeManager.getState(),
                 lineW = this.shapeManager.getStrokeWidth(),
                 color = this.shapeManager.getStrokeColor(),
@@ -483,7 +486,9 @@ export const RoiModalView = Backbone.View.extend({
                 opacities = ["0", "0.1", "0.2", "0.3", "0.4", "0.5", "0.6", "0.7", "0.8", "0.9", "1"],
                 fontSize = this.shapeManager.getFontSize(),
                 fontSizes = [6, 8, 10, 12, 14, 18, 21, 24, 36, 48],
-                text = sel ? this.shapeManager.getText() : "";
+                text = textShapes.length > 0 ? this.shapeManager.getText() : "";
+            // various different text values
+            if (text === false || text === undefined) text = "";
             color = color ? color.replace("#", "") : 'FFFFFF';
             fillColor = fillColor ? fillColor.replace("#", "") : 'FFFFFF';
             toPaste = (toPaste && (toPaste.SHAPES || toPaste.CROP));
@@ -504,6 +509,7 @@ export const RoiModalView = Backbone.View.extend({
                         'roisLoaded': this.roisLoaded,
                         'fontSizes': fontSizes,
                         'fontSize': fontSize,
+                        'textControlsEnabled': textShapes.length > 0 || state === "TEXT",
                         'text': text};
 
             $(".roi_toolbar", this.$el).html(this.template(json));
