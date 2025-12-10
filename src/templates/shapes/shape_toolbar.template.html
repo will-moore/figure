@@ -134,59 +134,92 @@
     </div>
 </div>
 
-<div class="btn-group me-2">
-    <button type="button" class="line-width btn btn-outline-secondary dropdown-toggle" title="Delete, Copy, Paste etc"
-        data-bs-toggle="dropdown">
-        <span>Edit</span>
-        <span class="caret"></span>
-    </button>
-    <ul class="dropdown-menu" role="menu">
-        <li <% if (!sel) print('class="disabled"') %> >
-            <a class="dropdown-item copyShape" href="#">
-                Copy Shape   &nbsp&nbsp&nbsp <%= cmdKey %>C
-            </a>
-        </li>
-        <li <% if (!toPaste) print('class="disabled"') %> >
-            <a class="dropdown-item pasteShape" href="#">
-                Paste Shape   &nbsp&nbsp&nbsp <%= cmdKey %>V
-            </a>
-        </li>
-        <li <% if (!sel) print('class="disabled"') %> >
-            <a class="dropdown-item deleteShape" href="#">
-                Delete Shape    &nbsp&nbsp&nbsp Del
-            </a>
-        </li>
-        <li>
-            <a class="dropdown-item selectAll" href="#">
-                Select All Shapes    &nbsp&nbsp <%= cmdKey %>A
-            </a>
-        </li>
-    </ul>
-</div>
-
 <!-- Text controls -->
-<li style="list-style-type: none;">
-    <div class="btn-group me-2" role="group" aria-label="...">
-        <div class="input-group input-group-sm float-start">
-            <input id="label-text" type="text" class="label-text form-control"
-               <% if (!textControlsEnabled) print('disabled') %>
-                    placeholder="Label" value="<% print(_.escape(text)) %>" />
-        </div>
-
-        <div class="btn-group">
-            <button type="button" class="text-font-size btn btn-outline-secondary dropdown-toggle" title="Font Size: <%= fontSize %>"
-                <% if (!textControlsEnabled) print('disabled') %>
-                data-bs-toggle="dropdown">
-                <span data-font-size="<%= fontSize %>"><%= fontSize %></span>
-                <span class="caret"></span>
-            </button>
-            <ul class="dropdown-menu dropdownSelect" role="menu">
-            <% _.each([6,8,10,12,14,18,21,24,36,48],function(p){ %>
-                <li><a class='dropdown-item' href='#'><span data-font-size='<%= p %>'><%= p %></span></a></li>
-            <% }); %>
-            </ul>
-        </div>
+<div class="btn-group me-2" role="group" aria-label="...">
+    <div class="input-group input-group-sm float-start">
+        <input id="label-text" type="text" class="label-text form-control"
+            <% if (!textControlsEnabled) print('disabled') %>
+                placeholder="Label" value="<% print(_.escape(text)) %>" />
     </div>
-</li>
+
+    <div class="btn-group">
+        <button type="button" class="text-font-size btn btn-outline-secondary dropdown-toggle"
+            title="Font Size: <%= fontSize %> <% if (!textControlsEnabled) print('(No Text Shapes selected)') %>"
+            data-bs-toggle="dropdown">
+            <span data-font-size="<%= fontSize %>"><%= fontSize %></span>
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu dropdownSelect" role="menu">
+        <% _.each([6,8,10,12,14,18,21,24,36,48],function(p){ %>
+            <li><a class='dropdown-item' href='#'><span data-font-size='<%= p %>'><%= p %></span></a></li>
+        <% }); %>
+        </ul>
+    </div>
+
+</div>
+<div class="btn-group me-2" role="group">
+    <div class="btn-group">
+        <button
+            type="button"
+            class="btn btn-outline-secondary dropdown-toggle text-anchor"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+            title="Shape alignment and text anchors"
+            >
+            <span data-textanchor="<%= textAnchor %>">
+                <i class="<%= textAnchorIcon %>"></i>
+            </span>
+        </button>
+        <ul class="dropdown-menu dropdownSelect">
+            <li>
+                <a href="#" class="dropdown-item">
+                <span data-text-anchor="start"><i class="bi-text-left"></i></span>
+                Text Anchor Start</a
+                >
+            </li>
+            <li>
+                <a href="#" class="dropdown-item">
+                <span data-text-anchor="middle"><i class="bi-text-center"></i></span>
+                Text Anchor Middle</a
+                >
+            </li>
+            <li>
+                <a href="#" class="dropdown-item">
+                <span data-text-anchor="end"><i class="bi-text-right"></i></span>
+                Text Anchor End</a
+                >
+            </li>
+        </ul>
+    </div>
+    <div class="btn-group">
+        <button type="button" class="line-width btn btn-outline-secondary dropdown-toggle" title="Delete, Copy, Paste etc"
+            data-bs-toggle="dropdown">
+            <span>Edit</span>
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" role="menu">
+            <li <% if (!sel) print('class="disabled"') %> >
+                <a class="dropdown-item copyShape" href="#">
+                    Copy Shape   &nbsp&nbsp&nbsp <%= cmdKey %>C
+                </a>
+            </li>
+            <li <% if (!toPaste) print('class="disabled"') %> >
+                <a class="dropdown-item pasteShape" href="#">
+                    Paste Shape   &nbsp&nbsp&nbsp <%= cmdKey %>V
+                </a>
+            </li>
+            <li <% if (!sel) print('class="disabled"') %> >
+                <a class="dropdown-item deleteShape" href="#">
+                    Delete Shape    &nbsp&nbsp&nbsp Del
+                </a>
+            </li>
+            <li>
+                <a class="dropdown-item selectAll" href="#">
+                    Select All Shapes    &nbsp&nbsp <%= cmdKey %>A
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
 
 <div style="flex: auto 1 1"></div>

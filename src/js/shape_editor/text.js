@@ -587,6 +587,7 @@ CreateText.prototype.startDrag = function startDrag(startX, startY) {
       vFlip = this.manager.getVerticalFlip(),
       hFlip = this.manager.getHorizontalFlip(),
       text = this.manager.getText(),
+      textAnchor = this.manager.getTextAnchor(),
       textRotation = this.manager.getTextRotation();
 
   this.startX = startX;
@@ -598,6 +599,7 @@ CreateText.prototype.startDrag = function startDrag(startX, startY) {
     zoom: zoom,
     shapeScalingFactor: shapeScalingFactor,
     text: text || "Text",
+    textAnchor: textAnchor,
     showText: true,
     inModalView: inModalView,
     textRotation: textRotation,

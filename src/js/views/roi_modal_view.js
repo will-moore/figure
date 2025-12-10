@@ -15,17 +15,10 @@ import roi_zt_buttons from '../../templates/modal_dialogs/roi_zt_buttons.templat
 import RoiLoaderView from './roi_loader_view';
 import { hideModal, getJson } from "./util";
 
-const LABEL_POSITION_ICONS = {
-    "topleft": "bi-box-arrow-in-up-left",
-    "topright": "bi-box-arrow-in-up-right",
-    "bottomleft": "bi-box-arrow-in-down-left",
-    "bottomright": "bi-box-arrow-in-down-right",
-    "left": "bi-box-arrow-left",
-    "top": "bi-box-arrow-up",
-    "right": "bi-box-arrow-right",
-    "bottom": "bi-box-arrow-down",
-    "center": "bi-arrows-fullscreen",
-    "freehand": "bi-arrows-move"
+const TEXT_ANCHOR_ICONS = {
+    "start": "bi-text-left",
+    "middle": "bi-text-center",
+    "end": "bi-text-right"
 }
 
 export const RoiModalView = Backbone.View.extend({
@@ -150,6 +143,7 @@ export const RoiModalView = Backbone.View.extend({
             "click .dropdownSelect a": "select_dropdown_option",
             "change .line-width": "changeLineWidth",
             "change .text-font-size": "changeFontSize",
+            "change .text-anchor": "changeTextAnchor",
             "keyup .label-text": "labelInputKeyup",
             "change .shape-color": "changeColor",
             "change .fill-color": "changeFillColor",
@@ -375,6 +369,11 @@ export const RoiModalView = Backbone.View.extend({
             this.shapeManager.setFontSize(fontSize);
         },
 
+        changeTextAnchor: function(event) {
+            var textAnchor = $("span:first", event.target).attr('data-text-anchor');
+            this.shapeManager.setTextAnchor(textAnchor);
+        },
+
         labelInputKeyup: function(event){
             // This will update text on any currently selected Text shapes
             // and/or set the default text for new Text shapes
@@ -401,10 +400,9 @@ export const RoiModalView = Backbone.View.extend({
         // Handles all the various drop-down menus in the toolbar
         select_dropdown_option: function(event) {
             event.preventDefault();
-            var $a = $(event.target),
-                $span = $a.children('span');
-            // Take the <span> from the <a> and place it in the <button>
-            if ($span.length === 0) $span = $a;  // in case we clicked on <span>
+            var $target = $(event.target);
+            // $target could be <a> or <span> or <i>
+            var $span = $("span", $target.closest('li'));
             var $li = $span.parent().parent();
             // Don't use $li.parent().prev() since bootstrap inserts a div.dropdown-backdrop on Windows
             var $button = $("button.dropdown-toggle", $li.parent().parent());
@@ -485,6 +483,7 @@ export const RoiModalView = Backbone.View.extend({
                 lineWidths = [0.25, 0.5, 0.75, 1, 2, 3, 4, 5, 7, 10, 15, 20, 30],
                 opacities = ["0", "0.1", "0.2", "0.3", "0.4", "0.5", "0.6", "0.7", "0.8", "0.9", "1"],
                 fontSize = this.shapeManager.getFontSize(),
+                textAnchor = this.shapeManager.getTextAnchor(),
                 fontSizes = [6, 8, 10, 12, 14, 18, 21, 24, 36, 48],
                 text = textShapes.length > 0 ? this.shapeManager.getText() : "";
             // various different text values
@@ -493,12 +492,15 @@ export const RoiModalView = Backbone.View.extend({
             fillColor = fillColor ? fillColor.replace("#", "") : 'FFFFFF';
             toPaste = (toPaste && (toPaste.SHAPES || toPaste.CROP));
             opacity = opacity <= 0.01 ? parseInt(opacity) : opacity;
+            textAnchor = textAnchor in TEXT_ANCHOR_ICONS ? textAnchor : "start";
 
             var json = {'state': state,
                         'lineWidths': lineWidths,
                         'lineWidth': lineW,
                         'color': color,
                         'fillColor': fillColor,
+                        'textAnchor': textAnchor,
+                        'textAnchorIcon': TEXT_ANCHOR_ICONS[textAnchor],
                         'opacities': opacities,
                         'opacity': opacity,
                         'sel': sel,
