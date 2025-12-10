@@ -544,7 +544,9 @@ var CreateText = function CreateText(options) {
 }
 
 CreateText.prototype.startDrag = function startDrag(startX, startY) {
-  var textColor = this.manager.getTextColor(),
+  var strokeColor = this.manager.getStrokeColor(),
+      fillColor = this.manager.getFillColor(),
+      fillOpacity = this.manager.getFillOpacity(),
       strokeWidth = this.manager.getStrokeWidth(),
       fontSize = this.manager.getFontSize(),
       zoom = this.manager.getZoom(),
@@ -574,6 +576,10 @@ CreateText.prototype.startDrag = function startDrag(startX, startY) {
     x: startX,
     y: startY,
     fontSize: fontSize,
+    strokeColor: strokeColor,
+    strokeWidth: strokeWidth,
+    fillColor: fillColor,
+    fillOpacity: fillOpacity,
   })
 
 };
