@@ -212,6 +212,15 @@ Text.prototype.getText = function getText() {
   return this._text;
 };
 
+Text.prototype.setTextAnchor = function setTextAnchor(textAnchor) {
+  this._textAnchor = textAnchor;
+  this.drawShape();
+};
+
+Text.prototype.getTextAnchor = function getTextAnchor() {
+  return this._textAnchor;
+};
+
 Text.prototype.setFillColor = function setFillColor(fillColor) {
   this._fillColor = fillColor;
   this.drawShape();
@@ -393,13 +402,18 @@ Text.prototype.drawShape = function drawShape() {
 
   // update Handles
   var handleIds = this.getHandleCoords();
+  var handleColours = this.getHandleColours();
   var hnd, h_id, hx, hy;
   for (var i = 0, l = this.handles.length; i < l; i++) {
     hnd = this.handles[i];
     h_id = hnd.h_id;
     hx = handleIds[h_id][0];
     hy = handleIds[h_id][1];
-    hnd.attr({ x: hx - this.handle_wh / 2, y: hy - this.handle_wh / 2 });
+    hnd.attr({
+      x: hx - this.handle_wh / 2,
+      y: hy - this.handle_wh / 2,
+      fill: handleColours[h_id]
+    });
   }
 };
 
@@ -438,6 +452,24 @@ Text.prototype.getHandleCoords = function getHandleCoords() {
     sw: [x, y + h],
     s: [x + w / 2, y + h],
     se: [x + w, y + h],
+  };
+  return handleIds;
+};
+
+Text.prototype.getHandleColours = function getHandleColours() {
+  // Use colours to indicate text anchor - start, middle, end
+  let txtA = this._textAnchor;
+  let mark ="#000000"; // black
+  let unmark ="#FFFFFF";
+  var handleIds = {
+    nw: txtA === "start" ? mark : unmark,
+    n: txtA === "middle" ? mark : unmark,
+    ne: txtA === "end" ? mark : unmark,
+    w: txtA === "start" ? mark : unmark,
+    e: txtA === "end" ? mark : unmark,
+    sw: txtA === "start" ? mark : unmark,
+    s: txtA === "middle" ? mark : unmark,
+    se: txtA === "end" ? mark : unmark,
   };
   return handleIds;
 };

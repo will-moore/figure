@@ -229,6 +229,13 @@ $(function () {
     var text = shapeManager.getText() || "";
     $("input[name='shapeText']").val(text);
 
+    var textAnchor = shapeManager.getTextAnchor();
+    if (textAnchor) {
+      $("select[name='textAnchor']").val(textAnchor);
+    } else {
+      $("select[name='textAnchor']").val("start");
+    }
+
     var fontSize = shapeManager.getFontSize() || 12;
     $("select[name='fontSize']").val(fontSize);
     console.log({text: text, fontSize: fontSize, strokeColor, fillColor});
@@ -284,6 +291,10 @@ $(function () {
     shapeManager.setText(text);
   });
 
+  $("select[name='textAnchor']").change(function () {
+    let textAnchor = $(this).val();
+    shapeManager.setTextAnchor(textAnchor);
+  });
 
   $("input[name='rotateImage']").on("input change", function () {
     let angle = $(this).val();

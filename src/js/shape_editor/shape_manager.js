@@ -43,6 +43,7 @@ var ShapeManager = function ShapeManager(elementId, width, height, options) {
   this._strokeColor = "#ff0000";
   this._strokeWidth = 2;
   this._text = "Text";
+  this._textAnchor = "start";  // one of "start", "middle", "end"
   this._textFontSize = 12;
   this._inModalView = false;
   this._vFlip = false;
@@ -333,6 +334,20 @@ ShapeManager.prototype.setText = function setText(text) {
   for (var s = 0; s < selected.length; s++) {
     if (selected[s].setText) {
       selected[s].setText(text);
+    }
+  }
+};
+
+ShapeManager.prototype.getTextAnchor = function getTextAnchor() {
+  return this._textAnchor;
+};
+
+ShapeManager.prototype.setTextAnchor = function setTextAnchor(textAnchor) {
+  this._textAnchor = textAnchor;
+  var selected = this.getSelectedShapes();
+  for (var s = 0; s < selected.length; s++) {
+    if (selected[s].setTextAnchor) {
+      selected[s].setTextAnchor(textAnchor);
     }
   }
 };
@@ -900,6 +915,7 @@ ShapeManager.prototype.selectAllShapes = function selectAllShapes(region) {
 // select shapes: 'shape' can be shape object or ID
 ShapeManager.prototype.selectShapes = function selectShapes(shapes) {
   var strokeColor, strokeWidth, fillColor, fillOpacity,
+      textAnchor,
       text, fontSize;
 
   // Clear selected with silent:true, since we notify again below
@@ -971,6 +987,16 @@ ShapeManager.prototype.selectShapes = function selectShapes(shapes) {
         }
       }
 
+      // for first shape, pick textAnchor
+      if (textAnchor === undefined) {
+        textAnchor = shape.getTextAnchor ? shape.getTextAnchor() : undefined;
+      } else {
+        // for subsequent shapes, if text don't match - set false
+        if (shape.getTextAnchor && textAnchor !== shape.getTextAnchor()) {
+          textAnchor = false;
+        }
+      }
+
       // for first shape, pick text font size
       console.log("selectShapes() fontSize before", i, shape.Type, fontSize, "undefined?", shape.getFontSize == undefined);
       if (fontSize === undefined) {
@@ -995,11 +1021,11 @@ ShapeManager.prototype.selectShapes = function selectShapes(shapes) {
   if (fillOpacity) {
     this._fillOpacity = fillOpacity;
   }
-  if (text) {
-    this._text = text;
-  }
   if (text != undefined) {
     this._text = text;
+  }
+  if (textAnchor != undefined) {
+    this._textAnchor = textAnchor;
   }
   if (fontSize) {
     this._textFontSize = fontSize;
