@@ -306,7 +306,9 @@ ShapeManager.prototype.setInModalView = function setInModalView(inModalView) {
   this._inModalView = inModalView;
   var selected = this.getSelectedShapes();
   for (var s=0; s<selected.length; s++) {
+    if (selected[s].setInModalView) {
       selected[s].setInModalView(inModalView);
+    }
   }
 };
 

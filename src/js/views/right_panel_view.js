@@ -155,10 +155,12 @@
                 var svg_css = panel.get_vp_full_plane_css(panel.get('zoom'), frame_w, frame_h);
                 var scale = svg_css.width / panel.get('orig_width');
 
+                var fontSize = 12;
+                var margin = fontSize * 2;
                 var x = vp.x + ((vp.width - rectSize) / 2);
                 var y = vp.y + ((vp.height - rectSize) / 2);
-                var txtX = x + (strokeWidth/2 + 6) / scale,
-                    txtY = y + (strokeWidth/2 + 10)  / scale;
+                var txtX = x + (strokeWidth/2 + margin) / scale,
+                    txtY = y + (strokeWidth/2 + margin)  / scale;
 
                 let rect = {
                     type: "Rectangle",
@@ -175,19 +177,16 @@
                 let text = {
                     type: "Text",
                     strokeWidth: strokeWidth,
-                    textColor: "#" + color,
+                    strokeColor: "#" + color,
                     x: txtX,
                     y: txtY,
                     id: textRandomId,
-                    linkedShapeId: rectRandomId,
-                    rotation: vp.rotation || 0,
-                    textRotation: -vp.rotation || 0,
+                    // linkedShapeId: rectRandomId,
+                    // rotation: vp.rotation || 0,
+                    // textRotation: -vp.rotation || 0,
                     fontSize: 12,
-                    textPosition: "topleft",
                     text: String.fromCharCode(lastInsetTextIndex),
-                    textAnchor: "start",
-                    showText: true,
-                    parentShapeCoords: {x: x, y: y, width: rectSize, height: rectSize},
+                    textAnchor: "middle",
                 }
                 panel.add_shapes([rect, text]);
                 panel.setLastInsetTextIndex(lastInsetTextIndex)
