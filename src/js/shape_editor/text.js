@@ -27,7 +27,6 @@
 import Raphael from "raphael";
 
 var Text = function Text(options) {
-  console.log("TEXT options", options);
   var self = this;
   this.manager = options.manager;
   this.paper = options.paper;
@@ -71,8 +70,6 @@ var Text = function Text(options) {
 
   this.element = this.paper.text();
   this.element.attr({"fill-opacity": 0.01, fill: "#fff"});
-
-  // console.log("Text, this._textPosition", this._textPosition)
 
   if (this.manager.canEdit) {
     // Drag handling of element

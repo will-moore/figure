@@ -619,7 +619,6 @@ ShapeManager.prototype.addShapeJson = function addShapeJson(
 
 // Create a Shape object from json
 ShapeManager.prototype.createShapeJson = function createShapeJson(jsonShape) {
-  console.log("createShapeJson()", jsonShape)
   var s = jsonShape, text,
     newShape,
     strokeColor = s.strokeColor || this.getStrokeColor(),
@@ -928,7 +927,6 @@ ShapeManager.prototype.selectShapes = function selectShapes(shapes) {
     if (typeof shape === "number") {
       shape = this.getShape(shape);
     }
-    console.log("ShapeManager.selectShapes() shape", shape);
     if (shape) {
       shape.setSelected(true);
     }
@@ -1000,7 +998,6 @@ ShapeManager.prototype.selectShapes = function selectShapes(shapes) {
       }
 
       // for first shape, pick text font size
-      console.log("selectShapes() fontSize before", i, shape.Type, fontSize, "undefined?", shape.getFontSize == undefined);
       if (fontSize === undefined) {
         fontSize = shape.getFontSize ? shape.getFontSize() : undefined;
       } else {
