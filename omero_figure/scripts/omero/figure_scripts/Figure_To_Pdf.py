@@ -384,175 +384,54 @@ class ShapeToPdfExport(ShapeExport):
             self.canvas, center[0] - w / 2, center[1] - h / 2 + size / 4)
 
     def draw_text(self, shape):
-        raw_text = shape.get('text', '')
-        if not shape.get('showText', True) or raw_text == '':
+        text = shape.get('text', '')
+        if not shape.get('showText', True) or text == '':
             return
 
+        font_size = shape.get('fontSize', 12)
+        stroke_color = shape.get('strokeColor', '#FFFFFF')
+        fill_color = shape.get('fillColor', '#000000')
+        fill_opacity = float(shape.get('fillOpacity', 0))
+        anchor = shape.get('textAnchor', "start")
         text_coords = self.panel_to_page_coords(shape['x'], shape['y'])
-        text = ""
 
-        if markdown_imported:
-            # convert markdown to html
-            text = markdown.markdown(raw_text)
+        # if markdown_imported:
+        #     # markdown not supported in JS for text shapes (yet)
+        #     text = markdown.markdown(text)
 
-        size = shape.get('fontSize', 12)
-        stroke_width = shape.get('strokeWidth', 2)
-        r, g, b, a = self.get_rgba(shape['textColor'])
-        # bump up alpha a bit to make text more readable
-        rgba = (r, g, b, 0.5 + a / 2.0)
+        r, g, b, a = self.get_rgba(stroke_color)
+        rgba_text = (r, g, b, a)
+        r, g, b, _ = self.get_rgba(fill_color)
+        rgba_fill = (r, g, b, fill_opacity)
 
-        x0 = text_coords["x"]
-        y0 = self.page_height - text_coords["y"]
-        anchor = shape['textAnchor']
-        alignment = TA_LEFT
-
-        # handle flipping
-        h_flip = self.panel.get('horizontal_flip', False)
-        v_flip = self.panel.get('vertical_flip', False)
-        anchor_dic = {"start": "end", "end": "start", "middle": "middle"}
-        if h_flip:
-            anchor = anchor_dic[anchor]
-
-        # handle shifting according to the test anchor
-        x = x0
-        if anchor == 'middle':
-            alignment = TA_CENTER
-            x = x0 - (self.page_width / 2)
-        elif anchor == "end":
-            alignment = TA_RIGHT
-            x = x0 - self.page_width
+        x = text_coords["x"]
+        y = self.page_height - text_coords["y"]
 
         font_name = "Helvetica"
-        style = ParagraphStyle(
-            'label',
-            parent=getSampleStyleSheet()['Normal'],
-            alignment=alignment,
-            textColor=Color(*rgba),
-            fontSize=size,
-            font_name=font_name,
-            leading=size,
-        )
-        para = Paragraph(text, style)
-        w, h = para.wrap(self.page_width, y0)
-
-        rotation = shape.get('textRotation', 0)
-        panel_rotation = shape.get('rotation', 0)
-        rotation = rotation + panel_rotation
-
-        # preparing offsets according to text position
-        text_position = shape['textPosition']
-        text_offset_x = stroke_width / 4 + 4
-        text_offset_y = size / 2 + stroke_width / 4 + 4
-        out_positions = ["top", "left", "bottom", "right"]
-        in_positions = ["topleft", "bottomleft", "bottomright", "topright"]
-        h_flip_dic = {
-            "top": "top",
-            "left": "right",
-            "right": "left",
-            "bottom": "bottom",
-            "topleft": "topright",
-            "topright": "topleft",
-            "bottomleft": "bottomright",
-            "bottomright": "bottomleft",
-            "center": "center",
-            "freehand": "freehand"
-        }
-        v_flip_dic = {
-            "top": "bottom",
-            "left": "left",
-            "right": "right",
-            "bottom": "top",
-            "topleft": "bottomleft",
-            "topright": "bottomright",
-            "bottomleft": "topleft",
-            "bottomright": "topright",
-            "center": "center",
-            "freehand": "freehand"
-        }
-        rotation_index = fmod(floor((360 - rotation + 45) / 90), 4)
-        final_index = 0
-
-        if text_position in out_positions:
-            pos_index = out_positions.index(text_position)
-            final_index = int(fmod((pos_index + rotation_index), 4))
-            text_position = out_positions[final_index]
-        if text_position in in_positions:
-            pos_index = in_positions.index(text_position)
-            final_index = int(fmod((pos_index + rotation_index), 4))
-            text_position = in_positions[final_index]
-
-        # handle flipping
-        if h_flip:
-            text_position = h_flip_dic[text_position]
-        if v_flip:
-            text_position = v_flip_dic[text_position]
-
-        dx, dy, padding_y = 0, 0, 0
-        if text_position == "bottom":
-            dx = 0
-            dy = text_offset_y
-            padding_y = - 2 * dy
-        if text_position == "left":
-            dx = -text_offset_x
-            dy = size * 0.4
-            padding_y = - 2 * dy
-        if text_position == "right":
-            dx = text_offset_x
-            dy = size * 0.4
-            padding_y = - 2 * dy
-        if text_position == "top":
-            dx = 0
-            dy = -stroke_width / 2
-            padding_y = - 2 * dy
-        if text_position == "topleft":
-            dx = text_offset_x
-            dy = text_offset_y
-            padding_y = - 2 * dy
-        if text_position == "topright":
-            dx = -text_offset_x
-            dy = text_offset_y
-            padding_y = - 2 * dy
-        if text_position == "bottomleft":
-            dx = text_offset_x
-            dy = -stroke_width / 2
-            padding_y = - 2 * dy
-        if text_position == "bottomright":
-            dx = -text_offset_x
-            dy = -stroke_width / 2
-            padding_y = - 2 * dy
-        if text_position == "center":
-            dx = 0
-            dy = size * 0.4
-            padding_y = - 2 * dy
-        if text_position == "freehand":
-            dx = 0
-            dy = 0
+        text_width = stringWidth(text, font_name, font_size)
+        x0 = 0  # default to left align
+        hflip = self.panel.get('horizontal_flip', False)
+        if anchor == 'middle':
+            x0 = text_width/2
+        elif (anchor == "end" and not hflip) or (anchor == "start" and hflip):
+            x0 = text_width
 
         # draw the text background color
-        if float(shape.get('textBackgroundOpacity', 0)) > 0:
-            r, g, b, a = self.get_rgba(shape['textBackgroundColor'])
-            a = float(shape['textBackgroundOpacity'])
-            self.canvas.setFillColorRGB(r, g, b, alpha=a)
-            text_width = stringWidth(raw_text, font_name, size)
-
-            # padding inside the background box
-            padding_h, padding_v = 3, size/4 + 1
-
-            if anchor == 'middle':
-                padding_x = -(text_width / 2 + padding_h)
-            elif anchor == "end":
-                padding_x = -(text_width + padding_h + text_offset_x)
-            else:
-                padding_x = text_offset_x - padding_h
-
-            box_width = text_width + padding_h * 2
-            box_height = size + padding_v
-
-            self.canvas.rect(x0 + padding_x, y0 + dy + padding_y - padding_v,
-                             box_width, box_height, fill=1, stroke=0)
+        if fill_opacity > 0:
+            self.canvas.setFillColorRGB(*rgba_fill)
+            pad = 2  # background padding around text
+            self.canvas.rect(x - x0 - pad - 1,
+                             y - font_size*.6 - pad,
+                             text_width + pad * 2 + 2,
+                             font_size + pad * 2, fill=1, stroke=0)
 
         # draw text
-        para.drawOn(self.canvas, x + dx, y0 - dy)
+        self.canvas.setFont("Helvetica", font_size)
+        self.canvas.setFillColorRGB(*rgba_text)
+        self.canvas.drawString(
+            x - x0,
+            y - font_size*.35 - .2,  # Fine tune positioning to match JS layout
+            text)
 
     def draw_line(self, shape):
         start = self.panel_to_page_coords(shape['x1'], shape['y1'])
@@ -769,6 +648,10 @@ class ShapeToPilExport(ShapeExport):
         self.crop = crop
         self.scale = pil_img.size[0] / crop['width']
         self.draw = ImageDraw.Draw(pil_img)
+
+        from omero.gateway import THISPATH
+        self.GATEWAYPATH = THISPATH
+
         super(ShapeToPilExport, self).__init__(panel)
 
     def get_panel_coords(self, shape_x, shape_y):
@@ -826,8 +709,7 @@ class ShapeToPilExport(ShapeExport):
         # bump up alpha a bit to make text more readable
         rgba = (r, g, b, int(128 + a / 2))
         font_name = "FreeSans.ttf"
-        from omero.gateway import THISPATH
-        path_to_font = os.path.join(THISPATH, "pilfonts", font_name)
+        path_to_font = os.path.join(self.GATEWAYPATH, "pilfonts", font_name)
         try:
             font = ImageFont.truetype(path_to_font, size)
         except Exception:
@@ -844,148 +726,59 @@ class ShapeToPilExport(ShapeExport):
         if not shape.get('showText', True) or text == '':
             return
 
+        font_size = scale_to_export_dpi(shape.get('fontSize', 12))
+        stroke_color = shape.get('strokeColor', '#FFFFFF')
+        fill_color = shape.get('fillColor', '#000000')
+        fill_opacity = float(shape.get('fillOpacity', 0))
+        anchor = shape.get('textAnchor', "start")
         text_coords = self.get_panel_coords(shape['x'], shape['y'])
+        x, y = text_coords['x'], text_coords['y']
 
-        font_size_dpi = scale_to_export_dpi(shape.get('fontSize', 12))
-        stroke_width = shape.get('strokeWidth', 2)
-        stroke_width_dpi = scale_to_export_dpi(float(stroke_width))
+        r, g, b, a = self.get_rgba_int(stroke_color)
 
-        r, g, b, a = self.get_rgba_int(shape['textColor'])
-        # bump up alpha a bit to make text more readable
-        rgba = (r, g, b, int(128 + a / 2))
         font_name = "FreeSans.ttf"
-        from omero.gateway import THISPATH
-        path_to_font = os.path.join(THISPATH, "pilfonts", font_name)
+        path_to_font = os.path.join(self.GATEWAYPATH, "pilfonts", font_name)
         try:
-            font = ImageFont.truetype(path_to_font, font_size_dpi)
+            font = ImageFont.truetype(path_to_font, font_size)
         except Exception:
             font = ImageFont.load(
-                '%s/pilfonts/B%0.2d.pil' % (self.GATEWAYPATH, font_size_dpi))
+                '%s/pilfonts/B%0.2d.pil' % (self.GATEWAYPATH, font_size))
 
         box = font.getbbox(text)
         txt_w = box[2] - box[0]
+        box = font.getbbox("Mg") # height including acsenders & descenders
         txt_h = box[3] - box[1]
+        temp_label = Image.new('RGBA', (txt_w, txt_h), (255, 255, 255, 0))
+        textdraw = ImageDraw.Draw(temp_label)
+        textdraw.text((0, -box[1]), text, font=font, fill=(r,g,b))
 
-        x = text_coords["x"]
-        y = text_coords["y"]
-        anchor = shape['textAnchor']
+        hflip = self.panel.get('horizontal_flip', False)
+        if anchor == "middle":
+            x = x - temp_label.size[0] / 2
+        elif (anchor == "end" and not hflip) or (anchor == "start" and hflip):
+            x = x - temp_label.size[0]
 
-        # handle flipping
-        h_flip = self.panel.get('horizontal_flip', False)
-        v_flip = self.panel.get('vertical_flip', False)
-        anchor_dic = {"start": "end", "end": "start", "middle": "middle"}
-        if h_flip:
-            anchor = anchor_dic[anchor]
-
-        # handle horizontal offset according to text anchor
-        if anchor == 'middle':
-            x = x - txt_w / 2
-        elif anchor == "end":
-            x = x - txt_w
-
-        rotation = shape.get('textRotation', 0)
-        panel_rotation = shape.get('rotation', 0)
-        rotation = rotation + panel_rotation
-
-        # Adjusting x/y offsets according to text position
-        text_position = shape['textPosition']
-        text_offset_x = scale_to_export_dpi(stroke_width / 4 + 4)
-        out_positions = ["top", "left", "bottom", "right"]
-        in_positions = ["topleft", "bottomleft", "bottomright", "topright"]
-        h_flip_dic = {
-            "top": "top",
-            "left": "right",
-            "right": "left",
-            "bottom": "bottom",
-            "topleft": "topright",
-            "topright": "topleft",
-            "bottomleft": "bottomright",
-            "bottomright": "bottomleft",
-            "center": "center",
-            "freehand": "freehand"
-        }
-        v_flip_dic = {
-            "top": "bottom",
-            "left": "left",
-            "right": "right",
-            "bottom": "top",
-            "topleft": "bottomleft",
-            "topright": "bottomright",
-            "bottomleft": "topleft",
-            "bottomright": "topright",
-            "center": "center",
-            "freehand": "freehand"
-        }
-        rotation_index = fmod(floor((360 - rotation + 45) / 90), 4)
-        final_index = 0
-
-        if text_position in out_positions:
-            pos_index = out_positions.index(text_position)
-            final_index = int(fmod((pos_index + rotation_index), 4))
-            text_position = out_positions[final_index]
-        if text_position in in_positions:
-            pos_index = in_positions.index(text_position)
-            final_index = int(fmod((pos_index + rotation_index), 4))
-            text_position = in_positions[final_index]
-
-        # handle flipping
-        if h_flip:
-            text_position = h_flip_dic[text_position]
-        if v_flip:
-            text_position = v_flip_dic[text_position]
-
-        if text_position == "bottom":
-            dx = 0
-            dy = stroke_width_dpi / 4
-        if text_position == "left":
-            dx = -text_offset_x
-            dy = -txt_h * 0.8
-        if text_position == "right":
-            dx = text_offset_x
-            dy = -txt_h * 0.8
-        if text_position == "top":
-            dx = 0
-            dy = -font_size_dpi - stroke_width_dpi / 2
-        if text_position == "topleft":
-            dx = text_offset_x
-            dy = 2
-        if text_position == "topright":
-            dx = -text_offset_x
-            dy = 2
-        if text_position == "bottomleft":
-            dx = text_offset_x
-            dy = -font_size_dpi - stroke_width_dpi / 2
-        if text_position == "bottomright":
-            dx = -text_offset_x
-            dy = -font_size_dpi - stroke_width_dpi / 2
-        if text_position == "center":
-            dx = 0
-            dy = -txt_h * 0.8
-        if text_position == "freehand":
-            dx = 0
-            dy = -txt_h * 0.8
-
-        xy = (x + dx, y + dy)
+        # The text in TIFF is higher compared to PDF. Add offset
+        y = y - txt_h/2 + scale_to_export_dpi(1)
+        x = int(round(x))
+        y = int(round(y))
 
         # draw background color
-        if float(shape.get('textBackgroundOpacity', 0)) > 0:
-            txt_offset = scale_to_export_dpi(3)
-            text_bbox = self.draw.textbbox(xy, text, font=font)
-            bkgd_color = shape.get('textBackgroundColor', '#00000000')
-            r, g, b, a = self.get_rgba_int(bkgd_color)
-            a = int(float(shape['textBackgroundOpacity']) * 255)
-            rgba_fill = (r, g, b, a)
-            box_width = int(text_bbox[2] - text_bbox[0] + 2 * txt_offset)
-            box_height = int(text_bbox[3] - text_bbox[1] + 2 * txt_offset)
-            box_x = int(text_bbox[0] - txt_offset)
-            box_y = int(text_bbox[1] - txt_offset)
-            temp_image = Image.new('RGBA', (box_width, box_height))
+        if fill_opacity > 0:
+            pad = scale_to_export_dpi(3)
+            r, g, b, _ = self.get_rgba_int(fill_color)
+            a = int(fill_opacity * 255)
+            box_x = int(x - pad)
+            box_y = int(y - pad)
+            box_w = int(txt_w + 2 * pad)
+            box_h = int(txt_h + 2 * pad)
+            temp_image = Image.new('RGBA', (box_w, box_h))
             temp_draw = ImageDraw.Draw(temp_image)
-            temp_draw.rectangle((0, 0, box_width, box_height), fill=rgba_fill)
+            temp_draw.rectangle((0, 0, box_w, box_h), fill=(r, g, b, a))
             self.pil_img.paste(temp_image, (box_x, box_y), mask=temp_image)
 
-        # draw text
-        self.draw.text(xy, text, fill=rgba, font=font)
+        # Use label as mask, so transparent part is not pasted
+        self.pil_img.paste(temp_label, (x, y), mask=temp_label)
 
     def draw_arrow(self, shape):
 
