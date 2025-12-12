@@ -366,12 +366,12 @@ Text.prototype.drawShape = function drawShape() {
   this.element.transform("r0");
   var bbox = this.element.getBBox();
 
-  const PADDING = 3;
+  const PADDING = 1;
   this.bkgdRect.attr({
     x: bbox.x - PADDING,
-    y: bbox.y - PADDING,
+    y: bbox.y,
     width: bbox.width + 2 * PADDING,
-    height: bbox.height + 2 * PADDING,
+    height: bbox.height + PADDING/2,
     fill: this._fillColor,
     "fill-opacity": this._fillOpacity,
     "stroke-width": 0,
