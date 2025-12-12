@@ -26,7 +26,7 @@ from datetime import datetime
 import os
 from os import path
 import zipfile
-from math import atan2, atan, sin, cos, sqrt, radians, floor, ceil, log2, fmod
+from math import atan2, atan, sin, cos, sqrt, radians, floor, ceil, log2
 from copy import deepcopy
 import re
 
@@ -746,11 +746,11 @@ class ShapeToPilExport(ShapeExport):
 
         box = font.getbbox(text)
         txt_w = box[2] - box[0]
-        box = font.getbbox("Mg") # height including acsenders & descenders
+        box = font.getbbox("Mg")  # height including acsenders & descenders
         txt_h = box[3] - box[1]
         temp_label = Image.new('RGBA', (txt_w, txt_h), (255, 255, 255, 0))
         textdraw = ImageDraw.Draw(temp_label)
-        textdraw.text((0, -box[1]), text, font=font, fill=(r,g,b))
+        textdraw.text((0, -box[1]), text, font=font, fill=(r, g, b))
 
         hflip = self.panel.get('horizontal_flip', False)
         if anchor == "middle":
