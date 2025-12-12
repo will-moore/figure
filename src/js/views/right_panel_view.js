@@ -166,6 +166,8 @@
                     type: "Rectangle",
                     strokeWidth: strokeWidth,
                     strokeColor: "#" + color,
+                    fillColor: "#FFFFFF",
+                    fillOpacity: 0,
                     x: x,
                     y: y,
                     width: rectSize,
@@ -174,6 +176,11 @@
                     textId: textRandomId,
                     rotation: vp.rotation || 0,
                 }
+                if (vp.rotation && !isNaN(vp.rotation)) {
+                    let coords = rotatePoint(txtX, txtY, x + (rectSize/2), y + (rectSize/2), vp.rotation);
+                    txtX = coords.x;
+                    txtY = coords.y;
+                }
                 let text = {
                     type: "Text",
                     strokeWidth: strokeWidth,
@@ -181,9 +188,7 @@
                     x: txtX,
                     y: txtY,
                     id: textRandomId,
-                    // linkedShapeId: rectRandomId,
-                    // rotation: vp.rotation || 0,
-                    // textRotation: -vp.rotation || 0,
+                    textRotation: -vp.rotation || 0,
                     fontSize: 12,
                     text: String.fromCharCode(lastInsetTextIndex),
                     textAnchor: "middle",
