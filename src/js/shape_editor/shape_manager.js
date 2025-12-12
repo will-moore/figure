@@ -502,29 +502,6 @@ ShapeManager.prototype.pasteShapesJson = function pasteShapesJson(
     idsMap = new Map();
 
   // For each shape we want to paste...
-  // jsonShapes.forEach(function (sh) {
-  //   var csh = $.extend(true, {}, sh);
-  //   if(csh.type == "Label"){
-  //     csh = self.convertOmeroLabelToFigureText(csh)
-  //   }
-
-  //   // get the ids before cloning/deleteing temp shape
-  //   var tempTextId = csh.textId
-  //   var tempLinkedShapeId = csh.linkedShapeId
-  //   var oldId = csh.id
-  //   csh.textId = -1
-  //   csh.linkedShapeId = -1
-  //   csh.id = self.getRandomId()
-
-  //   // create the new JSON shape
-  //   var temp = self.createShapeJson(csh);
-  //   var s = temp.toJson();
-  //   temp.destroy();
-
-  //   // reset ids
-  //   s.textId = tempTextId
-  //   s.linkedShapeId = tempLinkedShapeId
-
   jsonShapes.forEach(function (s) {
     // Create a shape to resolve any transform matrix -> coords
     var temp = self.createShapeJson(s);
@@ -538,23 +515,7 @@ ShapeManager.prototype.pasteShapesJson = function pasteShapesJson(
       s = match.offsetCoords(s, 20, 10);
       match = self.findShapeAtCoords(s);
     }
-    // Create shape and test if it's in the specified region
-
-  //   pastedShapes.push(s);
-  //   idsMap.set(s.id, oldId)
-  // });
-
-  // // reassign right text & shape ids to link text to the right shape
-  // pastedShapes.forEach(function(s){
-  //   if(s.textId != undefined && s.textId != -1){
-  //     var oldShapeId = idsMap.get(s.id)
-  //       pastedShapes.forEach(function(s2){
-  //         if(s2.linkedShapeId == oldShapeId){
-  //           s2.linkedShapeId = s.id
-  //           s.textId = s2.id
-  //         }
-  //       })
-  //   }
+    temp.destroy();
 
     // add the news shapes to the manager
     var added = self.addShapeJson(s, constrainRegion);
