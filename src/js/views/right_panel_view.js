@@ -516,19 +516,6 @@
                 return false;
             }
 
-            // If we need SPW info and we don't have it, load...
-            // Use regex to check if label_text contains "plate", "well", "wellsample", "field", "run", or "acquisition"
-            if (/\[(?:plate|well|wellsample|field|run|acquisition)(?:\.[^\]]*)?\]/.test(label_text)) {
-                // Load Plate Name for images...
-                console.log("label_text", label_text);
-                selected.addLabelsFromPlatesWellsFields({
-                    text: label_text,
-                    position: position,
-                    size: font_size,
-                    color: color});
-                return false;
-            }
-
             if (label_text == '[tags]') {
                 // Load Tags for this image and create labels
 
