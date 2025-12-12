@@ -192,6 +192,8 @@
                     fontSize: 12,
                     text: String.fromCharCode(lastInsetTextIndex),
                     textAnchor: "middle",
+                    hFlip: panel.get("horizontal_flip") ? -1 : 1,
+                    vFlip: panel.get("vertical_flip") ? -1 : 1,
                 }
                 panel.add_shapes([rect, text]);
                 panel.setLastInsetTextIndex(lastInsetTextIndex)
