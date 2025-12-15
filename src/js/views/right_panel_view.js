@@ -185,6 +185,8 @@
                     type: "Text",
                     strokeWidth: strokeWidth,
                     strokeColor: "#" + color,
+                    fillColor: "#000000",
+                    fillOpacity: 0,
                     x: txtX,
                     y: txtY,
                     id: textRandomId,
