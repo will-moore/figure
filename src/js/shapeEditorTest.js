@@ -95,10 +95,10 @@ $(function () {
     shapeManager.setTextPosition(textPosition);
   });
 
-  $("input[name='shapeScaleFactor']").on("input change", function () {
-    let factor = parseFloat($(this).val());
-    $("#shapeScaleFactorDisplay").text(factor);
-    shapeManager.setShapeScalingFactor(factor);
+  $("input[name='shapeScalingFraction']").on("input change", function () {
+    let fraction = parseFloat($(this).val());
+    $("#shapeScalingFractionDisplay").text(fraction);
+    shapeManager.setShapeScalingFraction(fraction);
   });
 
   var updateZoom = function updateZoom() {

@@ -31,7 +31,6 @@ var Text = function Text(options) {
   this.type = "Text";
   this.manager = options.manager;
   this.paper = options.paper;
-  this._shapeScalingFactor = options.shapeScalingFactor || 100;
   this._x = options.x;
   this._y = options.y;
   this._fontSize = options.fontSize;
@@ -106,11 +105,6 @@ var Text = function Text(options) {
 
   this.drawShape();
 };
-
-Text.prototype.setShapeScalingFactor = function setShapeScalingFactor(zoomPercent) {
-  this._shapeScalingFactor = zoomPercent ? zoomPercent : 100;
-  this.drawShape();
-}
 
 Text.prototype.toJson = function toJson() {
   var rv = {
@@ -322,7 +316,7 @@ Text.prototype.getPath = function getPath() {
 
 Text.prototype.drawShape = function drawShape() {
   var f = this._zoomFraction,
-      shapeScalingFactor = this._shapeScalingFactor / 100,
+      shapeScalingFraction = this.manager.getShapeScalingFraction(),
       y = this._y;
 
   this.element.attr({
@@ -330,7 +324,7 @@ Text.prototype.drawShape = function drawShape() {
     y: this._y * f,
     fill: this._strokeColor,
     "fill-opacity": 1,
-    "font-size": this._fontSize * shapeScalingFactor,
+    "font-size": this._fontSize * shapeScalingFraction,
     "text": this._text,
     // text-anchor: [“start”, “middle”, “end”], default is “middle”
     "text-anchor": this._textAnchor
@@ -515,9 +509,6 @@ Text.prototype.createHandles = function createHandles() {
     };
   };
 
-  // let cx = handleIds['n'][0];
-  // let cy = handleIds['e'][1];
-
   for (var key in handleIds) {
     var hx = handleIds[key][0];
     var hy = handleIds[key][1];
@@ -556,7 +547,6 @@ CreateText.prototype.startDrag = function startDrag(startX, startY) {
       strokeWidth = this.manager.getStrokeWidth(),
       fontSize = this.manager.getFontSize(),
       zoom = this.manager.getZoom(),
-      shapeScalingFactor = this.manager.getShapeScalingFactor(),
       inModalView = this.manager.getInModalView(),
       text = this.manager.getText(),
       textAnchor = this.manager.getTextAnchor();
@@ -568,7 +558,6 @@ CreateText.prototype.startDrag = function startDrag(startX, startY) {
     manager: this.manager,
     paper: this.paper,
     zoom: zoom,
-    shapeScalingFactor: shapeScalingFactor,
     text: text || "Text",
     textAnchor: textAnchor,
     showText: true,

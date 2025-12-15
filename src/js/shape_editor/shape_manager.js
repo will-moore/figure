@@ -53,7 +53,7 @@ var ShapeManager = function ShapeManager(elementId, width, height, options) {
   this._orig_width = width;
   this._orig_height = height;
   this._zoom = 100;
-  this._shapeScalingFactor = 100;
+  this._shapeScalingFraction = 1;
   // Don't allow editing of shapes - no drag/click events
   this.canEdit = !options.readOnly;
 
@@ -244,17 +244,15 @@ ShapeManager.prototype.setZoom = function setZoom(zoomPercent) {
   //                          'top': (currTop - deltaTop) + "px"});
 };
 
-ShapeManager.prototype.setShapeScalingFactor = function setShapeScalingFactor(shapeScalingFactor) {
-  this._shapeScalingFactor = shapeScalingFactor;
+ShapeManager.prototype.setShapeScalingFraction = function setShapeScalingFraction(shapeScalingFraction) {
+  this._shapeScalingFraction = shapeScalingFraction;
   this._shapes.forEach(function (shape) {
-    if (shape.setShapeScalingFactor) {
-      shape.setShapeScalingFactor(shapeScalingFactor);
-    }
+    shape.drawShape();
   });
 }
 
-ShapeManager.prototype.getShapeScalingFactor = function getShapeScalingFactor() {
-  return this._shapeScalingFactor;
+ShapeManager.prototype.getShapeScalingFraction = function getShapeScalingFraction() {
+  return this._shapeScalingFraction;
 };
 
 ShapeManager.prototype.getZoom = function getZoom(zoomPercent) {
@@ -594,14 +592,12 @@ ShapeManager.prototype.createShapeJson = function createShapeJson(jsonShape) {
     fontSize = s.fontSize || this.getFontSize(),
     inModalView = s.inModalView || this.getInModalView(),
     textId = s.textId || -1,
-    shapeScalingFactor = s.shapeScalingFactor || this.getShapeScalingFactor(),
     zoom = this.getZoom(),
     options = {
       manager: this,
       paper: this.paper,
       strokeWidth: strokeWidth,
       zoom: zoom,
-      shapeScalingFactor: shapeScalingFactor,
       strokeColor: strokeColor,
       fillColor: fillColor,
       fillOpacity: parseFloat(fillOpacity).toFixed(1),
