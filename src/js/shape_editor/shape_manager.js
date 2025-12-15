@@ -730,7 +730,6 @@ ShapeManager.prototype.notifySelectedShapesChanged =
 ShapeManager.prototype.notifyShapesChanged = function notifyShapesChanged(
   shapes
 ) {
-  this.sortShape(this._shapes);
   this.$el.trigger("change:shape", [shapes]);
 };
 
