@@ -188,7 +188,6 @@
                     x: txtX,
                     y: txtY,
                     id: textRandomId,
-                    textRotation: -vp.rotation || 0,
                     fontSize: 12,
                     text: String.fromCharCode(lastInsetTextIndex),
                     textAnchor: "middle",
@@ -1277,19 +1276,6 @@
                     'width': m.get('orig_width'),
                     'height': m.get('orig_height'),
                 });
-
-                var shapes = m.get('shapes');
-                if(shapes){
-                    shapes.forEach(function(sh){
-                        if(sh.type == "Text"){
-                            sh.textRotation = 0;
-                            sh.hFlip = 1;
-                            sh.vFlip = 1;
-                        }
-                    })
-                    m.save('shapes', shapes);
-                    m.trigger('change:vertical_flip')
-                }
             });
         },
 
@@ -1370,7 +1356,7 @@
             "click .flipping_horizontal": "flipping_horizontal",
             "input .rotation-slider": "rotation_input",
             "change .rotation-slider": "rotation_change",
-            "click .panel-rotation": "rotate_panel",
+            "click .panel-rotation": "rotate_panel_90",
         },
 
         rotation_input: function(event) {
@@ -1390,18 +1376,7 @@
             let val = parseInt(event.target.value);
             this.rotation = val;
             this.models.forEach(function(m){
-                var shapes = m.get('shapes');
-                if(shapes){
-                    let newShapes = shapes.map(sh => {
-                        if (sh.type === "Text") {
-                            return {...sh, textRotation: val};
-                         }
-                        return sh;
-                    });
-                    m.save({'rotation': val, 'shapes': newShapes});
-                }else{
-                    m.save('rotation', val);
-                }
+                m.save({'rotation': val});
             });
         },
 
@@ -1471,10 +1446,10 @@
             });
         },
 
-        rotate_panel: function(event){
+        rotate_panel_90: function(event){
             event.preventDefault()
             this.models.forEach(function(m){
-                var rotation = m.setPanelRotation()
+                var rotation = m.rotatePanel90()
                 $(".vp_img").css({'transform':'rotate(' + rotation + 'deg)'});
                 $(".rotation_value").text(rotation);
                 $(".rotation-slider").val(rotation);

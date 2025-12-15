@@ -177,6 +177,7 @@
                     this.shapeManager.setZoom(panel_scale * 100);
                 }
                 this.shapeManager.setShapesJson(shapes);
+                this.shapeManager.setTextRotation(this.model.get('rotation'));
             } else {
                 // delete shapes
                 if (this.shapeManager) {

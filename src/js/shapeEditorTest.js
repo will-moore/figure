@@ -95,11 +95,6 @@ $(function () {
     shapeManager.setTextPosition(textPosition);
   });
 
-//   $("select[name='rotateText']").change(function () {
-//     var rotateText = $(this).val();
-//     shapeManager.setTextRotated(rotateText);
-//   });
-
   $("input[name='shapeScaleFactor']").on("input change", function () {
     let factor = parseFloat($(this).val());
     $("#shapeScaleFactorDisplay").text(factor);

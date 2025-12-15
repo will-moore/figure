@@ -427,7 +427,7 @@
             this.save('shapes', rois);
         },
 
-        setPanelRotation(){
+        rotatePanel90(){
             var rotation = this.get('rotation') || "0"
             var panelRotationAngle =  (parseInt(rotation) + 90) % 360
 
@@ -438,15 +438,6 @@
             var yPercent = this.get('orig_height') / viewport.width;
             var zoom = Math.min(xPercent, yPercent) * 100;
 
-            var shapes = this.get('shapes');
-            if(shapes){
-                shapes.forEach(function(sh){
-                    if(sh.type == "Text"){
-                        sh.textRotation = panelRotationAngle;
-                    }
-                })
-                this.save('shapes', shapes)
-            }
             this.save({'rotation': panelRotationAngle, 'height': width, 'width': height, 'zoom': zoom});
 
             return panelRotationAngle

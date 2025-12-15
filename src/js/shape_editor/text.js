@@ -127,7 +127,6 @@ Text.prototype.toJson = function toJson() {
     text: this._text,
     textAnchor: this._textAnchor,
     rotation: this._rotation,
-    textRotation: this._textRotation,
     hFlip: this._hFlip,
     vFlip: this._vFlip,
   };
