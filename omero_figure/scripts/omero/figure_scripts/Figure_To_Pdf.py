@@ -190,13 +190,16 @@ class ShapeExport(object):
     def __init__(self, panel):
         self.panel = panel
         sorted_shapes = []
+        text_shapes = []
 
-        # sort shapes to draw text first
+        # sort shapes to draw text last
         for s in panel.get("shapes", ()):
             if s['type'].lower() == "text":
-                sorted_shapes.insert(0, s)
+                text_shapes.append(s)
             else:
                 sorted_shapes.append(s)
+
+        sorted_shapes.extend(text_shapes)
 
         for s in sorted_shapes:
             getattr(self, 'draw_%s' % s['type'].lower(), lambda s: None)(s)
