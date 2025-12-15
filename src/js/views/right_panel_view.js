@@ -191,8 +191,6 @@
                     fontSize: 12,
                     text: String.fromCharCode(lastInsetTextIndex),
                     textAnchor: "middle",
-                    hFlip: panel.get("horizontal_flip") ? -1 : 1,
-                    vFlip: panel.get("vertical_flip") ? -1 : 1,
                 }
                 panel.add_shapes([rect, text]);
                 panel.setLastInsetTextIndex(lastInsetTextIndex)
@@ -1409,18 +1407,7 @@
             const isHorizontalFlipped = $button.hasClass('active');
 
             this.models.forEach(function(m) {
-                var shapes = m.get('shapes');
-                if(shapes){
-                    let newShapes = shapes.map(sh => {
-                        if (sh.type === "Text") {
-                            return {...sh, hFlip: isHorizontalFlipped ? -1 : 1};
-                         }
-                        return sh;
-                    });
-                    m.save({'horizontal_flip': isHorizontalFlipped, 'shapes': newShapes});
-                }else{
-                    m.save('horizontal_flip', isHorizontalFlipped);
-                }
+                m.save('horizontal_flip', isHorizontalFlipped);
             });
         },
 

@@ -28,6 +28,7 @@ import Raphael from "raphael";
 
 var Text = function Text(options) {
   var self = this;
+  this.type = "Text";
   this.manager = options.manager;
   this.paper = options.paper;
   this._shapeScalingFactor = options.shapeScalingFactor || 100;
@@ -57,9 +58,6 @@ var Text = function Text(options) {
   this._zoomFraction = options.zoom ? options.zoom / 100 : 1
   this._textAnchor = options.textAnchor || "start"
   this._rotation = options.rotation || 0;
-  this._textRotation = options.textRotation || 0;
-  this._vFlip = options.vFlip || 1;
-  this._hFlip = options.hFlip || 1;
 
   this._selected = false;
   this._area = 0;
@@ -127,8 +125,6 @@ Text.prototype.toJson = function toJson() {
     text: this._text,
     textAnchor: this._textAnchor,
     rotation: this._rotation,
-    hFlip: this._hFlip,
-    vFlip: this._vFlip,
   };
   if (this._id) {
     rv.id = this._id;
@@ -245,21 +241,6 @@ Text.prototype.setRotation = function setRotation(rotation) {
   this.drawShape();
 };
 
-Text.prototype.setTextRotation = function setTextRotation(textRotation) {
-  this._textRotation = textRotation;
-  this.drawShape();
-};
-
-Text.prototype.setVerticalFlip = function setVerticalFlip(vFlip) {
-  this._vFlip = vFlip;
-  this.drawShape();
-};
-
-Text.prototype.setHorizontalFlip = function setHorizontalFlip(hFlip) {
-  this._hFlip = hFlip;
-  this.drawShape();
-};
-
 Text.prototype.setInModalView = function setInModalView(inModalView) {
   this._inModalView = inModalView
   this.drawShape();
@@ -294,12 +275,6 @@ Text.prototype.setSelected = function setSelected(selected) {
     return
   }
   this._selected = !!selected;
-  // if(this._linkedShapeId != -1){
-  //   var parentShape = this.manager.getShape(this._linkedShapeId);
-  //   if(parentShape){
-  //     parentShape.setSelected(selected)
-  //   }
-  // }
   this.drawShape();
 };
 
@@ -379,10 +354,13 @@ Text.prototype.drawShape = function drawShape() {
   this.element.toFront()
 
   if(!this._inModalView){
+    let hFlip = this.manager.getHorizontalFlip();
+    let vFlip = this.manager.getVerticalFlip();
+    let textRotation = this.manager.getTextRotation();
     let rotOriginX = (this._textAnchor === "start") ? (bbox.x) : (this._textAnchor === "end") ? (bbox.x + bbox.width) : (bbox.x + bbox.width/2);
     let rotOriginY = (y * f);
-    this.element.transform(`r${-this._textRotation},${rotOriginX},${rotOriginY} s${this._hFlip}, ${this._vFlip}`);
-    this.bkgdRect.transform(`r${-this._textRotation},${rotOriginX},${rotOriginY} s${this._hFlip}, ${this._vFlip}`);
+    this.element.transform(`r${-textRotation},${rotOriginX},${rotOriginY} s${hFlip}, ${vFlip}`);
+    this.bkgdRect.transform(`r${-textRotation},${rotOriginX},${rotOriginY} s${hFlip}, ${vFlip}`);
   }else{
     this.element.transform("r" + 0);
     this.bkgdRect.transform("r" + 0);
@@ -580,11 +558,8 @@ CreateText.prototype.startDrag = function startDrag(startX, startY) {
       zoom = this.manager.getZoom(),
       shapeScalingFactor = this.manager.getShapeScalingFactor(),
       inModalView = this.manager.getInModalView(),
-      vFlip = this.manager.getVerticalFlip(),
-      hFlip = this.manager.getHorizontalFlip(),
       text = this.manager.getText(),
-      textAnchor = this.manager.getTextAnchor(),
-      textRotation = this.manager.getTextRotation();
+      textAnchor = this.manager.getTextAnchor();
 
   this.startX = startX;
   this.startY = startY;
@@ -598,9 +573,6 @@ CreateText.prototype.startDrag = function startDrag(startX, startY) {
     textAnchor: textAnchor,
     showText: true,
     inModalView: inModalView,
-    textRotation: textRotation,
-    vFlip: vFlip,
-    hFlip: hFlip,
     linkedShapeId: -1,
     x: startX,
     y: startY,

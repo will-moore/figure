@@ -387,10 +387,11 @@ ShapeManager.prototype.getTextRotation = function getTextRotation() {
 
 ShapeManager.prototype.setTextRotation = function setTextRotation(textRotation) {
   this._textRotation = textRotation;
-  var selected = this.getShapes();
-  for (var s = 0; s < selected.length; s++) {
-    if (selected[s].setTextRotation) {
-      selected[s].setTextRotation(textRotation);
+  // redraw all Text shapes
+  var shapes = this.getShapes();
+  for (var s = 0; s < shapes.length; s++) {
+    if (shapes[s].type == "Text") {
+      shapes[s].drawShape();
     }
   }
 };
@@ -413,9 +414,11 @@ ShapeManager.prototype.getVerticalFlip = function getVerticalFlip() {
 
 ShapeManager.prototype.setVerticalFlip = function setVerticalFlip(vFlip) {
   this._vFlip = vFlip;
-  var selected = this.getSelectedShapes();
-  for (var s = 0; s < selected.length; s++) {
-    selected[s].setVerticalFlip(vFlip);
+  var shapes = this.getShapes();
+  for (var s = 0; s < shapes.length; s++) {
+    if (shapes[s].type == "Text") {
+      shapes[s].drawShape();
+    }
   };
 };
 
@@ -425,9 +428,11 @@ ShapeManager.prototype.getHorizontalFlip = function getHorizontalFlip() {
 
 ShapeManager.prototype.setHorizontalFlip = function setHorizontalFlip(hFlip) {
   this._hFlip = hFlip;
-  var selected = this.getSelectedShapes();
-  for (var s = 0; s < selected.length; s++) {
-    selected[s].setHorizontalFlip(hFlip);
+  var shapes = this.getShapes();
+  for (var s = 0; s < shapes.length; s++) {
+    if (shapes[s].type == "Text") {
+      shapes[s].drawShape();
+    }
   };
 };
 

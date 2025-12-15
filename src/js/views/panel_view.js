@@ -178,6 +178,8 @@
                 }
                 this.shapeManager.setShapesJson(shapes);
                 this.shapeManager.setTextRotation(this.model.get('rotation'));
+                this.shapeManager.setHorizontalFlip(this.model.get('horizontal_flip') ? -1 : 1);
+                this.shapeManager.setVerticalFlip(this.model.get('vertical_flip') ? -1 : 1);
             } else {
                 // delete shapes
                 if (this.shapeManager) {

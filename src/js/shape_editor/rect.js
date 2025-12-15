@@ -24,7 +24,6 @@
 */
 
 import Raphael from "raphael";
-import {Text} from "./text";
 
 
 var Rect = function Rect(options) {
@@ -68,7 +67,6 @@ var Rect = function Rect(options) {
   this._rotation = options.rotation || 0;
 
   this._textId = options.textId || undefined;
-  // this._textShape = this.manager.getShape(this._textId)
 
   this.handle_wh = 6;
 
@@ -232,7 +230,6 @@ Rect.prototype.isSelected = function isSelected() {
 
 Rect.prototype.loadTextShape = function loadTextShape(){
   this._textShape = this.manager.getShape(this._textId);
-  console.log("loadTextShape", this._textId, this._textShape);
   return this._textShape;
 };
 
@@ -297,43 +294,10 @@ Rect.prototype.setTextId = function setTextId(textId) {
   this._textId = textId;
 };
 
-Rect.prototype.setInModalView = function setInModalView(inModalView) {
-  if(this._textShape){
-    this._textShape.setInModalView(inModalView)
-  }
-};
-
-// Rect.prototype.setTextRotation = function setTextRotation(textRotation) {
-//   if(this._textShape){
-//     this._textShape.setTextRotation(textRotation)
-//   }
-// };
-
-Rect.prototype.setVerticalFlip = function setVerticalFlip(vFlip) {
-  if(this._textShape){
-    this._textShape.setVerticalFlip(vFlip)
-  }
-};
-
-Rect.prototype.setHorizontalFlip = function setHorizontalFlip(hFlip) {
-  if(this._textShape){
-    this._textShape.setHorizontalFlip(hFlip)
-  }
-};
-
 Rect.prototype.destroy = function destroy() {
-  if(this._textShape){
-    this.manager.deleteShapesByIds([this._textShape._id])
-    this.destroyTextShape()
-  }
   this.element.remove();
   this.handles.remove();
 };
-
-Rect.prototype.destroyTextShape = function destroyTextShape() {
-  this._textId = -1
-  this._textShape = undefined;
-}
 
 Rect.prototype.drawShape = function drawShape() {
   var strokeColor = this._strokeColor,
@@ -377,10 +341,6 @@ Rect.prototype.drawShape = function drawShape() {
     hnd.attr({ x: hx - this.handle_wh / 2, y: hy - this.handle_wh / 2 });
     hnd.transform("r" + this._rotation + "," + (x + (w/2)) + "," + (y + (h/2)));
   }
-
-  // if(this._textShape || this.loadTextShape()){
-  //   this._textShape.setParentShapeCoords({x: this._x, y: this._y, width: this._width, height: this._height})
-  // }
 };
 
 Rect.prototype.getHandleCoords = function getHandleCoords() {
@@ -494,7 +454,6 @@ Rect.prototype.createHandles = function createHandles() {
         // if we're dragging an 'WEST' handle, update x and width
         newRect.x = new_x + self.handle_wh / 2;
         newRect.width = this.owidth - dx;
-        console.log("newRect.width textShape", textShape);
         if (textShape) {
           textShape._x = this.text_offset_x + newRect.x;
         }
