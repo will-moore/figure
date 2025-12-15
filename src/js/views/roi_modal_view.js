@@ -450,7 +450,7 @@ export const RoiModalView = Backbone.View.extend({
             }
             this.shapeManager.setState(newState);
             if (this.shapeManager.getSelectedShapes().length == 0){
-                this.shapeManager.setText("");
+                this.shapeManager.setText("Text");
             }
             this.renderToolbar();
         },
