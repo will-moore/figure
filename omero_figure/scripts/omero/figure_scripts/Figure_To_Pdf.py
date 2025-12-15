@@ -394,6 +394,7 @@ class ShapeToPdfExport(ShapeExport):
         fill_opacity = float(shape.get('fillOpacity', 0))
         anchor = shape.get('textAnchor', "start")
         text_coords = self.panel_to_page_coords(shape['x'], shape['y'])
+        font = "Helvetica"
 
         # if markdown_imported:
         #     # markdown not supported in JS for text shapes (yet)
@@ -407,8 +408,7 @@ class ShapeToPdfExport(ShapeExport):
         x = text_coords["x"]
         y = self.page_height - text_coords["y"]
 
-        font_name = "Helvetica"
-        text_width = stringWidth(text, font_name, font_size)
+        text_width = stringWidth(text, font, font_size)
         x0 = 0  # default to left align
         hflip = self.panel.get('horizontal_flip', False)
         if anchor == 'middle':
@@ -419,14 +419,14 @@ class ShapeToPdfExport(ShapeExport):
         # draw the text background color
         if fill_opacity > 0:
             self.canvas.setFillColorRGB(*rgba_fill)
-            pad = 2  # background padding around text
-            self.canvas.rect(x - x0 - pad - 1,
-                             y - font_size*.6 - pad,
-                             text_width + pad * 2 + 2,
-                             font_size + pad * 2, fill=1, stroke=0)
+            pad = 1
+            self.canvas.rect(x - x0 - pad,
+                             y - font_size * .57 - pad,
+                             text_width + pad * 2,
+                             font_size * 1.11 + pad, fill=1, stroke=0)
 
         # draw text
-        self.canvas.setFont("Helvetica", font_size)
+        self.canvas.setFont(font, font_size)
         self.canvas.setFillColorRGB(*rgba_text)
         self.canvas.drawString(
             x - x0,
@@ -758,20 +758,20 @@ class ShapeToPilExport(ShapeExport):
         elif (anchor == "end" and not hflip) or (anchor == "start" and hflip):
             x = x - temp_label.size[0]
 
-        # The text in TIFF is higher compared to PDF. Add offset
-        y = y - txt_h/2 + scale_to_export_dpi(1)
-        x = int(round(x))
-        y = int(round(y))
+        y = y - txt_h * 0.4
+        x = int(round(x))  # Round before drawing background
+        y = int(round(y))  # to fix text position within the background box
 
         # draw background color
         if fill_opacity > 0:
-            pad = scale_to_export_dpi(3)
+            pad = scale_to_export_dpi(1)
             r, g, b, _ = self.get_rgba_int(fill_color)
             a = int(fill_opacity * 255)
-            box_x = int(x - pad)
-            box_y = int(y - pad)
-            box_w = int(txt_w + 2 * pad)
-            box_h = int(txt_h + 2 * pad)
+            height_scale = 0.15
+            box_x = round(x - pad)
+            box_y = round(y - txt_h * height_scale)
+            box_w = round(txt_w + 2 * pad)
+            box_h = round(txt_h * (1 + height_scale) + pad/2)
             temp_image = Image.new('RGBA', (box_w, box_h))
             temp_draw = ImageDraw.Draw(temp_image)
             temp_draw.rectangle((0, 0, box_w, box_h), fill=(r, g, b, a))
