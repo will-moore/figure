@@ -330,82 +330,69 @@ $(function () {
   });
 
   // Add some shapes to display
-  // shapeManager.addShapeJson({"type": "Polygon",
-  //                            "points": "329,271 295,314 295,365 333,432 413,400 452,350 432,292 385,256",
-  //                            "strokeColor": "#ffffff",
-  //                            "strokeWidth": 0.5});
+  shapeManager.addShapeJson({"type": "Polygon",
+                             "points": "329,271 295,314 295,365 333,432 413,400 452,350 432,292 385,256",
+                             "strokeColor": "#ffffff",
+                             "strokeWidth": 0.5});
 
-  // shapeManager.addShapeJson({"type": "Polyline",
-  //                            "points": "29,71 95,14 95,65 33,132 113,100 152,50",
-  //                            "strokeColor": "#00ffdd",
-  //                            "strokeWidth": 4});
+  shapeManager.addShapeJson({"type": "Polyline",
+                             "points": "29,71 95,14 95,65 33,132 113,100 152,50",
+                             "strokeColor": "#00ffdd",
+                             "strokeWidth": 4});
 
-  // shapeManager.addShapeJson({"id": 1234,
-  //                            "rotation": 25,
-  //                            "type": "Rectangle",
-  //                            "strokeColor": "#ff00ff",
-  //                            "strokeWidth": 6,
-  //                            "x": 200, "y": 150,
-  //                            "width": 125, "height": 150});
+  shapeManager.addShapeJson({"id": 1234,
+                             "rotation": 25,
+                             "type": "Rectangle",
+                             "strokeColor": "#ff00ff",
+                             "strokeWidth": 6,
+                             "x": 200, "y": 150,
+                             "width": 125, "height": 150});
 
-  // shapeManager.addShapeJson({"type": "Rectangle",
-  //                            "strokeColor": "#ffffff",
-  //                            "strokeWidth": 3,
-  //                            "x": 50, "y": 300,
-  //                            "width": 50, "height": 100});
+  shapeManager.addShapeJson({"type": "Rectangle",
+                             "strokeColor": "#ffffff",
+                             "strokeWidth": 3,
+                             "x": 50, "y": 300,
+                             "width": 50, "height": 100});
 
-  // shapeManager.addShapeJson({"type": "Ellipse",
-  //                            "x": 200, "y": 150,
-  //                            "radiusX": 125, "radiusY": 50,
-  //                            "rotation": 45});
+  shapeManager.addShapeJson({"type": "Ellipse",
+                             "x": 200, "y": 150,
+                             "radiusX": 125, "radiusY": 50,
+                             "rotation": 45});
 
-  // shapeManager.addShapeJson({"type": "Ellipse",
-  //                            "strokeColor": "#ffffff",
-  //                            "x": 204, "y": 260,
-  //                            "radiusX": 95, "radiusY": 55,
-  //                            "transform": "matrix(0.82 0.56 -0.56 0.82 183.0 -69.7)"});
+  shapeManager.addShapeJson({"type": "Ellipse",
+                             "strokeColor": "#ffffff",
+                             "x": 204, "y": 260,
+                             "radiusX": 95, "radiusY": 55,
+                             "transform": "matrix(0.82 0.56 -0.56 0.82 183.0 -69.7)"});
 
-  // shapeManager.addShapeJson({"type": "Arrow",
-  //                            "strokeColor": "#ffff00",
-  //                            "strokeWidth": 4,
-  //                            "x1": 25, "y1": 450,
-  //                            "x2": 200, "y2": 400});
+  shapeManager.addShapeJson({"type": "Ellipse",
+                            "strokeColor": "#00ff00",
+                            "radiusY": 31.5,
+                            "radiusX": 91,
+                            "transform": "matrix(2.39437435854 -0.644012141633 2.14261951162 0.765696311828 -1006.17788921 153.860479773)",
+                            "strokeWidth": 2,
+                            "y": 297.5,
+                            "x": 258});
 
-  // shapeManager.addShapeJson({"type": "Arrow",
-  //                            "strokeColor": "#ffff00",
-  //                            "strokeWidth": 10,
-  //                            "x1": 25, "y1": 250,
-  //                            "x2": 200, "y2": 200});
+  shapeManager.addShapeJson({"type": "Ellipse",
+                        "strokeColor": "#ffff00",
+                        "radiusY": 71.5,
+                        "radiusX": 41,
+                        "transform": "matrix(0.839800601976 0.542894970432 -0.542894970432 0.839800601976 111.894472287 -140.195845758)",
+                        "strokeWidth": 2,
+                        "y": 260.5,
+                        "x": 419});
 
-  // shapeManager.addShapeJson({"type": "Ellipse",
-  //                           "strokeColor": "#00ff00",
-  //                           "radiusY": 31.5,
-  //                           "radiusX": 91,
-  //                           "transform": "matrix(2.39437435854 -0.644012141633 2.14261951162 0.765696311828 -1006.17788921 153.860479773)",
-  //                           "strokeWidth": 2,
-  //                           "y": 297.5,
-  //                           "x": 258});
+  shapeManager.addShapeJson({"type": "Point",
+                        "strokeWidth": 2,
+                        "y": 30,
+                        "x": 30});
 
-  // shapeManager.addShapeJson({"type": "Ellipse",
-  //                       "strokeColor": "#ffff00",
-  //                       "radiusY": 71.5,
-  //                       "radiusX": 41,
-  //                       "transform": "matrix(0.839800601976 0.542894970432 -0.542894970432 0.839800601976 111.894472287 -140.195845758)",
-  //                       "strokeWidth": 2,
-  //                       "y": 260.5,
-  //                       "x": 419});
-
-  // shapeManager.addShapeJson({"type": "Point",
-  //                       "strokeWidth": 2,
-  //                       "y": 30,
-  //                       "x": 30});
-
-  // var s = shapeManager.addShapeJson({"type": "Line",
-  //                            "strokeColor": "#00ff00",
-  //                            "strokeWidth": 2,
-  //                            "x1": 400, "y1": 400,
-  //                            "x2": 250, "y2": 310});
-  // lastShapeId = s.toJson().id;
+  shapeManager.addShapeJson({"type": "Line",
+                             "strokeColor": "#00ff00",
+                             "strokeWidth": 2,
+                             "x1": 400, "y1": 400,
+                             "x2": 250, "y2": 310});
 
   shapeManager.addShapeJson({
     type: "Arrow",
