@@ -621,10 +621,10 @@
                 });
         },
 
-        refreshMetadata: function() {
-            // Refresh metadata (name, dataset, channels, pixel sizes, ...) for all panels
+        reloadMetadata: function() {
+            // Reload metadata (name, dataset, channels, pixel sizes, ...) for all panels
             // Fetch each image's data once per id, then apply to all panels with that imageId.
-            // Refresh here must not change edits made by the user (channel LUT, contrast, field of view, ...)
+            // Reload here must not change edits made by the user (channel LUT, contrast, field of view, ...)
 
             var panels = this.panels;
             var ids = {};
@@ -689,7 +689,7 @@
                 });
             });
             this.set('unsaved', true);
-            alert("Metadata refreshed for " + this.panels.length + " panel" + (this.panels.length > 1 ? 's.' : '.'));
+            alert("Metadata reloaded for " + this.panels.length + " panel" + (this.panels.length > 1 ? 's.' : '.'));
         },
 
         // Used to position the #figure within canvas and also to coordinate svg layout.
