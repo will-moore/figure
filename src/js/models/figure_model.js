@@ -689,6 +689,7 @@
                 });
             });
             this.set('unsaved', true);
+            alert("Metadata refreshed for " + this.panels.length + " panel" + (this.panels.length > 1 ? 's.' : '.'));
         },
 
         // Used to position the #figure within canvas and also to coordinate svg layout.
