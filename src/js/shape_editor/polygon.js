@@ -330,7 +330,7 @@ Polygon.prototype.drawShape = function drawShape() {
   this.element.attr({
     path: path,
     stroke: strokeColor,
-    "stroke-width": strokeW,
+    "stroke-width": strokeW * this.manager.getShapeScalingFraction(),
     fill: fillColor,
     'fill-opacity': fillOpacity
   });

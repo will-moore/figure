@@ -317,7 +317,7 @@ Rect.prototype.drawShape = function drawShape() {
     width: w,
     height: h,
     stroke: strokeColor,
-    "stroke-width": lineW,
+    "stroke-width": lineW * this.manager.getShapeScalingFraction(),
     fill: fillColor,
     "fill-opacity": fillOpacity
   });
