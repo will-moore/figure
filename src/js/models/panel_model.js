@@ -177,11 +177,17 @@
                                     if(inset_lbl[0].text !== txtShape.text){
                                         txtShape.text = inset_lbl[0].text.replaceAll("*","")
                                     }
+                                } else {
+                                    // No label found for inset - remove the Text shape
+                                    // return undefined to filter out this shape
+                                    return;
                                 }
                                 return {...txtShape, ...newCoords};
                             }
                             return shape;
                         });
+                        // filter out any undefined shapes (deleted Text)
+                        updated = updated.filter(shape => shape !== undefined);
                         this.save('shapes', updated);
                         this.trigger("change:shapes")
                     }
