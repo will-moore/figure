@@ -260,6 +260,13 @@ export const RoiModalView = Backbone.View.extend({
 
             // Paste (will offset if shape exists)
             var viewport = this.m.getViewportAsRect();
+
+            shapesJson = shapesJson.map(s => {
+                if(s.type == "Label") {
+                    return this.shapeManager.convertOmeroLabelToFigureText(s);
+                }
+                return s;
+            });
             shape = this.shapeManager.pasteShapesJson(shapesJson, viewport);
             if (!shape) {
                 alert("Couldn't add shape outside of current view. Try zooming out.");
@@ -271,12 +278,11 @@ export const RoiModalView = Backbone.View.extend({
             this.shapeManager.deleteShapesByIds([this.TEMP_SHAPE_ID]);
             if (shape) {
                 var viewport = this.m.getViewportAsRect();
-                shape.id = this.TEMP_SHAPE_ID;
                 var convertedShape = shape;
-                if(shape.type == "Label"){
-                    convertedShape = this.shapeManager.convertOmeroLabelToFigureText(shape)
-                    convertedShape.id = this.TEMP_SHAPE_ID
+                if(shape.type == "Label") {
+                    convertedShape = this.shapeManager.convertOmeroLabelToFigureText(shape);
                 }
+                convertedShape.id = this.TEMP_SHAPE_ID;
                 var ok = this.shapeManager.addShapeJson(convertedShape, viewport);
             }
         },

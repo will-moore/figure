@@ -49,26 +49,26 @@ var RoiLoaderView = Backbone.View.extend({
             var shape = this.collection.getShape(shapeId);
             var shapeJson = shape.toJSON();
             var shapeList = [shapeJson]
-            if(shapeJson.type != "Label" && shapeJson.Text != undefined){
-                var textRandomId = getRandomId();
-                var rectRandomId = getRandomId();
-                shapeJson.id = rectRandomId;
-                shapeJson.textId = textRandomId;
-                shapeJson.isFromOmero = true;
-                var parentShapeCoords = this.getParentShapeCoords(shapeJson)
-                var textShape = {
-                    text: shapeJson.Text,
-                    id: textRandomId,
-                    x: shapeJson.x,
-                    y: shapeJson.y,
-                    type: "Text",
-                    parentShapeCoords: parentShapeCoords,
-                    linkedShapeId: rectRandomId,
-                    textPosition: "top",
-                    isFromOmero: true
-                }
-                shapeList.push(textShape)
-            }
+            // if(shapeJson.type != "Label" && shapeJson.Text != undefined){
+            //     var textRandomId = getRandomId();
+            //     var rectRandomId = getRandomId();
+            //     shapeJson.id = rectRandomId;
+            //     shapeJson.textId = textRandomId;
+            //     shapeJson.isFromOmero = true;
+            //     var parentShapeCoords = this.getParentShapeCoords(shapeJson)
+            //     var textShape = {
+            //         text: shapeJson.Text,
+            //         id: textRandomId,
+            //         x: shapeJson.x,
+            //         y: shapeJson.y,
+            //         type: "Text",
+            //         parentShapeCoords: parentShapeCoords,
+            //         linkedShapeId: rectRandomId,
+            //         textPosition: "top",
+            //         isFromOmero: true
+            //     }
+            //     shapeList.push(textShape)
+            // }
             this.collection.trigger('shape_add', shapeList.reverse());
         }
     },

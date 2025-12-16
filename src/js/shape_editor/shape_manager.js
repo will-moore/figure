@@ -477,21 +477,22 @@ ShapeManager.prototype.findShapeAtCoords = function findShapeAtCoords(
   return false;
 };
 
-// ShapeManager.prototype.convertOmeroLabelToFigureText = function convertOmeroLabelToFigureText(shape){
-//    return {
-//       text: shape.Text,
-//       fillColor: shape.fillColor,
-//       fillOpacity: shape.fillOpacity,
-//       textColor: shape.strokeColor,
-//       fontSize: shape.FontSize.Value / 2,
-//       type: "Text",
-//       x: shape.x,
-//       y: shape.y,
-//       linkedShapeId: -1,
-//       textPosition: "freehand"
-//     }
+ShapeManager.prototype.convertOmeroLabelToFigureText = function convertOmeroLabelToFigureText(shape){
+   return {
+      text: shape.Text,
+      fillColor: shape.fillColor,
+      fillOpacity: 0,
+      strokeColor: shape.strokeColor,
+      // fontSize from e.g. iviewer is unreliable (can be very large)
+      fontSize: 18,     // shape.FontSize.Value / 2,
+      type: "Text",
+      x: shape.x,
+      y: shape.y,
+      linkedShapeId: -1,
+      textAnchor: "start",
+    }
 
-// };
+};
 
 // Add new shapes from json but, IF it matches existing shape - offset a bit
 ShapeManager.prototype.pasteShapesJson = function pasteShapesJson(
@@ -500,9 +501,7 @@ ShapeManager.prototype.pasteShapesJson = function pasteShapesJson(
 ) {
   var self = this,
     newShapes = [],
-    pastedShapes = [],
-    allPasted = true,
-    idsMap = new Map();
+    allPasted = true;
 
   // For each shape we want to paste...
   jsonShapes.forEach(function (s) {
