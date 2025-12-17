@@ -377,25 +377,6 @@ Text.prototype.drawShape = function drawShape() {
   }
 };
 
-Text.prototype.applyShapeRotation = function applyShapeRotation(cx, cy, x, y, rotation){
-  var dx = cx - x
-  var dy = cy - y
-  // distance of point from centre of rotation
-  var h = Math.sqrt(dx * dx + dy * dy)
-  // and the angle
-  var angle1 = Math.atan2(dx, dy)
-
-  // Add the rotation to the angle and calculate new
-  // opposite and adjacent lengths from centre of rotation
-  var angle2 = angle1 - rotation * Math.PI / 180
-  var newo = Math.sin(angle2) * h
-  var newa = Math.cos(angle2) * h
-  // to give correct x and y within cropped panel
-  x = cx - newo
-  y = cy - newa
-  return {x, y}
-};
-
 Text.prototype.getHandleCoords = function getHandleCoords() {
   var bbox = this.element.getBBox();
   var x = bbox.x,
