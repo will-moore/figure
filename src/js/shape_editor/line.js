@@ -590,9 +590,10 @@ var CreateArrow = function CreateArrow(options) {
       x2: startX,
       y2: startY,
       area: 0,
-      strokeWidth: strokeWidth * this.manager.getShapeScalingFraction(),
+      strokeWidth: strokeWidth,
       zoom: zoom,
       strokeColor: strokeColor,
+      fillOpacity: 0,
     });
   };
 
