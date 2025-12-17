@@ -304,7 +304,7 @@ export const RoiModalView = Backbone.View.extend({
             } else if (roiJson.CROP) {
                 // Need to create Rectangle with current color & line width
                 var color = $(".roi_toolbar .shape-color span:first", this.$el).attr('data-color'),
-                    fillColor = $(".roi_toolbar .fill-color span:first", this.$el).attr('data-fill-color'),
+                    fillColor = $(".roi_toolbar .fill-color span:first", this.$el).attr('data-color'),
                     opacity = $(".roi_toolbar .fill-opacity span:first", this.$el).attr('data-fill-opacity'),
                     width = $(".roi_toolbar .line-width span:first", this.$el).attr('data-line-width'),
                     rect = roiJson.CROP;
@@ -389,11 +389,12 @@ export const RoiModalView = Backbone.View.extend({
 
         changeColor: function(event) {
             var color = $("span:first", event.target).attr('data-color');
+            console.log("Changing color to " + color);
             this.shapeManager.setStrokeColor("#" + color);
         },
 
         changeFillColor: function(event) {
-            var color = $("span:first", event.target).attr('data-fill-color');
+            var color = $("span:first", event.target).attr('data-color');
             this.shapeManager.setFillColor("#" + color);
         },
 
@@ -414,19 +415,17 @@ export const RoiModalView = Backbone.View.extend({
             var $button = $("button.dropdown-toggle", $li.parent().parent());
             $span = $span.clone();
 
+            console.log($span);
+
             if ($span.hasClass('colorpickerOption')) {
-                var oldcolor = $a.attr('data-oldcolor');
+                var oldcolor = $span.attr('data-color');
                 FigureColorPicker.show({
                     'color': oldcolor,
                     'success': function(newColor){
                         $span.css({'background-color': newColor, 'background-image': 'none'});
                         // remove # from E.g. #ff00ff
                         newColor = newColor.replace("#", "");
-                        if($a.attr('data-color')){
-                            $span.attr('data-color', newColor);
-                        }else{
-                            $span.attr('data-fill-color', newColor);
-                        }
+                        $span.attr('data-color', newColor);
                         $('span:first', $button).replaceWith($span);
                         // can listen for this if we want to 'submit' etc
                         $button.trigger('change');

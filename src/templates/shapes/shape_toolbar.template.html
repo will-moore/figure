@@ -61,8 +61,8 @@
                 <span data-color="00FFFF" style="background-color:#0ff">&nbsp &nbsp &nbsp</span>&nbsp Cyan
             </a></li>
             <li class="dropdown-divider"></li>
-            <li><a class="dropdown-item" data-color="colorpicker" data-oldcolor="<%= color %>" href="#">
-                <span class="colorpickerOption">&nbsp &nbsp &nbsp</span>&nbsp More Colors...
+            <li><a class="dropdown-item" href="#">
+                <span class="colorpickerOption" data-color="<%= color %>">&nbsp &nbsp &nbsp</span>&nbsp More Colors...
             </a></li>
         </ul>
     </div>
@@ -85,37 +85,38 @@
     <div class="btn-group">
         <button type="button" class="fill-color btn btn-outline-secondary dropdown-toggle" title="Fill Color"
             data-bs-toggle="dropdown">
-            <span data-fill-color="<%= fillColor %>" style="background-color:#<%= fillColor %>">&nbsp &nbsp &nbsp</span>
+            <span data-color="<%= fillColor %>" style="background-color:#<%= fillColor %>">&nbsp &nbsp &nbsp</span>
             <span class="caret"></span>
         </button>
         <ul class="dropdown-menu dropdownSelect colorpicker" role="menu">
             <li><a class="dropdown-item" href="#">
-                <span data-fill-color="000000" style="background-color:#000">&nbsp &nbsp &nbsp</span>&nbsp Black
+                <span data-color="000000" style="background-color:#000">&nbsp &nbsp &nbsp</span>&nbsp Black
             </a></li>
             <li><a class="dropdown-item" href="#">
-                <span data-fill-color="0000FF" style="background-color:#00f">&nbsp &nbsp &nbsp</span>&nbsp Blue
+                <span data-color="0000FF" style="background-color:#00f">&nbsp &nbsp &nbsp</span>&nbsp Blue
             </a></li>
             <li><a class="dropdown-item" href="#">
-                <span data-fill-color="00FF00" style="background-color:#0f0">&nbsp &nbsp &nbsp</span>&nbsp Green
+                <span data-color="00FF00" style="background-color:#0f0">&nbsp &nbsp &nbsp</span>&nbsp Green
             </a></li>
             <li><a class="dropdown-item" href="#">
-                <span data-fill-color="FF0000" style="background-color:#f00">&nbsp &nbsp &nbsp</span>&nbsp Red
+                <span data-color="FF0000" style="background-color:#f00">&nbsp &nbsp &nbsp</span>&nbsp Red
             </a></li>
             <li><a class="dropdown-item" href="#">
-                <span data-fill-color="FFFF00" style="background-color:#ff0">&nbsp &nbsp &nbsp</span>&nbsp Yellow
+                <span data-color="FFFF00" style="background-color:#ff0">&nbsp &nbsp &nbsp</span>&nbsp Yellow
             </a></li>
             <li><a class="dropdown-item" href="#">
-                <span data-fill-color="FFFFFF" style="background-color:#fff">&nbsp &nbsp &nbsp</span>&nbsp White
+                <span data-color="FFFFFF" style="background-color:#fff">&nbsp &nbsp &nbsp</span>&nbsp White
             </a></li>
             <li><a class="dropdown-item" href="#">
-                <span data-fill-color="FF00FF" style="background-color:#f0f">&nbsp &nbsp &nbsp</span>&nbsp Magenta
+                <span data-color="FF00FF" style="background-color:#f0f">&nbsp &nbsp &nbsp</span>&nbsp Magenta
             </a></li>
             <li><a class="dropdown-item" href="#">
-                <span data-fill-color="00FFFF" style="background-color:#0ff">&nbsp &nbsp &nbsp</span>&nbsp Cyan
+                <span data-color="00FFFF" style="background-color:#0ff">&nbsp &nbsp &nbsp</span>&nbsp Cyan
             </a></li>
             <li class="dropdown-divider"></li>
-            <li><a class="dropdown-item" data-fill-color="colorpicker" data-oldcolor="<%= fillColor %>" href="#">
-                <span class="colorpickerOption">&nbsp &nbsp &nbsp</span>&nbsp More Colors...
+            <li><a class="dropdown-item" href="#">
+                <span class="colorpickerOption" data-color="<%= fillColor %>">
+                    &nbsp &nbsp &nbsp</span>&nbsp More Colors...
             </a></li>
         </ul>
     </div>
