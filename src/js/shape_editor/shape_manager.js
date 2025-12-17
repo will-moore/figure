@@ -394,18 +394,6 @@ ShapeManager.prototype.setTextRotation = function setTextRotation(textRotation) 
   }
 };
 
-ShapeManager.prototype.getTextColor = function getTextColor() {
-  return this._textColor;
-};
-
-ShapeManager.prototype.setTextColor = function setTextColor(textColor) {
-  this._textColor = textColor;
-  var selected = this.getSelectedShapes();
-  for (var s=0; s<selected.length; s++) {
-      selected[s].setTextColor(textColor);
-  }
-};
-
 ShapeManager.prototype.getVerticalFlip = function getVerticalFlip() {
   return this._vFlip;
 };

@@ -162,15 +162,6 @@ Text.prototype.getStrokeColor = function getStrokeColor() {
   return this._strokeColor;
 };
 
-Text.prototype.setTextColor = function setTextColor(color) {
-  this._textColor = color;
-  this.drawShape();
-};
-
-Text.prototype.getTextColor = function getTextColor() {
-  return this._textColor;
-};
-
 Text.prototype.setStrokeWidth = function setStrokeWidth(width) {
   this._strokeWidth = width;
   this.drawShape();
