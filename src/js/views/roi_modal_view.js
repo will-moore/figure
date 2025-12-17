@@ -342,6 +342,10 @@ export const RoiModalView = Backbone.View.extend({
 
             var shapesJson = this.shapeManager.getShapesJson();
             shapesJson = shapesJson.filter(function(s){
+                // Delete any Text shapes with "" text
+                if (s.type === "Text" && (s.text === null || s.text.trim() === "")) {
+                    return false;
+                }
                 // Remove any temporary shapes (from hovering over OMERO shapes)
                 return (s.id !== this.TEMP_SHAPE_ID);
             }.bind(this));
