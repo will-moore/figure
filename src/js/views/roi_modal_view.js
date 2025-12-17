@@ -15,17 +15,10 @@ import roi_zt_buttons from '../../templates/modal_dialogs/roi_zt_buttons.templat
 import RoiLoaderView from './roi_loader_view';
 import { hideModal, getJson } from "./util";
 
-const LABEL_POSITION_ICONS = {
-    "topleft": "bi-box-arrow-in-up-left",
-    "topright": "bi-box-arrow-in-up-right",
-    "bottomleft": "bi-box-arrow-in-down-left",
-    "bottomright": "bi-box-arrow-in-down-right",
-    "left": "bi-box-arrow-left",
-    "top": "bi-box-arrow-up",
-    "right": "bi-box-arrow-right",
-    "bottom": "bi-box-arrow-down",
-    "center": "bi-arrows-fullscreen",
-    "freehand": "bi-arrows-move"
+const TEXT_ANCHOR_ICONS = {
+    "start": "bi-text-left",
+    "middle": "bi-text-center",
+    "end": "bi-text-right"
 }
 
 export const RoiModalView = Backbone.View.extend({
@@ -150,12 +143,7 @@ export const RoiModalView = Backbone.View.extend({
             "click .dropdownSelect a": "select_dropdown_option",
             "change .line-width": "changeLineWidth",
             "change .text-font-size": "changeFontSize",
-            "change .text-position": "changeTextPosition",
-            "change .text-color": "changeTextColor",
-            "change .text-background-opacity": "changeTextBackgroundOpacity",
-            "change .text-background-color": "changeTextBackgroundColor",
-            "click .show-text":"showText",
-            "click .hide-text":"hideText",
+            "change .text-anchor": "changeTextAnchor",
             "keyup .label-text": "labelInputKeyup",
             "change .shape-color": "changeColor",
             "change .fill-color": "changeFillColor",
@@ -272,6 +260,13 @@ export const RoiModalView = Backbone.View.extend({
 
             // Paste (will offset if shape exists)
             var viewport = this.m.getViewportAsRect();
+
+            shapesJson = shapesJson.map(s => {
+                if(s.type == "Label") {
+                    return this.shapeManager.convertOmeroLabelToFigureText(s);
+                }
+                return s;
+            });
             shape = this.shapeManager.pasteShapesJson(shapesJson, viewport);
             if (!shape) {
                 alert("Couldn't add shape outside of current view. Try zooming out.");
@@ -283,12 +278,11 @@ export const RoiModalView = Backbone.View.extend({
             this.shapeManager.deleteShapesByIds([this.TEMP_SHAPE_ID]);
             if (shape) {
                 var viewport = this.m.getViewportAsRect();
-                shape.id = this.TEMP_SHAPE_ID;
                 var convertedShape = shape;
-                if(shape.type == "Label"){
-                    convertedShape = this.shapeManager.convertOmeroLabelToFigureText(shape)
-                    convertedShape.id = this.TEMP_SHAPE_ID
+                if(shape.type == "Label") {
+                    convertedShape = this.shapeManager.convertOmeroLabelToFigureText(shape);
                 }
+                convertedShape.id = this.TEMP_SHAPE_ID;
                 var ok = this.shapeManager.addShapeJson(convertedShape, viewport);
             }
         },
@@ -310,7 +304,7 @@ export const RoiModalView = Backbone.View.extend({
             } else if (roiJson.CROP) {
                 // Need to create Rectangle with current color & line width
                 var color = $(".roi_toolbar .shape-color span:first", this.$el).attr('data-color'),
-                    fillColor = $(".roi_toolbar .fill-color span:first", this.$el).attr('data-fill-color'),
+                    fillColor = $(".roi_toolbar .fill-color span:first", this.$el).attr('data-color'),
                     opacity = $(".roi_toolbar .fill-opacity span:first", this.$el).attr('data-fill-opacity'),
                     width = $(".roi_toolbar .line-width span:first", this.$el).attr('data-line-width'),
                     rect = roiJson.CROP;
@@ -348,6 +342,10 @@ export const RoiModalView = Backbone.View.extend({
 
             var shapesJson = this.shapeManager.getShapesJson();
             shapesJson = shapesJson.filter(function(s){
+                // Delete any Text shapes with "" text
+                if (s.type === "Text" && (s.text === null || s.text.trim() === "")) {
+                    return false;
+                }
                 // Remove any temporary shapes (from hovering over OMERO shapes)
                 return (s.id !== this.TEMP_SHAPE_ID);
             }.bind(this));
@@ -378,66 +376,29 @@ export const RoiModalView = Backbone.View.extend({
         changeFontSize: function(event) {
             var fontSize = $("span:first", event.target).attr('data-font-size');
             fontSize = parseFloat(fontSize, 10);
-            this.shapeManager.setTextFontSize(fontSize);
+            this.shapeManager.setFontSize(fontSize);
         },
 
-        changeTextPosition: function(event){
-           var position =  $('span:first', event.target).attr('data-position');
-           this.shapeManager.setTextPosition(position);
-        },
-
-        showText: function(event){
-            event.preventDefault()
-            var text = $("#label-text").val()
-            if(text != undefined && text != ""){
-                this.addTextToShape(event)
-                this.shapeManager.setShowText(true);
-                this.renderToolbar();
-            }
-        },
-
-        hideText: function(event){
-            var previousText = this.shapeManager.getText();
-            var text = $("#label-text").val()
-            if(text == previousText){
-                this.shapeManager.setShowText(false);
-                this.renderToolbar();
-            }else{
-                this.addTextToShape(event)
-                this.renderToolbar();
-            }
+        changeTextAnchor: function(event) {
+            var textAnchor = $("span:first", event.target).attr('data-text-anchor');
+            this.shapeManager.setTextAnchor(textAnchor);
         },
 
         labelInputKeyup: function(event){
-            // This will update text on the currently selected shape
-            this.addTextToShape(event);
-        },
-
-        addTextToShape: function(event){
-            // Adds text to the currently selected shape
-            if (event) {
-                event.preventDefault();
-            }
-            var text = $("#label-text").val();
-            this.shapeManager.createShapeText();
-
-            // request focus again as when we add new shapes, it looses the focus
-            // on the text placeholder
-            $("#label-text").val(text);
-            $("#label-text").trigger("focus");
-
+            // This will update text on any currently selected Text shapes
+            // and/or set the default text for new Text shapes
+            var text = event.target.value;
             this.shapeManager.setText(text);
-            this.shapeManager.setTextPosition(this.shapeManager.getTextPosition());
-            this.shapeManager.setTextFontSize(this.shapeManager.getTextFontSize());
-         },
+        },
 
         changeColor: function(event) {
             var color = $("span:first", event.target).attr('data-color');
+            console.log("Changing color to " + color);
             this.shapeManager.setStrokeColor("#" + color);
         },
 
         changeFillColor: function(event) {
-            var color = $("span:first", event.target).attr('data-fill-color');
+            var color = $("span:first", event.target).attr('data-color');
             this.shapeManager.setFillColor("#" + color);
         },
 
@@ -447,47 +408,28 @@ export const RoiModalView = Backbone.View.extend({
             this.shapeManager.setFillOpacity(opacity);
         },
 
-        changeTextColor: function(event) {
-            var color = $("span:first", event.target).attr('data-text-color');
-            this.shapeManager.setTextColor("#" + color);
-        },
-
-        changeTextBackgroundColor: function(event) {
-            var color = $("span:first", event.target).attr('data-text-background-color');
-            this.shapeManager.setTextBackgroundColor("#" + color);
-        },
-
-        changeTextBackgroundOpacity: function(event) {
-            var opacity = $("span:first", event.target).attr('data-text-background-opacity');
-            opacity = parseFloat(opacity, 10).toFixed(1);
-            this.shapeManager.setTextBackgroundOpacity(opacity);
-        },
-
         // Handles all the various drop-down menus in the toolbar
         select_dropdown_option: function(event) {
             event.preventDefault();
-            var $a = $(event.target),
-                $span = $a.children('span');
-            // Take the <span> from the <a> and place it in the <button>
-            if ($span.length === 0) $span = $a;  // in case we clicked on <span>
+            var $target = $(event.target);
+            // $target could be <a> or <span> or <i>
+            var $span = $("span", $target.closest('li'));
             var $li = $span.parent().parent();
             // Don't use $li.parent().prev() since bootstrap inserts a div.dropdown-backdrop on Windows
             var $button = $("button.dropdown-toggle", $li.parent().parent());
             $span = $span.clone();
 
+            console.log($span);
+
             if ($span.hasClass('colorpickerOption')) {
-                var oldcolor = $a.attr('data-oldcolor');
+                var oldcolor = $span.attr('data-color');
                 FigureColorPicker.show({
                     'color': oldcolor,
                     'success': function(newColor){
                         $span.css({'background-color': newColor, 'background-image': 'none'});
                         // remove # from E.g. #ff00ff
                         newColor = newColor.replace("#", "");
-                        if($a.attr('data-color')){
-                            $span.attr('data-color', newColor);
-                        }else{
-                            $span.attr('data-fill-color', newColor);
-                        }
+                        $span.attr('data-color', newColor);
                         $('span:first', $button).replaceWith($span);
                         // can listen for this if we want to 'submit' etc
                         $button.trigger('change');
@@ -517,7 +459,7 @@ export const RoiModalView = Backbone.View.extend({
             }
             this.shapeManager.setState(newState);
             if (this.shapeManager.getSelectedShapes().length == 0){
-                this.shapeManager.setText("");
+                this.shapeManager.setText("Text");
             }
             this.renderToolbar();
         },
@@ -536,38 +478,38 @@ export const RoiModalView = Backbone.View.extend({
 
         renderToolbar: function() {
             // render toolbar
-            var sel = this.shapeManager.getSelectedShapes().length > 0,
+            let shapes = this.shapeManager.getSelectedShapesJson();
+            let textShapes = shapes.filter(s => s.type === "Text");
+            var sel = shapes.length > 0,
                 state = this.shapeManager.getState(),
                 lineW = this.shapeManager.getStrokeWidth(),
                 color = this.shapeManager.getStrokeColor(),
                 fillColor = this.shapeManager.getFillColor(),
-                textColor = this.shapeManager.getTextColor(),
-                textBackgroundColor = this.shapeManager.getTextBackgroundColor(),
-                textBackgroundOpacity = this.shapeManager.getTextBackgroundOpacity(),
                 opacity = this.shapeManager.getFillOpacity(),
                 scale = this.zoom,
                 toPaste = this.model.get('clipboard'),
                 windows = navigator.platform.toUpperCase().indexOf('WIN') > -1,
                 lineWidths = [0.25, 0.5, 0.75, 1, 2, 3, 4, 5, 7, 10, 15, 20, 30],
                 opacities = ["0", "0.1", "0.2", "0.3", "0.4", "0.5", "0.6", "0.7", "0.8", "0.9", "1"],
-                textPosition = this.shapeManager.getTextPosition(),
-                fontSize = this.shapeManager.getTextFontSize(),
+                fontSize = this.shapeManager.getFontSize(),
+                textAnchor = this.shapeManager.getTextAnchor(),
                 fontSizes = [6, 8, 10, 12, 14, 18, 21, 24, 36, 48],
-                text = sel ? this.shapeManager.getText() : "",
-                showText = sel ? this.shapeManager.getShowText() : false;
+                text = textShapes.length > 0 ? this.shapeManager.getText() : "";
+            // various different text values
+            if (text === false || text === undefined) text = "";
             color = color ? color.replace("#", "") : 'FFFFFF';
             fillColor = fillColor ? fillColor.replace("#", "") : 'FFFFFF';
-            textColor = textColor ? textColor.replace("#", "") : 'FFFFFF';
-            textBackgroundColor = textBackgroundColor ? textBackgroundColor.replace("#", "") : 'FFFFFF';
             toPaste = (toPaste && (toPaste.SHAPES || toPaste.CROP));
             opacity = opacity <= 0.01 ? parseInt(opacity) : opacity;
-            textBackgroundOpacity = textBackgroundOpacity <= 0.01 ? parseInt(textBackgroundOpacity) : textBackgroundOpacity;
+            textAnchor = textAnchor in TEXT_ANCHOR_ICONS ? textAnchor : "start";
 
             var json = {'state': state,
                         'lineWidths': lineWidths,
                         'lineWidth': lineW,
                         'color': color,
                         'fillColor': fillColor,
+                        'textAnchor': textAnchor,
+                        'textAnchorIcon': TEXT_ANCHOR_ICONS[textAnchor],
                         'opacities': opacities,
                         'opacity': opacity,
                         'sel': sel,
@@ -576,14 +518,9 @@ export const RoiModalView = Backbone.View.extend({
                         'zoom': parseInt(scale * 100, 10),
                         'omeroRoiCount': this.omeroRoiCount,
                         'roisLoaded': this.roisLoaded,
-                        'textPosition': textPosition,
-                        'position_icon_cls': LABEL_POSITION_ICONS[textPosition],
                         'fontSizes': fontSizes,
                         'fontSize': fontSize,
-                        'showState': !showText,
-                        'textColor': textColor,
-                        'textBackgroundOpacity': textBackgroundOpacity,
-                        'textBackgroundColor': textBackgroundColor,
+                        'textControlsEnabled': textShapes.length > 0 || state === "TEXT",
                         'text': text};
 
             $(".roi_toolbar", this.$el).html(this.template(json));
@@ -735,7 +672,7 @@ export const RoiModalView = Backbone.View.extend({
             this.shapeManager._orig_width = w;
             this.shapeManager._orig_height = h;
             this.shapeManager.setZoom(scale * 100);
-            this.shapeManager.setShapeScalingFactor(sc * 100);
+            this.shapeManager.setShapeScalingFraction(sc);
             $("#roi_paper").css(svg_css);
 
             $("#roiViewer").css({'width': frame_w + 'px', 'height': frame_h + 'px'});

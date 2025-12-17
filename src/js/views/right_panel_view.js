@@ -155,15 +155,19 @@
                 var svg_css = panel.get_vp_full_plane_css(panel.get('zoom'), frame_w, frame_h);
                 var scale = svg_css.width / panel.get('orig_width');
 
+                var fontSize = 12;
+                var margin = fontSize * 2;
                 var x = vp.x + ((vp.width - rectSize) / 2);
                 var y = vp.y + ((vp.height - rectSize) / 2);
-                var txtX = x + (strokeWidth/2 + 6) / scale,
-                    txtY = y + (strokeWidth/2 + 10)  / scale;
+                var txtX = x + (strokeWidth/2 + margin) / scale,
+                    txtY = y + (strokeWidth/2 + margin)  / scale;
 
                 let rect = {
                     type: "Rectangle",
                     strokeWidth: strokeWidth,
                     strokeColor: "#" + color,
+                    fillColor: "#FFFFFF",
+                    fillOpacity: 0,
                     x: x,
                     y: y,
                     width: rectSize,
@@ -172,22 +176,23 @@
                     textId: textRandomId,
                     rotation: vp.rotation || 0,
                 }
+                if (vp.rotation && !isNaN(vp.rotation)) {
+                    let coords = rotatePoint(txtX, txtY, x + (rectSize/2), y + (rectSize/2), vp.rotation);
+                    txtX = coords.x;
+                    txtY = coords.y;
+                }
                 let text = {
                     type: "Text",
                     strokeWidth: strokeWidth,
-                    textColor: "#" + color,
+                    strokeColor: "#" + color,
+                    fillColor: "#000000",
+                    fillOpacity: 0,
                     x: txtX,
                     y: txtY,
                     id: textRandomId,
-                    linkedShapeId: rectRandomId,
-                    rotation: vp.rotation || 0,
-                    textRotation: -vp.rotation || 0,
                     fontSize: 12,
-                    textPosition: "topleft",
                     text: String.fromCharCode(lastInsetTextIndex),
-                    textAnchor: "start",
-                    showText: true,
-                    parentShapeCoords: {x: x, y: y, width: rectSize, height: rectSize},
+                    textAnchor: "middle",
                 }
                 panel.add_shapes([rect, text]);
                 panel.setLastInsetTextIndex(lastInsetTextIndex)
@@ -1271,19 +1276,6 @@
                     'width': m.get('orig_width'),
                     'height': m.get('orig_height'),
                 });
-
-                var shapes = m.get('shapes');
-                if(shapes){
-                    shapes.forEach(function(sh){
-                        if(sh.type == "Text"){
-                            sh.textRotation = 0;
-                            sh.hFlip = 1;
-                            sh.vFlip = 1;
-                        }
-                    })
-                    m.save('shapes', shapes);
-                    m.trigger('change:vertical_flip')
-                }
             });
         },
 
@@ -1364,7 +1356,7 @@
             "click .flipping_horizontal": "flipping_horizontal",
             "input .rotation-slider": "rotation_input",
             "change .rotation-slider": "rotation_change",
-            "click .panel-rotation": "rotate_panel",
+            "click .panel-rotation": "rotate_panel_90",
         },
 
         rotation_input: function(event) {
@@ -1384,18 +1376,7 @@
             let val = parseInt(event.target.value);
             this.rotation = val;
             this.models.forEach(function(m){
-                var shapes = m.get('shapes');
-                if(shapes){
-                    let newShapes = shapes.map(sh => {
-                        if (sh.type === "Text") {
-                            return {...sh, textRotation: val};
-                         }
-                        return sh;
-                    });
-                    m.save({'rotation': val, 'shapes': newShapes});
-                }else{
-                    m.save('rotation', val);
-                }
+                m.save({'rotation': val});
             });
         },
 
@@ -1428,18 +1409,7 @@
             const isHorizontalFlipped = $button.hasClass('active');
 
             this.models.forEach(function(m) {
-                var shapes = m.get('shapes');
-                if(shapes){
-                    let newShapes = shapes.map(sh => {
-                        if (sh.type === "Text") {
-                            return {...sh, hFlip: isHorizontalFlipped ? -1 : 1};
-                         }
-                        return sh;
-                    });
-                    m.save({'horizontal_flip': isHorizontalFlipped, 'shapes': newShapes});
-                }else{
-                    m.save('horizontal_flip', isHorizontalFlipped);
-                }
+                m.save('horizontal_flip', isHorizontalFlipped);
             });
         },
 
@@ -1465,10 +1435,10 @@
             });
         },
 
-        rotate_panel: function(event){
+        rotate_panel_90: function(event){
             event.preventDefault()
             this.models.forEach(function(m){
-                var rotation = m.setPanelRotation()
+                var rotation = m.rotatePanel90()
                 $(".vp_img").css({'transform':'rotate(' + rotation + 'deg)'});
                 $(".rotation_value").text(rotation);
                 $(".rotation-slider").val(rotation);

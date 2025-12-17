@@ -40,7 +40,9 @@
       Arrow:
       <input type="radio" name="state" value="ARROW"/> <br>
       Point:
-      <input type="radio" name="state" value="POINT"/>
+      <input type="radio" name="state" value="POINT"/> <br>
+      Text:
+      <input type="radio" name="state" value="TEXT"/>
     </div>
 
     <div class="toolbar">
@@ -64,6 +66,28 @@
         White:
         <input type="radio" name="strokeColor" value="#ffffff"/>
       </span>
+      <br>
+      <span style="background: #00ffff">
+        Cyan:
+        <input type="radio" name="strokeColor" value="#00ffff"/>
+      </span>
+      <br>
+      Stroke Width:
+      <select name="strokeWidth">
+        <option value="0.25">0.25</option>
+        <option value="0.5">0.5</option>
+        <option value="1">1</option>
+        <option value="2" selected="selected">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+        <option value="6">6</option>
+        <option value="7">7</option>
+        <option value="8">8</option>
+        <option value="9">9</option>
+        <option value="10">10</option>
+        <option value="15">15</option>
+      </select>
     </div>
 
     <div class="toolbar">
@@ -87,26 +111,12 @@
         White:
         <input type="radio" name="fillColor" value="#ffffff"/>
       </span>
-    </div>
-
-    <div class="toolbar">
-      Stroke Width:
-      <select name="strokeWidth">
-        <option value="0.25">0.25</option>
-        <option value="0.5">0.5</option>
-        <option value="1">1</option>
-        <option value="2" selected="selected">2</option>
-        <option value="3">3</option>
-        <option value="4">4</option>
-        <option value="5">5</option>
-        <option value="6">6</option>
-        <option value="7">7</option>
-        <option value="8">8</option>
-        <option value="9">9</option>
-        <option value="10">10</option>
-        <option value="15">15</option>
-      </select>
-      <br />
+      <br>
+      <span style="background: #00ffff">
+        Cyan:
+        <input type="radio" name="fillColor" value="#00ffff"/>
+      </span>
+      <br>
       Fill Opacity:
       <select name="fillOpacity">
         <option value="0.01">0.01</option>
@@ -121,7 +131,9 @@
         <option value="0.9">0.9</option>
         <option value="1">1</option>
       </select>
-      <br />
+    </div>
+
+    <div class="toolbar">
       Font Size:
       <select name="fontSize">
         <option value="8">8</option>
@@ -137,28 +149,26 @@
         <option value="50">50</option>
       </select>
       <br />
-      Text Position:
-      <select name="textPosition">
-        <option value="top" selected="selected">Top</option>
-        <option value="bottom">Bottom</option>
-        <option value="right">Right</option>
-        <option value="left">Left</option>
-        <option value="topleft">topleft</option>
-        <option value="topright">topright</option>
-        <option value="bottomleft">bottomleft</option>
-        <option value="bottomright">bottomright</option>
+      Text:
+      <input type="text" name="shapeText" placeholder="Text"/>
+      <br />
+      Text Anchor:
+      <select name="textAnchor">
+        <option value="start" selected="selected">Start</option>
+        <option value="middle">Middle</option>
+        <option value="end">End</option>
       </select>
       <br />
-      Align text with rotation:
-      <select name="rotateText">
-        <option value="false" selected="selected">No</option>
-        <option value="true">Yes</option>
-      </select>
-      <br />
+      ShapeScalingFraction (dialog): <span id="shapeScalingFractionDisplay">1</span><br>
+      <input type="range" name="shapeScalingFraction" value="1" step="0.01" min="0.1" max="5" />
+      <br>
+
       Zoom:
       <button name="zoomIn">+</button>
       <button name="zoomOut">-</button>
       <span id="zoomDisplay">100 %</span>
+      <br>
+      Rotate Image: <input type="range" min="0" max="360" value="0" name="rotateImage"/>
     </div>
 
     <div class="toolbar">
@@ -173,7 +183,9 @@
       <button name="getShapes">Get shapes (to console)</button>
       <button name="getBBoxes">Add bounding boxes</button><br>
       <button name="selectShape">Select shape by ID</button>
-      <button name="deleteShapesByIds">Delete shape by ID</button>
+      <button name="deleteShapesByIds">Delete shape by ID</button><br>
+      <button name="createInset">Create inset</button>
+      Rotate Inset: <input type="range" min="0" max="360" value="0" name="rotateInset"/>
     </div>
 
     <div class="imageWrapper">

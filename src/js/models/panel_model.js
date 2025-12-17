@@ -2,6 +2,7 @@
     import Backbone from "backbone";
     import _ from "underscore";
     import $ from "jquery";
+    import { rotatePoint } from "../views/util";
 
     // Corresponds to css - allows us to calculate size of labels
     var LINE_HEIGHT = 1.43;
@@ -131,29 +132,62 @@
                     } else {
                         let rect = panel.getViewportAsRect();
                         let textId = -1;
+                        // update Rectangle with `rect` coordinates and note the OLD coords so we can transform Text
+                        let prevCoords = {};
                         updated = updated.map(shape => {
                             if (shape.type == 'Rectangle' && shape.id == insetRoiId) {
-                                textId = shape.textId
+                                textId = shape.textId;
+                                prevCoords = {x: shape.x, y: shape.y, rotation: shape.rotation || 0, width: shape.width, height: shape.height};
                                 return {...shape, ...rect}
                             }
                             return shape;
                         });
                         updated = updated.map(shape => {
                             if (shape.type == 'Text' && shape.id == textId) {
-                                var prev = shape.parentShapeCoords
-                                shape.parentShapeCoords = {...rect}
-                                shape.x = shape.x + rect.x - prev.x
-                                shape.y = shape.y + rect.y - prev.y
-                                shape.rotation = rect.rotation
-
-                                if(inset_lbl && inset_lbl[0]){
-                                    if(inset_lbl[0].text !== shape.text){
-                                        shape.text = inset_lbl[0].text.replaceAll("*","")
-                                    }
+                                let txtShape = shape;
+                                // apply any translation and rotation to Text
+                                let newCoords = {x: txtShape.x, y: txtShape.y};
+                                // If the Inset was previously rotated, we need to 'undo' that rotation first 
+                                if (prevCoords.rotation && prevCoords.rotation != 360) {
+                                    let prevCx = prevCoords.x + prevCoords.width / 2;
+                                    let prevCy = prevCoords.y + prevCoords.height / 2;
+                                    newCoords = rotatePoint(newCoords.x, newCoords.y, prevCx, prevCy, 360-prevCoords.rotation)
                                 }
+                                // Move x and y wrt to the closest edge.
+                                // If x < centerX, move wrt left edge, else right edge
+                                if (newCoords.x < prevCoords.x + prevCoords.width / 2) {
+                                    newCoords.x += (rect.x - prevCoords.x);
+                                } else {
+                                    newCoords.x += ((rect.x + rect.width) - (prevCoords.x + prevCoords.width));
+                                }
+                                // If y < centerY, move wrt top edge, else bottom edge
+                                if (newCoords.y < prevCoords.y + prevCoords.height / 2) {
+                                    newCoords.y += (rect.y - prevCoords.y);
+                                } else {
+                                    newCoords.y += ((rect.y + rect.height) - (prevCoords.y + prevCoords.height));
+                                }
+                                // Now apply any new rotation
+                                if (rect.rotation != 0) {
+                                    let newCentreX = rect.x + rect.width / 2;
+                                    let newCentreY = rect.y + rect.height / 2;
+                                    newCoords = rotatePoint(newCoords.x, newCoords.y, newCentreX, newCentreY, rect.rotation)
+                                }
+                                // also update the text to match Inset Label
+                                if(inset_lbl && inset_lbl[0]){
+                                    if(inset_lbl[0].text !== txtShape.text){
+                                        txtShape.text = inset_lbl[0].text.replaceAll("*","")
+                                    }
+                                } else {
+                                    // No label found for inset - remove the Text shape
+                                    // return undefined to filter out this shape
+                                    return;
+                                }
+                                return {...txtShape, ...newCoords};
                             }
                             return shape;
                         });
+                        // filter out any undefined shapes (deleted Text)
+                        updated = updated.filter(shape => shape !== undefined);
                         this.save('shapes', updated);
                         this.trigger("change:shapes")
                     }
@@ -399,7 +433,7 @@
             this.save('shapes', rois);
         },
 
-        setPanelRotation(){
+        rotatePanel90(){
             var rotation = this.get('rotation') || "0"
             var panelRotationAngle =  (parseInt(rotation) + 90) % 360
 
@@ -410,15 +444,6 @@
             var yPercent = this.get('orig_height') / viewport.width;
             var zoom = Math.min(xPercent, yPercent) * 100;
 
-            var shapes = this.get('shapes');
-            if(shapes){
-                shapes.forEach(function(sh){
-                    if(sh.type == "Text"){
-                        sh.textRotation = panelRotationAngle;
-                    }
-                })
-                this.save('shapes', shapes)
-            }
             this.save({'rotation': panelRotationAngle, 'height': width, 'width': height, 'zoom': zoom});
 
             return panelRotationAngle

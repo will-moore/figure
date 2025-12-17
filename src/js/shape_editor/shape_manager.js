@@ -42,23 +42,18 @@ var ShapeManager = function ShapeManager(elementId, width, height, options) {
   this._state = "SELECT";
   this._strokeColor = "#ff0000";
   this._strokeWidth = 2;
-  this._text = "";
+  this._text = "Text";
+  this._textAnchor = "start";  // one of "start", "middle", "end"
   this._textFontSize = 12;
-  this._textPosition = "top";
-  this._textRotation = 0;
   this._inModalView = false;
   this._vFlip = false;
   this._hFlip = false;
-  this._rotateText = false;
   this._fillColor = "#ffffff";
   this._fillOpacity = 0;
-  this._textColor = "#ffffff";
-  this._textBackgroundColor = "#ffffff";
-  this._textBackgroundOpacity = 0;
   this._orig_width = width;
   this._orig_height = height;
   this._zoom = 100;
-  this._shapeScalingFactor = 100;
+  this._shapeScalingFraction = 1;
   // Don't allow editing of shapes - no drag/click events
   this.canEdit = !options.readOnly;
 
@@ -84,7 +79,7 @@ var ShapeManager = function ShapeManager(elementId, width, height, options) {
   this.selectRegion = this.paper.rect(0, 0, width, height);
   this.selectRegion
     .hide()
-    .attr({ stroke: "#ddd", "stroke-width": 0, "stroke-dasharray": "- " });
+    .attr({ stroke: "#ddd", "stroke-width": 1, "stroke-dasharray": "- " });
   if (this.canEdit) {
     this.newShapeBg.drag(
       function () {
@@ -249,21 +244,15 @@ ShapeManager.prototype.setZoom = function setZoom(zoomPercent) {
   //                          'top': (currTop - deltaTop) + "px"});
 };
 
-ShapeManager.prototype.setShapeScalingFactor = function setShapeScalingFactor(shapeScalingFactor) {
-  this._shapeScalingFactor = shapeScalingFactor;
+ShapeManager.prototype.setShapeScalingFraction = function setShapeScalingFraction(shapeScalingFraction) {
+  this._shapeScalingFraction = shapeScalingFraction;
   this._shapes.forEach(function (shape) {
-    if (shape.setShapeScalingFactor) {
-      shape.setShapeScalingFactor(shapeScalingFactor);
-    }
+    shape.drawShape();
   });
 }
 
-ShapeManager.prototype.getShapeScalingFactor = function getShapeScalingFactor() {
-  return this._shapeScalingFactor;
-};
-
-ShapeManager.prototype.getOriginalShape = function getOriginalShape() {
-  return {x:0, y:0, width: this._orig_width, height: this._orig_height};
+ShapeManager.prototype.getShapeScalingFraction = function getShapeScalingFraction() {
+  return this._shapeScalingFraction;
 };
 
 ShapeManager.prototype.getZoom = function getZoom(zoomPercent) {
@@ -315,7 +304,9 @@ ShapeManager.prototype.setInModalView = function setInModalView(inModalView) {
   this._inModalView = inModalView;
   var selected = this.getSelectedShapes();
   for (var s=0; s<selected.length; s++) {
+    if (selected[s].setInModalView) {
       selected[s].setInModalView(inModalView);
+    }
   }
 };
 
@@ -341,7 +332,23 @@ ShapeManager.prototype.setText = function setText(text) {
   this._text = text;
   var selected = this.getSelectedShapes();
   for (var s = 0; s < selected.length; s++) {
-    selected[s].setText(text);
+    if (selected[s].setText) {
+      selected[s].setText(text);
+    }
+  }
+};
+
+ShapeManager.prototype.getTextAnchor = function getTextAnchor() {
+  return this._textAnchor;
+};
+
+ShapeManager.prototype.setTextAnchor = function setTextAnchor(textAnchor) {
+  this._textAnchor = textAnchor;
+  var selected = this.getSelectedShapes();
+  for (var s = 0; s < selected.length; s++) {
+    if (selected[s].setTextAnchor) {
+      selected[s].setTextAnchor(textAnchor);
+    }
   }
 };
 
@@ -357,28 +364,18 @@ ShapeManager.prototype.setShowText = function setShowText(showText) {
   }
 };
 
-ShapeManager.prototype.getTextFontSize = function getTextFontSize() {
+ShapeManager.prototype.getFontSize = function getTextFontSize() {
   return this._textFontSize;
 };
 
-ShapeManager.prototype.setTextFontSize = function setTextFontSize(fontSize) {
+ShapeManager.prototype.setFontSize = function setFontSize(fontSize) {
   fontSize = parseFloat(fontSize, 10);
   this._textFontSize = fontSize;
   var selected = this.getSelectedShapes();
   for (var s = 0; s < selected.length; s++) {
-    selected[s].setFontSize(fontSize);
-  }
-};
-
-ShapeManager.prototype.getTextPosition = function getTextPosition() {
-  return this._textPosition;
-};
-
-ShapeManager.prototype.setTextPosition = function setTextPosition(position) {
-  this._textPosition = position;
-  var selected = this.getSelectedShapes();
-  for (var s = 0; s < selected.length; s++) {
-    selected[s].setTextPosition(position);
+    if (selected[s].setFontSize) {
+      selected[s].setFontSize(fontSize);
+    }
   }
 };
 
@@ -388,10 +385,13 @@ ShapeManager.prototype.getTextRotation = function getTextRotation() {
 
 ShapeManager.prototype.setTextRotation = function setTextRotation(textRotation) {
   this._textRotation = textRotation;
-  var selected = this.getSelectedShapes();
-  for (var s = 0; s < selected.length; s++) {
-    selected[s].setTextRotation(textRotation);
-  };
+  // redraw all Text shapes
+  var shapes = this.getShapes();
+  for (var s = 0; s < shapes.length; s++) {
+    if (shapes[s].type == "Text") {
+      shapes[s].drawShape();
+    }
+  }
 };
 
 ShapeManager.prototype.getTextColor = function getTextColor() {
@@ -406,48 +406,17 @@ ShapeManager.prototype.setTextColor = function setTextColor(textColor) {
   }
 };
 
-ShapeManager.prototype.getTextBackgroundColor = function getTextBackgroundColor() {
-  return this._textBackgroundColor;
-};
-
-ShapeManager.prototype.setTextBackgroundColor = function setTextBackgroundColor(textBackgroundColor) {
-  this._textBackgroundColor = textBackgroundColor;
-  var selected = this.getSelectedShapes();
-  for (var s=0; s<selected.length; s++) {
-      selected[s].setTextBackgroundColor(textBackgroundColor);
-  }
-};
-
-ShapeManager.prototype.getTextBackgroundOpacity = function getTextBackgroundOpacity() {
-  return this._textBackgroundOpacity;
-};
-
-ShapeManager.prototype.setTextBackgroundOpacity = function setTextBackgroundOpacity(textBackgroundOpacity) {
-  var textBackgroundOpacity = parseFloat(textBackgroundOpacity, 10).toFixed(1);
-  if(textBackgroundOpacity <= 0.01) textBackgroundOpacity = parseInt(textBackgroundOpacity);
-  this._textBackgroundOpacity = textBackgroundOpacity;
-  var selected = this.getSelectedShapes();
-  for (var s=0; s<selected.length; s++) {
-      selected[s].setTextBackgroundOpacity(textBackgroundOpacity);
-  }
-};
-
 ShapeManager.prototype.getVerticalFlip = function getVerticalFlip() {
   return this._vFlip;
 };
 
 ShapeManager.prototype.setVerticalFlip = function setVerticalFlip(vFlip) {
   this._vFlip = vFlip;
-  var selected = this.getSelectedShapes();
-  for (var s = 0; s < selected.length; s++) {
-    selected[s].setVerticalFlip(vFlip);
-  };
-};
-
-ShapeManager.prototype.createShapeText = function createShapeText() {
-  var selected = this.getSelectedShapes();
-  for (var s = 0; s < selected.length; s++) {
-    selected[s].createShapeText();
+  var shapes = this.getShapes();
+  for (var s = 0; s < shapes.length; s++) {
+    if (shapes[s].type == "Text") {
+      shapes[s].drawShape();
+    }
   };
 };
 
@@ -457,9 +426,11 @@ ShapeManager.prototype.getHorizontalFlip = function getHorizontalFlip() {
 
 ShapeManager.prototype.setHorizontalFlip = function setHorizontalFlip(hFlip) {
   this._hFlip = hFlip;
-  var selected = this.getSelectedShapes();
-  for (var s = 0; s < selected.length; s++) {
-    selected[s].setHorizontalFlip(hFlip);
+  var shapes = this.getShapes();
+  for (var s = 0; s < shapes.length; s++) {
+    if (shapes[s].type == "Text") {
+      shapes[s].drawShape();
+    }
   };
 };
 
@@ -510,14 +481,15 @@ ShapeManager.prototype.convertOmeroLabelToFigureText = function convertOmeroLabe
    return {
       text: shape.Text,
       fillColor: shape.fillColor,
-      fillOpacity: shape.fillOpacity,
-      textColor: shape.strokeColor,
-      fontSize: shape.FontSize.Value / 2,
+      fillOpacity: 0,
+      strokeColor: shape.strokeColor,
+      // fontSize from e.g. iviewer is unreliable (can be very large)
+      fontSize: 18,     // shape.FontSize.Value / 2,
       type: "Text",
       x: shape.x,
       y: shape.y,
       linkedShapeId: -1,
-      textPosition: "freehand"
+      textAnchor: "start",
     }
 
 };
@@ -529,33 +501,13 @@ ShapeManager.prototype.pasteShapesJson = function pasteShapesJson(
 ) {
   var self = this,
     newShapes = [],
-    pastedShapes = [],
-    allPasted = true,
-    idsMap = new Map();
+    allPasted = true;
 
   // For each shape we want to paste...
-  jsonShapes.forEach(function (sh) {
-    var csh = $.extend(true, {}, sh);
-    if(csh.type == "Label"){
-      csh = self.convertOmeroLabelToFigureText(csh)
-    }
-
-    // get the ids before cloning/deleteing temp shape
-    var tempTextId = csh.textId
-    var tempLinkedShapeId = csh.linkedShapeId
-    var oldId = csh.id
-    csh.textId = -1
-    csh.linkedShapeId = -1
-    csh.id = self.getRandomId()
-
-    // create the new JSON shape
-    var temp = self.createShapeJson(csh);
-    var s = temp.toJson();
-    temp.destroy();
-
-    // reset ids
-    s.textId = tempTextId
-    s.linkedShapeId = tempLinkedShapeId
+  jsonShapes.forEach(function (s) {
+    // Create a shape to resolve any transform matrix -> coords
+    var temp = self.createShapeJson(s);
+    s = temp.toJson();
 
     // check if a shape is at the same coordinates...
     var match = self.findShapeAtCoords(s);
@@ -565,22 +517,7 @@ ShapeManager.prototype.pasteShapesJson = function pasteShapesJson(
       s = match.offsetCoords(s, 20, 10);
       match = self.findShapeAtCoords(s);
     }
-
-    pastedShapes.push(s);
-    idsMap.set(s.id, oldId)
-  });
-
-  // reassign right text & shape ids to link text to the right shape
-  pastedShapes.forEach(function(s){
-    if(s.textId != undefined && s.textId != -1){
-      var oldShapeId = idsMap.get(s.id)
-        pastedShapes.forEach(function(s2){
-          if(s2.linkedShapeId == oldShapeId){
-            s2.linkedShapeId = s.id
-            s.textId = s2.id
-          }
-        })
-    }
+    temp.destroy();
 
     // add the news shapes to the manager
     var added = self.addShapeJson(s, constrainRegion);
@@ -589,7 +526,7 @@ ShapeManager.prototype.pasteShapesJson = function pasteShapesJson(
     } else {
       allPasted = false;
     }
-  })
+  });
 
   // Select the newly added shapes
   this.selectShapes(newShapes);
@@ -651,22 +588,15 @@ ShapeManager.prototype.createShapeJson = function createShapeJson(jsonShape) {
     fillColor = s.fillColor || this.getFillColor(),
     fillOpacity = s.fillOpacity == undefined ? this.getFillOpacity() : s.fillOpacity,
     strokeWidth = s.strokeWidth || this.getStrokeWidth(),
-    fontSize = s.fontSize || this.getTextFontSize(),
-    textPosition = s.textPosition || this.getTextPosition(),
-    showText = s.showText || this.getShowText(),
-    textColor = s.textColor || this.getTextColor(),
-    textBackgroundColor = s.textBackgroundColor || this.getTextBackgroundColor(),
-    textBackgroundOpacity = s.textBackgroundOpacity == undefined ? this.getTextBackgroundOpacity(): s.textBackgroundOpacity,
+    fontSize = s.fontSize || this.getFontSize(),
     inModalView = s.inModalView || this.getInModalView(),
     textId = s.textId || -1,
-    shapeScalingFactor = s.shapeScalingFactor || this.getShapeScalingFactor(),
     zoom = this.getZoom(),
     options = {
       manager: this,
       paper: this.paper,
       strokeWidth: strokeWidth,
       zoom: zoom,
-      shapeScalingFactor: shapeScalingFactor,
       strokeColor: strokeColor,
       fillColor: fillColor,
       fillOpacity: parseFloat(fillOpacity).toFixed(1),
@@ -733,20 +663,13 @@ ShapeManager.prototype.createShapeJson = function createShapeJson(jsonShape) {
     options.x = s.x || 0,
     options.y = s.y || 0,
     options.fontSize = fontSize,
-    options.textPosition = textPosition,
     options.text = text,
     options.textAnchor = s.textAnchor,
-    options.parentShapeCoords = s.parentShapeCoords || {x:0, y:0, width: this._orig_width, height: this._orig_height},
     options.rotation = s.rotation,
     options.textRotation = s.textRotation,
-    options.textColor = textColor,
-    options.textBackgroundColor = textBackgroundColor,
-    options.textBackgroundOpacity = parseFloat(textBackgroundOpacity).toFixed(1),
     options.vFlip = s.vFlip,
     options.hFlip = s.hFlip,
-    options.linkedShapeId = s.linkedShapeId,
     options.inModalView = inModalView,
-    options.showText = showText,
     newShape = new Text(options);
   }
   return newShape;
@@ -778,6 +701,7 @@ ShapeManager.prototype.sortShape = function sortShape(shapes) {
 
   shapes.forEach(function (s) {
     if(s.type == "Text"){
+      s.bkgdRect.toFront();
       s.element.toFront();
     }
   });
@@ -888,25 +812,25 @@ ShapeManager.prototype.deleteShapesByIds = function deleteShapesByIds(
 
 ShapeManager.prototype.deleteSelectedShapes = function deleteSelectedShapes() {
   var notSelected = [];
-  var shapeToTextDestroy = [];
-  var intermediateShapes = [];
+  // var shapeToTextDestroy = [];
+  // var intermediateShapes = [];
   this.getShapes().forEach(function (s) {
     if (s.isSelected()) {
-      if(s._textShape && s._linkedShapeId != -1){
-        shapeToTextDestroy.push(s._linkedShapeId)
-      }
+      // if(s._textShape && s._linkedShapeId != -1){
+      //   shapeToTextDestroy.push(s._linkedShapeId)
+      // }
       s.destroy();
     } else {
-      intermediateShapes.push(s);
+      notSelected.push(s);
     }
   });
 
-  intermediateShapes.forEach(function (s) {
-    if (shapeToTextDestroy.indexOf(s._id) > -1) {
-      s.destroyTextShape();
-    }
-    notSelected.push(s);
-  });
+  // intermediateShapes.forEach(function (s) {
+  //   if (shapeToTextDestroy.indexOf(s._id) > -1) {
+  //     s.destroyTextShape();
+  //   }
+  //   notSelected.push(s);
+  // });
 
   this._shapes = notSelected;
   this.$el.trigger("change:selected");
@@ -938,9 +862,6 @@ ShapeManager.prototype.clearSelectedShapes = function clearSelectedShapes(
 ShapeManager.prototype.selectShapesByRegion = function selectShapesByRegion(
   region
 ) {
-  // Clear selected with silent:true, since we notify again below
-  this.clearSelectedShapes(true);
-
   var toSelect = [];
   this.getShapes().forEach(function (shape) {
     if (shape.intersectRegion(region)) {
@@ -956,18 +877,28 @@ ShapeManager.prototype.selectAllShapes = function selectAllShapes(region) {
 
 // select shapes: 'shape' can be shape object or ID
 ShapeManager.prototype.selectShapes = function selectShapes(shapes) {
-  var strokeColor, strokeWidth, fillColor, fillOpacity, showText,
-      text, fontSize, textPosition, textColor, textBackgroundColor, textBackgroundOpacity;
+  var strokeColor, strokeWidth, fillColor, fillOpacity,
+      textAnchor,
+      text, fontSize;
 
   // Clear selected with silent:true, since we notify again below
   this.clearSelectedShapes(true);
 
-  // Each shape, set selected and get color & stroke width...
+  // Each shape, set selected...
   shapes.forEach(function (shape, i) {
     if (typeof shape === "number") {
       shape = this.getShape(shape);
     }
     if (shape) {
+      shape.setSelected(true);
+    }
+  });
+
+  // Now, determine common properties of selected shapes...
+  // NB: selected shapes may now include Inset Labels NOT included in shapes above
+  this.getSelectedShapes().forEach(function (shape, i) {
+    if (shape) {
+
       // for first shape, pick color
       if (strokeColor === undefined) {
         strokeColor = shape.getStrokeColor();
@@ -1010,75 +941,33 @@ ShapeManager.prototype.selectShapes = function selectShapes(shapes) {
 
       // for first shape, pick text
       if (text === undefined) {
-        text = shape.getText();
+        text = shape.getText ? shape.getText() : undefined;
       } else {
         // for subsequent shapes, if text don't match - set false
-        if (text !== shape.getText()) {
+        if (shape.getText && text !== shape.getText()) {
           text = false;
+        }
+      }
+
+      // for first shape, pick textAnchor
+      if (textAnchor === undefined) {
+        textAnchor = shape.getTextAnchor ? shape.getTextAnchor() : undefined;
+      } else {
+        // for subsequent shapes, if text don't match - set false
+        if (shape.getTextAnchor && textAnchor !== shape.getTextAnchor()) {
+          textAnchor = false;
         }
       }
 
       // for first shape, pick text font size
       if (fontSize === undefined) {
-        fontSize = shape.getFontSize();
+        fontSize = shape.getFontSize ? shape.getFontSize() : undefined;
       } else {
         // for subsequent shapes, if text font size don't match - set false
-        if (fontSize !== shape.getFontSize()) {
+        if (shape.getFontSize && fontSize !== shape.getFontSize()) {
           fontSize = false;
         }
       }
-
-      // for first shape, pick text position
-      if (textPosition === undefined) {
-        textPosition = shape.getTextPosition();
-      } else {
-        // for subsequent shapes, if text position don't match - set false
-        if (textPosition !== shape.getTextPosition()) {
-          textPosition = false;
-        }
-      }
-
-      // for first shape, pick color
-      if (textColor === undefined) {
-        textColor = shape.getTextColor();
-      } else {
-        // for subsequent shapes, if colors don't match - set false
-        if (textColor !== shape.getTextColor()) {
-            textColor = false;
-        }
-      }
-
-      // for first shape, pick color
-      if (textBackgroundColor === undefined) {
-        textBackgroundColor = shape.getTextBackgroundColor();
-      } else {
-        // for subsequent shapes, if colors don't match - set false
-        if (textBackgroundColor !== shape.getTextBackgroundColor()) {
-            textBackgroundColor = false;
-        }
-      }
-
-      // for first shape, pick color
-      if (textBackgroundOpacity === undefined) {
-        textBackgroundOpacity = shape.getTextBackgroundOpacity();
-      } else {
-        // for subsequent shapes, if colors don't match - set false
-        if (textBackgroundOpacity !== shape.getTextBackgroundOpacity()) {
-            textBackgroundOpacity = false;
-        }
-      }
-
-      // for first shape, pick color
-      if (showText === undefined) {
-        showText = shape.getShowText();
-      } else {
-        // for subsequent shapes, if colors don't match - set false
-        if (showText !== shape.getShowText()) {
-            showText = false;
-        }
-      }
-
-      shape.setSelected(true);
     }
   });
   if (strokeColor) {
@@ -1093,23 +982,11 @@ ShapeManager.prototype.selectShapes = function selectShapes(shapes) {
   if (fillOpacity) {
     this._fillOpacity = fillOpacity;
   }
-  if (textColor) {
-    this._textColor = textColor;
-  }
-  if (showText != undefined) {
-    this._showText = showText;
-  }
-  if (textBackgroundColor) {
-    this._textBackgroundColor = textBackgroundColor;
-  }
-  if (textBackgroundOpacity) {
-    this._textBackgroundOpacity = textBackgroundOpacity;
-  }
   if (text != undefined) {
     this._text = text;
   }
-  if (textPosition) {
-    this._textPosition = textPosition;
+  if (textAnchor != undefined) {
+    this._textAnchor = textAnchor;
   }
   if (fontSize) {
     this._textFontSize = fontSize;
