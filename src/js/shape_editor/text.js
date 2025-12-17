@@ -345,6 +345,7 @@ Text.prototype.drawShape = function drawShape() {
     "stroke-width": 0,
   })
 
+  this.bkgdRect.toFront();
   this.element.toFront()
 
   if(!this._inModalView){

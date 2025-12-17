@@ -701,6 +701,7 @@ ShapeManager.prototype.sortShape = function sortShape(shapes) {
 
   shapes.forEach(function (s) {
     if(s.type == "Text"){
+      s.bkgdRect.toFront();
       s.element.toFront();
     }
   });
