@@ -800,25 +800,13 @@ ShapeManager.prototype.deleteShapesByIds = function deleteShapesByIds(
 
 ShapeManager.prototype.deleteSelectedShapes = function deleteSelectedShapes() {
   var notSelected = [];
-  // var shapeToTextDestroy = [];
-  // var intermediateShapes = [];
   this.getShapes().forEach(function (s) {
     if (s.isSelected()) {
-      // if(s._textShape && s._linkedShapeId != -1){
-      //   shapeToTextDestroy.push(s._linkedShapeId)
-      // }
       s.destroy();
     } else {
       notSelected.push(s);
     }
   });
-
-  // intermediateShapes.forEach(function (s) {
-  //   if (shapeToTextDestroy.indexOf(s._id) > -1) {
-  //     s.destroyTextShape();
-  //   }
-  //   notSelected.push(s);
-  // });
 
   this._shapes = notSelected;
   this.$el.trigger("change:selected");
