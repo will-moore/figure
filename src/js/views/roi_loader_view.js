@@ -49,26 +49,54 @@ var RoiLoaderView = Backbone.View.extend({
             var shape = this.collection.getShape(shapeId);
             var shapeJson = shape.toJSON();
             var shapeList = [shapeJson]
-            // For Now, don't add Label text as separate shape
-            // if(shapeJson.type != "Label" && shapeJson.Text != undefined){
-            //     var textRandomId = getRandomId();
-            //     var rectRandomId = getRandomId();
-            //     shapeJson.id = rectRandomId;
-            //     shapeJson.textId = textRandomId;
-            //     shapeJson.isFromOmero = true;
-            //     var textShape = {
-            //         text: shapeJson.Text,
-            //         id: textRandomId,
-            //         x: shapeJson.x,
-            //         y: shapeJson.y,
-            //         type: "Text",
-            //         parentShapeCoords: parentShapeCoords,
-            //         linkedShapeId: rectRandomId,
-            //         textPosition: "top",
-            //         isFromOmero: true
-            //     }
-            //     shapeList.push(textShape)
-            // }
+
+            var loadComment = $("#loadRoisComment")[0].checked;
+            if (loadComment) {
+                if(shapeJson.type != "Label" && shapeJson.Text != undefined){
+                    shape = shapeJson;
+                    var x, y;
+                    if(shape.type == "Point" || shape.type == "Ellipse"){
+                        x = shape.x;
+                        y = shape.y;
+                    } else if (shape.type == "Rectangle"){
+                        x = shape.x + shape.width/2;
+                        y = shape.y + shape.height/2;
+                    } else if(shape.type == "Line" || shape.type == "Arrow"){
+                        x = (shape.x1 + shape.x2) / 2;
+                        y = (shape.y1 + shape.y2) / 2
+                    } else if(shape.type == "Polygon" || shape.type == "Polyline"){
+                        // center of bounding box
+                        var coords = shape.points.split(" ");
+                        var xCoords = [];
+                        var yCoords = [];
+
+                        coords.forEach(function (s) {
+                            var point = s.split(",");
+                            xCoords.push(parseFloat(point[0]));
+                            yCoords.push(parseFloat(point[1]));
+                        });
+
+                        var x1 = Math.min(...xCoords)
+                        var x2 = Math.max(...xCoords)
+                        var y1 = Math.min(...yCoords)
+                        var y2 = Math.max(...yCoords)
+                        x = (x1 + x2) / 2;
+                        y = (y1 + y2) / 2;
+                    } else {
+                        x=0; y=0;
+                    }
+                    var textShape = {
+                        type: "Text",
+                        text: shapeJson.Text,
+                        id: getRandomId(),
+                        x: x,
+                        y: y,
+                        // textAnchor, fontSize, fillOpacity and fillColor will be populated by the ShapeManager
+                    }
+                    shapeList.push(textShape)
+                }
+            }
+
             this.collection.trigger('shape_add', shapeList.reverse());
         }
     },

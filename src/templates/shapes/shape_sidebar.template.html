@@ -17,7 +17,12 @@
         <% } %>
     </button>
 </div>
-
+<% if (omeroRoiCount > 0 && roisLoaded) {%>
+    <div>
+        <input type="checkbox" id= "loadRoisComment" checked/>
+        <label for="loadRoisComment">  Also add ROI comment</label>
+    </div>
+<% } %>
 
 <div>
     <span
