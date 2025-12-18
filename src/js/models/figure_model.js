@@ -822,13 +822,19 @@
             for (var c = 0; c < ref_row.length; c++) {
                 let panel = ref_row[c];
                 var current_x = panel.get('x')
-                var gap = Math.floor(Math.abs(current_x - new_x) / last_panel_width)
-                for(var i = 0; i < gap; i++){
-                    reference_grid[global_index] = new_x
-                    new_x = new_x + spacer + last_panel_width;
-                    global_index++
+                var gap = Math.floor(Math.abs(current_x - new_x) / last_panel_width);
+                // first loop, when last_panel_width is 0, gap will be NaN or Infinity - skip
+                if (c > 0) {
+                    for(var i = 0; i < gap; i++){
+                        reference_grid[global_index] = new_x
+                        new_x = new_x + spacer + last_panel_width;
+                        global_index++
+                    }
                 }
-                panel.save({'x':new_x, 'y':new_y});
+                // in case we got invalid x or y, don't save
+                if (!isNaN(new_x) && !isNaN(new_y)) {
+                    panel.save({'x':new_x, 'y':new_y});
+                }
                 reference_grid[global_index] = new_x
                 max_h = Math.max(max_h, panel.get('height'));
                 new_x = new_x + spacer + panel.get('width');
