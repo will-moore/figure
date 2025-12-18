@@ -58,7 +58,7 @@ if (!String.prototype.endsWith)
   };
 
 export const showExportAsJsonModal = function(figureJSON) {
-    var figureText = JSON.stringify(figureJSON);
+    var figureText = JSON.stringify(figureJSON, null, 2);
     showModal('exportJsonModal');
     $('#exportJsonModal textarea').text(figureText);
 }

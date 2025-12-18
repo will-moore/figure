@@ -131,24 +131,83 @@
             var strokeWidth = parseFloat($('button.inset-width span:first', this.$el).attr('data-line-width'));
 
             selected.forEach(panel => {
-                let randomId = getRandomId();
+                let textRandomId = getRandomId();
+                let rectRandomId = getRandomId();
                 // Add Rectangle (square) in centre of viewport
                 let vp = panel.getViewportAsRect();
+                let lastInsetTextIndex = (panel.getLastInsetTextIndex() || 64) + 1;
                 let minSide = Math.min(vp.width, vp.height);
                 // Square is 1/3 size of the viewport
                 let rectSize = minSide / 3;
+                var maxSize = 550,
+                frame_w = maxSize,
+                frame_h = maxSize,
+                wh = panel.get('width') / panel.get('height');
+                if (wh <= 1) {
+                    frame_h = maxSize;
+                    frame_w = maxSize * wh;
+                } else {
+                    frame_w = maxSize;
+                    frame_h = maxSize / wh;
+                }
+
+                // Get css for the SVG (full plane)
+                var svg_css = panel.get_vp_full_plane_css(panel.get('zoom'), frame_w, frame_h);
+                var scale = svg_css.width / panel.get('orig_width');
+
+                var fontSize = 12;
+                var margin = fontSize * 2;
+                var x = vp.x + ((vp.width - rectSize) / 2);
+                var y = vp.y + ((vp.height - rectSize) / 2);
+                var txtX = x + (strokeWidth/2 + margin) / scale,
+                    txtY = y + (strokeWidth/2 + margin)  / scale;
+
                 let rect = {
                     type: "Rectangle",
-                    strokeWidth,
+                    strokeWidth: strokeWidth,
                     strokeColor: "#" + color,
-                    x: vp.x + ((vp.width - rectSize) / 2),
-                    y: vp.y + ((vp.height - rectSize) / 2),
+                    fillColor: "#FFFFFF",
+                    fillOpacity: 0,
+                    x: x,
+                    y: y,
                     width: rectSize,
                     height: rectSize,
-                    id: randomId,
+                    id: rectRandomId,
+                    textId: textRandomId,
                     rotation: vp.rotation || 0,
                 }
-                panel.add_shapes([rect]);
+                if (vp.rotation && !isNaN(vp.rotation)) {
+                    let coords = rotatePoint(txtX, txtY, x + (rectSize/2), y + (rectSize/2), vp.rotation);
+                    txtX = coords.x;
+                    txtY = coords.y;
+                }
+                let text = {
+                    type: "Text",
+                    strokeWidth: strokeWidth,
+                    strokeColor: "#" + color,
+                    fillColor: "#000000",
+                    fillOpacity: 0,
+                    x: txtX,
+                    y: txtY,
+                    id: textRandomId,
+                    fontSize: 12,
+                    text: String.fromCharCode(lastInsetTextIndex),
+                    textAnchor: "middle",
+                }
+                panel.add_shapes([rect, text]);
+                panel.setLastInsetTextIndex(lastInsetTextIndex)
+
+                var new_label = {
+                    text: String.fromCharCode(lastInsetTextIndex),
+                    size: 18,
+                    position: "topleft",
+                    color: color,
+                    inset: true,
+                };
+                var prev_labels = panel.get('labels') || []
+                var labels = [...prev_labels]
+                labels = labels.filter(lbl => !lbl.inset)
+                labels.push(new_label)
 
                 // Create duplicate panels
                 let panelJson = panel.toJSON();
@@ -181,7 +240,9 @@
                 panelJson.zoom = Math.min(xPercent, yPercent) * 100;
                 panelJson.selected = false;
                 panelJson.shapes = [];
-                panelJson.insetRoiId = randomId;
+                panelJson.insetRoiId = rectRandomId;
+                panelJson.lastInsetTextIndex = 64;
+                panelJson.labels = labels;
 
                 this.model.panels.create(panelJson);
             });
@@ -1295,7 +1356,7 @@
             "click .flipping_horizontal": "flipping_horizontal",
             "input .rotation-slider": "rotation_input",
             "change .rotation-slider": "rotation_change",
-            "click .panel-rotation": "rotate_panel",
+            "click .panel-rotation": "rotate_panel_90",
         },
 
         rotation_input: function(event) {
@@ -1315,7 +1376,7 @@
             let val = parseInt(event.target.value);
             this.rotation = val;
             this.models.forEach(function(m){
-                m.save('rotation', val);
+                m.save({'rotation': val});
             });
         },
 
@@ -1334,10 +1395,10 @@
             const $button = $(event.currentTarget);
             $button.toggleClass('active');
 
-            const ishorizontalFlipped = $button.hasClass('active');
+            const isHorizontalFlipped = $button.hasClass('active');
 
             this.models.forEach(function(m) {
-                m.save('horizontal_flip', ishorizontalFlipped);
+                m.save('horizontal_flip', isHorizontalFlipped);
             });
         },
 
@@ -1363,11 +1424,10 @@
             });
         },
 
-        rotate_panel: function(event){
+        rotate_panel_90: function(event){
             event.preventDefault()
             this.models.forEach(function(m){
-                var rotation = m.setPanelRotation()
-                console.log(rotation)
+                var rotation = m.rotatePanel90()
                 $(".vp_img").css({'transform':'rotate(' + rotation + 'deg)'});
                 $(".rotation_value").text(rotation);
                 $(".rotation-slider").val(rotation);

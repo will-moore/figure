@@ -399,7 +399,7 @@ Ellipse.prototype.drawShape = function drawShape() {
     rx: radiusX,
     ry: radiusY,
     stroke: strokeColor,
-    "stroke-width": strokeW,
+    "stroke-width": strokeW * this.manager.getShapeScalingFraction(),
     fill: fillColor,
     'fill-opacity': fillOpacity
   });
