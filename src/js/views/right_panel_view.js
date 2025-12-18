@@ -1387,18 +1387,7 @@
             const isVerticalFlipped = $button.hasClass('active');
 
             this.models.forEach(function(m) {
-                var shapes = m.get('shapes');
-                if(shapes){
-                    let newShapes = shapes.map(sh => {
-                        if (sh.type === "Text") {
-                            return {...sh, vFlip: isVerticalFlipped ? -1 : 1};
-                         }
-                        return sh;
-                    });
-                    m.save({'vertical_flip': isVerticalFlipped, 'shapes': newShapes});
-                }else{
-                    m.save('vertical_flip', isVerticalFlipped);
-                }
+                m.save('vertical_flip', isVerticalFlipped);
             });
         },
 
