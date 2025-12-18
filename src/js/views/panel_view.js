@@ -42,7 +42,7 @@
             this.listenTo(this.model,
                 'change:channels change:zoom change:dx change:dy change:width change:height change:rotation change:labels change:theT change:deltaT change:theZ change:deltaZ change:z_projection change:z_start change:z_end',
                 this.render_labels);
-            this.listenTo(this.model, 'change:shapes', this.render_shapes);
+            this.listenTo(this.model, 'change:shapes change:rotation change:vertical_flip change:horizontal_flip', this.render_shapes);
             this.listenTo(this.model, 'change:border', this.render_layout);
             // During drag or resize, model isn't updated, but we trigger 'drag'
             this.model.on('drag_resize', this.drag_resize, this);
@@ -177,6 +177,9 @@
                     this.shapeManager.setZoom(panel_scale * 100);
                 }
                 this.shapeManager.setShapesJson(shapes);
+                this.shapeManager.setTextRotation(this.model.get('rotation'));
+                this.shapeManager.setHorizontalFlip(this.model.get('horizontal_flip') ? -1 : 1);
+                this.shapeManager.setVerticalFlip(this.model.get('vertical_flip') ? -1 : 1);
             } else {
                 // delete shapes
                 if (this.shapeManager) {

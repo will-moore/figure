@@ -23,158 +23,204 @@
     <button type="button" class="btn btn-outline-secondary <% if (state==='POINT')print('pressed') %>"
             title="Point" data-state="POINT">
         <span class="glyphicon point-icon"></span></button>
+    <button type="button" class="btn btn-outline-secondary <% if (state==='TEXT')print('pressed') %>"
+            title="Text" data-state="TEXT">
+        <span class="glyphicon text-icon"></span></button>
 </div>
 
+ <div class="btn-group" role="group">
+    <div class="btn-group">
+        <button type="button" class="shape-color btn btn-outline-secondary dropdown-toggle" title="Shape Color"
+            data-bs-toggle="dropdown">
+            <span data-color="<%= color %>" style="background-color:#<%= color %>">&nbsp &nbsp &nbsp</span>
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu dropdownSelect colorpicker" role="menu">
+            <li><a class="dropdown-item" href="#">
+                <span data-color="000000" style="background-color:#000">&nbsp &nbsp &nbsp</span>&nbsp Black
+            </a></li>
+            <li><a class="dropdown-item" href="#">
+                <span data-color="0000FF" style="background-color:#00f">&nbsp &nbsp &nbsp</span>&nbsp Blue
+            </a></li>
+            <li><a class="dropdown-item" href="#">
+                <span data-color="00FF00" style="background-color:#0f0">&nbsp &nbsp &nbsp</span>&nbsp Green
+            </a></li>
+            <li><a class="dropdown-item" href="#">
+                <span data-color="FF0000" style="background-color:#f00">&nbsp &nbsp &nbsp</span>&nbsp Red
+            </a></li>
+            <li><a class="dropdown-item" href="#">
+                <span data-color="FFFF00" style="background-color:#ff0">&nbsp &nbsp &nbsp</span>&nbsp Yellow
+            </a></li>
+            <li><a class="dropdown-item" href="#">
+                <span data-color="FFFFFF" style="background-color:#fff">&nbsp &nbsp &nbsp</span>&nbsp White
+            </a></li>
+            <li><a class="dropdown-item" href="#">
+                <span data-color="FF00FF" style="background-color:#f0f">&nbsp &nbsp &nbsp</span>&nbsp Magenta
+            </a></li>
+            <li><a class="dropdown-item" href="#">
+                <span data-color="00FFFF" style="background-color:#0ff">&nbsp &nbsp &nbsp</span>&nbsp Cyan
+            </a></li>
+            <li class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="#">
+                <span class="colorpickerOption" data-color="<%= color %>">&nbsp &nbsp &nbsp</span>&nbsp More Colors...
+            </a></li>
+        </ul>
+    </div>
 
-<div class="btn-group me-2">
-    <button type="button" class="shape-color btn btn-outline-secondary dropdown-toggle" title="Shape Color"
-        data-bs-toggle="dropdown">
-        <span data-color="<%= color %>" style="background-color:#<%= color %>">&nbsp &nbsp &nbsp</span>
-        <span class="caret"></span>
-    </button>
-    <ul class="dropdown-menu dropdownSelect colorpicker" role="menu">
-        <li><a class="dropdown-item" href="#">
-            <span data-color="000000" style="background-color:#000">&nbsp &nbsp &nbsp</span>&nbsp Black
-        </a></li>
-        <li><a class="dropdown-item" href="#">
-            <span data-color="0000FF" style="background-color:#00f">&nbsp &nbsp &nbsp</span>&nbsp Blue
-        </a></li>
-        <li><a class="dropdown-item" href="#">
-            <span data-color="00FF00" style="background-color:#0f0">&nbsp &nbsp &nbsp</span>&nbsp Green
-        </a></li>
-        <li><a class="dropdown-item" href="#">
-            <span data-color="FF0000" style="background-color:#f00">&nbsp &nbsp &nbsp</span>&nbsp Red
-        </a></li>
-        <li><a class="dropdown-item" href="#">
-            <span data-color="FFFF00" style="background-color:#ff0">&nbsp &nbsp &nbsp</span>&nbsp Yellow
-        </a></li>
-        <li><a class="dropdown-item" href="#">
-            <span data-color="FFFFFF" style="background-color:#fff">&nbsp &nbsp &nbsp</span>&nbsp White
-        </a></li>
-        <li><a class="dropdown-item" href="#">
-            <span data-color="FF00FF" style="background-color:#f0f">&nbsp &nbsp &nbsp</span>&nbsp Magenta
-        </a></li>
-        <li><a class="dropdown-item" href="#">
-            <span data-color="00FFFF" style="background-color:#0ff">&nbsp &nbsp &nbsp</span>&nbsp Cyan
-        </a></li>
-        <li class="dropdown-divider"></li>
-        <li><a class="dropdown-item" data-color="colorpicker" data-oldcolor="<%= color %>" href="#">
-            <span class="colorpickerOption">&nbsp &nbsp &nbsp</span>&nbsp More Colors...
-        </a></li>
-    </ul>
+    <div class="btn-group me-2">
+        <button type="button" class="line-width btn btn-outline-secondary dropdown-toggle" title="Line Width: <%= lineWidth %>"
+            data-bs-toggle="dropdown">
+            <span data-line-width="<%= lineWidth %>"><%= lineWidth %> pt</span>
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu dropdownSelect lineWidth" style="min-width: 0" role="menu">
+            <% _.each(lineWidths,function(p){ %>
+                <li><a class="dropdown-item" href='#'><span data-line-width='<%= p %>'><%= p %> pt</span></a></li>
+            <% }); %>
+        </ul>
+    </div>
 </div>
 
-<div class="btn-group me-2">
-    <button type="button" class="line-width btn btn-outline-secondary dropdown-toggle" title="Line Width: <%= lineWidth %>"
-        data-bs-toggle="dropdown">
-        <span data-line-width="<%= lineWidth %>"><%= lineWidth %> pt</span>
-        <span class="caret"></span>
-    </button>
-    <ul class="dropdown-menu dropdownSelect lineWidth" style="min-width: 0" role="menu">
-        <% _.each(lineWidths,function(p){ %>
-            <li><a class="dropdown-item" href='#'><span data-line-width='<%= p %>'><%= p %> pt</span></a></li>
+ <div class="btn-group" role="group">
+    <div class="btn-group">
+        <button type="button" class="fill-color btn btn-outline-secondary dropdown-toggle" title="Fill Color"
+            data-bs-toggle="dropdown">
+            <span data-color="<%= fillColor %>" style="background-color:#<%= fillColor %>">&nbsp &nbsp &nbsp</span>
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu dropdownSelect colorpicker" role="menu">
+            <li><a class="dropdown-item" href="#">
+                <span data-color="000000" style="background-color:#000">&nbsp &nbsp &nbsp</span>&nbsp Black
+            </a></li>
+            <li><a class="dropdown-item" href="#">
+                <span data-color="0000FF" style="background-color:#00f">&nbsp &nbsp &nbsp</span>&nbsp Blue
+            </a></li>
+            <li><a class="dropdown-item" href="#">
+                <span data-color="00FF00" style="background-color:#0f0">&nbsp &nbsp &nbsp</span>&nbsp Green
+            </a></li>
+            <li><a class="dropdown-item" href="#">
+                <span data-color="FF0000" style="background-color:#f00">&nbsp &nbsp &nbsp</span>&nbsp Red
+            </a></li>
+            <li><a class="dropdown-item" href="#">
+                <span data-color="FFFF00" style="background-color:#ff0">&nbsp &nbsp &nbsp</span>&nbsp Yellow
+            </a></li>
+            <li><a class="dropdown-item" href="#">
+                <span data-color="FFFFFF" style="background-color:#fff">&nbsp &nbsp &nbsp</span>&nbsp White
+            </a></li>
+            <li><a class="dropdown-item" href="#">
+                <span data-color="FF00FF" style="background-color:#f0f">&nbsp &nbsp &nbsp</span>&nbsp Magenta
+            </a></li>
+            <li><a class="dropdown-item" href="#">
+                <span data-color="00FFFF" style="background-color:#0ff">&nbsp &nbsp &nbsp</span>&nbsp Cyan
+            </a></li>
+            <li class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="#">
+                <span class="colorpickerOption" data-color="<%= fillColor %>">
+                    &nbsp &nbsp &nbsp</span>&nbsp More Colors...
+            </a></li>
+        </ul>
+    </div>
+
+    <div class="btn-group me-2">
+        <button type="button" class="fill-opacity btn btn-outline-secondary dropdown-toggle" title="Fill opacity: <%= opacity %>"
+            data-bs-toggle="dropdown">
+            <span data-fill-opacity="<%= opacity %>"><%= opacity %></span>
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu dropdownSelect opacity" style="min-width: 0" role="menu">
+            <% _.each(opacities,function(p){ %>
+                <li><a class="dropdown-item" href='#'><span data-fill-opacity='<%= p %>'><%= p %></span></a></li>
+            <% }); %>
+        </ul>
+    </div>
+</div>
+
+<!-- Text controls -->
+<div class="btn-group me-2" role="group" aria-label="...">
+    <div class="input-group input-group-sm float-start">
+        <input id="label-text" type="text" class="label-text form-control"
+            <% if (!textControlsEnabled) print('disabled') %>
+                placeholder="Label" value="<% print(_.escape(text)) %>" />
+    </div>
+
+    <div class="btn-group">
+        <button type="button" class="text-font-size btn btn-outline-secondary dropdown-toggle"
+            title="Font Size: <%= fontSize %> <% if (!textControlsEnabled) print('(No Text Shapes selected)') %>"
+            data-bs-toggle="dropdown">
+            <span data-font-size="<%= fontSize %>"><%= fontSize %></span>
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu dropdownSelect" role="menu">
+        <% _.each([6,8,10,12,14,18,21,24,36,48],function(p){ %>
+            <li><a class='dropdown-item' href='#'><span data-font-size='<%= p %>'><%= p %></span></a></li>
         <% }); %>
-    </ul>
-</div>
+        </ul>
+    </div>
 
-<div class="btn-group me-2">
-    <button type="button" class="fill-color btn btn-outline-secondary dropdown-toggle" title="Fill Color"
-        data-bs-toggle="dropdown">
-        <span data-fill-color="<%= fillColor %>" style="background-color:#<%= fillColor %>">&nbsp &nbsp &nbsp</span>
-        <span class="caret"></span>
-    </button>
-    <ul class="dropdown-menu dropdownSelect colorpicker" role="menu">
-        <li><a class="dropdown-item" href="#">
-            <span data-fill-color="000000" style="background-color:#000">&nbsp &nbsp &nbsp</span>&nbsp Black
-        </a></li>
-        <li><a class="dropdown-item" href="#">
-            <span data-fill-color="0000FF" style="background-color:#00f">&nbsp &nbsp &nbsp</span>&nbsp Blue
-        </a></li>
-        <li><a class="dropdown-item" href="#">
-            <span data-fill-color="00FF00" style="background-color:#0f0">&nbsp &nbsp &nbsp</span>&nbsp Green
-        </a></li>
-        <li><a class="dropdown-item" href="#">
-            <span data-fill-color="FF0000" style="background-color:#f00">&nbsp &nbsp &nbsp</span>&nbsp Red
-        </a></li>
-        <li><a class="dropdown-item" href="#">
-            <span data-fill-color="FFFF00" style="background-color:#ff0">&nbsp &nbsp &nbsp</span>&nbsp Yellow
-        </a></li>
-        <li><a class="dropdown-item" href="#">
-            <span data-fill-color="FFFFFF" style="background-color:#fff">&nbsp &nbsp &nbsp</span>&nbsp White
-        </a></li>
-        <li><a class="dropdown-item" href="#">
-            <span data-fill-color="FF00FF" style="background-color:#f0f">&nbsp &nbsp &nbsp</span>&nbsp Magenta
-        </a></li>
-        <li><a class="dropdown-item" href="#">
-            <span data-fill-color="00FFFF" style="background-color:#0ff">&nbsp &nbsp &nbsp</span>&nbsp Cyan
-        </a></li>
-        <li class="dropdown-divider"></li>
-        <li><a class="dropdown-item" data-fill-color="colorpicker" data-oldcolor="<%= fillColor %>" href="#">
-            <span class="colorpickerOption">&nbsp &nbsp &nbsp</span>&nbsp More Colors...
-        </a></li>
-    </ul>
 </div>
-
-<div class="btn-group me-2">
-    <button type="button" class="fill-opacity btn btn-outline-secondary dropdown-toggle" title="Fill opacity: <%= opacity %>"
-        data-bs-toggle="dropdown">
-        <span data-fill-opacity="<%= opacity %>"><%= opacity %></span>
-        <span class="caret"></span>
-    </button>
-    <ul class="dropdown-menu dropdownSelect opacity" style="min-width: 0" role="menu">
-        <% _.each(opacities,function(p){ %>
-            <li><a class="dropdown-item" href='#'><span data-fill-opacity='<%= p %>'><%= p %></span></a></li>
-        <% }); %>
-    </ul>
-</div>
-
-<div class="btn-group me-2">
-    <button type="button" class="line-width btn btn-outline-secondary dropdown-toggle" title="Delete, Copy, Paste etc"
-        data-bs-toggle="dropdown">
-        <span>Edit</span>
-        <span class="caret"></span>
-    </button>
-    <ul class="dropdown-menu" role="menu">
-        <li <% if (!sel) print('class="disabled"') %> >
-            <a class="dropdown-item copyShape" href="#">
-                Copy Shape   &nbsp&nbsp&nbsp <%= cmdKey %>C
-            </a>
-        </li>
-        <li <% if (!toPaste) print('class="disabled"') %> >
-            <a class="dropdown-item pasteShape" href="#">
-                Paste Shape   &nbsp&nbsp&nbsp <%= cmdKey %>V
-            </a>
-        </li>
-        <li <% if (!sel) print('class="disabled"') %> >
-            <a class="dropdown-item deleteShape" href="#">
-                Delete Shape    &nbsp&nbsp&nbsp Del
-            </a>
-        </li>
-        <li>
-            <a class="dropdown-item selectAll" href="#">
-                Select All Shapes    &nbsp&nbsp <%= cmdKey %>A
-            </a>
-        </li>
-    </ul>
+<div class="btn-group me-2" role="group">
+    <div class="btn-group">
+        <button
+            type="button"
+            class="btn btn-outline-secondary dropdown-toggle text-anchor"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+            title="Shape alignment and text anchors"
+            >
+            <span data-textanchor="<%= textAnchor %>">
+                <i class="<%= textAnchorIcon %>"></i>
+            </span>
+        </button>
+        <ul class="dropdown-menu dropdownSelect">
+            <li>
+                <a href="#" class="dropdown-item">
+                <span data-text-anchor="start"><i class="bi-text-left"></i></span>
+                Text Anchor Start</a
+                >
+            </li>
+            <li>
+                <a href="#" class="dropdown-item">
+                <span data-text-anchor="middle"><i class="bi-text-center"></i></span>
+                Text Anchor Middle</a
+                >
+            </li>
+            <li>
+                <a href="#" class="dropdown-item">
+                <span data-text-anchor="end"><i class="bi-text-right"></i></span>
+                Text Anchor End</a
+                >
+            </li>
+        </ul>
+    </div>
+    <div class="btn-group">
+        <button type="button" class="line-width btn btn-outline-secondary dropdown-toggle" title="Delete, Copy, Paste etc"
+            data-bs-toggle="dropdown">
+            <span>Edit</span>
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" role="menu">
+            <li <% if (!sel) print('class="disabled"') %> >
+                <a class="dropdown-item copyShape" href="#">
+                    Copy Shape   &nbsp&nbsp&nbsp <%= cmdKey %>C
+                </a>
+            </li>
+            <li <% if (!toPaste) print('class="disabled"') %> >
+                <a class="dropdown-item pasteShape" href="#">
+                    Paste Shape   &nbsp&nbsp&nbsp <%= cmdKey %>V
+                </a>
+            </li>
+            <li <% if (!sel) print('class="disabled"') %> >
+                <a class="dropdown-item deleteShape" href="#">
+                    Delete Shape    &nbsp&nbsp&nbsp Del
+                </a>
+            </li>
+            <li>
+                <a class="dropdown-item selectAll" href="#">
+                    Select All Shapes    &nbsp&nbsp <%= cmdKey %>A
+                </a>
+            </li>
+        </ul>
+    </div>
 </div>
 
 <div style="flex: auto 1 1"></div>
-
-<div class="btn-group me-2" style="float: right"
-    <% if (omeroRoiCount > 0) { %>
-        title="Load <%=omeroRoiCount%> ROIs from OMERO"
-    <% } else { %>
-        title="This image has no ROIs on the OMERO server"
-    <% } %>>
-    <button class="loadRois btn btn-success"
-        <% if (omeroRoiCount == 0) { %>
-            disabled='disabled'
-        <% } %>
-    >
-        <% if (roisLoaded) {%>
-            Refresh ROIs
-        <% } else { %>
-            Load ROIs
-        <% } %>
-    </button>
-</div>

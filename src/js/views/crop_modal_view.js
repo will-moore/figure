@@ -1,4 +1,3 @@
-
 import Backbone from "backbone";
 import _ from "underscore";
 import $ from "jquery";
@@ -88,9 +87,10 @@ export const CropModalView = Backbone.View.extend({
             // we also need to update the scaled ROI coords...
             this.listenTo(this.cropModel, 'change:x change:y change:width change:height', function(m){
                 var scale = self.zoom / 100;
+                // Subtract offset to convert from view coordinates to image coordinates
                 self.currentROI = {
-                    'x': m.get('x') / scale,
-                    'y': m.get('y') / scale,
+                    'x': (m.get('x') - self.offsetX) / scale,
+                    'y': (m.get('y') - self.offsetY) / scale,
                     'width': m.get('width') / scale,
                     'height': m.get('height') / scale
                 }
@@ -587,22 +587,70 @@ export const CropModalView = Backbone.View.extend({
             this.m.set('width', newW);
             this.m.set('height', newH);
             var src = this.m.get_img_src(true);
+            var rotation = this.m.get('rotation') || 0;
+            
+            // Calculate bounding box for rotated image
+            var boundingBox = this.calculateRotatedBoundingBox(newW, newH, rotation);
+            
+            // Calculate the offset to center the image in the expanded bounding box
+            var offsetX = (boundingBox.width - newW) / 2;
+            var offsetY = (boundingBox.height - newH) / 2;
+            
+            // Store offsets for coordinate conversion
+            this.offsetX = offsetX;
+            this.offsetY = offsetY;
+            
+            // Get base CSS but we'll override positioning
             var css = this.m.get_vp_full_plane_css(100, newW, newH);
+            
+            // Override to center the image and use center transform-origin
+            css = $.extend({}, css, {
+                'left': offsetX,
+                'top': offsetY,
+                'width': newW,
+                'height': newH,
+                '-webkit-transform-origin': '50% 50%',
+                'transform-origin': '50% 50%',
+                '-webkit-transform': 'rotate(' + rotation + 'deg)',
+                'transform': 'rotate(' + rotation + 'deg)'
+            });
 
-            this.paper.setSize(newW, newH);
-            $("#crop_paper").css({'height': newH, 'width': newW});
-            $("#cropViewer").css({'height': newH, 'width': newW});
+            // Set paper and crop_paper to fit the rotated content
+            this.paper.setSize(boundingBox.width, boundingBox.height);
+            $("#crop_paper").css({
+                'height': boundingBox.height, 
+                'width': boundingBox.width
+            });
 
-            this.$cropImg.css(css)
-                    .attr('src', src);
+            this.$cropImg.css(css).attr('src', src);
 
-            var roiX = this.currentROI.x * scale,
-                roiY = this.currentROI.y * scale,
+            // Center the scroll position
+            var $viewer = $("#cropViewer");
+            $viewer.scrollLeft((boundingBox.width - 500) / 2);
+            $viewer.scrollTop((boundingBox.height - 450) / 2);
+
+            // When setting ROI position, ADD the offset because cropModel is in view coordinates
+            var roiX = this.currentROI.x * scale + offsetX,
+                roiY = this.currentROI.y * scale + offsetY,
                 roiW = this.currentROI.width * scale,
                 roiH = this.currentROI.height * scale;
             this.cropModel.set({
                 'x': roiX, 'y': roiY, 'width': roiW, 'height': roiH,
                 'selected': true
             });
+        },
+
+        calculateRotatedBoundingBox: function(width, height, rotation) {
+            var radians = rotation * Math.PI / 180;
+            var cos = Math.abs(Math.cos(radians));
+            var sin = Math.abs(Math.sin(radians));
+            
+            var newWidth = width * cos + height * sin;
+            var newHeight = width * sin + height * cos;
+            
+            return {
+                width: Math.ceil(newWidth),
+                height: Math.ceil(newHeight)
+            };
         }
     });

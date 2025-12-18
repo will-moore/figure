@@ -31,21 +31,29 @@ import { CreateLine, Line, CreateArrow, Arrow } from "./line";
 import { CreateEllipse, Ellipse } from "./ellipse";
 import { CreatePoint, Point } from "./point";
 import { Polygon, Polyline } from "./polygon";
-
+import { CreateText, Text } from "./text";
+import { union } from "underscore";
 var ShapeManager = function ShapeManager(elementId, width, height, options) {
   var self = this;
   options = options || {};
 
   // Keep track of state, strokeColor etc
-  this.STATES = ["SELECT", "RECT", "LINE", "ARROW", "ELLIPSE", "POLYGON", "POINT"];
+  this.STATES = ["SELECT", "RECT", "LINE", "ARROW", "ELLIPSE", "POLYGON", "POINT", "TEXT"];
   this._state = "SELECT";
   this._strokeColor = "#ff0000";
   this._strokeWidth = 2;
+  this._text = "Text";
+  this._textAnchor = "start";  // one of "start", "middle", "end"
+  this._textFontSize = 12;
+  this._inModalView = false;
+  this._vFlip = false;
+  this._hFlip = false;
   this._fillColor = "#ffffff";
   this._fillOpacity = 0;
   this._orig_width = width;
   this._orig_height = height;
   this._zoom = 100;
+  this._shapeScalingFraction = 1;
   // Don't allow editing of shapes - no drag/click events
   this.canEdit = !options.readOnly;
 
@@ -71,7 +79,7 @@ var ShapeManager = function ShapeManager(elementId, width, height, options) {
   this.selectRegion = this.paper.rect(0, 0, width, height);
   this.selectRegion
     .hide()
-    .attr({ stroke: "#ddd", "stroke-width": 0, "stroke-dasharray": "- " });
+    .attr({ stroke: "#ddd", "stroke-width": 1, "stroke-dasharray": "- " });
   if (this.canEdit) {
     this.newShapeBg.drag(
       function () {
@@ -91,6 +99,7 @@ var ShapeManager = function ShapeManager(elementId, width, height, options) {
       LINE: new CreateLine({ manager: this, paper: this.paper }),
       ARROW: new CreateArrow({ manager: this, paper: this.paper }),
       POINT: new CreatePoint({ manager: this, paper: this.paper }),
+      TEXT: new CreateText({ manager: this, paper: this.paper }),
     };
 
     this.createShape = this.shapeFactories.LINE;
@@ -176,7 +185,7 @@ ShapeManager.prototype.setState = function setState(state) {
     return;
   }
   // When creating shapes, cover existing shapes with newShapeBg
-  var shapes = ["RECT", "LINE", "ARROW", "ELLIPSE", "POLYGON", "POINT"];
+  var shapes = ["RECT", "LINE", "ARROW", "ELLIPSE", "POLYGON", "POINT", "TEXT"];
   if (shapes.indexOf(state) > -1) {
     this.newShapeBg.toFront();
     this.newShapeBg.attr({ cursor: "crosshair" });
@@ -235,6 +244,17 @@ ShapeManager.prototype.setZoom = function setZoom(zoomPercent) {
   //                          'top': (currTop - deltaTop) + "px"});
 };
 
+ShapeManager.prototype.setShapeScalingFraction = function setShapeScalingFraction(shapeScalingFraction) {
+  this._shapeScalingFraction = shapeScalingFraction;
+  this._shapes.forEach(function (shape) {
+    shape.drawShape();
+  });
+}
+
+ShapeManager.prototype.getShapeScalingFraction = function getShapeScalingFraction() {
+  return this._shapeScalingFraction;
+};
+
 ShapeManager.prototype.getZoom = function getZoom(zoomPercent) {
   return this._zoom;
 };
@@ -276,18 +296,130 @@ ShapeManager.prototype.setFillColor = function setFillColor(fillColor) {
   }
 };
 
+ShapeManager.prototype.getInModalView = function getInModalView() {
+  return this._inModalView;
+};
+
+ShapeManager.prototype.setInModalView = function setInModalView(inModalView) {
+  this._inModalView = inModalView;
+  var selected = this.getSelectedShapes();
+  for (var s=0; s<selected.length; s++) {
+    if (selected[s].setInModalView) {
+      selected[s].setInModalView(inModalView);
+    }
+  }
+};
+
 ShapeManager.prototype.getFillOpacity = function getFillOpacity() {
   return this._fillOpacity;
 };
 
 ShapeManager.prototype.setFillOpacity = function setFillOpacity(fillOpacity) {
   var fillOpacity = parseFloat(fillOpacity, 10).toFixed(1);
-  if(fillOpacity == 0) fillOpacity = 0.01;
+  if(fillOpacity <= 0.01) fillOpacity = parseInt(fillOpacity);
   this._fillOpacity = fillOpacity;
     var selected = this.getSelectedShapes();
     for (var s=0; s<selected.length; s++) {
         selected[s].setFillOpacity(fillOpacity);
     }
+};
+
+ShapeManager.prototype.getText = function getText() {
+  return this._text;
+};
+
+ShapeManager.prototype.setText = function setText(text) {
+  this._text = text;
+  var selected = this.getSelectedShapes();
+  for (var s = 0; s < selected.length; s++) {
+    if (selected[s].setText) {
+      selected[s].setText(text);
+    }
+  }
+};
+
+ShapeManager.prototype.getTextAnchor = function getTextAnchor() {
+  return this._textAnchor;
+};
+
+ShapeManager.prototype.setTextAnchor = function setTextAnchor(textAnchor) {
+  this._textAnchor = textAnchor;
+  var selected = this.getSelectedShapes();
+  for (var s = 0; s < selected.length; s++) {
+    if (selected[s].setTextAnchor) {
+      selected[s].setTextAnchor(textAnchor);
+    }
+  }
+};
+
+ShapeManager.prototype.getShowText = function getShowText() {
+  return this._showText;
+};
+
+ShapeManager.prototype.setShowText = function setShowText(showText) {
+  this._showText = showText;
+  var selected = this.getSelectedShapes();
+  for (var s = 0; s < selected.length; s++) {
+    selected[s].setShowText(showText);
+  }
+};
+
+ShapeManager.prototype.getFontSize = function getTextFontSize() {
+  return this._textFontSize;
+};
+
+ShapeManager.prototype.setFontSize = function setFontSize(fontSize) {
+  fontSize = parseFloat(fontSize, 10);
+  this._textFontSize = fontSize;
+  var selected = this.getSelectedShapes();
+  for (var s = 0; s < selected.length; s++) {
+    if (selected[s].setFontSize) {
+      selected[s].setFontSize(fontSize);
+    }
+  }
+};
+
+ShapeManager.prototype.getTextRotation = function getTextRotation() {
+  return this._textRotation;
+};
+
+ShapeManager.prototype.setTextRotation = function setTextRotation(textRotation) {
+  this._textRotation = textRotation;
+  // redraw all Text shapes
+  var shapes = this.getShapes();
+  for (var s = 0; s < shapes.length; s++) {
+    if (shapes[s].type == "Text") {
+      shapes[s].drawShape();
+    }
+  }
+};
+
+ShapeManager.prototype.getVerticalFlip = function getVerticalFlip() {
+  return this._vFlip;
+};
+
+ShapeManager.prototype.setVerticalFlip = function setVerticalFlip(vFlip) {
+  this._vFlip = vFlip;
+  var shapes = this.getShapes();
+  for (var s = 0; s < shapes.length; s++) {
+    if (shapes[s].type == "Text") {
+      shapes[s].drawShape();
+    }
+  };
+};
+
+ShapeManager.prototype.getHorizontalFlip = function getHorizontalFlip() {
+  return this._hFlip;
+};
+
+ShapeManager.prototype.setHorizontalFlip = function setHorizontalFlip(hFlip) {
+  this._hFlip = hFlip;
+  var shapes = this.getShapes();
+  for (var s = 0; s < shapes.length; s++) {
+    if (shapes[s].type == "Text") {
+      shapes[s].drawShape();
+    }
+  };
 };
 
 ShapeManager.prototype.getShapesJson = function getShapesJson() {
@@ -333,6 +465,23 @@ ShapeManager.prototype.findShapeAtCoords = function findShapeAtCoords(
   return false;
 };
 
+ShapeManager.prototype.convertOmeroLabelToFigureText = function convertOmeroLabelToFigureText(shape){
+   return {
+      text: shape.Text,
+      fillColor: shape.fillColor,
+      fillOpacity: 0,
+      strokeColor: shape.strokeColor,
+      // fontSize from e.g. iviewer is unreliable (can be very large)
+      fontSize: 18,     // shape.FontSize.Value / 2,
+      type: "Text",
+      x: shape.x,
+      y: shape.y,
+      linkedShapeId: -1,
+      textAnchor: "start",
+    }
+
+};
+
 // Add new shapes from json but, IF it matches existing shape - offset a bit
 ShapeManager.prototype.pasteShapesJson = function pasteShapesJson(
   jsonShapes,
@@ -341,12 +490,13 @@ ShapeManager.prototype.pasteShapesJson = function pasteShapesJson(
   var self = this,
     newShapes = [],
     allPasted = true;
+
   // For each shape we want to paste...
   jsonShapes.forEach(function (s) {
     // Create a shape to resolve any transform matrix -> coords
     var temp = self.createShapeJson(s);
     s = temp.toJson();
-    temp.destroy();
+
     // check if a shape is at the same coordinates...
     var match = self.findShapeAtCoords(s);
     // if so, keep offsetting until we find a spot...
@@ -355,7 +505,9 @@ ShapeManager.prototype.pasteShapesJson = function pasteShapesJson(
       s = match.offsetCoords(s, 20, 10);
       match = self.findShapeAtCoords(s);
     }
-    // Create shape and test if it's in the specified region
+    temp.destroy();
+
+    // add the news shapes to the manager
     var added = self.addShapeJson(s, constrainRegion);
     if (added) {
       newShapes.push(added);
@@ -363,6 +515,7 @@ ShapeManager.prototype.pasteShapesJson = function pasteShapesJson(
       allPasted = false;
     }
   });
+
   // Select the newly added shapes
   this.selectShapes(newShapes);
   return allPasted;
@@ -417,12 +570,15 @@ ShapeManager.prototype.addShapeJson = function addShapeJson(
 
 // Create a Shape object from json
 ShapeManager.prototype.createShapeJson = function createShapeJson(jsonShape) {
-  var s = jsonShape,
+  var s = jsonShape, text,
     newShape,
     strokeColor = s.strokeColor || this.getStrokeColor(),
     fillColor = s.fillColor || this.getFillColor(),
     fillOpacity = s.fillOpacity == undefined ? this.getFillOpacity() : s.fillOpacity,
     strokeWidth = s.strokeWidth || this.getStrokeWidth(),
+    fontSize = s.fontSize || this.getFontSize(),
+    inModalView = s.inModalView || this.getInModalView(),
+    textId = s.textId || -1,
     zoom = this.getZoom(),
     options = {
       manager: this,
@@ -431,8 +587,20 @@ ShapeManager.prototype.createShapeJson = function createShapeJson(jsonShape) {
       zoom: zoom,
       strokeColor: strokeColor,
       fillColor: fillColor,
-      fillOpacity: parseFloat(fillOpacity).toFixed(1)
+      fillOpacity: parseFloat(fillOpacity).toFixed(1),
+      textId: textId,
     };
+
+  if(s.text === undefined){
+    if(s.Text === undefined){
+      text = this.getText()
+    }else{
+      text = s.Text
+    }
+  }else{
+    text = s.text
+  }
+
   if (jsonShape.id) {
     options.id = jsonShape.id;
   }
@@ -479,6 +647,18 @@ ShapeManager.prototype.createShapeJson = function createShapeJson(jsonShape) {
   } else if (s.type === "Polyline") {
     options.points = s.points;
     newShape = new Polyline(options);
+  } else if (s.type === "Text") {
+    options.x = s.x || 0,
+    options.y = s.y || 0,
+    options.fontSize = fontSize,
+    options.text = text,
+    options.textAnchor = s.textAnchor,
+    options.rotation = s.rotation,
+    options.textRotation = s.textRotation,
+    options.vFlip = s.vFlip,
+    options.hFlip = s.hFlip,
+    options.inModalView = inModalView,
+    newShape = new Text(options);
   }
   return newShape;
 };
@@ -506,6 +686,14 @@ ShapeManager.prototype.sortShape = function sortShape(shapes) {
   shapes.reverse().forEach(function (s) {
     s.element.toFront();
   });
+
+  shapes.forEach(function (s) {
+    if(s.type == "Text"){
+      s.bkgdRect.toFront();
+      s.element.toFront();
+    }
+  });
+
   // If we're in drawing state (not in "SELECT" state) we need to keep
   // the draw layer on top
   if (this.state != "SELECT") {
@@ -585,13 +773,27 @@ ShapeManager.prototype.deleteShapesByIds = function deleteShapesByIds(
   shapeIds
 ) {
   var notSelected = [];
+  var intermediateShapes = [];
+  var textToDestroy = [];
   this.getShapes().forEach(function (s) {
     if (shapeIds.indexOf(s._id) > -1) {
+      if(s._textShape){
+        textToDestroy.push(s._textId)
+      }
+      s.destroy();
+    } else {
+      intermediateShapes.push(s);
+    }
+  });
+
+  intermediateShapes.forEach(function (s) {
+    if (textToDestroy.indexOf(s._id) > -1) {
       s.destroy();
     } else {
       notSelected.push(s);
     }
   });
+
   this._shapes = notSelected;
   this.$el.trigger("change:selected");
 };
@@ -605,6 +807,7 @@ ShapeManager.prototype.deleteSelectedShapes = function deleteSelectedShapes() {
       notSelected.push(s);
     }
   });
+
   this._shapes = notSelected;
   this.$el.trigger("change:selected");
 };
@@ -635,9 +838,6 @@ ShapeManager.prototype.clearSelectedShapes = function clearSelectedShapes(
 ShapeManager.prototype.selectShapesByRegion = function selectShapesByRegion(
   region
 ) {
-  // Clear selected with silent:true, since we notify again below
-  this.clearSelectedShapes(true);
-
   var toSelect = [];
   this.getShapes().forEach(function (shape) {
     if (shape.intersectRegion(region)) {
@@ -653,17 +853,28 @@ ShapeManager.prototype.selectAllShapes = function selectAllShapes(region) {
 
 // select shapes: 'shape' can be shape object or ID
 ShapeManager.prototype.selectShapes = function selectShapes(shapes) {
-  var strokeColor, strokeWidth, fillColor, fillOpacity;
+  var strokeColor, strokeWidth, fillColor, fillOpacity,
+      textAnchor,
+      text, fontSize;
 
   // Clear selected with silent:true, since we notify again below
   this.clearSelectedShapes(true);
 
-  // Each shape, set selected and get color & stroke width...
+  // Each shape, set selected...
   shapes.forEach(function (shape, i) {
     if (typeof shape === "number") {
       shape = this.getShape(shape);
     }
     if (shape) {
+      shape.setSelected(true);
+    }
+  });
+
+  // Now, determine common properties of selected shapes...
+  // NB: selected shapes may now include Inset Labels NOT included in shapes above
+  this.getSelectedShapes().forEach(function (shape, i) {
+    if (shape) {
+
       // for first shape, pick color
       if (strokeColor === undefined) {
         strokeColor = shape.getStrokeColor();
@@ -704,7 +915,35 @@ ShapeManager.prototype.selectShapes = function selectShapes(shapes) {
         }
       }
 
-      shape.setSelected(true);
+      // for first shape, pick text
+      if (text === undefined) {
+        text = shape.getText ? shape.getText() : undefined;
+      } else {
+        // for subsequent shapes, if text don't match - set false
+        if (shape.getText && text !== shape.getText()) {
+          text = false;
+        }
+      }
+
+      // for first shape, pick textAnchor
+      if (textAnchor === undefined) {
+        textAnchor = shape.getTextAnchor ? shape.getTextAnchor() : undefined;
+      } else {
+        // for subsequent shapes, if text don't match - set false
+        if (shape.getTextAnchor && textAnchor !== shape.getTextAnchor()) {
+          textAnchor = false;
+        }
+      }
+
+      // for first shape, pick text font size
+      if (fontSize === undefined) {
+        fontSize = shape.getFontSize ? shape.getFontSize() : undefined;
+      } else {
+        // for subsequent shapes, if text font size don't match - set false
+        if (shape.getFontSize && fontSize !== shape.getFontSize()) {
+          fontSize = false;
+        }
+      }
     }
   });
   if (strokeColor) {
@@ -717,7 +956,16 @@ ShapeManager.prototype.selectShapes = function selectShapes(shapes) {
     this._fillColor = fillColor;
   }
   if (fillOpacity) {
-      this._fillOpacity = fillOpacity;
+    this._fillOpacity = fillOpacity;
+  }
+  if (text != undefined) {
+    this._text = text;
+  }
+  if (textAnchor != undefined) {
+    this._textAnchor = textAnchor;
+  }
+  if (fontSize) {
+    this._textFontSize = fontSize;
   }
   this.$el.trigger("change:selected");
 };
@@ -730,7 +978,6 @@ ShapeManager.prototype.notifySelectedShapesChanged =
 ShapeManager.prototype.notifyShapesChanged = function notifyShapesChanged(
   shapes
 ) {
-  this.sortShape(this._shapes);
   this.$el.trigger("change:shape", [shapes]);
 };
 

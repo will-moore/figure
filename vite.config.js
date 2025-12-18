@@ -1,7 +1,10 @@
+import injectHTML from 'vite-plugin-html-inject';
+
 const path = require('path')
 
 export default {
   root: path.resolve(__dirname, 'src'),
+  plugins: [injectHTML()],
   resolve: {
     alias: {
       '~bootstrap': path.resolve(__dirname, 'node_modules/bootstrap'),

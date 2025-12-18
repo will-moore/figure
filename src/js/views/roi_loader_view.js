@@ -2,7 +2,7 @@
 import $ from "jquery";
 import _ from "underscore";
 import Backbone from "backbone";
-
+import {getRandomId} from "./util";
 import roi_modal_roi_template from '../../templates/modal_dialogs/roi_modal_roi.template.html?raw';
 import roi_modal_shape_template from '../../templates/modal_dialogs/roi_modal_shape.template.html?raw';
 
@@ -33,6 +33,7 @@ var RoiLoaderView = Backbone.View.extend({
                'Arrow': 'arrow-icon',
                'Polygon': 'polygon-icon',
                'Point': 'point-icon',
+               'Label': 'text-icon',
                'Polyline': 'polyline-icon'},
 
     addOmeroShape: function(event) {
@@ -47,7 +48,28 @@ var RoiLoaderView = Backbone.View.extend({
             var shapeId = parseInt($tr.attr('data-shapeId'), 10);
             var shape = this.collection.getShape(shapeId);
             var shapeJson = shape.toJSON();
-            this.collection.trigger('shape_add', [shapeJson]);
+            var shapeList = [shapeJson]
+            // For Now, don't add Label text as separate shape
+            // if(shapeJson.type != "Label" && shapeJson.Text != undefined){
+            //     var textRandomId = getRandomId();
+            //     var rectRandomId = getRandomId();
+            //     shapeJson.id = rectRandomId;
+            //     shapeJson.textId = textRandomId;
+            //     shapeJson.isFromOmero = true;
+            //     var textShape = {
+            //         text: shapeJson.Text,
+            //         id: textRandomId,
+            //         x: shapeJson.x,
+            //         y: shapeJson.y,
+            //         type: "Text",
+            //         parentShapeCoords: parentShapeCoords,
+            //         linkedShapeId: rectRandomId,
+            //         textPosition: "top",
+            //         isFromOmero: true
+            //     }
+            //     shapeList.push(textShape)
+            // }
+            this.collection.trigger('shape_add', shapeList.reverse());
         }
     },
 
