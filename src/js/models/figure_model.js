@@ -896,7 +896,9 @@
                         new_x = reference_grid[lastRefColumn] -closest_column*(last_panel_width + spacer)
                     }
 					last_column_id++
-                    panel.save({'x':new_x, 'y':y});
+                    if (!isNaN(new_x) && !isNaN(y)) {
+                        panel.save({'x':new_x, 'y':y});
+                    }
                     new_x = new_x + spacer + panel.get('width');
                 }
             }
