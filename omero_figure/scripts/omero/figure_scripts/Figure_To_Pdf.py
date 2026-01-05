@@ -69,7 +69,7 @@ except ImportError:
     reportlab_installed = False
     logger.error("Reportlab not installed.")
 
-VERSION = "7.3.0"
+VERSION = "7.3.1.dev0"
 DEFAULT_OFFSET = 0
 
 ORIGINAL_DIR = "1_originals"
