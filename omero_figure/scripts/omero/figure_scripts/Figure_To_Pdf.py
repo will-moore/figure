@@ -2107,10 +2107,10 @@ class FigureExport(object):
 
         self.draw_scalebar_line(x1, y1, x2, y2, tick_thickness, rgb)
 
-    def is_big_image(self, image):
+    def is_big_image(self, panel):
         """Return True if this is a 'big' tiled image."""
-        max_w, max_h = self.conn.getMaxPlaneSize()
-        return image.getSizeX() * image.getSizeY() > max_w * max_h
+        max_w, max_h = self.conn.getMaxPlaneSize() if self.conn else (3000, 3000)
+        return panel['orig_width'] * panel['orig_height'] > max_w * max_h
 
     def get_zoom_level_scale(self, image, region, max_width):
         """Calculate the scale and zoom level we want to use for big image."""
@@ -2196,7 +2196,7 @@ class FigureExport(object):
 
         return pil_img
 
-    def get_panel_big_image(self, image, panel):
+    def get_panel_big_image(self, panel):
         """Render the viewport region for BIG images"""
 
         viewport_region = self.get_crop_region(panel)
@@ -2224,8 +2224,26 @@ class FigureExport(object):
                                'height': vp_h + extra_h}
             max_width = max_width * (viewport_region['width'] / vp_w)
 
-        pil_img = self.render_big_image_region(image, panel, z, t,
-                                               viewport_region, max_width)
+        image_id = None
+        try:
+            image_id = int(panel['imageId'])
+        except Exception:
+            pass
+
+        if image_id is not None:
+            image = self.conn.getObject("Image", image_id)
+            if image is None:
+                return None
+            try:
+                self.apply_rdefs(image, panel)
+                pil_img = self.render_big_image_region(image, panel, z, t,
+                                                       viewport_region, max_width)
+            finally:
+                if image._re is not None:
+                    image._re.close()
+        else:
+            # Zarr image - TODO: how to decide target_size?
+            pil_img = self.render_zarr_to_pil(panel, target_size=1000)
 
         # Optional rotation
         if rotation != 0 and pil_img is not None:
@@ -2275,7 +2293,16 @@ class FigureExport(object):
         img_data = pyramid[0]
         if target_size is not None:
             # basic thumbnail logic: pick smallest level
-            img_data = pyramid[-1]
+            for level, level_data in enumerate(pyramid[:-1]):
+                # if the next level is closer to target_size, use it
+                current_size_x = level_data.shape[-1]
+                next_size_x = pyramid[level + 1].shape[-1]
+                print(" Level %d: size_x=%d, next_size_x=%d" % (level,
+                                                       current_size_x,
+                                                       next_size_x))
+                if abs(next_size_x - target_size) < abs(current_size_x - target_size):
+                    print("  picking level %d" % (level + 1))
+                    img_data = pyramid[level + 1]
 
         size_x = img_data.shape[-1]
         size_y = img_data.shape[-2]
@@ -2364,45 +2391,17 @@ class FigureExport(object):
         """
         z = panel['theZ']
         t = panel['theT']
-        # size_x = image.getSizeX()
-        # size_y = image.getSizeY()
-        # size_z = image.getSizeZ()
-        # size_c = image.getSizeC()
-
-        # if 'z_projection' in panel and panel['z_projection']:
-        #     if 'z_start' in panel and 'z_end' in panel:
-        #         # check max_projection_bytes
-        #         pixel_range = image.getPixelRange()
-        #         bytes_per_pixel = ceil(log2(pixel_range[1]) / 8.0)
-        #         proj_bytes = (size_z * size_x * size_y
-        #                       * size_c * bytes_per_pixel)
-
-        #         cfg = self.conn.getConfigService()
-        #         max_bytes = int(cfg.getConfigValue(
-        #             'omero.pixeldata.max_projection_bytes'))
-
-        #         if proj_bytes <= max_bytes:
-        #             image.setProjection('intmax')
-        #             image.setProjectionRange(panel['z_start'], panel['z_end'])
-        #         else:
-        #             print(f'projected_bytes {proj_bytes} exceeds '
-        #                   f'MAX_PROJECTED_BYTES limit: {max_bytes}')
-        #             # Turn off all channels to render a black panel
-        #             image.setActiveChannels([])
 
         # If big image, we don't want to render the whole plane
-        # TODO: handle big images...
-        # if self.is_big_image(image):
-        if False:
-            pil_img = self.get_panel_big_image(image, panel)
+        if self.is_big_image(panel):
+            pil_img = self.get_panel_big_image(panel)
         else:
             # Handle Image ID being either int or Zarr URL
             image_id = None
-            zarr_url = None
             try:
                 image_id = int(panel['imageId'])
             except Exception:
-                zarr_url = panel['imageId']
+                pass
 
             if image_id is not None:
                 image = self.conn.getObject("Image", image_id)
@@ -2417,6 +2416,8 @@ class FigureExport(object):
             else:
                 # handle Zarr URL
                 pil_img = self.render_zarr_to_pil(panel)
+                print("pil_img from Zarr:", pil_img.size)
+                pil_img.show()
 
         if pil_img is None:
             return
@@ -2425,8 +2426,8 @@ class FigureExport(object):
             pil_img.save(orig_name)
 
         # big image will already be cropped...
-        # if self.is_big_image(image):
-        #     return pil_img
+        if self.is_big_image(panel):
+            return pil_img
 
         # Need to crop around centre before rotating...
         size_x, size_y = pil_img.size
