@@ -765,6 +765,7 @@
                 grid = [],
                 row = [],
                 next_panel,
+                checkedPanels = [],
                 c = {'x': left_x + left.get('width')/2, 'y': top_y + top.get('height')/2};
 
             // loop over the rows, starting by the top panel row
@@ -773,11 +774,15 @@
                 // loop over the columns, starting by the left panel column
                 while(c.x < right_x){
                     next_panel = this.get_panel_at(c.x , c.y, sel);
-                    
+                    if(checkedPanels.includes(next_panel)){
+                        next_panel = undefined
+                    }
+
                     // if a panel doesn't exist at the current position c
                     // just go to the next position until it reaches the selection boundaries
                     if (next_panel) {
                         row.push(next_panel);
+                        checkedPanels.push(next_panel)
                         c = next_panel.get_centre();
                     }else{
                         next_panel = next_panel == undefined ? left : next_panel
