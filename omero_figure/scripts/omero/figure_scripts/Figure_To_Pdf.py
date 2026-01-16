@@ -652,8 +652,9 @@ class ShapeToPilExport(ShapeExport):
         self.scale = pil_img.size[0] / crop['width']
         self.draw = ImageDraw.Draw(pil_img)
 
-        from omero.gateway import THISPATH
-        self.GATEWAYPATH = THISPATH
+        if omero_installed:
+            from omero.gateway import THISPATH
+            self.GATEWAYPATH = THISPATH
 
         super(ShapeToPilExport, self).__init__(panel)
 
@@ -712,12 +713,15 @@ class ShapeToPilExport(ShapeExport):
         # bump up alpha a bit to make text more readable
         rgba = (r, g, b, int(128 + a / 2))
         font_name = "FreeSans.ttf"
-        path_to_font = os.path.join(self.GATEWAYPATH, "pilfonts", font_name)
-        try:
-            font = ImageFont.truetype(path_to_font, size)
-        except Exception:
-            font = ImageFont.load(
-                '%s/pilfonts/B%0.2d.pil' % (self.GATEWAYPATH, size))
+        if omero_installed:
+            path_to_font = os.path.join(self.GATEWAYPATH, "pilfonts", font_name)
+            try:
+                font = ImageFont.truetype(path_to_font, size)
+            except Exception:
+                font = ImageFont.load(
+                    '%s/pilfonts/B%0.2d.pil' % (self.GATEWAYPATH, size))
+        else:
+            font = ImageFont.load_default()
         box = font.getbbox(text)
         width = box[2] - box[0]
         height = box[3] - box[1]
@@ -2139,38 +2143,27 @@ class FigureExport(object):
         scale = zm_levels[zm]
         return scale, level
 
-    def render_big_image_region(self, image, panel, z, t, region, max_width):
+    def render_big_image_region(self, panel, z, t, region, max_width):
         """
         Render region of a big image at an appropriate zoom level
         so width < max_width
         """
-        scale, level = self.get_zoom_level_scale(image, region, max_width)
-        # cache the 'zoom_level_scale', in the panel dict.
-        # since we need it for scalebar, and don't want to calculate again
-        # since rendering engine will be closed by then
-        panel['zoom_level_scale'] = scale
 
         width = region['width']
         height = region['height']
         x = region['x']
         y = region['y']
-        size_x = image.getSizeX()
-        size_y = image.getSizeY()
-        x = int(x * scale)
-        y = int(y * scale)
-        width = int(width * scale)
-        height = int(height * scale)
-        size_x = int(size_x * scale)
-        size_y = int(size_y * scale)
+        size_x = panel['orig_width']
+        size_y = panel['orig_height']
 
-        canvas = None
-        # Coordinates below are all final jpeg coordinates & sizes
+        region_outside_image = False
+        paste_x = 0
+        paste_y = 0
+
         if x < 0 or y < 0 or (x + width) > size_x or (y + height) > size_y:
+            region_outside_image = True
             # If we're outside the bounds of the image...
             # Need to render reduced region and paste on to full size image
-            canvas = Image.new("RGBA", (width, height), (221, 221, 221))
-            paste_x = 0
-            paste_y = 0
             if x < 0:
                 paste_x = -x
                 width = width + x
@@ -2179,19 +2172,61 @@ class FigureExport(object):
                 paste_y = -y
                 height = height + y
                 y = 0
+            if x + width > size_x:
+                width = size_x - x
+            if y + height > size_y:
+                height = size_y - y
 
-        # Render the region...
-        jpeg_data = image.renderJpegRegion(z, t, x, y, width, height,
-                                           level=level)
-        if jpeg_data is None:
-            return
+        image_id = None
+        try:
+            image_id = int(panel['imageId'])
+        except Exception:
+            pass
 
-        i = BytesIO(jpeg_data)
-        pil_img = Image.open(i)
+        image = None
+        if image_id is not None:
+            image = self.conn.getObject("Image", image_id)
+            if image is None:
+                return None
+            
+            # Render the region...
+            scale, level = self.get_zoom_level_scale(image, region, max_width)
+
+            # We need to use final rendered jpeg coordinates
+            # Convert from original image coordinates by scaling
+            x = int(x * scale)
+            y = int(y * scale)
+            width = int(width * scale)
+            height = int(height * scale)
+            size_x = int(size_x * scale)
+            size_y = int(size_y * scale)
+
+            try:
+                self.apply_rdefs(image, panel)
+                jpeg_data = image.renderJpegRegion(z, t, x, y, width, height,
+                                                   level=level)
+                if jpeg_data is None:
+                    return
+                i = BytesIO(jpeg_data)
+                pil_img = Image.open(i)
+            finally:
+                if image._re is not None:
+                    image._re.close()
+        else:
+            # Zarr image - TODO: how to decide target_size?
+            scale, pil_img = self.render_zarr_to_pil(panel, xywh=(x, y, width, height))
+
+        # cache the 'zoom_level_scale', in the panel dict.
+        # since we need it for scalebar, and don't want to calculate again
+        # since rendering engine will be closed by then
+        panel['zoom_level_scale'] = scale
 
         # paste to canvas if needed
-        if canvas is not None:
-            canvas.paste(pil_img, (paste_x, paste_y))
+        if region_outside_image:
+            canvas_width = int(region['width'] * scale)
+            canvas_height = int(region['height'] * scale)
+            canvas = Image.new("RGBA", (canvas_width, canvas_height), (221, 221, 221, 255))
+            canvas.paste(pil_img, (int(paste_x * scale), int(paste_y * scale)))
             pil_img = canvas
 
         return pil_img
@@ -2224,26 +2259,8 @@ class FigureExport(object):
                                'height': vp_h + extra_h}
             max_width = max_width * (viewport_region['width'] / vp_w)
 
-        image_id = None
-        try:
-            image_id = int(panel['imageId'])
-        except Exception:
-            pass
-
-        if image_id is not None:
-            image = self.conn.getObject("Image", image_id)
-            if image is None:
-                return None
-            try:
-                self.apply_rdefs(image, panel)
-                pil_img = self.render_big_image_region(image, panel, z, t,
-                                                       viewport_region, max_width)
-            finally:
-                if image._re is not None:
-                    image._re.close()
-        else:
-            # Zarr image - TODO: how to decide target_size?
-            pil_img = self.render_zarr_to_pil(panel, target_size=1000)
+        pil_img = self.render_big_image_region(panel, z, t,
+                                               viewport_region, max_width)
 
         # Optional rotation
         if rotation != 0 and pil_img is not None:
@@ -2270,7 +2287,8 @@ class FigureExport(object):
 
         return pil_img
 
-    def render_zarr_to_pil(self, panel, target_size=None):
+    def render_zarr_to_pil(self, panel, target_size=4000, xywh=None):
+        #TODO: pick default target_size (based on dpi?) - e.g. 10000?
 
         import zarr
         import dask.array as da
@@ -2287,25 +2305,52 @@ class FigureExport(object):
         paths = [ds["path"] for ds in zattrs["multiscales"][0]["datasets"]]
         axes = zattrs["multiscales"][0].get("axes", ["t", "c", "z", "y", "x"])
 
-        pyramid = [da.from_zarr(img_group[path]) for path in paths]
+        pyramid = []
+        img_data = da.from_zarr(img_group[paths[0]])
+        pyramid.append(img_data)
 
-        # TODO: pick the right pyramid level based on target_size
-        img_data = pyramid[0]
-        if target_size is not None:
-            # basic thumbnail logic: pick smallest level
-            for level, level_data in enumerate(pyramid[:-1]):
-                # if the next level is closer to target_size, use it
-                current_size_x = level_data.shape[-1]
-                next_size_x = pyramid[level + 1].shape[-1]
-                print(" Level %d: size_x=%d, next_size_x=%d" % (level,
-                                                       current_size_x,
-                                                       next_size_x))
-                if abs(next_size_x - target_size) < abs(current_size_x - target_size):
-                    print("  picking level %d" % (level + 1))
-                    img_data = pyramid[level + 1]
+        # pick the right pyramid level based on target_size
+        orig_width = pyramid[0].shape[-1]
+        scale_x = 1.0
+        region_width = orig_width if xywh is None else xywh[2]
+        # start big, and go smaller until we reach target size
+        for level, path in enumerate(paths[:-1]):
+            level_data = pyramid[level]
+            # if the next level is closer to target_size, use it
+            current_size_x = level_data.shape[-1]
+            scale_x = current_size_x / orig_width       # e.g. 0.5, 0.25, etc
+            expected_size = region_width * scale_x
+            if expected_size <= target_size:
+                break
+            # load next level, add to pyramid
+            next_data = da.from_zarr(img_group[paths[level + 1]])
+            pyramid.append(next_data)
+            next_size_x = next_data.shape[-1]
+            next_scale_x = next_size_x / orig_width
+            expected_next_size = region_width * next_scale_x
+            # if next level is closer to target size, use it
+            print(" level %d: size_x %d, expected_size %.1f" %
+                  (level, current_size_x, expected_size))
+            print("target_size %d" % (target_size))
+            print("nxt", expected_next_size - target_size, "curr", expected_size - target_size)
+            if abs(expected_next_size - target_size) < abs(expected_size - target_size):
+                print("  picking next level %d: size_x %d, expected_size %.1f" %
+                        (level + 1, next_size_x, expected_next_size))
+                img_data = pyramid[level + 1]
 
         size_x = img_data.shape[-1]
         size_y = img_data.shape[-2]
+        crop_x = 0
+        crop_y = 0
+
+        # crop if needed
+        if xywh is not None:
+            # slicing happens below...
+            crop_x = int(scale_x * xywh[0])
+            crop_y = int(scale_x * xywh[1])
+            size_x = int(scale_x * xywh[2])
+            size_y = int(scale_x * xywh[3])
+
 
         rgb_plane = numpy.zeros((size_y, size_x, 3), numpy.uint16)
 
@@ -2342,15 +2387,9 @@ class FigureExport(object):
                     else:
                         indices.append(z)
                 elif dim_name == 'y':
-                    size_y = dask_data.shape[axes.index(dim)]
-                    y = 0
-                    y_max = size_y
-                    indices.append(numpy.s_[y:y_max:])
+                    indices.append(numpy.s_[crop_y: crop_y + size_y:])
                 elif dim_name == 'x':
-                    size_x = dask_data.shape[axes.index(dim)]
-                    x = 0
-                    x_max = size_x
-                    indices.append(numpy.s_[x:x_max:])
+                    indices.append(numpy.s_[crop_x: crop_x + size_x:])
 
             channel0 = dask_data[tuple(indices)]
             channel0 = channel0.compute()
@@ -2381,7 +2420,7 @@ class FigureExport(object):
         rgb_plane.clip(0, 255, out=rgb_plane)
         rgb_plane = rgb_plane.astype(numpy.uint8)
 
-        return Image.fromarray(rgb_plane, mode='RGB')
+        return scale_x, Image.fromarray(rgb_plane, mode='RGB')
 
     def get_panel_image(self, panel, orig_name=None):
         """
@@ -2415,9 +2454,7 @@ class FigureExport(object):
                         image._re.close()
             else:
                 # handle Zarr URL
-                pil_img = self.render_zarr_to_pil(panel)
-                print("pil_img from Zarr:", pil_img.size)
-                pil_img.show()
+                scale, pil_img = self.render_zarr_to_pil(panel)
 
         if pil_img is None:
             return
@@ -2527,7 +2564,7 @@ class FigureExport(object):
             i = BytesIO(thumb_data)
             pil_img = Image.open(i)
         except ValueError:
-            pil_img = self.render_zarr_to_pil(panel, target_size=96)
+            scale, pil_img = self.render_zarr_to_pil(panel, target_size=96)
         temp_name = str(idx) + "_thumb.jpg"
         pil_img.save(temp_name)
         return temp_name
@@ -2881,8 +2918,9 @@ class TiffExport(FigureExport):
 
         super(TiffExport, self).__init__(conn, script_params, export_images)
 
-        from omero.gateway import THISPATH
-        self.GATEWAYPATH = THISPATH
+        if omero_installed:
+            from omero.gateway import THISPATH
+            self.GATEWAYPATH = THISPATH
 
         self.ns = "omero.web.figure.tiff"
         self.mimetype = "image/tiff"
@@ -2893,6 +2931,8 @@ class TiffExport(FigureExport):
 
     def get_font(self, fontsize, bold=False, italics=False):
         """ Try to load font from known location in OMERO """
+        if not omero_installed:
+            return ImageFont.load_default()
         font_name = "FreeSans.ttf"
         if bold and italics:
             font_name = "FreeSansBoldOblique.ttf"
