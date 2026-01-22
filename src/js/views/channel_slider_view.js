@@ -401,17 +401,10 @@ var ChannelSliderView = Backbone.View.extend({
                 var active = actives.reduce(allEqualFn, actives[0]);
                 var style = {'background-position': '0 0'}
                 var lutBgPos = FigureLutPicker.getLutBackgroundPosition(color);
-                var lutPng = FigureLutPicker.getLutPng(color);
-                console.log("lutPng", lutPng);
-                var lutBgCss = '--bgPos: 0 0;';
-                if (color.endsWith('.lut') && lutPng) {
-                    // lutPng means we have LUT from ome-zarr.js. Apply without offset
-                    lutBgCss = `--bgPos: 0 0; --lutPng: url('${lutPng}'); --pngHeight: 100%;`;
+                if (color.endsWith('.lut')) {
+                    style['background-position'] = lutBgPos;
                     color = "ccc";
-                } else {
-                    lutBgCss = `--bgPos: ${lutBgPos};`
-                }
-                if (color.toUpperCase() === "FFFFFF") {
+                } else if (color.toUpperCase() === "FFFFFF") {
                     color = "ccc";  // white slider would be invisible
                 }
                 if (color == "FFFFFF") color = "ccc";  // white slider would be invisible
@@ -430,7 +423,7 @@ var ChannelSliderView = Backbone.View.extend({
                                                 'max': max,
                                                 'step': (max - min > SLIDER_INCR_CUTOFF) ? 1 : 0.01,
                                                 'active': active,
-                                                'lutBgCss': lutBgCss,
+                                                'lutBgPos': lutBgPos,
                                                 'reverse': reverse,
                                                 'color': color,
                                                 'isDark': this.isDark(color)
