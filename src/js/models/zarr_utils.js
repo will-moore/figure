@@ -18,6 +18,7 @@ export async function loadZarrForPanel(zarrUrl) {
     console.error("Error loading Zarr:", error);
     return {"Error": error.toString()};
   }
+  console.log("msWithArray", msWithArray);
   const {arr, shapes, multiscale, omero, scales, zarr_version} = msWithArray;
   let zarrName = zarrUrl.split("/").pop();
   console.log("multiscale", multiscale);
@@ -42,6 +43,7 @@ export async function loadZarrForPanel(zarrUrl) {
     multiscales: [multiscale],
   }
   zarr_attrs["arrays"] = zarrays;
+  zarr_attrs["zarr_version"] = zarr_version;
 
   let zarray = zarrays[0];
   console.log("zarray", zarray);
