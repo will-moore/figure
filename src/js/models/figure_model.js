@@ -615,23 +615,6 @@
                         return;
                     }
 
-                    // coords.spacer = coords.spacer || data.size.width/20;
-                    // var full_width = (coords.colCount * (data.size.width + coords.spacer)) - coords.spacer,
-                    //     full_height = (coords.rowCount * (data.size.height + coords.spacer)) - coords.spacer;
-                    // coords.scale = coords.paper_width / (full_width + (2 * coords.spacer));
-                    // coords.scale = Math.min(coords.scale, 1);    // only scale down
-                    // // For the FIRST IMAGE ONLY (coords.px etc undefined), we
-                    // // need to work out where to start (px,py) now that we know size of panel
-                    // // (assume all panels are same size)
-                    // coords.px = coords.px || coords.c.x - (full_width * coords.scale)/2;
-                    // coords.py = coords.py || coords.c.y - (full_height * coords.scale)/2;
-
-                    // // calculate panel coordinates from index...
-                    // var row = parseInt(index / coords.colCount, 10);
-                    // var col = index % coords.colCount;
-                    // var panelX = coords.px + ((data.size.width + coords.spacer) * coords.scale * col);
-                    // var panelY = coords.py + ((data.size.height + coords.spacer) * coords.scale * row);
-
                     // ****** This is the Data Model ******
                     //-------------------------------------
                     // Any changes here will create a new version
