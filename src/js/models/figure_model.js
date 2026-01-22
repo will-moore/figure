@@ -572,6 +572,11 @@
             this.set('loading_count', this.get('loading_count') + 1);
 
             let panel_json = await loadZarrForPanel(zarrUrl);
+            if (panel_json.Error) {
+                alert(`Error loading Zarr ${zarrUrl}: ${panel_json.Error}`);
+                this.set('loading_count', this.get('loading_count') - 1);
+                return;
+            }
 
             // coords (px, py etc) are incremented for each panel added
             this.updateCoordsAndPanelCoords(panel_json, coords, index)

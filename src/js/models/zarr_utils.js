@@ -11,13 +11,18 @@ export async function loadZarrForPanel(zarrUrl) {
 
   // we load smallest array. Only need it for min/max values if not in 'omero' metadata
   let datasetIndex = -1;
-  const  {arr, shapes, multiscale, omero, scales, zarr_version} = await omezarr.getMultiscaleWithArray(store, datasetIndex);
-  console.log({arr, shapes, multiscale, omero, scales, zarr_version})
+  let msWithArray;
+  try {
+    msWithArray = await omezarr.getMultiscaleWithArray(store, datasetIndex);
+  } catch (error) {
+    console.error("Error loading Zarr:", error);
+    return {"Error": error.toString()};
+  }
+  const {arr, shapes, multiscale, omero, scales, zarr_version} = msWithArray;
   let zarrName = zarrUrl.split("/").pop();
   console.log("multiscale", multiscale);
   if (!multiscale) {
-    alert(`Failed to load multiscale from ${zarrUrl}`);
-    return;
+    return {"Error": `Failed to load multiscale`};
   }
 
   let imgName = multiscale.name || zarrName;
