@@ -2,7 +2,7 @@
     import Backbone from "backbone";
     import _ from "underscore";
     import $ from "jquery";
-    import { rotatePoint } from "../views/util";
+    import { rotatePoint, figureConfirmDialog } from "../views/util";
 
     // Corresponds to css - allows us to calculate size of labels
     var LINE_HEIGHT = 1.43;
@@ -221,6 +221,18 @@
                     ch.color = "FFFFFF";
                 }
                 return ch;
+            });
+            // Enforce max active channels limit
+            const maxActive = window.MAX_ACTIVE_CHANNELS || 10;
+            let activeCount = 0;
+            data.channels.forEach(ch => {
+                if (ch.active) {
+                    activeCount += 1;
+                    if (activeCount > maxActive) {
+                        ch.active = false;  // disable extra active channels
+                    }
+                }
+
             });
             return data;
         },
@@ -753,6 +765,19 @@
         toggle_channel: function(cIndex, active) {
             if (typeof active == "undefined") {
                 active = !this.get('channels')[cIndex].active;
+            }
+
+            // Enforce max active channels - block if trying to activate beyond limit.
+            const MAX_ACTIVE_CHANNELS = window.MAX_ACTIVE_CHANNELS || 10;
+            if (active) {
+                const channels = this.get('channels') || [];
+                const activeCount = channels.reduce((acc, ch) => acc + (ch.active ? 1 : 0), 0);
+                if (!channels[cIndex].active && activeCount >= MAX_ACTIVE_CHANNELS) {
+                    figureConfirmDialog(
+                        "Channels Limit", "Cannot activate the channel. The maximum number of channels is already active.",
+                         ["OK"]);
+                    return;
+                }
             }
 
             if (this.get("hilo_enabled") && active) {
