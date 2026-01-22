@@ -331,16 +331,29 @@ export async function renderZarrToSrc(source, attrs, theZ, theT, channels, rect)
       return 0;
     });
     let cacheKey = `${source}/${path}/${sliceKey.join(",")}`;
-    // console.log("cacheKey", cacheKey);
-    // console.log("Zarr chIndex slices:", chIndex, "" + slices);
-    // console.log("Zarr chIndex shape:", chIndex, shape);
-    // TODO: add controller: { opts: { signal: controller.signal } }
-    // check cache!
+    // If we have requested slice in cache, return that instead of loading chunks...
     if (ZARR_DATA_CACHE[cacheKey]) {
-      console.log("RETURN cache!", ZARR_DATA_CACHE[cacheKey]);
-      return ZARR_DATA_CACHE[cacheKey];
+      if (ZARR_DATA_CACHE[cacheKey] !== "pending") {
+        console.log("RETURN cache!", ZARR_DATA_CACHE[cacheKey]);
+        return ZARR_DATA_CACHE[cacheKey];
+      } else {
+        // data is pending...
+        console.log("PENDING cache...", cacheKey);
+        // wait until data is populated, check every 100ms
+        return new Promise((resolve, reject) => {
+          let checkInterval = setInterval(() => {
+            if (ZARR_DATA_CACHE[cacheKey] && ZARR_DATA_CACHE[cacheKey] !== "pending") {
+              console.log("RESOLVE pending cache!", ZARR_DATA_CACHE[cacheKey]);
+              clearInterval(checkInterval);
+              resolve(ZARR_DATA_CACHE[cacheKey]);
+            }
+          }, 100);
+        });
+      }
     }
 
+    // "pending" flag to avoid duplicate loads
+    ZARR_DATA_CACHE[cacheKey] = "pending";
     return zarr.get(arr, slices).then((data) => {
       console.log("populate cache...");
       ZARR_DATA_CACHE[cacheKey] = data;
