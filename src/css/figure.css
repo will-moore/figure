@@ -1037,7 +1037,7 @@
         text-align: left;
     }
 
-    .lutOption span {
+    .lutOption span, .lutOption img {
         width: 85px;
         display: inline-block;
     }

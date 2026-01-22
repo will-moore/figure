@@ -5,7 +5,11 @@
 	<% _.each(luts, function(lut, i) { %>
 
 		<button type="button" class="btn btn-default lutOption" data-lut="<%= lut.name %>">
-			<span class="lutBg" style="background-position: <%= lut.bgPos %>;">&nbsp</span>
+			<% if (lut.png) { %>
+				<img height="24px" src="<%= lut.png %>" />
+			<% } else { %>
+				<span class="lutBg" style="background-position: <%= lut.bgPos %>;">&nbsp</span>
+			<% } %>
 			<%= lut.displayName %> </button>
 
 		<% if (i === parseInt(luts.length/2)) { %>

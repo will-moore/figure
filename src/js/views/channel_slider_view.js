@@ -430,7 +430,7 @@ var ChannelSliderView = Backbone.View.extend({
                                                 'max': max,
                                                 'step': (max - min > SLIDER_INCR_CUTOFF) ? 1 : 0.01,
                                                 'active': active,
-                                                'lutBgPos': lutBgPos,
+                                                'lutBgCss': lutBgCss,
                                                 'reverse': reverse,
                                                 'color': color,
                                                 'isDark': this.isDark(color)
