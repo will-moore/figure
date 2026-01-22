@@ -520,7 +520,7 @@
             var invalidIds = [];
             for (var i=0; i<iIds.length; i++) {
                 console.log("Adding image", iIds[i]);
-                if (iIds[i].includes(".zarr")) {
+                if (iIds[i].includes("zarr")) {
                     this.importZarrImage(iIds[i], coords, i);
                     continue;
                 }
@@ -566,6 +566,9 @@
         },
 
         importZarrImage: async function(zarrUrl, coords, index) {
+            if (zarrUrl.endsWith("/")) {
+                zarrUrl = zarrUrl.slice(0, -1);
+            }
             this.set('loading_count', this.get('loading_count') + 1);
 
             let panel_json = await loadZarrForPanel(zarrUrl);
