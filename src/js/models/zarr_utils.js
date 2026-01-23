@@ -45,6 +45,14 @@ export async function loadZarrForPanel(zarrUrl) {
   zarr_attrs["arrays"] = zarrays;
   zarr_attrs["zarr_version"] = zarr_version;
 
+  // TODO: look-up OME-Zarr version or get it from omezarr
+  // For now, if it's not in multiscale.version, assume v0.5
+  if (multiscale.version) {
+    zarr_attrs["version"] = multiscale.version;
+  } else if (zarr_version == "3") {
+    zarr_attrs["version"] = "0.5";
+  }
+
   let zarray = zarrays[0];
   console.log("zarray", zarray);
 
