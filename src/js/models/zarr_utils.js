@@ -113,6 +113,35 @@ export async function loadZarrForPanel(zarrUrl) {
     });
   }
 
+  let deltaT = [];
+  if (axesNames.includes("t")) {
+    // if we have time units...
+    let timeAxis = axes.find((a) => a.name == "t");
+    if (timeAxis && timeAxis.unit) {
+      let secsIncrement = 1;
+      let scaleTransform0 = multiscale.datasets[0].coordinateTransformations?.find(
+        (ct) => ct.type == "scale"
+      );
+      if (scaleTransform0) {
+        secsIncrement = scaleTransform0.scale[axesNames.indexOf("t")];
+      }
+      const LENGTH_UNITS = {
+        "nanosecond": 1e-9,
+        "microsecond": 1e-6,
+        "millisecond": 1e-3,
+        "second": 1,
+        "minute": 60,
+        "hour": 3600,
+      };
+      if (LENGTH_UNITS[timeAxis.unit]) {
+        secsIncrement = secsIncrement * LENGTH_UNITS[timeAxis.unit];
+        for(let t = 0; t < sizeT; t++) {
+          deltaT.push(t * secsIncrement);
+        }
+      }
+    }
+  }
+
   let panelX = 0;
   let panelY = 0;
   let coords = {scale: 1};
@@ -145,6 +174,10 @@ export async function loadZarrForPanel(zarrUrl) {
     // let's dump the zarr data into the panel
     zarr: zarr_attrs,
   };
+
+  if (deltaT.length > 0) {
+    n['deltaT'] = deltaT;
+  }
 
   // handle pixel sizes if available
   // Use 'scale' from first 'coordinateTransforms' if available
