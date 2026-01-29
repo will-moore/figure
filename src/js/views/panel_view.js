@@ -256,18 +256,31 @@
                             format = prop_nf[1] ? prop_nf[1] : "index";
                             precision = param_dict["precision"] !== undefined ? param_dict["precision"] : 0; // decimal places default to 0
                             label_value = self.model.get_time_label_text(format, param_dict["offset"], precision);
-                        } else if (['image', 'dataset', 'screen', 'plate', 'well', 'wellsample', 'acquisition', 'run', 'field'].includes(prop_nf[0])){
-                            // Map aliases: 
+                        } else if (['image', 'project', 'dataset', 'screen', 'plate', 'well', 'wellsample', 'acquisition', 'run', 'field'].includes(prop_nf[0])){
+                            // Map aliases:
                             // 'field' -> 'wellsample' (because backend stores field under 'wellsample')
                             // 'run' -> 'acquisition'
                             prop_nf[0] = prop_nf[0] === 'field' ? 'wellsample' : prop_nf[0];
                             prop_nf[0] = prop_nf[0] === 'run' ? 'acquisition' : prop_nf[0];
-                            
-                            format = prop_nf[1] ? prop_nf[1] : "name";
-                            label_value = self.model.get_name_label_text(prop_nf[0], format);
-                            console.log("render_label label_value", label_value, prop_nf);
-                            //Escape the underscore for markdown
-                            label_value = ("" + label_value).replaceAll("_", "\\_");
+
+                            // Determine default format based on property type
+                            let defaultFormat = "name";
+                            if (prop_nf[0] === 'wellsample') {
+                                defaultFormat = "index";
+                            } else if (prop_nf[0] === 'well') {
+                                defaultFormat = "label";
+                            }
+
+                            format = prop_nf[1] ? prop_nf[1] : defaultFormat;
+                            if (["id", defaultFormat].indexOf(format) === -1) {
+                                label_value = "";
+                                // when format is not in allowed formats, will set to original expression
+                            } else {
+                                label_value = self.model.get_name_label_text(prop_nf[0], format);
+                                //Escape the underscore for markdown
+                                label_value = ("" + label_value).replaceAll("_", "\\_");
+                            }
+
                         } else if (['x', 'y', 'z', 'width', 'height', 'w', 'h', 'rotation', 'rot'].includes(prop_nf[0])){
                             format = prop_nf[1] ? prop_nf[1] : "pixel";
                             precision = param_dict["precision"] !== undefined ? param_dict["precision"] : 2; // decimal places default to 2
