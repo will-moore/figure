@@ -670,19 +670,40 @@
                                 new_channels[i].label = data.channels[i].label;
                             }
 
-                            panel.set({
+                            var newData = {
                                 'name': data.meta.imageName,
                                 'datasetName': data.meta.datasetName,
                                 'datasetId': data.meta.datasetId,
-                                'pixel_size_x': data.pixel_size.valueX,
-                                'pixel_size_y': data.pixel_size.valueY,
-                                'pixel_size_z': data.pixel_size.valueZ,
-                                'pixel_size_x_symbol': data.pixel_size.symbolX,
-                                'pixel_size_z_symbol': data.pixel_size.symbolZ,
-                                'pixel_size_x_unit': data.pixel_size.unitX,
-                                'pixel_size_z_unit': data.pixel_size.unitZ,
                                 'channels': new_channels
-                            });
+                            };
+
+                            // Unset to start afresh
+                            panel.unset('pixel_size_x');
+                            panel.unset('pixel_size_y');
+                            panel.unset('pixel_size_z');
+                            panel.unset('pixel_size_x_symbol');
+                            panel.unset('pixel_size_z_symbol');
+                            panel.unset('pixel_size_x_unit');
+                            panel.unset('pixel_size_z_unit');
+                            newData.pixel_size_x_unit = 'MICROMETER';  // Set back to panel model default
+                            newData.pixel_size_x_symbol = '\xB5m'; // µm
+
+                            if (data.pixel_size) {
+                                if (data.pixel_size.valueX) {
+                                    newData.pixel_size_x = data.pixel_size.valueX;
+                                    newData.pixel_size_x_symbol = data.pixel_size.symbolX;
+                                }
+                                if (data.pixel_size.valueY) {
+                                    newData.pixel_size_y = data.pixel_size.valueY;
+                                    newData.pixel_size_y_symbol = data.pixel_size.symbolY;
+                                }
+                                if (data.pixel_size.valueZ) {
+                                    newData.pixel_size_z = data.pixel_size.valueZ;
+                                    newData.pixel_size_z_symbol = data.pixel_size.symbolZ;
+                                }
+                            }
+
+                            panel.set(newData);
                             panel.trigger('change:labels');
                         }
                     });

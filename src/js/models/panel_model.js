@@ -186,15 +186,34 @@
                 'orig_height': data.orig_height,
                 'datasetName': data.datasetName,
                 'datasetId': data.datasetId,
-                'pixel_size_x': data.pixel_size_x,
-                'pixel_size_y': data.pixel_size_y,
-                'pixel_size_z': data.pixel_size_z,
-                'pixel_size_x_symbol': data.pixel_size_x_symbol,
-                'pixel_size_z_symbol': data.pixel_size_z_symbol,
-                'pixel_size_x_unit': data.pixel_size_x_unit,
-                'pixel_size_z_unit': data.pixel_size_z_unit,
                 'deltaT': data.deltaT,
             };
+
+            // Unset to start afresh
+            this.unset('pixel_size_x');
+            this.unset('pixel_size_y');
+            this.unset('pixel_size_z');
+            this.unset('pixel_size_x_symbol');
+            this.unset('pixel_size_z_symbol');
+            this.unset('pixel_size_x_unit');
+            this.unset('pixel_size_z_unit');
+            newData.pixel_size_x_unit = 'MICROMETER';  // Set back to panel model default
+            newData.pixel_size_x_symbol = '\xB5m'; // µm
+
+            if (data.pixel_size) {
+                if (data.pixel_size.valueX) {
+                    newData.pixel_size_x = data.pixel_size.valueX;
+                    newData.pixel_size_x_symbol = data.pixel_size.symbolX;
+                }
+                if (data.pixel_size.valueY) {
+                    newData.pixel_size_y = data.pixel_size.valueY;
+                    newData.pixel_size_y_symbol = data.pixel_size.symbolY;
+                }
+                if (data.pixel_size.valueZ) {
+                    newData.pixel_size_z = data.pixel_size.valueZ;
+                    newData.pixel_size_z_symbol = data.pixel_size.symbolZ;
+                }
+            }
 
             // theT and theZ are not changed unless we have to...
             if (this.get('theT') >= newData.sizeT) {
