@@ -37,7 +37,7 @@
                 'change:zoom change:dx change:dy change:width change:height change:channels change:theZ change:theT change:z_start change:z_end change:z_projection change:min_export_dpi change:pixel_range change:vertical_flip change:horizontal_flip',
                 this.render_image);
             this.listenTo(this.model,
-                'change:channels change:zoom change:dx change:dy change:width change:height change:rotation change:labels change:theT change:deltaT change:theZ change:deltaZ change:z_projection change:z_start change:z_end',
+                'change:channels change:zoom change:dx change:dy change:width change:height change:rotation change:labels change:theT change:deltaT change:theZ change:deltaZ change:z_projection change:z_start change:z_end change:parents',
                 this.render_labels);
             this.listenTo(this.model, 'change:shapes', this.render_shapes);
             this.listenTo(this.model, 'change:border', this.render_layout);
