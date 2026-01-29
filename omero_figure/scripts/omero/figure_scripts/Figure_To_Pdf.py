@@ -1362,83 +1362,36 @@ class FigureExport(object):
                     # Escaping "_" for markdown
                     label_value = label_value.replace("_", "\\_")
 
-                elif prop_nf[0] == "dataset":
-                    format = prop_nf[1] if len(prop_nf) > 1 else "name"
-                    if format == "name":
-                        if panel['datasetName']:
-                            label_value = panel['datasetName']
+                elif prop_nf[0] in ["dataset", "project", "plate", "screen",
+                                    "run", "acquisition", "well",
+                                    "field", "wellsample"]:
+
+                    default_frmt = "name"  # default property format
+                    if prop_nf[0] == "well":
+                        default_frmt = "label"
+                    if prop_nf[0] == "field":
+                        default_frmt = "index"
+                        prop_nf[0] = "wellsample"  # Also handle aliases
+                    if prop_nf[0] == "run":
+                        prop_nf[0] = "acquisition"
+
+                    format = prop_nf[1] if len(prop_nf) > 1 else default_frmt
+
+                    if format in ["id", default_frmt]:
+                        parent = panel.get("parents", {}).get(prop_nf[0], {})
+                        if parent:
+                            label_value = str(
+                                parent.get(format, '')
+                            )
                         else:
-                            label_value = "No/Many Datasets"
-                    elif format == "id":
-                        if panel['datasetId']:
-                            label_value = str(panel['datasetId'])
-                        else:
-                            label_value = "null"
+                            # undefined value for valid format
+                            # e.g the screen id of an image in a dataset
+                            label_value = 'undefined'
+                    else:
+                        # Unknown format, will use original [label]
+                        label_value = ''
                     # Escaping "_" for markdown
                     label_value = label_value.replace("_", "\\_")
-
-                # Handle well, field/wellsample, run/acquisition, plate,
-                # screen labels when figure is created
-                elif prop_nf[0] == "well":
-                    format = prop_nf[1] if len(prop_nf) > 1 else "label"
-                    if format == "label":
-                        label_value = str(
-                            panel.get('well', {}).get('label', '')
-                        )
-                    elif format == "id":
-                        label_value = str(panel.get('well', {}).get('id', ''))
-                    else:
-                        label_value = ''
-
-                elif prop_nf[0] in ["field", "wellsample"]:
-                    format = prop_nf[1] if len(prop_nf) > 1 else "index"
-                    if format == "index":
-                        label_value = str(
-                            panel.get('wellsample', {}).get('index', '')
-                        )
-                    elif format == "id":
-                        label_value = str(
-                            panel.get('wellsample', {}).get('id', '')
-                        )
-                    else:
-                        label_value = ''
-
-                elif prop_nf[0] in ["run", "acquisition"]:
-                    format = prop_nf[1] if len(prop_nf) > 1 else "name"
-                    if format == "name":
-                        label_value = str(
-                            panel.get('acquisition', {}).get('name', '')
-                        )
-                    elif format == "id":
-                        label_value = str(
-                            panel.get('acquisition', {}).get('id', '')
-                        )
-                    else:
-                        label_value = ''
-
-                elif prop_nf[0] == "plate":
-                    format = prop_nf[1] if len(prop_nf) > 1 else "name"
-                    if format == "name":
-                        label_value = str(
-                            panel.get('plate', {}).get('name', '')
-                        )
-                    elif format == "id":
-                        label_value = str(panel.get('plate', {}).get('id', ''))
-                    else:
-                        label_value = ''
-
-                elif prop_nf[0] == "screen":
-                    format = prop_nf[1] if len(prop_nf) > 1 else "name"
-                    if format == "name":
-                        label_value = str(
-                            panel.get('screen', {}).get('name', '')
-                        )
-                    elif format == "id":
-                        label_value = str(
-                            panel.get('screen', {}).get('id', '')
-                        )
-                    else:
-                        label_value = ''
 
                 elif prop_nf[0] in ['x', 'y', 'z', 'width', 'height',
                                     'w', 'h', 'rotation', 'rot']:
