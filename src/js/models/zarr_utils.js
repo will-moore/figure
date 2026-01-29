@@ -87,9 +87,13 @@ export async function loadZarrForPanel(zarrUrl) {
     "FFFFFF",
   ];
   let channels = omero?.channels;
+  let indices = {};
+  if (axesNames.includes("z")) {
+    indices["z"] = defaultZ;
+  }
   if (!channels) {
     // load smallest array to get min/max values for every channel
-    let slices = omezarr.getSlices(_.range(sizeC), shape, axesNames, {});
+    let slices = omezarr.getSlices(_.range(sizeC), arr.shape, axesNames, indices, shapes[0]);
     let promises = slices.map((chSlice) => zarr.get(arr, chSlice));
     let ndChunks = await Promise.all(promises);
 
@@ -246,6 +250,11 @@ export async function renderZarrToSrc(source, attrs, theZ, theT, channels, rect,
     width: Math.floor(region_width * targetScale),
     height: Math.floor(region_height * targetScale),
   };
+
+  // Handle any Z-downsampling...
+  let sizeZ = zarrays[paths[0]].shape[axes.indexOf("z")];
+  let cropZ = zarrays[path].shape[axes.indexOf("z")];
+  theZ = Math.floor(theZ *cropZ / sizeZ);
 
   // We can create canvas of the size of the array_rect
   const canvas = document.createElement("canvas");
