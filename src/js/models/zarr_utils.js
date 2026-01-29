@@ -200,7 +200,7 @@ function dtypeToPixelsType(dtype) {
   return dt;
 };
 
-export async function renderZarrToSrc(source, attrs, theZ, theT, channels, rect) {
+export async function renderZarrToSrc(source, attrs, theZ, theT, channels, rect, targetSize=500) {
   let paths = attrs.multiscales[0].datasets.map((d) => d.path);
   // for v0.3 each axes is a string, for v0.4+ it is an object
   let axes = attrs.multiscales[0].axes?.map((a) => a.name || a);
@@ -208,8 +208,7 @@ export async function renderZarrToSrc(source, attrs, theZ, theT, channels, rect)
   axes = axes || ["t", "c", "z", "y", "x"];
   let zarrays = attrs.arrays;
 
-  // Pick first resolution that is below a max size...
-  const MAX_SIZE = 500;
+  // Pick resolution where crop size is closest to targetSize
   // use the arrays themselves to determine 'scale', since we might
   // not have 'coordinateTransforms' for pre-v0.4 etc.
   let path;
@@ -221,28 +220,32 @@ export async function renderZarrToSrc(source, attrs, theZ, theT, channels, rect)
   let region_y = rect?.y || 0;
   let region_width = rect?.width || fullShape.at(-1);
   let region_height = rect?.height || fullShape.at(-2);
+  let region_max_size = Math.max(region_width, region_height);
 
-  // crop region for the downscaled array
-  let array_rect;
+  let dsScales = paths.map((p) => zarrays[p].shape.at(-1) / fullShape.at(-1));
+  // E.g. if dataset shape is 1/2 of fullShape then crop size will be half
+  let cropSizes = dsScales.map((s) => region_max_size * s);
 
-  for (let p of paths) {
-    let arrayAttrs = zarrays[p];
-    let shape = arrayAttrs.shape;
-    // E.g. if dataset shape is 1/2 of fullShape then crop size will be half
-    let crop_w = region_width * shape.at(-1) / fullShape.at(-1);
-    let crop_h = region_height * shape.at(-2) / fullShape.at(-2);
-
-    if (crop_w * crop_h < MAX_SIZE * MAX_SIZE) {
-      array_rect = {
-        x: Math.floor(region_x * shape.at(-1) / fullShape.at(-1)),
-        y: Math.floor(region_y * shape.at(-2) / fullShape.at(-2)),
-        width: Math.floor(crop_w),
-        height: Math.floor(crop_h),
+  // find the closest matching size...
+  let targetScale;
+  for (let i = 0; i < cropSizes.length; i++) {
+    if (cropSizes[i] <= targetSize) {
+      if (Math.abs(cropSizes[i] - targetSize) < Math.abs(cropSizes[Math.max(0, i - 1)] - targetSize)) {
+        path = paths[i];
+        targetScale = dsScales[i];
+      } else {
+        path = paths[Math.max(0, i - 1)];
+        targetScale = dsScales[Math.max(0, i - 1)];
       }
-      path = p;
       break;
     }
   }
+  let array_rect = {
+    x: Math.floor(region_x * targetScale),
+    y: Math.floor(region_y * targetScale),
+    width: Math.floor(region_width * targetScale),
+    height: Math.floor(region_height * targetScale),
+  };
 
   // We can create canvas of the size of the array_rect
   const canvas = document.createElement("canvas");
@@ -251,7 +254,7 @@ export async function renderZarrToSrc(source, attrs, theZ, theT, channels, rect)
 
   if (!path) {
     console.error(
-      `Lowest resolution too large for rendering: > ${MAX_SIZE} x ${MAX_SIZE}`
+      `Lowest resolution too large for rendering: > ${targetSize} x ${targetSize}`
     );
     return;
   }
