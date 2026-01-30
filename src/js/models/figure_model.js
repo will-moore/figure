@@ -572,7 +572,26 @@
 
             let panel_json = await loadZarrForPanel(zarrUrl);
             if (panel_json.Error) {
-                alert(`Error loading Zarr ${zarrUrl}: ${panel_json.Error}`);
+                let zarrErr = panel_json.Error;
+                for (let fmt of ["bioformats2raw.layout", "OME-Zarr Plates"]) {
+                    if (zarrErr.includes(fmt)) {
+                        zarrErr = `Error loading Zarr ${zarrUrl}:
+                        <p>${fmt} not currently supported.</p>
+                        <p>Please <a href="https://ome.github.io/ome-ngff-validator/?source=${encodeURIComponent(zarrUrl)}" target="_blank">
+                        open in the OME-NGFF Validator</a> to choose a single Image url.</p>
+                        `;
+                    }
+                }
+                if (zarrErr.includes("File not found")) {
+                    zarrErr = `Error loading Zarr from <br/>${zarrUrl}:
+                    <p>File not found (No <code>zarr.json</code> or <code>.zattrs</code>)</p>`;
+                }
+                figureConfirmDialog(
+                    "Zarr Load Error",
+                    zarrErr,
+                    ["OK"]
+                );
+                // alert(`Error loading Zarr ${zarrUrl}: ${panel_json.Error}`);
                 this.set('loading_count', this.get('loading_count') - 1);
                 return;
             }

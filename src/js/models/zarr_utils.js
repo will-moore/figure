@@ -2,11 +2,40 @@ import * as zarr from "zarrita";
 import * as omezarr from "ome-zarr.js";
 import { slice } from "zarrita";
 import _ from 'underscore';
+import { getJson, FILE_NOT_FOUND } from "../views/util.js";
 
 const ZARRITA_ARRAY_CACHE = {};
 const ZARR_DATA_CACHE = {};
 
 export async function loadZarrForPanel(zarrUrl) {
+
+  // first check if we have a zarr image...
+  let zarrJson;
+  try {
+    zarrJson = await getJson(zarrUrl + "/zarr.json");
+    zarrJson = zarrJson.attributes?.ome;   // zarr v3
+  } catch (error) {
+    console.log("Error loading zarr.json:", error);
+    if (error.toString().includes(FILE_NOT_FOUND)) {
+      try {
+        zarrJson = await getJson(zarrUrl + "/.zattrs");
+      } catch (error2) {
+        return {"Error": error2.toString()};
+      }
+    } else {
+      return {"Error": error.toString()};
+    }
+  }
+  if (!zarrJson) {
+    return {"Error": "Failed to load Zarr metadata"};
+  }
+  if (zarrJson["bioformats2raw.layout"]) {
+    return {"Error": "bioformats2raw.layout is not currently supported"};
+  }
+  if (zarrJson.plate) {
+    return {"Error": "OME-Zarr Plates are not currently supported"};
+  }
+
   let store = new zarr.FetchStore(zarrUrl);
 
   // we load smallest array. Only need it for min/max values if not in 'omero' metadata
@@ -45,12 +74,10 @@ export async function loadZarrForPanel(zarrUrl) {
   zarr_attrs["arrays"] = zarrays;
   zarr_attrs["zarr_version"] = zarr_version;
 
-  // TODO: look-up OME-Zarr version or get it from omezarr
-  // For now, if it's not in multiscale.version, assume v0.5
   if (multiscale.version) {
     zarr_attrs["version"] = multiscale.version;
   } else if (zarr_version == "3") {
-    zarr_attrs["version"] = "0.5";
+    zarr_attrs["version"] = zarrJson.version;
   }
 
   let zarray = zarrays[0];
@@ -266,7 +293,8 @@ export async function renderZarrToSrc(source, attrs, theZ, theT, channels, rect,
   // find the closest matching size...
   let targetScale;
   for (let i = 0; i < cropSizes.length; i++) {
-    if (cropSizes[i] <= targetSize) {
+    // if we've gone small enough, or at last one...
+    if (cropSizes[i] <= targetSize || i == cropSizes.length - 1) {
       if (Math.abs(cropSizes[i] - targetSize) < Math.abs(cropSizes[Math.max(0, i - 1)] - targetSize)) {
         path = paths[i];
         targetScale = dsScales[i];

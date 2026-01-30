@@ -262,6 +262,51 @@ export async function getJsonWithCredentials (url) {
     return fetch(url, cors_headers).then(rsp => rsp.json());
 }
 
+export const FILE_NOT_FOUND = "File not found";
+export async function getJson(url) {
+    // This will throw an Error if 404 or CORS fails etc
+    return fetchHandleError(url).then(rsp => rsp.json());
+}
+
+async function fetchHandleError(url) {
+  let msg = `Error Loading ${url}:`;
+  let rsp;
+  try {
+    rsp = await fetch(url).then(function (response) {
+      if (!response.ok) {
+        // make the promise be rejected if we didn't get a 2xx response
+        // NB. statusText could be "Not Found" or "File not found" depending on server
+        // Standardise based on response.status
+        if (response.status == 404) {
+          msg += ` ${FILE_NOT_FOUND}`;
+        } else {
+          msg += ` ${response.statusText}`;
+        }
+      } else {
+        return response;
+      }
+    });
+  } catch (error) {
+    console.log("check for CORS...");
+    console.log(error);
+    try {
+      let corsRsp = await fetch(url, { mode: "no-cors" });
+      console.log("corsRsp", corsRsp);
+      // If the 'no-cors' mode allows this to return, then we
+      // likely failed due to CORS in the original request
+      msg += " Failed due to CORS issues.";
+    } catch (anotherError) {
+      console.log("Even `no-cors` request failed!", anotherError);
+      // return the original error (same as anotherError?)
+      msg += ` ${error}`;
+    }
+  }
+  if (rsp) {
+    return rsp;
+  }
+  throw Error(msg);
+}
+
 export const RANDOM_NUMBER_RANGE = 100000000;
 
 export function getRandomId() {
