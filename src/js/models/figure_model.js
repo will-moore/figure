@@ -520,7 +520,7 @@
             var invalidIds = [];
             for (var i=0; i<iIds.length; i++) {
                 console.log("Adding image", iIds[i]);
-                if (iIds[i].includes("zarr")) {
+                if (iIds[i].includes("http")) {
                     this.importZarrImage(iIds[i], coords, i);
                     continue;
                 }
