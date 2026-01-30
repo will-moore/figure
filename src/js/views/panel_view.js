@@ -194,9 +194,12 @@
             // But we don't want the previous image showing while we wait...
             if (this.model.is_big_image()) {
                 this.$img_panel.hide();
-                $(".image_panel_spinner", this.$el).show();
             }
+            let timeoutId = setTimeout(() => {
+                $(".image_panel_spinner", this.$el).show();
+            }, 100); // Show spinner only if image load takes longer than 100ms
             this.$img_panel.one("load", function(){
+                clearTimeout(timeoutId);
                 $(".image_panel_spinner", this.$el).hide();
                 this.$img_panel.show();
             }.bind(this));

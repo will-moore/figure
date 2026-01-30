@@ -1125,6 +1125,8 @@
                     document.getElementById(img_id).src = src;
                 });
                 var img_css = m.get_vp_img_css(m.get('zoom'), frame_w, frame_h);
+                // placeholder transparent gif
+                img_css.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
                 img_css.id = img_id;
                 // if a 'reasonable' dpi is set, we don't pixelate
                 var dpiSet = m.get('min_export_dpi') > 100;
