@@ -3366,7 +3366,7 @@ class OmeroExport(TiffExport):
         # Create a new blank tiffFigure for subsequent pages
         self.create_figure()
 
-    def create_file_annotation(self, image_ids):
+    def create_file_annotation(self):
         """Return result of script."""
 
         # We don't need to create file annotation, but we can return
