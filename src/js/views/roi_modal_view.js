@@ -13,7 +13,7 @@ import shape_toolbar_template from '../../templates/shapes/shape_toolbar.templat
 import shape_sidebar_template from '../../templates/shapes/shape_sidebar.template.html?raw';
 import roi_zt_buttons from '../../templates/modal_dialogs/roi_zt_buttons.template.html?raw';
 import RoiLoaderView from './roi_loader_view';
-import { hideModal, getJson } from "./util";
+import { hideModal, getJsonWithCredentials } from "./util";
 
 const TEXT_ANCHOR_ICONS = {
     "start": "bi-text-left",
@@ -182,7 +182,7 @@ export const RoiModalView = Backbone.View.extend({
                 .attr({'disabled': 'disabled'});
             $btn.parent().attr('title', 'Checking for ROIs...');  // title on parent div - still works if btn disabled
 
-            getJson(url).then((data) => {
+            getJsonWithCredentials(url).then((data) => {
                 this.omeroRoiCount = data.roi;
                 this.renderSidebar();
             });
@@ -222,7 +222,7 @@ export const RoiModalView = Backbone.View.extend({
             var iid = this.m.get('imageId');
             let url = BASE_OMEROWEB_URL + 'api/v0/m/rois/';
             var roiUrl = url + '?image=' + iid + '&limit=' + this.roisPageSize + '&offset=' + (this.roisPageSize * this.roisPage);
-            getJson(roiUrl).then((data) => {
+            getJsonWithCredentials(roiUrl).then((data) => {
                 this.Rois.set(data.data);
                 $("#loadRois").prop('disabled', false);
                 $("#roiModalRoiList table").empty();

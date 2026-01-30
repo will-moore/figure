@@ -256,7 +256,8 @@ export function hideModal(modalId) {
     thisModal.hide();
 }
 
-export async function getJson (url) {
+export async function getJsonWithCredentials (url) {
+    // $.getJSON() also works for OMERO.web requests
     let cors_headers = { mode: 'cors', credentials: 'include' };
     return fetch(url, cors_headers).then(rsp => rsp.json());
 }

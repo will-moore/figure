@@ -6,7 +6,7 @@ import Raphael from "raphael";
 import FigureModel from "../models/figure_model";
 import RectView from "./raphael-rect";
 
-import {figureConfirmDialog, hideModal, getJson, rotatePoint} from "./util";
+import {figureConfirmDialog, hideModal, getJsonWithCredentials, rotatePoint} from "./util";
 
 import crop_modal_roi_template from '../../templates/modal_dialogs/crop_modal_roi.template.html?raw';
 
@@ -399,7 +399,7 @@ export const CropModalView = Backbone.View.extend({
                 iid = self.m.get('imageId');
             var offset = this.roisPageSize * this.roisPage;
             var url = BASE_WEBFIGURE_URL + 'roiRectangles/' + iid + '/?limit=' + self.roisPageSize + '&offset=' + offset;
-            getJson(url).then(rsp => {
+            getJsonWithCredentials(url).then(rsp => {
                 var data = rsp.data;
                 self.roisLoaded += data.length;
                 self.roisPage += 1;

@@ -7,7 +7,7 @@
     import { recoverFigureFromStorage,
         clearFigureFromStorage,
         figureConfirmDialog,
-        getJson,
+        getJsonWithCredentials,
         saveFigureToStorage} from "../views/util";
     import { loadZarrForPanel } from "./zarr_utils";
 
@@ -66,7 +66,7 @@
             var load_url = BASE_WEBFIGURE_URL + "load_web_figure/" + fileId + "/",
                 self = this;
 
-            getJson(load_url).then(data => {
+            getJsonWithCredentials(load_url).then(data => {
                 data.fileId = fileId;
                 self.load_from_JSON(data);
                 self.set('unsaved', false);
@@ -296,7 +296,7 @@
                 if (iids.length > 0) {
                     var ptUrl = BASE_WEBFIGURE_URL + 'pixels_type/';
                     ptUrl += '?image=' + iids.join('&image=');
-                    getJson(ptUrl).then(data => {
+                    getJsonWithCredentials(ptUrl).then(data => {
                         // Update all panels
                         // NB: By the time that this callback runs, the panels will have been created
                         self.panels.forEach(function(p){
@@ -540,7 +540,6 @@
         },
 
         updateCoordsAndPanelCoords(panel_json, coords, index) {
-            console.log("importZarrImage coords.spacer coords:", coords.spacer, coords);
             // update panel_json and coords
             coords.spacer = coords.spacer || panel_json.orig_width/20;
             var full_width = (coords.colCount * (panel_json.orig_width + coords.spacer)) - coords.spacer,
