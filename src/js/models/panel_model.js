@@ -1466,7 +1466,11 @@
 
         createLabelsFromTags: function(options) {
             // Loads Tags for selected images and creates labels
-            var image_ids = this.map(function(s){return s.get('imageId')})
+            var image_ids = this.map(function(s){return s.get('imageId')});
+            image_ids = _.uniq(image_ids).filter(id => !isNaN(id));    // ignore zarr images
+            if (image_ids.length === 0) {
+                return;
+            }
             image_ids = "image=" + image_ids.join("&image=");
             // TODO: Use /api/ when annotations is supported
             var url = WEBINDEX_URL + "api/annotations/?type=tag&parents=true&limit=1000&" + image_ids;

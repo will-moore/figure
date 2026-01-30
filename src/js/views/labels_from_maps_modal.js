@@ -39,6 +39,12 @@ export var LabelFromMapsModal = Backbone.View.extend({
      */
     loadMapAnns() {
         let imageIds = this.model.getSelected().map(function(m){return m.get('imageId')});
+        imageIds = _.uniq(imageIds).filter(id => !isNaN(id));    // ignore zarr images
+        if (imageIds.length === 0) {
+            this.annotations = [];
+            this.render();
+            return;
+        }
         this.isLoading = true;
         $('select', this.el).html("<option>Loading data...</option>");
 
