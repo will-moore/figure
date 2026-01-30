@@ -1208,7 +1208,8 @@ class FigureExport(object):
         if self.conn is not None and len(panels_json) > 0:
             try:
                 id1 = int(panels_json[0]['imageId'])
-                group_id = self.conn.getObject("Image", id1).getDetails().group.id.val
+                group_id = self.conn.getObject(
+                    "Image", id1).getDetails().group.id.val
             except ValueError:
                 # e.g. imageId is zarr url
                 pass
@@ -1321,8 +1322,6 @@ class FigureExport(object):
 
         image.setActiveChannels(c_idxs, windows, colors, reverses)
 
-        z = panel['theZ']
-        t = panel['theT']
         size_x = image.getSizeX()
         size_y = image.getSizeY()
         size_z = image.getSizeZ()
@@ -2113,7 +2112,8 @@ class FigureExport(object):
 
     def is_big_image(self, panel):
         """Return True if this is a 'big' tiled image."""
-        max_w, max_h = self.conn.getMaxPlaneSize() if self.conn else (3000, 3000)
+        max_w, max_h = (self.conn.getMaxPlaneSize()
+                        if self.conn else (3000, 3000))
         return panel['orig_width'] * panel['orig_height'] > max_w * max_h
 
     def get_zoom_level_scale(self, image, region, max_width):
@@ -2188,7 +2188,7 @@ class FigureExport(object):
             image = self.conn.getObject("Image", image_id)
             if image is None:
                 return None
-            
+
             # Render the region...
             scale, level = self.get_zoom_level_scale(image, region, max_width)
 
@@ -2214,7 +2214,8 @@ class FigureExport(object):
                     image._re.close()
         else:
             # Zarr image - TODO: how to decide target_size?
-            scale, pil_img = self.render_zarr_to_pil(panel, xywh=(x, y, width, height))
+            scale, pil_img = self.render_zarr_to_pil(
+                panel, xywh=(x, y, width, height))
 
         # cache the 'zoom_level_scale', in the panel dict.
         # since we need it for scalebar, and don't want to calculate again
@@ -2225,7 +2226,8 @@ class FigureExport(object):
         if region_outside_image:
             canvas_width = int(region['width'] * scale)
             canvas_height = int(region['height'] * scale)
-            canvas = Image.new("RGBA", (canvas_width, canvas_height), (221, 221, 221, 255))
+            canvas = Image.new("RGBA", (canvas_width, canvas_height),
+                               (221, 221, 221, 255))
             canvas.paste(pil_img, (int(paste_x * scale), int(paste_y * scale)))
             pil_img = canvas
 
@@ -2288,7 +2290,7 @@ class FigureExport(object):
         return pil_img
 
     def render_zarr_to_pil(self, panel, target_size=4000, xywh=None):
-        #TODO: pick default target_size (based on dpi?) - e.g. 10000?
+        # TODO: pick default target_size (based on dpi?) - e.g. 10000?
 
         import zarr
         import dask.array as da
@@ -2314,22 +2316,22 @@ class FigureExport(object):
         scale_x = 1.0
         region_width = orig_width if xywh is None else xywh[2]
         # start big, and go smaller until we reach target size
-        for level, path in enumerate(paths[:-1]):
+        for level in range(len(paths) - 1):
             level_data = pyramid[level]
             # if the next level is closer to target_size, use it
             current_size_x = level_data.shape[-1]
             scale_x = current_size_x / orig_width       # e.g. 0.5, 0.25, etc
-            expected_size = region_width * scale_x
-            if expected_size <= target_size:
+            this_size = region_width * scale_x
+            if this_size <= target_size:
                 break
             # load next level, add to pyramid
             next_data = da.from_zarr(img_group[paths[level + 1]])
             pyramid.append(next_data)
             next_size_x = next_data.shape[-1]
             next_scale_x = next_size_x / orig_width
-            expected_next_size = region_width * next_scale_x
+            next_size = region_width * next_scale_x
             # if next level is closer to target size, use it
-            if abs(expected_next_size - target_size) < abs(expected_size - target_size):
+            if abs(next_size - target_size) < abs(this_size - target_size):
                 img_data = pyramid[level + 1]
 
         size_x = img_data.shape[-1]
@@ -2345,15 +2347,14 @@ class FigureExport(object):
             size_x = int(scale_x * xywh[2])
             size_y = int(scale_x * xywh[3])
 
-
         rgb_plane = numpy.zeros((size_y, size_x, 3), numpy.uint16)
 
-        def display(image, display_min, display_max): # copied from Bi Rico
+        def display(image, display_min, display_max):
             # https://stackoverflow.com/questions/14464449/using-numpy-to-efficiently-convert-16-bit-image-data-to-8-bit-for-display-with
             image.clip(display_min, display_max, out=image)
             image -= display_min
             numpy.floor_divide(image, (display_max - display_min + 1) / 256,
-                            out=image, casting='unsafe')
+                               out=image, casting='unsafe')
             return image.astype(numpy.uint8)
 
         def render_plane(dask_data, t, c, z, window=None):
@@ -2395,7 +2396,6 @@ class FigureExport(object):
 
             return display(channel0, window[0], window[1])
 
-
         the_z = panel['theZ']
         the_t = panel['theT']
         for ch_index, ch in enumerate(channels):
@@ -2409,7 +2409,8 @@ class FigureExport(object):
 
             for index, fraction in enumerate(color):
                 if fraction > 0:
-                    rgb_plane[:, :, index] += (fraction * plane).astype(numpy.uint16)
+                    color_plane = (fraction * plane).astype(numpy.uint16)
+                    rgb_plane[:, :, index] += color_plane
 
         rgb_plane.clip(0, 255, out=rgb_plane)
         rgb_plane = rgb_plane.astype(numpy.uint8)
