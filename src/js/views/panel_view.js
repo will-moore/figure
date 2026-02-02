@@ -265,14 +265,16 @@
 
                             // Determine default format based on property type
                             let defaultFormat = "name";
+                            let otherFormats = [];  // place to add more supported formats
                             if (prop_nf[0] === 'wellsample') {
                                 defaultFormat = "index";
+                                otherFormats.push("index_run");
                             } else if (prop_nf[0] === 'well') {
                                 defaultFormat = "label";
                             }
 
                             format = prop_nf[1] ? prop_nf[1] : defaultFormat;
-                            if (["id", defaultFormat].indexOf(format) === -1) {
+                            if (["id", defaultFormat].concat(otherFormats).indexOf(format) === -1) {
                                 label_value = "";
                                 // when format is not in allowed formats, will set to original expression
                             } else {
