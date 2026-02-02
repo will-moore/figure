@@ -108,8 +108,8 @@
 
                 // If one of z_start, z_end or z_projection is defined, ensure that they are within bounds
                 if (p.z_start !== undefined || p.z_end !== undefined || p.z_projection !== undefined) {
-                    p.z_start = (p.z_start  === undefined) ? 0 : p.z_start;
-                    p.z_end = (p.z_end  === undefined) ? 0 : p.z_end;
+                    p.z_start = (p.z_start === undefined) ? 0 : p.z_start;
+                    p.z_end = (p.z_end === undefined) ? 0 : p.z_end;
                     p.z_projection = (p.z_projection  === undefined) ? false : p.z_projection;
 
                     if (p.sizeZ === 1) {

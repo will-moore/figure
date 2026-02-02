@@ -284,19 +284,21 @@
 
             if (this.get('theZ') >= newData.sizeZ) {
                 newData.theZ = newData.sizeZ - 1;
-                if (this.get('z_start') !== undefined || this.get('z_end') !== undefined || this.get('z_projection') !== undefined) {
-                    newData.z_projection = (this.get("z_projection")  === undefined) ? false : this.get("z_projection");
+            }
 
-                    // bounds checking for z-projection
-                    var z_end = (this.get("z_end") === undefined) ? 0 : this.get("z_end");
-                    var z_start = (this.get("z_start")  === undefined) ? 0 : this.get("z_start");
-                    newData.z_end = Math.max(Math.min(z_end, newData.sizeZ - 1), 0);
-                    newData.z_start = Math.max(Math.min(z_start, newData.sizeZ - 1), 0);
-                    if (newData.z_start > newData.z_end) {
-                        var tmp = newData.z_start;
-                        newData.z_start = newData.z_end;
-                        newData.z_end = tmp;
-                    }
+            // Ensure z-projection parameters are within bounds of the new image
+            if (this.get('z_start') !== undefined || this.get('z_end') !== undefined || this.get('z_projection') !== undefined) {
+                newData.z_projection = (this.get("z_projection") === undefined) ? false : this.get("z_projection");
+
+                // bounds checking for z-projection
+                var z_end = (this.get("z_end") === undefined) ? 0 : this.get("z_end");
+                var z_start = (this.get("z_start") === undefined) ? 0 : this.get("z_start");
+                newData.z_end = Math.max(Math.min(z_end, newData.sizeZ - 1), 0);
+                newData.z_start = Math.max(Math.min(z_start, newData.sizeZ - 1), 0);
+                if (newData.z_start > newData.z_end) {
+                    var tmp = newData.z_start;
+                    newData.z_start = newData.z_end;
+                    newData.z_end = tmp;
                 }
             }
 
