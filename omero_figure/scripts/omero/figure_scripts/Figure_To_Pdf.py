@@ -2320,8 +2320,8 @@ class FigureExport(object):
             level_data = pyramid[level]
             # if the next level is closer to target_size, use it
             current_size_x = level_data.shape[-1]
-            scale_x = current_size_x / orig_width       # e.g. 0.5, 0.25, etc
-            this_size = region_width * scale_x
+            this_scale = current_size_x / orig_width    # e.g. 0.5, 0.25, etc
+            this_size = region_width * this_scale
             if this_size <= target_size:
                 break
             # load next level, add to pyramid
@@ -2331,8 +2331,10 @@ class FigureExport(object):
             next_scale_x = next_size_x / orig_width
             next_size = region_width * next_scale_x
             # if next level is closer to target size, use it
+            # True for every loop, except maybe the last
             if abs(next_size - target_size) < abs(this_size - target_size):
                 img_data = pyramid[level + 1]
+                scale_x = next_scale_x
 
         size_x = img_data.shape[-1]
         size_y = img_data.shape[-2]
