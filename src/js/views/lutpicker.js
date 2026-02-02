@@ -21,6 +21,7 @@ import Backbone from "backbone";
 import $ from "jquery";
 import _ from 'underscore';
 import * as bootstrap from "bootstrap"
+import * as omezarr from "ome-zarr.js";
 
 import lut_picker_template from '../../templates/lut_picker.template.html?raw';
 import { showModal } from "./util";
@@ -38,6 +39,10 @@ var LutPickerView = Backbone.View.extend({
     initialize:function () {
         this.lutModal = new bootstrap.Modal('#lutpickerModal');
         this.lut_names = [];
+    
+        // These will be overwritten with LUTs from OMERO if served by OMERO
+        this.luts = omezarr.getLuts();
+
         this.loadLuts();
     },
 
@@ -58,13 +63,24 @@ var LutPickerView = Backbone.View.extend({
         this.pickedLut = lutName;
 
         // Update preview to show LUT
-        var bgPos = this.getLutBackgroundPosition(lutName);
-        $(".lutPreview", this.el).css({'background-position': bgPos, 'background-image': `url(${this.lutsPngUrl})`});
+        var lut = this.luts.find(lut => lut.name == lutName);
+        if (lut.png) {
+            $(".lutPreview", this.el).css({'background-position': '0 0', 'background-image': "url('" + lut.png + "')", 'background-size': '100% 100%'});
+        } else {
+            var bgPos = this.getLutBackgroundPosition(lutName);
+            $(".lutPreview", this.el).css({'background-position': bgPos, 'background-image': `url(${this.lutsPngUrl})`});
+        }
         // Enable OK button
         $("button[type='submit']", this.el).removeAttr('disabled');
     },
 
     loadLuts: async function(force_reload = false) {
+        if (!APP_SERVED_BY_OMERO) {
+            $(":root").css({
+                "--pngHeight": "100%"
+            });
+            return;
+        }
         var url = WEBGATEWAYINDEX + 'luts/';
         let cors_headers = { mode: 'cors', credentials: 'include' };
         if (force_reload || this.lut_names === undefined || this.lutsPngUrl === undefined || this.luts === undefined) {
@@ -100,6 +116,14 @@ var LutPickerView = Backbone.View.extend({
         return this.lutsPngUrl
     },
 
+    getLutPng(lutName) {
+        // This will return undefined if the LUTs are loaded from OMERO
+        var lut = this.luts.find(lut => lut.name == lutName);
+        if (lut && lut.png) {
+            return lut.png;
+        }
+    },
+
     getLutBackgroundPosition: function(lutName) {
         var lutIndex = this.lut_names.indexOf(lutName);
         if (lutIndex > -1) {
@@ -125,8 +149,7 @@ var LutPickerView = Backbone.View.extend({
         if (options.success) {
             this.success = options.success;
         }
-
-        this.loadLuts().then(() => this.render());
+        this.render();
     },
 
     render:function() {
@@ -140,6 +163,7 @@ var LutPickerView = Backbone.View.extend({
                 // Add css background-position to each lut to offset luts_10.png
                 return {'bgPos': this.getLutBackgroundPosition(lut.name),
                         'name': lut.name,
+                        'png': lut.png,    // if LUT is from omezarr.js, we have png in hand
                         'displayName': this.formatLutName(lut.name)};
             }.bind(this));
 
@@ -151,4 +175,4 @@ var LutPickerView = Backbone.View.extend({
 
 const FigureLutPicker = new LutPickerView();
 
-export default FigureLutPicker
+export default FigureLutPicker;
