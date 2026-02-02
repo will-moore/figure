@@ -8,7 +8,8 @@
         clearFigureFromStorage,
         figureConfirmDialog,
         getJson,
-        saveFigureToStorage} from "../views/util";
+        saveFigureToStorage,
+        normalizeZProjectionBounds} from "../views/util";
 
     // Version of the json file we're saving.
     // This only needs to increment when we make breaking changes (not linked to release versions.)
@@ -108,24 +109,15 @@
 
                 // If one of z_start, z_end or z_projection is defined, ensure that they are within bounds
                 if (p.z_start !== undefined || p.z_end !== undefined || p.z_projection !== undefined) {
-                    p.z_start = (p.z_start === undefined) ? 0 : p.z_start;
-                    p.z_end = (p.z_end === undefined) ? 0 : p.z_end;
-                    p.z_projection = (p.z_projection  === undefined) ? false : p.z_projection;
-
-                    if (p.sizeZ === 1) {
-                        p.z_projection = false;
-                        p.z_start = 0;
-                        p.z_end = 0;
-                    } else {
-                        // bounds checking and ensures start <= end
-                        p.z_end = Math.max(Math.min(p.z_end, p.sizeZ - 1), 0);
-                        p.z_start = Math.max(Math.min(p.z_start, p.sizeZ - 1), 0);
-                        if (p.z_start > p.z_end) {
-                            var tmp = p.z_start;
-                            p.z_start = p.z_end;
-                            p.z_end = tmp;
-                        }
-                    }
+                    var normalized = normalizeZProjectionBounds(
+                        p.z_start,
+                        p.z_end,
+                        p.z_projection,
+                        p.sizeZ
+                    );
+                    p.z_projection = normalized.z_projection;
+                    p.z_start = normalized.z_start;
+                    p.z_end = normalized.z_end;
                 }
 
                 self.panels.create(p);
