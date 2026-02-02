@@ -147,7 +147,7 @@
                                 let txtShape = shape;
                                 // apply any translation and rotation to Text
                                 let newCoords = {x: txtShape.x, y: txtShape.y};
-                                // If the Inset was previously rotated, we need to 'undo' that rotation first 
+                                // If the Inset was previously rotated, we need to 'undo' that rotation first
                                 if (prevCoords.rotation && prevCoords.rotation != 360) {
                                     let prevCx = prevCoords.x + prevCoords.width / 2;
                                     let prevCy = prevCoords.y + prevCoords.height / 2;
@@ -283,6 +283,12 @@
             }
             if (this.get('theZ') >= newData.sizeZ) {
                 newData.theZ = newData.sizeZ - 1;
+                if (this.get('z_start') !== undefined || this.get('z_end') !== undefined || this.get('z_projection') !== undefined) {
+                    // bounds checking for z-projection
+                    newData.z_projection = this.get('z_projection');
+                    newData.z_end = Math.max(Math.min(this.get('z_end'), newData.sizeZ - 1), 0);
+                    newData.z_start = Math.max(Math.min(this.get('z_start'), newData.sizeZ - 1), 0);
+                }
             }
 
             // Make sure dx and dy are not outside the new image
