@@ -105,6 +105,29 @@
 
             _.each(data.panels, function(p){
                 p.selected = false;
+
+                // If one of z_start, z_end or z_projection is defined, ensure that they are within bounds
+                if (p.z_start !== undefined || p.z_end === undefined || p.z_projection === undefined) {
+                    p.z_start = (p.z_start  === undefined) ? 0 : p.z_start;
+                    p.z_end = (p.z_end  === undefined) ? 0 : p.z_end;
+                    p.z_projection = (p.z_projection  === undefined) ? false : p.z_projection;
+
+                    if (p.sizeZ === 1) {
+                        p.z_projection = false;
+                        p.z_start = 0;
+                        p.z_end = 0;
+                    } else {
+                        // bounds checking and ensures start <= end
+                        p.z_end = Math.max(Math.min(p.z_end, p.sizeZ - 1), 0);
+                        p.z_start = Math.max(Math.min(p.z_start, p.sizeZ - 1), 0);
+                        if (p.z_start > p.z_end) {
+                            var tmp = p.z_start;
+                            p.z_start = p.z_end;
+                            p.z_end = tmp;
+                        }
+                    }
+                }
+
                 self.panels.create(p);
             });
 
@@ -759,7 +782,7 @@
                 right = this.get_right_panel(sel),
                 bottom = this.get_bottom_panel(sel),
                 left_x = left.get('x'),
-                right_x = right.get('x') + right.get('width'), 
+                right_x = right.get('x') + right.get('width'),
                 top_y = top.get('y'),
                 bottom_y = bottom.get('y') + bottom.get('height'),
                 grid = [],
@@ -796,7 +819,7 @@
                 }else{
                     c = {'x': left_x + left.get('width')/2, 'y': c.y + row[0].get('height')}
                     grid.push(row);
-                }               
+                }
             }
 
             // get the row id of the most left panel
@@ -806,7 +829,7 @@
                     left_panel_row = i;
                 }
             });
-            
+
             // define the spacer between images
             var spacer = left.get('width')/20;
             if (!isNaN(parseFloat(gridGap))) {
@@ -848,7 +871,7 @@
             }
 
             // set the row position (i.e. y coordinate) of each row
-            var ref_y_offset = max_h    
+            var ref_y_offset = max_h
             var rows_position = {}
             max_h = 0
             // for rows above the reference row
@@ -871,15 +894,15 @@
                     max_h = Math.max(max_h,  row[c].get('height'));
                 }
             }
-            
-            // update position of panels 
+
+            // update position of panels
             for (var [r, y] of Object.entries(rows_position)){
                 var row = grid[r];
                 var last_column_id = -1
                 for (var c=0; c<row.length; c++) {
                     let panel = row[c];
                     var closest_column = this.get_closest_column(panel, reference_grid, last_panel_width)
-										
+
                     if(closest_column >= 0){
                         // update closest_column id to take into account spare panel positions
 						if(last_column_id == closest_column){
@@ -919,7 +942,7 @@
                 if(current_distance < min_x_distance){
                     closest_col = col_id
                     min_x_distance = current_distance
-                } 
+                }
             }
 
             // if the panel is located far away from the last reference column,
@@ -944,7 +967,7 @@
                     return p;
                 } else {
                     return top_left;
-                }                
+                }
             });
         },
 
