@@ -93,6 +93,7 @@ export class LabelSuggestions {
         this.have_time = options && options.have_time ? options.have_time : false;
         this.$menu = $container.find('.label-suggestions');
         this.$input = $container.find('.label-text');
+        this.preventBlurHide = false;
     }
 
     /**
@@ -134,6 +135,21 @@ export class LabelSuggestions {
         var match = segment.match(/\[([^\];]+)/);
         if (!match) return null;
         var inner = match[1].trim().split(";")[0].trim();
+        var prop_nf = inner.split(".");
+        return prop_nf[0].toLowerCase();
+    }
+
+    /**
+     * Find the label right before the cursor position
+     * e.g., "[time.index]|" -> "time"
+     */
+    getLabelTypeBeforeCursor(segment, relativePos) {
+        // Look backwards from cursor to find the last complete label
+        var beforeCursor = segment.slice(0, relativePos);
+        // Match the last complete label [xxx]
+        var matches = beforeCursor.match(/\[([^\]]+)\](?=[^\[]*$)/);
+        if (!matches) return null;
+        var inner = matches[1].trim().split(";")[0].trim();
         var prop_nf = inner.split(".");
         return prop_nf[0].toLowerCase();
     }
@@ -242,6 +258,13 @@ export class LabelSuggestions {
             }
         }
 
+        // Check if there's a complete label right before cursor
+        var labelBeforeCursor = this.getLabelTypeBeforeCursor(segment, relativePos);
+        if (labelBeforeCursor && LABEL_DICTIONARY[labelBeforeCursor] && LABEL_DICTIONARY[labelBeforeCursor].options) {
+            this.renderTypeOptions(labelBeforeCursor);
+            return;
+        }
+
         // Otherwise, show general suggestions
         var cleaned = segment.replace(/^\[/, "").replace(/\]$/, "");
         this.renderSuggestions(cleaned);
@@ -252,17 +275,47 @@ export class LabelSuggestions {
      */
     handleSuggestionClick(value, type, key) {
         var current = this.$input.val();
+        var cursorPos = this.$input[0].selectionStart || 0;
         var parts = this.getLastSegment(current);
         var prefix = parts.prefix;
-        var sep = prefix ? prefix + " " : "";
-        var next = prefix + value;
-        this.$input.val(next).trigger('input').focus();
+        var segment = parts.segment.trim();
+        var relativePos = this.getCursorPositionInSegment(current, cursorPos);
+
+        // Prevent blur from hiding the menu
+        this.preventBlurHide = true;
+        var self = this;
+        setTimeout(function() {
+            self.preventBlurHide = false;
+        }, 200);
+
+        // Check if we're replacing a label that's right before cursor
+        var labelBeforeCursor = this.getLabelTypeBeforeCursor(segment, relativePos);
+        if (labelBeforeCursor) {
+            // Replace the last complete label with the new value
+            var beforeLabel = segment.replace(/\[[^\]]+\](?=[^\[]*$)/, value);
+            var next = prefix + beforeLabel;
+            this.$input.val(next);
+            // Position cursor after the new label
+            var newCursorPos = next.length;
+            this.$input[0].setSelectionRange(newCursorPos, newCursorPos);
+        } else {
+            // Just append the value
+            var next = prefix + value;
+            this.$input.val(next);
+            // Position cursor at the end
+            this.$input[0].setSelectionRange(next.length, next.length);
+        }
+
+        this.$input.trigger('input').focus();
     }
 
     /**
      * Hide suggestions
      */
     hide() {
+        if (this.preventBlurHide) {
+            return;
+        }
         this.$menu.removeClass('show');
     }
 }
