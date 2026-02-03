@@ -10,6 +10,7 @@
 
     import {figureConfirmDialog, showModal, rotatePoint, getRandomId} from "./util";
     import FigureColorPicker from "../views/colorpicker";
+    import LabelSuggestions from "../views/label_suggestions";
 
     import FigureModel from "../models/figure_model";
     import InfoPanelView from "./info_panel_view";
@@ -495,18 +496,54 @@
             $('.new-label-form', this.$el).html(this.template(json));
             // $('.btn-sm').tooltip({container: 'body', placement:'bottom', toggle:"tooltip"});
 
+            // Initialize label suggestions after template is rendered
+            this.labelSuggestions = new LabelSuggestions($('.new-label-form', this.$el), {have_time: false});
+
             this.render();
         },
 
         events: {
             "submit .new-label-form": "handle_new_label",
             "click .dropdown-menu a": "select_dropdown_option",
+            "input .new-label-form .label-text": "handle_label_input",
+            "focus .new-label-form .label-text": "handle_label_input",
+            "click .new-label-form .label-text": "handle_label_input",
+            "keyup .new-label-form .label-text": "handle_label_input",
+            "blur .new-label-form .label-text": "handle_label_blur",
+            "click .label-suggestions .dropdown-item": "handle_label_suggestion_click",
             "click .markdown-info": "markdownInfo",
         },
 
         markdownInfo: function(event) {
             event.preventDefault();
             showModal("markdownInfoModal");
+        },
+
+        handle_label_input: function(event) {
+            if (this.labelSuggestions) {
+                this.labelSuggestions.handleInput();
+            }
+        },
+
+        handle_label_blur: function() {
+            if (this.labelSuggestions) {
+                var self = this;
+                setTimeout(function(){
+                    self.labelSuggestions.hide();
+                }, 150);
+            }
+        },
+
+        handle_label_suggestion_click: function(event) {
+            event.preventDefault();
+            var $item = $(event.target);
+            var value = $item.attr('data-value');
+            var type = $item.attr('data-type');
+            var key = $item.attr('data-key');
+
+            if (this.labelSuggestions) {
+                this.labelSuggestions.handleSuggestionClick(value, type, key);
+            }
         },
 
         // Handles all the various drop-down menus in the 'New' AND 'Edit Label' forms
@@ -623,6 +660,10 @@
                     $(".add_time_label", this.$el).removeClass('disabled');
                 } else {
                     $(".add_time_label", this.$el).addClass('disabled');
+                }
+                // Update label suggestions with time availability
+                if (this.labelSuggestions) {
+                    this.labelSuggestions.have_time = have_time;
                 }
             }
 
