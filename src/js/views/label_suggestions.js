@@ -2,7 +2,7 @@ import $ from "jquery";
 import _ from "underscore";
 
 const LIMIT_SUGGESTIONS = 8;  // Max number of suggestions to show
-const SEPARATOR_CHARS = ",\\s;:";  // Characters that separate label segments
+const SEPARATOR_CHARS = ", ;:";  // Characters that separate label segments
 
 /**
  * LabelSuggestions - Manages smart label suggestions based on cursor position and context
@@ -107,10 +107,10 @@ const LABEL_DICTIONARY = {
     },
     "well": {
         label: "Well",
-        keywords: ["well", "label", "id"],
+        keywords: ["well", "label", "id", "name"],
         options: [
             { label: "Well ID", value: "[well.id]" },
-            { label: "Well Name", value: "[well.name]" }
+            { label: "Well Label", value: "[well.label]" }
         ]
     },
     "Run": {
@@ -161,7 +161,7 @@ export class LabelSuggestions {
     /**
      * Get the current label segment where the cursor is positioned
      *
-     * Segments are text portions separated by delimiters (comma, newline, semicolon, or colon).
+     * Segments are text portions separated by delimiters (defined in SEPARATOR_CHARS).
      * This function identifies which segment contains the cursor and returns it along with
      * the text before (prefix) and after (suffix) the segment.
      *
