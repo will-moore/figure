@@ -183,15 +183,17 @@ export class LabelSuggestions {
      * Initialize the LabelSuggestions component
      *
      * @param {jQuery} $container - The container element that holds both the input and suggestion menu
-     * @param {Object} options - Configuration options
-     * @param {boolean} options.have_time - Whether the current data supports time-based labels
      *
      * Sets up references to the input field and dropdown menu, and initializes state for
      * preventing blur events from hiding the menu during suggestion clicks.
      */
-    constructor($container, options) {
+    constructor($container) {
         this.$container = $container;
-        this.have_time = options && options.have_time ? options.have_time : false;
+        this.have_time = false;
+        this.have_project = false;
+        this.have_dataset = false;
+        this.have_screen = false;
+        this.have_plate = false;
         this.$menu = $container.find('.label-suggestions');
         this.$input = $container.find('.label-text');
         this.preventBlurHide = false;
@@ -469,7 +471,7 @@ export class LabelSuggestions {
      * Matches are found by checking if the query appears in:
      *   - The label's display name
      *   - The label's keywords
-     * Shows all labels if query is empty. Filters out time labels if have_time is false.
+     * Shows all labels if query is empty.
      * Limits results to top LIMIT_SUGGESTIONS matches.
      *
      * @param {string} query - The search query (case-insensitive)
@@ -488,8 +490,12 @@ export class LabelSuggestions {
             if (LABEL_DICTIONARY.hasOwnProperty(key)) {
                 var entry = LABEL_DICTIONARY[key];
 
-                // Filter out time if no time data
+                // Filters out labels
                 if (key === "time" && !this.have_time) continue;
+                if (key === "project" && !this.have_project) continue;
+                if (key === "dataset" && !this.have_dataset) continue;
+                if (key === "screen" && !this.have_screen) continue;
+                if (key === "plate" && !this.have_plate) continue;
 
                 // Match by label, value, or keywords
                 if (!lower) {

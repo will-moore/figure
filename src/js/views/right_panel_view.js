@@ -497,7 +497,7 @@
             // $('.btn-sm').tooltip({container: 'body', placement:'bottom', toggle:"tooltip"});
 
             // Initialize label suggestions after template is rendered
-            this.labelSuggestions = new LabelSuggestions($('.new-label-form', this.$el), {have_time: false});
+            this.labelSuggestions = new LabelSuggestions($('.new-label-form', this.$el));
 
             this.render();
         },
@@ -650,11 +650,26 @@
                 $(".new-label-form", this.$el).show();
                 // if none of the selected panels have time data, disable 'add_time_label's
                 var have_time = false, dTs;
+                var have_project = false;
+                var have_dataset = false;
+                var have_screen = false;
+                var have_plate = false;
                 selected.forEach(function(p){
                     dTs = p.get('deltaT');
                     if (dTs && dTs.length > 0) {
                         have_time = true;
                     }
+                    Object.keys(p.get("parents", {})).forEach(function(parentType){
+                        if (parentType == "project") {
+                            have_project = true;
+                        } else if (parentType == "dataset") {
+                            have_dataset = true;
+                        } else if (parentType == "screen") {
+                            have_screen = true;
+                        } else if (parentType == "plate") {
+                            have_plate = true;
+                        }
+                    });
                 });
                 if (have_time) {
                     $(".add_time_label", this.$el).removeClass('disabled');
@@ -664,6 +679,10 @@
                 // Update label suggestions with time availability
                 if (this.labelSuggestions) {
                     this.labelSuggestions.have_time = have_time;
+                    this.labelSuggestions.have_project = have_project;
+                    this.labelSuggestions.have_dataset = have_dataset;
+                    this.labelSuggestions.have_screen = have_screen;
+                    this.labelSuggestions.have_plate = have_plate;
                 }
             }
 
