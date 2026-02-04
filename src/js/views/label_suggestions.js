@@ -1,28 +1,15 @@
 import $ from "jquery";
 import _ from "underscore";
 
+const LIMIT_SUGGESTIONS = 8;  // Max number of suggestions to show
+const SEPARATOR_CHARS = ",\\s;:";  // Characters that separate label segments
+
 /**
  * LabelSuggestions - Manages smart label suggestions based on cursor position and context
  * Provides type-specific options when cursor is inside brackets, general suggestions otherwise
+ * Topmost items are listed first, limited to LIMIT_SUGGESTIONS.
  */
-
 const LABEL_DICTIONARY = {
-    "image": {
-        label: "Image",
-        keywords: ["image", "name", "id", "filename"],
-        options: [
-            { label: "Image ID", value: "[image.id]" },
-            { label: "Image Name", value: "[image.name]" }
-        ]
-    },
-    "dataset": {
-        label: "Dataset",
-        keywords: ["dataset", "name", "id"],
-        options: [
-            { label: "Dataset ID", value: "[dataset.id]" },
-            { label: "Dataset Name", value: "[dataset.name]" }
-        ]
-    },
     "channels": {
         label: "Channels",
         keywords: ["channels", "labels", "separate", "single"],
@@ -84,6 +71,71 @@ const LABEL_DICTIONARY = {
         label: "Zoom level (%)",
         keywords: ["zoom", "scale", "percent"],
         value: "[zoom]"
+    },
+    "image": {
+        label: "Image",
+        keywords: ["image", "name", "id", "filename"],
+        options: [
+            { label: "Image ID", value: "[image.id]" },
+            { label: "Image Name", value: "[image.name]" }
+        ]
+    },
+    "dataset": {
+        label: "Dataset",
+        keywords: ["dataset", "name", "id"],
+        options: [
+            { label: "Dataset ID", value: "[dataset.id]" },
+            { label: "Dataset Name", value: "[dataset.name]" }
+        ]
+    },
+    "project": {
+        label: "Project",
+        keywords: ["project", "name", "id"],
+        options: [
+            { label: "Project ID", value: "[project.id]" },
+            { label: "Project Name", value: "[project.name]" }
+        ]
+    },
+    "wellsample": {
+        label: "WellSample",
+        keywords: ["wellsample", "index", "id"],
+        options: [
+            { label: "WellSample ID", value: "[wellsample.id]" },
+            { label: "WellSample Index", value: "[wellsample.index]" },
+            { label: "WellSample Run Index", value: "[wellsample.index_run]" }
+        ]
+    },
+    "well": {
+        label: "Well",
+        keywords: ["well", "label", "id"],
+        options: [
+            { label: "Well ID", value: "[well.id]" },
+            { label: "Well Name", value: "[well.name]" }
+        ]
+    },
+    "Run": {
+        label: "Run",
+        keywords: ["run", "acquisition", "plateacquisition", "name", "id"],
+        options: [
+            { label: "Run ID", value: "[run.id]" },
+            { label: "Run Name", value: "[run.name]" }
+        ]
+    },
+    "plate": {
+        label: "Plate",
+        keywords: ["plate", "name", "id"],
+        options: [
+            { label: "Plate ID", value: "[plate.id]" },
+            { label: "Plate Name", value: "[plate.name]" }
+        ]
+    },
+    "screen": {
+        label: "Screen",
+        keywords: ["screen", "name", "id"],
+        options: [
+            { label: "Screen ID", value: "[screen.id]" },
+            { label: "Screen Name", value: "[screen.name]" }
+        ]
     }
 };
 
@@ -135,11 +187,11 @@ export class LabelSuggestions {
         var afterCursor = text.slice(cursorPos);
 
         // Find last separator before cursor
-        var lastSepBefore = beforeCursor.search(/[,\s;:](?!.*[,\s;:])/);
+        var lastSepBefore = beforeCursor.search(new RegExp("[" + SEPARATOR_CHARS + "](?!.*[" + SEPARATOR_CHARS + "])"));
         var startIdx = lastSepBefore === -1 ? 0 : lastSepBefore + 1;
 
         // Find first separator after cursor
-        var firstSepAfter = afterCursor.search(/[,\s;:]/);
+        var firstSepAfter = afterCursor.search(new RegExp("[" + SEPARATOR_CHARS + "]"));
         var endIdx = firstSepAfter === -1 ? text.length : cursorPos + firstSepAfter;
 
         return {
@@ -286,7 +338,7 @@ export class LabelSuggestions {
      *   - The label's display name
      *   - The label's keywords
      * Shows all labels if query is empty. Filters out time labels if have_time is false.
-     * Limits results to top 8 matches.
+     * Limits results to top LIMIT_SUGGESTIONS matches.
      *
      * @param {string} query - The search query (case-insensitive)
      *
@@ -334,7 +386,7 @@ export class LabelSuggestions {
             filtered = [dynamic].concat(filtered);
         }*/
 
-        filtered = filtered.slice(0, 8);  // Limit to top 8 suggestions
+        filtered = filtered.slice(0, LIMIT_SUGGESTIONS);  // Limit to top suggestions
         if (filtered.length === 0) {
             this.$menu.removeClass('show').empty();
             return;
