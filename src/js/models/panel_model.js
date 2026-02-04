@@ -996,7 +996,8 @@
             // async function since zarr src is the rendered image data
             if (this.get("zarr")) {
                 // use current size to choose resolution level...
-                const targetSize = 2 * Math.max(this.get('width'), this.get('height'));
+                let targetSize = 4 * Math.max(this.get('width'), this.get('height'));
+                targetSize = Math.max(targetSize, 500);
                 return this.get_zarr_img_src(force_no_padding, targetSize);
             }
             var chs = this.get('channels');
