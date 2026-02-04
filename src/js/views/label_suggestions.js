@@ -71,6 +71,28 @@ const LABEL_DICTIONARY = {
             { key: "precision", default: "2" },
         ]
     },
+    "width": {
+        label: "Width",
+        keywords: ["position", "pixel", "unit"],
+        options: [
+            { label: "Pixel", value: "[width.pixel]" },
+            { label: "Unit", value: "[width.unit]" }
+        ],
+        extraOptions: [
+            { key: "precision", default: "2" },
+        ]
+    },
+    "height": {
+        label: "Height",
+        keywords: ["position", "pixel", "unit"],
+        options: [
+            { label: "Pixel", value: "[height.pixel]" },
+            { label: "Unit", value: "[height.unit]" }
+        ],
+        extraOptions: [
+            { key: "precision", default: "2" },
+        ]
+    },
     "z": {
         label: "Z Coordinate",
         keywords: ["stack", "slice", "pixel", "unit"],
