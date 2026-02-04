@@ -988,6 +988,10 @@
                     rect.width = length;
                     rect.height = length;
                 }
+            } else {
+                // Since we render the whole plane every time (no 'rect' here), caching will prevent reloading on pan/zoom.
+                // as long as targetSize doesn't change. So we can afford to render at higher resolution...
+                targetSize = Math.max(targetSize, 2000);
             }
             return renderZarrToSrc(this.get('imageId'), this.get('zarr'), this.get('theZ'), this.get('theT'), this.get('channels'), rect, targetSize);
         },
