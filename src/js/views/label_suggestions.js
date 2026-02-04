@@ -23,12 +23,12 @@ const LABEL_DICTIONARY = {
         keywords: ["tags"],
         value: "[tags]"
     },
-    /*"key-values": {
+    "key-values": {
         label: "Key-Value Pairs",
         keywords: ["key", "value", "kv", "map", "annotation"],
         value: "[key-values]",
         type: "key-values"
-    },*/
+    },
     "time": {
         label: "Time",
         keywords: ["time", "t", "timestamp"],
@@ -370,7 +370,7 @@ export class LabelSuggestions {
             }
         }
 
-        // Add dynamic key-value pair suggestion
+        // TODO Add dynamic key-value pair suggestion
         /*
         var dynamic = null;
         if (lower && lower.length > 1) {
