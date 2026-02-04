@@ -538,13 +538,11 @@
             event.preventDefault();
             var $item = $(event.target);
             var value = $item.attr('data-value');
-            var type = $item.attr('data-type');
-            var key = $item.attr('data-key');
             var extraOption = $item.attr('data-extra-option');
             var defaultValue = $item.attr('data-default-value');
 
             if (this.labelSuggestions) {
-                this.labelSuggestions.handleSuggestionClick(value, type, key, extraOption, defaultValue);
+                this.labelSuggestions.handleSuggestionClick(value, extraOption, defaultValue);
             }
         },
 

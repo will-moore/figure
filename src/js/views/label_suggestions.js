@@ -12,7 +12,7 @@ const SEPARATOR_CHARS = ", ;:";  // Characters that separate label segments
 const LABEL_DICTIONARY = {
     "channels": {
         label: "Channels",
-        keywords: ["channels", "labels", "separate", "single"],
+        keywords: ["labels", "separate", "single"],
         options: [
             { label: "Single label", value: "[channels]" },
             { label: "Separate labels", value: "[channels labels]" }
@@ -20,19 +20,21 @@ const LABEL_DICTIONARY = {
     },
     "tags": {
         label: "Tags",
-        keywords: ["tags"],
-        value: "[tags]"
+        keywords: [],
+        options: [
+            { label: "Tags", value: "[tags]" }
+        ]
     },
     "key-values": {
         label: "Key-Value Pairs",
-        keywords: ["key", "value", "kv", "map", "annotation"],
-        value: "[key-values]",
-        type: "key-values"
+        keywords: ["kv", "map", "annotation"],
+        options: [
+            { label: "Key-Value pairs", value: "[key-values]" }
+        ]
     },
     "time": {
         label: "Time",
-        keywords: ["time", "t", "timestamp"],
-        type: "time",
+        keywords: ["t", "timestamp"],
         options: [
             { label: "Index", value: "[time.index]" },
             { label: "Milliseconds", value: "[time.milliseconds]" },
@@ -49,7 +51,7 @@ const LABEL_DICTIONARY = {
     },
     "x": {
         label: "X Coordinate",
-        keywords: ["x", "position", "pixel", "unit"],
+        keywords: ["position", "pixel", "unit"],
         options: [
             { label: "Pixel", value: "[x.pixel]" },
             { label: "Unit", value: "[x.unit]" }
@@ -57,7 +59,7 @@ const LABEL_DICTIONARY = {
     },
     "y": {
         label: "Y Coordinate",
-        keywords: ["y", "position", "pixel", "unit"],
+        keywords: ["position", "pixel", "unit"],
         options: [
             { label: "Pixel", value: "[y.pixel]" },
             { label: "Unit", value: "[y.unit]" }
@@ -65,7 +67,7 @@ const LABEL_DICTIONARY = {
     },
     "z": {
         label: "Z Coordinate",
-        keywords: ["z", "stack", "slice", "pixel", "unit"],
+        keywords: ["stack", "slice", "pixel", "unit"],
         options: [
             { label: "Pixel", value: "[z.pixel]" },
             { label: "Unit", value: "[z.unit]" }
@@ -73,12 +75,14 @@ const LABEL_DICTIONARY = {
     },
     "zoom": {
         label: "Zoom level (%)",
-        keywords: ["zoom", "scale", "percent"],
-        value: "[zoom]"
+        keywords: ["scale", "percent"],
+        options: [
+            { label: "Zoom level", value: "[zoom]" }
+        ]
     },
     "image": {
         label: "Image",
-        keywords: ["image", "name", "id", "filename"],
+        keywords: ["name", "id", "filename"],
         options: [
             { label: "Image ID", value: "[image.id]" },
             { label: "Image Name", value: "[image.name]" }
@@ -86,7 +90,7 @@ const LABEL_DICTIONARY = {
     },
     "dataset": {
         label: "Dataset",
-        keywords: ["dataset", "name", "id"],
+        keywords: ["name", "id"],
         options: [
             { label: "Dataset ID", value: "[dataset.id]" },
             { label: "Dataset Name", value: "[dataset.name]" }
@@ -94,7 +98,7 @@ const LABEL_DICTIONARY = {
     },
     "project": {
         label: "Project",
-        keywords: ["project", "name", "id"],
+        keywords: ["name", "id"],
         options: [
             { label: "Project ID", value: "[project.id]" },
             { label: "Project Name", value: "[project.name]" }
@@ -102,7 +106,7 @@ const LABEL_DICTIONARY = {
     },
     "wellsample": {
         label: "WellSample",
-        keywords: ["wellsample", "index", "id"],
+        keywords: ["index", "id"],
         options: [
             { label: "WellSample ID", value: "[wellsample.id]" },
             { label: "WellSample Index", value: "[wellsample.index]" },
@@ -111,7 +115,7 @@ const LABEL_DICTIONARY = {
     },
     "well": {
         label: "Well",
-        keywords: ["well", "label", "id", "name"],
+        keywords: ["label", "id", "name"],
         options: [
             { label: "Well ID", value: "[well.id]" },
             { label: "Well Label", value: "[well.label]" }
@@ -119,7 +123,7 @@ const LABEL_DICTIONARY = {
     },
     "Run": {
         label: "Run",
-        keywords: ["run", "acquisition", "plateacquisition", "name", "id"],
+        keywords: ["plateacquisition", "name", "id"],
         options: [
             { label: "Run ID", value: "[run.id]" },
             { label: "Run Name", value: "[run.name]" }
@@ -127,7 +131,7 @@ const LABEL_DICTIONARY = {
     },
     "plate": {
         label: "Plate",
-        keywords: ["plate", "name", "id"],
+        keywords: ["name", "id"],
         options: [
             { label: "Plate ID", value: "[plate.id]" },
             { label: "Plate Name", value: "[plate.name]" }
@@ -135,7 +139,7 @@ const LABEL_DICTIONARY = {
     },
     "screen": {
         label: "Screen",
-        keywords: ["screen", "name", "id"],
+        keywords: ["name", "id"],
         options: [
             { label: "Screen ID", value: "[screen.id]" },
             { label: "Screen Name", value: "[screen.name]" }
@@ -557,13 +561,6 @@ export class LabelSuggestions {
             var value = entry.value || "[" + item.key + "]";
             var dataAttrs = "";
 
-            if (entry.type) {
-                dataAttrs += " data-type='" + entry.type + "'";
-            }
-            if (entry.dynamicKey) {
-                dataAttrs += " data-key='" + _.escape(entry.dynamicKey) + "'";
-            }
-
             return "<button type='button' class='dropdown-item'" + dataAttrs + " data-value='" + _.escape(value) + "'>" + _.escape(entry.label) + "</button>";
         }).join("");
 
@@ -621,8 +618,6 @@ export class LabelSuggestions {
      * any text that was after the cursor (suffix).
      *
      * @param {string} value - The suggestion value to insert (e.g., "[time.index]")
-     * @param {string} type - Optional type information (for future use)
-     * @param {string} key - Optional key for dynamic labels (for future use)
      *
      * Side effects:
      *   - Updates input field value
@@ -630,8 +625,8 @@ export class LabelSuggestions {
      *   - Triggers input event to refresh suggestions
      *   - Prevents blur from hiding menu during the operation
      */
-    handleSuggestionClick(value, type, key, extraOption, defaultValue) {
-        console.log({value: value, type: type, key: key, extraOption: extraOption, defaultValue: defaultValue});
+    handleSuggestionClick(value, extraOption, defaultValue) {
+        console.log({value: value, extraOption: extraOption, defaultValue: defaultValue});
         var current = this.$input.val();
         var cursorPos = this.$input[0].selectionStart || 0;
 
