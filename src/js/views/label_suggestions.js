@@ -41,6 +41,10 @@ const LABEL_DICTIONARY = {
             { label: "m:s", value: "[time.mins:secs]" },
             { label: "h:m", value: "[time.hrs:mins]" },
             { label: "h:m:s", value: "[time.hrs:mins:secs]" }
+        ],
+        extraOptions: [
+            { key: "precision", default: "2" },
+            { key: "offset", default: "0" }
         ]
     },
     "x": {
@@ -161,27 +165,31 @@ export class LabelSuggestions {
     /**
      * Get the current label segment where the cursor is positioned
      *
-        * Segments are text portions separated by delimiters (defined in SEPARATOR_CHARS).
-        * Delimiters inside bracket expressions are ignored so that options like
-        * "[time.secs; precision=2; offset=3]" remain a single segment.
-        * This function identifies which segment contains the cursor and returns it along with
-        * the text before (prefix) and after (suffix) the segment.
+     * Segments are text portions separated by delimiters (defined in SEPARATOR_CHARS).
+     * Delimiters inside bracket expressions are ignored so that options like
+     * "[time.secs; precision=2; offset=3]" remain a single segment.
+     *
+     * If the cursor is inside a bracket expression or right after one, extracts that
+     * bracket as the segment. Otherwise, returns the full segment containing the cursor.
      *
      * @param {string} text - The full text content
      * @param {number} cursorPos - The current cursor position (0-based index)
-     * @returns {Object} An object with three properties:
-     *   - prefix: Text before the current segment (including delimiter)
-     *   - segment: The segment containing the cursor
-     *   - suffix: Text after the current segment (including delimiter)
+     * @returns {Object} An object with:
+     *   - prefix: Text before the segment (including delimiter)
+     *   - segment: The segment containing the cursor (bracket expr or plain text)
+     *   - suffix: Text after the segment (including delimiter)
+     *   - hasBracket: Boolean flag - true if segment is a bracket expression, false otherwise
      *
-     * Example:
-     *   text = "[image.name], [time.index], [tags]"
-     *   cursorPos = 20 (inside "time.index")
-     *   returns: { prefix: "[image.name], ", segment: "[time.index]", suffix: ", [tags]" }
+     * Examples:
+     *   text = "[image.name], [time.secs|], [tags]", cursorPos = 20 (inside time.secs)
+     *   returns: { prefix: "[image.name], ", segment: "[time.secs]", suffix: ", [tags]", hasBracket: true }
+     *
+     *   text = "hello| world", cursorPos = 5
+     *   returns: { prefix: "", segment: "hello world", suffix: "", hasBracket: false }
      */
     getCurrentSegment(text, cursorPos) {
         if (!text) {
-            return { prefix: "", segment: "", suffix: "" };
+            return { prefix: "", segment: "", suffix: "", hasBracket: false };
         }
 
         var safeCursorPos = Math.min(Math.max(cursorPos, 0), text.length);
@@ -203,7 +211,7 @@ export class LabelSuggestions {
                 lastSepBefore = i;
             }
         }
-        var startIdx = lastSepBefore === -1 ? 0 : lastSepBefore + 1;
+        var segmentStart = lastSepBefore === -1 ? 0 : lastSepBefore + 1;
 
         // Find first separator after cursor, ignoring separators inside brackets
         var nextSepAfter = -1;
@@ -220,116 +228,112 @@ export class LabelSuggestions {
                 break;
             }
         }
-        var endIdx = nextSepAfter === -1 ? text.length : nextSepAfter;
+        var segmentEnd = nextSepAfter === -1 ? text.length : nextSepAfter;
 
-        return {
-            prefix: text.slice(0, startIdx),
-            segment: text.slice(startIdx, endIdx),
-            suffix: text.slice(endIdx)
-        };
+        var fullSegment = text.slice(segmentStart, segmentEnd);
+        var relativePos = safeCursorPos - segmentStart;
+
+
+        if (relativePos > 0 && fullSegment[relativePos - 1] === "]") {
+            relativePos -= 1;  // Count as it could be inside bracket
+        }
+
+        // Check if cursor is inside a bracket expression
+        var beforeCursor = fullSegment.slice(0, relativePos);
+        var afterCursor = fullSegment.slice(relativePos);
+        var openIdx = beforeCursor.lastIndexOf('[');
+        var closeIdx = afterCursor.indexOf(']');
+        if (openIdx !== -1 && closeIdx !== -1) {
+            var bracketExpr = fullSegment.slice(openIdx, relativePos + closeIdx + 1);
+            var suffixPart = fullSegment.slice(relativePos + closeIdx + 1);
+            return {
+                prefix: text.slice(0, segmentStart + openIdx),
+                segment: bracketExpr,
+                suffix: suffixPart + text.slice(segmentEnd),
+                hasBracket: true
+            };
+        } else if (openIdx !== -1 && closeIdx === -1) {
+            // Cursor is inside an unclosed bracket - extract from opening bracket onwards
+            var partialSegment = fullSegment.slice(openIdx);
+            return {
+                prefix: text.slice(0, segmentStart + openIdx),
+                segment: partialSegment,
+                suffix: text.slice(segmentEnd),
+                hasBracket: false
+            };
+        } else {
+            return {
+                prefix: text.slice(0, segmentStart),
+                segment: fullSegment,
+                suffix: text.slice(segmentEnd),
+                hasBracket: false
+            };
+        }
     }
 
     /**
-     * Alternative: Get current segment while ignoring separators inside brackets
+     * Get the bracket expression at the cursor position
      *
-     * Uses a bracket-aware scan to find the nearest separators outside of brackets.
-     * This keeps expressions like "[time.secs; precision=2]" intact as a single segment.
+     * Finds the bracket expression that contains or is adjacent to the cursor.
+     * Returns the expression, its absolute position in the full text, and whether
+     * the cursor is inside it or right after it.
      *
      * @param {string} text - The full text content
      * @param {number} cursorPos - The current cursor position (0-based index)
-     * @returns {Object} An object with three properties: prefix, segment, and suffix
+     * @returns {Object|null} An object with:
+     *   - expr: The bracket expression string (e.g., "[time.secs; precision=2]")
+     *   - startPos: Absolute start position in full text
+     *   - endPos: Absolute end position in full text
+     *   - isInside: True if cursor is inside brackets, false if after
+     *   Returns null if no bracket expression found at cursor
+     *
+     * Examples:
+     *   text = "[time.secs|]", cursorPos = 11
+     *   returns: { expr: "[time.secs]", startPos: 0, endPos: 11, isInside: true }
+     *
+     *   text = "[time.secs]|", cursorPos = 12
+     *   returns: { expr: "[time.secs]", startPos: 0, endPos: 11, isInside: false }
      */
-    getCurrentSegmentOutsideBrackets(text, cursorPos) {
-        if (!text) {
-            return { prefix: "", segment: "", suffix: "" };
-        }
+    getBracketAtCursor(text, cursorPos) {  // GET RID OF
+        var parts = this.getCurrentSegment(text, cursorPos);
+        var segment = parts.segment.trim();
+        var segmentStart = parts.prefix.length;
+        var relativePos = cursorPos - segmentStart;
 
-        var safeCursorPos = Math.min(Math.max(cursorPos, 0), text.length);
-        var isSeparator = function(ch) {
-            return SEPARATOR_CHARS.indexOf(ch) !== -1;
-        };
-
-        var depth = 0;
-        var lastSepBefore = -1;
-        for (var i = 0; i < safeCursorPos; i++) {
-            var ch = text[i];
-            if (ch === "[") {
-                depth += 1;
-            } else if (ch === "]" && depth > 0) {
-                depth -= 1;
-            }
-            if (depth === 0 && isSeparator(ch)) {
-                lastSepBefore = i;
-            }
-        }
-        var startIdx = lastSepBefore === -1 ? 0 : lastSepBefore + 1;
-
-        var nextSepAfter = -1;
-        var depthAfter = depth;
-        for (var j = safeCursorPos; j < text.length; j++) {
-            var nextCh = text[j];
-            if (nextCh === "[") {
-                depthAfter += 1;
-            } else if (nextCh === "]" && depthAfter > 0) {
-                depthAfter -= 1;
-            }
-            if (depthAfter === 0 && isSeparator(nextCh)) {
-                nextSepAfter = j;
-                break;
-            }
-        }
-        var endIdx = nextSepAfter === -1 ? text.length : nextSepAfter;
-
-        return {
-            prefix: text.slice(0, startIdx),
-            segment: text.slice(startIdx, endIdx),
-            suffix: text.slice(endIdx)
-        };
-    }
-
-    /**
-     * Get cursor position relative to the current segment
-     *
-     * Converts the absolute cursor position in the full text to a relative position
-     * within the current segment. This is useful for determining where the cursor is
-     * within a specific label segment, independent of the rest of the text.
-     *
-     * @param {string} fullText - The complete text content
-     * @param {number} cursorPos - The absolute cursor position in the full text
-     * @returns {number} The cursor position relative to the start of the current segment (0-based)
-     *
-     * Example:
-     *   fullText = "[image.name], [time.index]"
-     *   cursorPos = 20 (inside "time.index")
-     *   returns: 6 (position within "[time.index]" segment)
-     */
-    getCursorPositionInSegment(fullText, cursorPos) {
-        var parts = this.getCurrentSegment(fullText, cursorPos);
-        var prefix = parts.prefix;
-        var relativePos = cursorPos - prefix.length;
-        return Math.max(0, relativePos);
-    }
-
-    /**
-     * Check if cursor is inside an unclosed bracket pair [ ]
-     *
-     * Determines whether the cursor is currently positioned within an open bracket
-     * by counting opening '[' and closing ']' brackets before the cursor position.
-     * If there are more opening brackets than closing brackets, the cursor is inside.
-     *
-     * @param {string} segment - The text segment to check
-     * @param {number} relativePos - Cursor position within the segment
-     * @returns {boolean} True if cursor is inside brackets, false otherwise
-     *
-     * Example:
-     *   segment = "[time.ind|ex]" (| represents cursor)
-     *   relativePos = 9
-     *   returns: true (cursor is between [ and ])
-     */
-    isCursorInBrackets(segment, relativePos) {
+        // Check if cursor is inside brackets
         var beforeCursor = segment.slice(0, relativePos);
         var openCount = (beforeCursor.match(/\[/g) || []).length - (beforeCursor.match(/\]/g) || []).length;
-        return openCount > 0;
+
+        if (openCount > 0) {
+            // Cursor is inside brackets - find the enclosing bracket
+            var openIdx = beforeCursor.lastIndexOf('[');
+            var afterCursor = segment.slice(relativePos);
+            var closeIdx = afterCursor.indexOf(']');
+
+            if (openIdx !== -1 && closeIdx !== -1) {
+                var expr = segment.slice(openIdx, relativePos + closeIdx + 1);
+                return {
+                    expr: expr,
+                    startPos: segmentStart + openIdx,
+                    endPos: segmentStart + relativePos + closeIdx + 1,
+                    isInside: true
+                };
+            }
+        }
+
+        // Check if there's a complete bracket right before cursor
+        var match = beforeCursor.match(/\[[^\]]+\](?=[^\[]*$)/);
+        if (match) {
+            var matchStart = beforeCursor.lastIndexOf(match[0]);
+            return {
+                expr: match[0],
+                startPos: segmentStart + matchStart,
+                endPos: segmentStart + matchStart + match[0].length,
+                isInside: false
+            };
+        }
+
+        return null;
     }
 
     /**
@@ -348,7 +352,7 @@ export class LabelSuggestions {
      *   "[channels" -> "channels"
      *   "no brackets" -> null
      */
-    getLabelTypeFromBracket(segment) {
+    getLabelTypeFromBracket(segment) {  // LIKELY SHOULD BE KEPT
         var match = segment.match(/\[([^\];]+)/);
         if (!match) return null;
         var inner = match[1].trim().split(";")[0].trim();
@@ -357,34 +361,85 @@ export class LabelSuggestions {
     }
 
     /**
-     * Find the label type of the last complete label before the cursor
+     * Parse a bracket expression into its components
      *
-     * Searches backwards from the cursor position to find the most recent complete
-     * label enclosed in brackets. This is used to provide context-aware suggestions
-     * when the cursor is positioned right after a label.
+     * Extracts the base label and any semicolon-separated options from a bracket expression.
+     * Options are parsed as key=value pairs and stored in a map.
      *
-     * @param {string} segment - The text segment to search
-     * @param {number} relativePos - Cursor position within the segment
-     * @returns {string|null} The label type of the last complete label, or null if none found
+     * @param {string} segment - The text segment containing a bracket expression
+     * @returns {Object} An object with:
+     *   - base: The base label (e.g., "time.secs")
+     *   - options: A map of option keys to values (e.g., {precision: "2", offset: "0"})
+     *   - raw: The original segment text
      *
      * Examples:
-     *   segment = "[time.index]|some text" (| represents cursor)
-     *   relativePos = 12
-     *   returns: "time"
-     *
-     *   segment = "text [image.name] [time|" (| represents cursor)
-     *   relativePos = 23
-     *   returns: "image" (last complete label before cursor)
+     *   "[time.secs]" -> { base: "time.secs", options: {}, raw: "[time.secs]" }
+     *   "[time.secs; precision=2; offset=3]" -> { base: "time.secs", options: {precision: "2", offset: "3"}, raw: "[time.secs; precision=2; offset=3]" }
      */
-    getLabelTypeBeforeCursor(segment, relativePos) {
-        // Look backwards from cursor to find the last complete label
-        var beforeCursor = segment.slice(0, relativePos);
-        // Match the last complete label [xxx]
-        var matches = beforeCursor.match(/\[([^\]]+)\](?=[^\[]*$)/);
-        if (!matches) return null;
-        var inner = matches[1].trim().split(";")[0].trim();
-        var prop_nf = inner.split(".");
-        return prop_nf[0].toLowerCase();
+    parseBracketExpr(segment) {
+        var match = segment.match(/\[([^\]]+)\]/);
+        if (!match) {
+            return { base: "", options: {}, raw: segment };
+        }
+
+        var inner = match[1].trim();
+        var parts = inner.split(";").map(function(p) { return p.trim(); });
+        var base = parts[0];
+        var options = {};
+
+        for (var i = 1; i < parts.length; i++) {
+            var keyValue = parts[i].split("=");
+            if (keyValue.length === 2) {
+                var key = keyValue[0].trim();
+                var value = keyValue[1].trim();
+                options[key] = value;
+            }
+        }
+
+        return { base: base, options: options, raw: segment };
+    }
+
+    /**
+     * Build a bracket expression from base label and options
+     *
+     * Constructs a bracket expression string by combining the base label with
+     * semicolon-separated key=value options.
+     *
+     * @param {string} base - The base label (e.g., "time.milliseconds")
+     * @param {Object} options - A map of option keys to values
+     * @returns {string} The complete bracket expression
+     *
+     * Examples:
+     *   ("time.secs", {}) -> "[time.secs]"
+     *   ("time.secs", {precision: "2", offset: "3"}) -> "[time.secs; precision=2; offset=3]"
+     */
+    buildBracketExpr(base, options) {
+        var expr = "[" + base;
+        for (var key in options) {
+            if (options.hasOwnProperty(key)) {
+                expr += "; " + key + "=" + options[key];
+            }
+        }
+        expr += "]";
+        return expr;
+    }
+
+    /**
+     * Merge a new option into an existing options map
+     *
+     * Adds or updates an option key-value pair. If the key already exists,
+     * it is not overwritten (to avoid duplicates).
+     *
+     * @param {Object} options - Existing options map
+     * @param {string} key - The option key to add
+     * @param {string} value - The option value to add
+     * @returns {Object} The updated options map
+     */
+    mergeOption(options, key, value) {
+        if (!options.hasOwnProperty(key)) {
+            options[key] = value;
+        }
+        return options;
     }
 
     /**
@@ -401,7 +456,7 @@ export class LabelSuggestions {
      *   - Shows or hides the menu based on availability of options
      *   - Each option is rendered as a clickable button with data-value attribute
      */
-    renderTypeOptions(labelType) {
+    renderTypeOptions(labelType, currentSegment) {
         var entry = LABEL_DICTIONARY[labelType];
         if (!entry || !entry.options) {
             this.$menu.removeClass('show').empty();
@@ -412,6 +467,24 @@ export class LabelSuggestions {
         html += entry.options.map(function(opt) {
             return "<button type='button' class='dropdown-item' data-value='" + _.escape(opt.value) + "'>" + _.escape(opt.label) + "</button>";
         }).join("");
+
+        // Add extra options if available
+        if (entry.extraOptions && entry.extraOptions.length > 0) {
+            // Parse current segment to check which options are already present
+            var parsed = currentSegment ? this.parseBracketExpr(currentSegment) : { options: {} };
+            var existingOptions = parsed.options;
+
+            html += "<div class='dropdown-divider'></div>";
+            html += "<div class='dropdown-header'>Extra Options</div>";
+            var self = this;
+            html += entry.extraOptions.map(function(extraOpt) {
+                var optLabel = extraOpt.key + "=" + extraOpt.default;
+                var alreadyAdded = existingOptions.hasOwnProperty(extraOpt.key);
+                var disabled = alreadyAdded ? " disabled" : "";
+                var title = alreadyAdded ? " title='Already added'" : "";
+                return "<button type='button' class='dropdown-item'" + disabled + title + " data-extra-option='" + _.escape(extraOpt.key) + "' data-default-value='" + _.escape(extraOpt.default) + "'>" + _.escape(optLabel) + "</button>";
+            }).join("");
+        }
 
         this.$menu.html(html).addClass('show');
     }
@@ -503,9 +576,8 @@ export class LabelSuggestions {
      * This is the primary entry point called whenever the input changes or cursor moves.
      * It determines what suggestions to show based on cursor context:
      *
-     * 1. If cursor is inside brackets (e.g., "[time|]"), shows type-specific options
-     * 2. If cursor is right after a complete label (e.g., "[time.index]|"), shows options for that label
-     * 3. Otherwise, shows general label suggestions filtered by any partial input
+     * 1. If cursor is inside brackets (e.g., "[time|]") or right after (e.g., "[time.index]|"), shows type-specific options
+     * 2. Otherwise, shows general label suggestions filtered by any partial input
      *
      * The function analyzes the current segment (where cursor is), determines context,
      * and delegates to either renderTypeOptions() or renderSuggestions().
@@ -518,26 +590,18 @@ export class LabelSuggestions {
         var cursorPos = this.$input[0].selectionStart || 0;
         var parts = this.getCurrentSegment(current, cursorPos);
         var segment = parts.segment.trim();
-        var relativePos = this.getCursorPositionInSegment(current, cursorPos);
 
-        // Check if cursor is inside brackets
-        if (this.isCursorInBrackets(segment, relativePos)) {
+        // If the cursor is inside brackets, suggest options for that label type
+        if (parts.hasBracket) {
             var labelType = this.getLabelTypeFromBracket(segment);
             if (labelType && LABEL_DICTIONARY[labelType]) {
-                this.renderTypeOptions(labelType);
+                this.renderTypeOptions(labelType, segment);
                 return;
             }
         }
 
-        // Check if there's a complete label right before cursor
-        var labelBeforeCursor = this.getLabelTypeBeforeCursor(segment, relativePos);
-        if (labelBeforeCursor && LABEL_DICTIONARY[labelBeforeCursor] && LABEL_DICTIONARY[labelBeforeCursor].options) {
-            this.renderTypeOptions(labelBeforeCursor);
-            return;
-        }
-
         // Otherwise, show general suggestions
-        var cleaned = segment.replace(/^\[/, "").replace(/\]$/, "");
+        var cleaned = segment.replace(/^\[/, "").replace(/\]/, "");
         this.renderSuggestions(cleaned);
     }
 
@@ -566,13 +630,10 @@ export class LabelSuggestions {
      *   - Triggers input event to refresh suggestions
      *   - Prevents blur from hiding menu during the operation
      */
-    handleSuggestionClick(value, type, key) {
+    handleSuggestionClick(value, type, key, extraOption, defaultValue) {
+        console.log({value: value, type: type, key: key, extraOption: extraOption, defaultValue: defaultValue});
         var current = this.$input.val();
         var cursorPos = this.$input[0].selectionStart || 0;
-        var parts = this.getCurrentSegment(current, cursorPos);
-        var prefix = parts.prefix;
-        var segment = parts.segment.trim();
-        var relativePos = this.getCursorPositionInSegment(current, cursorPos);
 
         // Prevent blur from hiding the menu
         this.preventBlurHide = true;
@@ -581,25 +642,40 @@ export class LabelSuggestions {
             self.preventBlurHide = false;
         }, 200);
 
-        // Check if we're replacing a label that's right before cursor
-        var labelBeforeCursor = this.getLabelTypeBeforeCursor(segment, relativePos);
-        if (labelBeforeCursor) {
-            // Replace the last complete label with the new value
-            var beforeLabel = segment.replace(/\[[^\]]+\](?=[^\[]*$)/, value);
-            var next = prefix + beforeLabel + parts.suffix;
-            this.$input.val(next);
-            // Position cursor after the new label
-            var newCursorPos = (prefix + beforeLabel).length;
-            this.$input[0].setSelectionRange(newCursorPos, newCursorPos);
+        // Find the bracket expression at cursor (if any)
+        var bracketInfo = this.getBracketAtCursor(current, cursorPos);
+        var finalValue;
+        var newText;
+        var newCursorPos;
+
+        if (extraOption) {
+            // Adding an extra option to existing bracket
+            if (bracketInfo) {
+                var parsed = this.parseBracketExpr(bracketInfo.expr);
+                this.mergeOption(parsed.options, extraOption, defaultValue);
+                finalValue = this.buildBracketExpr(parsed.base, parsed.options);
+
+                newText = current.slice(0, bracketInfo.startPos) + finalValue + current.slice(bracketInfo.endPos);
+                newCursorPos = bracketInfo.startPos + finalValue.length;
+            }
+        } else if (bracketInfo) {
+            // Replacing existing bracket expression with new value, preserving options
+            var existingParsed = this.parseBracketExpr(bracketInfo.expr);
+            var newParsed = this.parseBracketExpr(value);
+            finalValue = this.buildBracketExpr(newParsed.base, existingParsed.options);
+
+            newText = current.slice(0, bracketInfo.startPos) + finalValue + current.slice(bracketInfo.endPos);
+            newCursorPos = bracketInfo.startPos + finalValue.length;
         } else {
-            // Just append the value
-            var next = prefix + value + parts.suffix;
-            this.$input.val(next);
-            // Position cursor at the end of the inserted value
-            var newCursorPos = (prefix + value).length;
-            this.$input[0].setSelectionRange(newCursorPos, newCursorPos);
+            // No bracket at cursor - insert new value at cursor position
+            var parts = this.getCurrentSegment(current, cursorPos);
+            finalValue = value;
+            newText = parts.prefix + finalValue + parts.suffix;
+            newCursorPos = parts.prefix.length + finalValue.length;
         }
 
+        this.$input.val(newText);
+        this.$input[0].setSelectionRange(newCursorPos, newCursorPos);
         this.$input.trigger('input').focus();
     }
 
