@@ -73,7 +73,7 @@ const LABEL_DICTIONARY = {
     },
     "width": {
         label: "Width",
-        keywords: ["position", "pixel", "unit"],
+        keywords: ["length", "size", "pixel", "unit"],
         options: [
             { label: "Pixel", value: "[width.pixel]" },
             { label: "Unit", value: "[width.unit]" }
@@ -84,7 +84,7 @@ const LABEL_DICTIONARY = {
     },
     "height": {
         label: "Height",
-        keywords: ["position", "pixel", "unit"],
+        keywords: ["length", "size", "pixel", "unit"],
         options: [
             { label: "Pixel", value: "[height.pixel]" },
             { label: "Unit", value: "[height.unit]" }
