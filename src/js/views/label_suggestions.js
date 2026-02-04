@@ -161,9 +161,11 @@ export class LabelSuggestions {
     /**
      * Get the current label segment where the cursor is positioned
      *
-     * Segments are text portions separated by delimiters (defined in SEPARATOR_CHARS).
-     * This function identifies which segment contains the cursor and returns it along with
-     * the text before (prefix) and after (suffix) the segment.
+        * Segments are text portions separated by delimiters (defined in SEPARATOR_CHARS).
+        * Delimiters inside bracket expressions are ignored so that options like
+        * "[time.secs; precision=2; offset=3]" remain a single segment.
+        * This function identifies which segment contains the cursor and returns it along with
+        * the text before (prefix) and after (suffix) the segment.
      *
      * @param {string} text - The full text content
      * @param {number} cursorPos - The current cursor position (0-based index)
@@ -182,17 +184,101 @@ export class LabelSuggestions {
             return { prefix: "", segment: "", suffix: "" };
         }
 
-        // Find separators before and after cursor
-        var beforeCursor = text.slice(0, cursorPos);
-        var afterCursor = text.slice(cursorPos);
+        var safeCursorPos = Math.min(Math.max(cursorPos, 0), text.length);
+        var isSeparator = function(ch) {
+            return SEPARATOR_CHARS.indexOf(ch) !== -1;
+        };
 
-        // Find last separator before cursor
-        var lastSepBefore = beforeCursor.search(new RegExp("[" + SEPARATOR_CHARS + "](?!.*[" + SEPARATOR_CHARS + "])"));
+        // Find last separator before cursor, ignoring separators inside brackets
+        var lastSepBefore = -1;
+        var depth = 0;
+        for (var i = 0; i < safeCursorPos; i++) {
+            var ch = text[i];
+            if (ch === "[") {
+                depth += 1;
+            } else if (ch === "]" && depth > 0) {
+                depth -= 1;
+            }
+            if (depth === 0 && isSeparator(ch)) {
+                lastSepBefore = i;
+            }
+        }
         var startIdx = lastSepBefore === -1 ? 0 : lastSepBefore + 1;
 
-        // Find first separator after cursor
-        var firstSepAfter = afterCursor.search(new RegExp("[" + SEPARATOR_CHARS + "]"));
-        var endIdx = firstSepAfter === -1 ? text.length : cursorPos + firstSepAfter;
+        // Find first separator after cursor, ignoring separators inside brackets
+        var nextSepAfter = -1;
+        var depthAfter = depth;
+        for (var j = safeCursorPos; j < text.length; j++) {
+            var nextCh = text[j];
+            if (nextCh === "[") {
+                depthAfter += 1;
+            } else if (nextCh === "]" && depthAfter > 0) {
+                depthAfter -= 1;
+            }
+            if (depthAfter === 0 && isSeparator(nextCh)) {
+                nextSepAfter = j;
+                break;
+            }
+        }
+        var endIdx = nextSepAfter === -1 ? text.length : nextSepAfter;
+
+        return {
+            prefix: text.slice(0, startIdx),
+            segment: text.slice(startIdx, endIdx),
+            suffix: text.slice(endIdx)
+        };
+    }
+
+    /**
+     * Alternative: Get current segment while ignoring separators inside brackets
+     *
+     * Uses a bracket-aware scan to find the nearest separators outside of brackets.
+     * This keeps expressions like "[time.secs; precision=2]" intact as a single segment.
+     *
+     * @param {string} text - The full text content
+     * @param {number} cursorPos - The current cursor position (0-based index)
+     * @returns {Object} An object with three properties: prefix, segment, and suffix
+     */
+    getCurrentSegmentOutsideBrackets(text, cursorPos) {
+        if (!text) {
+            return { prefix: "", segment: "", suffix: "" };
+        }
+
+        var safeCursorPos = Math.min(Math.max(cursorPos, 0), text.length);
+        var isSeparator = function(ch) {
+            return SEPARATOR_CHARS.indexOf(ch) !== -1;
+        };
+
+        var depth = 0;
+        var lastSepBefore = -1;
+        for (var i = 0; i < safeCursorPos; i++) {
+            var ch = text[i];
+            if (ch === "[") {
+                depth += 1;
+            } else if (ch === "]" && depth > 0) {
+                depth -= 1;
+            }
+            if (depth === 0 && isSeparator(ch)) {
+                lastSepBefore = i;
+            }
+        }
+        var startIdx = lastSepBefore === -1 ? 0 : lastSepBefore + 1;
+
+        var nextSepAfter = -1;
+        var depthAfter = depth;
+        for (var j = safeCursorPos; j < text.length; j++) {
+            var nextCh = text[j];
+            if (nextCh === "[") {
+                depthAfter += 1;
+            } else if (nextCh === "]" && depthAfter > 0) {
+                depthAfter -= 1;
+            }
+            if (depthAfter === 0 && isSeparator(nextCh)) {
+                nextSepAfter = j;
+                break;
+            }
+        }
+        var endIdx = nextSepAfter === -1 ? text.length : nextSepAfter;
 
         return {
             prefix: text.slice(0, startIdx),
