@@ -88,6 +88,16 @@ const LABEL_DICTIONARY = {
 };
 
 export class LabelSuggestions {
+    /**
+     * Initialize the LabelSuggestions component
+     *
+     * @param {jQuery} $container - The container element that holds both the input and suggestion menu
+     * @param {Object} options - Configuration options
+     * @param {boolean} options.have_time - Whether the current data supports time-based labels
+     *
+     * Sets up references to the input field and dropdown menu, and initializes state for
+     * preventing blur events from hiding the menu during suggestion clicks.
+     */
     constructor($container, options) {
         this.$container = $container;
         this.have_time = options && options.have_time ? options.have_time : false;
@@ -97,29 +107,86 @@ export class LabelSuggestions {
     }
 
     /**
-     * Get the last label segment separated by comma or newline
+     * Get the current label segment where the cursor is positioned
+     *
+     * Segments are text portions separated by delimiters (comma, newline, semicolon, or colon).
+     * This function identifies which segment contains the cursor and returns it along with
+     * the text before (prefix) and after (suffix) the segment.
+     *
+     * @param {string} text - The full text content
+     * @param {number} cursorPos - The current cursor position (0-based index)
+     * @returns {Object} An object with three properties:
+     *   - prefix: Text before the current segment (including delimiter)
+     *   - segment: The segment containing the cursor
+     *   - suffix: Text after the current segment (including delimiter)
+     *
+     * Example:
+     *   text = "[image.name], [time.index], [tags]"
+     *   cursorPos = 20 (inside "time.index")
+     *   returns: { prefix: "[image.name], ", segment: "[time.index]", suffix: ", [tags]" }
      */
-    getLastSegment(text) {
-        var match = text.match(/[,\s;:](?!.*[,\s;:])/);
-        if (!match) {
-            return { prefix: "", segment: text };
+    getCurrentSegment(text, cursorPos) {
+        if (!text) {
+            return { prefix: "", segment: "", suffix: "" };
         }
-        var idx = match.index;
-        return { prefix: text.slice(0, idx + 1), segment: text.slice(idx + 1) };
+
+        // Find separators before and after cursor
+        var beforeCursor = text.slice(0, cursorPos);
+        var afterCursor = text.slice(cursorPos);
+
+        // Find last separator before cursor
+        var lastSepBefore = beforeCursor.search(/[,\s;:](?!.*[,\s;:])/);
+        var startIdx = lastSepBefore === -1 ? 0 : lastSepBefore + 1;
+
+        // Find first separator after cursor
+        var firstSepAfter = afterCursor.search(/[,\s;:]/);
+        var endIdx = firstSepAfter === -1 ? text.length : cursorPos + firstSepAfter;
+
+        return {
+            prefix: text.slice(0, startIdx),
+            segment: text.slice(startIdx, endIdx),
+            suffix: text.slice(endIdx)
+        };
     }
 
     /**
      * Get cursor position relative to the current segment
+     *
+     * Converts the absolute cursor position in the full text to a relative position
+     * within the current segment. This is useful for determining where the cursor is
+     * within a specific label segment, independent of the rest of the text.
+     *
+     * @param {string} fullText - The complete text content
+     * @param {number} cursorPos - The absolute cursor position in the full text
+     * @returns {number} The cursor position relative to the start of the current segment (0-based)
+     *
+     * Example:
+     *   fullText = "[image.name], [time.index]"
+     *   cursorPos = 20 (inside "time.index")
+     *   returns: 6 (position within "[time.index]" segment)
      */
     getCursorPositionInSegment(fullText, cursorPos) {
-        var parts = this.getLastSegment(fullText);
+        var parts = this.getCurrentSegment(fullText, cursorPos);
         var prefix = parts.prefix;
         var relativePos = cursorPos - prefix.length;
         return Math.max(0, relativePos);
     }
 
     /**
-     * Check if cursor is inside brackets [ ]
+     * Check if cursor is inside an unclosed bracket pair [ ]
+     *
+     * Determines whether the cursor is currently positioned within an open bracket
+     * by counting opening '[' and closing ']' brackets before the cursor position.
+     * If there are more opening brackets than closing brackets, the cursor is inside.
+     *
+     * @param {string} segment - The text segment to check
+     * @param {number} relativePos - Cursor position within the segment
+     * @returns {boolean} True if cursor is inside brackets, false otherwise
+     *
+     * Example:
+     *   segment = "[time.ind|ex]" (| represents cursor)
+     *   relativePos = 9
+     *   returns: true (cursor is between [ and ])
      */
     isCursorInBrackets(segment, relativePos) {
         var beforeCursor = segment.slice(0, relativePos);
@@ -128,8 +195,20 @@ export class LabelSuggestions {
     }
 
     /**
-     * Extract the label type from inside brackets
-     * e.g., "[time.index]" -> "time"
+     * Extract the label type from an incomplete or complete bracket expression
+     *
+     * Parses the content within brackets to identify the base label type.
+     * Handles both complete labels like "[time.index]" and incomplete ones like "[time.
+     * Ignores semicolon-separated parameters and extracts only the first part before a dot.
+     *
+     * @param {string} segment - The text segment containing a bracket expression
+     * @returns {string|null} The label type (e.g., "time", "image", "channels") or null if not found
+     *
+     * Examples:
+     *   "[time.index]" -> "time"
+     *   "[image.name; key=value]" -> "image"
+     *   "[channels" -> "channels"
+     *   "no brackets" -> null
      */
     getLabelTypeFromBracket(segment) {
         var match = segment.match(/\[([^\];]+)/);
@@ -140,8 +219,24 @@ export class LabelSuggestions {
     }
 
     /**
-     * Find the label right before the cursor position
-     * e.g., "[time.index]|" -> "time"
+     * Find the label type of the last complete label before the cursor
+     *
+     * Searches backwards from the cursor position to find the most recent complete
+     * label enclosed in brackets. This is used to provide context-aware suggestions
+     * when the cursor is positioned right after a label.
+     *
+     * @param {string} segment - The text segment to search
+     * @param {number} relativePos - Cursor position within the segment
+     * @returns {string|null} The label type of the last complete label, or null if none found
+     *
+     * Examples:
+     *   segment = "[time.index]|some text" (| represents cursor)
+     *   relativePos = 12
+     *   returns: "time"
+     *
+     *   segment = "text [image.name] [time|" (| represents cursor)
+     *   relativePos = 23
+     *   returns: "image" (last complete label before cursor)
      */
     getLabelTypeBeforeCursor(segment, relativePos) {
         // Look backwards from cursor to find the last complete label
@@ -156,6 +251,17 @@ export class LabelSuggestions {
 
     /**
      * Render type-specific options for a label type
+     *
+     * Displays a dropdown menu with all available options for a specific label type.
+     * For example, when cursor is in "[time]", shows options like "Index", "Milliseconds", etc.
+     * If the label type has no options or doesn't exist, hides the menu.
+     *
+     * @param {string} labelType - The label type (e.g., "time", "image", "x")
+     *
+     * Side effects:
+     *   - Updates the dropdown menu HTML with type-specific options
+     *   - Shows or hides the menu based on availability of options
+     *   - Each option is rendered as a clickable button with data-value attribute
      */
     renderTypeOptions(labelType) {
         var entry = LABEL_DICTIONARY[labelType];
@@ -173,7 +279,21 @@ export class LabelSuggestions {
     }
 
     /**
-     * Filter and render general label suggestions
+     * Filter and render general label suggestions based on search query
+     *
+     * Searches through the label dictionary and displays matching suggestions.
+     * Matches are found by checking if the query appears in:
+     *   - The label's display name
+     *   - The label's keywords
+     * Shows all labels if query is empty. Filters out time labels if have_time is false.
+     * Limits results to top 8 matches.
+     *
+     * @param {string} query - The search query (case-insensitive)
+     *
+     * Side effects:
+     *   - Updates the dropdown menu HTML with filtered suggestions
+     *   - Shows menu if suggestions exist, hides if none found
+     *   - Each suggestion includes data attributes for value, type, and dynamic keys
      */
     renderSuggestions(query) {
         var lower = query.toLowerCase();
@@ -240,12 +360,25 @@ export class LabelSuggestions {
     }
 
     /**
-     * Main handler for input events
+     * Main handler for input events - orchestrates suggestion display logic
+     *
+     * This is the primary entry point called whenever the input changes or cursor moves.
+     * It determines what suggestions to show based on cursor context:
+     *
+     * 1. If cursor is inside brackets (e.g., "[time|]"), shows type-specific options
+     * 2. If cursor is right after a complete label (e.g., "[time.index]|"), shows options for that label
+     * 3. Otherwise, shows general label suggestions filtered by any partial input
+     *
+     * The function analyzes the current segment (where cursor is), determines context,
+     * and delegates to either renderTypeOptions() or renderSuggestions().
+     *
+     * Side effects:
+     *   - Updates the suggestion menu based on current input and cursor position
      */
     handleInput() {
         var current = this.$input.val();
         var cursorPos = this.$input[0].selectionStart || 0;
-        var parts = this.getLastSegment(current);
+        var parts = this.getCurrentSegment(current, cursorPos);
         var segment = parts.segment.trim();
         var relativePos = this.getCursorPositionInSegment(current, cursorPos);
 
@@ -271,12 +404,34 @@ export class LabelSuggestions {
     }
 
     /**
-     * Handle suggestion click
+     * Handle suggestion click - inserts the selected suggestion into the text
+     *
+     * Inserts the selected suggestion value into the input field at the appropriate position.
+     * Handles two scenarios:
+     *
+     * 1. Replacement mode: If there's a complete label before the cursor, replaces it with the new value
+     *    Example: "[time.index]|" -> click on "[time.mins]" -> "[time.mins]|"
+     *
+     * 2. Insertion mode: Otherwise, inserts the value at the current cursor position
+     *    Example: "hello ta| world" -> click on "[tags]" -> "hello [tags]| world"
+     *
+     * After insertion, positions the cursor after the inserted value and preserves
+     * any text that was after the cursor (suffix).
+     *
+     * @param {string} value - The suggestion value to insert (e.g., "[time.index]")
+     * @param {string} type - Optional type information (for future use)
+     * @param {string} key - Optional key for dynamic labels (for future use)
+     *
+     * Side effects:
+     *   - Updates input field value
+     *   - Repositions cursor after inserted value
+     *   - Triggers input event to refresh suggestions
+     *   - Prevents blur from hiding menu during the operation
      */
     handleSuggestionClick(value, type, key) {
         var current = this.$input.val();
         var cursorPos = this.$input[0].selectionStart || 0;
-        var parts = this.getLastSegment(current);
+        var parts = this.getCurrentSegment(current, cursorPos);
         var prefix = parts.prefix;
         var segment = parts.segment.trim();
         var relativePos = this.getCursorPositionInSegment(current, cursorPos);
@@ -293,24 +448,33 @@ export class LabelSuggestions {
         if (labelBeforeCursor) {
             // Replace the last complete label with the new value
             var beforeLabel = segment.replace(/\[[^\]]+\](?=[^\[]*$)/, value);
-            var next = prefix + beforeLabel;
+            var next = prefix + beforeLabel + parts.suffix;
             this.$input.val(next);
             // Position cursor after the new label
-            var newCursorPos = next.length;
+            var newCursorPos = (prefix + beforeLabel).length;
             this.$input[0].setSelectionRange(newCursorPos, newCursorPos);
         } else {
             // Just append the value
-            var next = prefix + value;
+            var next = prefix + value + parts.suffix;
             this.$input.val(next);
-            // Position cursor at the end
-            this.$input[0].setSelectionRange(next.length, next.length);
+            // Position cursor at the end of the inserted value
+            var newCursorPos = (prefix + value).length;
+            this.$input[0].setSelectionRange(newCursorPos, newCursorPos);
         }
 
         this.$input.trigger('input').focus();
     }
 
     /**
-     * Hide suggestions
+     * Hide the suggestions dropdown menu
+     *
+     * Called when the input loses focus (blur event). Respects the preventBlurHide
+     * flag to avoid hiding the menu during suggestion clicks, which would prevent
+     * the click from being registered.
+     *
+     * Side effects:
+     *   - Removes 'show' class from menu if not prevented
+     *   - Does nothing if preventBlurHide is true
      */
     hide() {
         if (this.preventBlurHide) {
