@@ -19,20 +19,6 @@ const LABEL_DICTIONARY = {
         ],
         hint: "Shows the name of the active channels."
     },
-    "tags": {
-        label: "Tags",
-        keywords: [],
-        options: [
-            { label: "Tags", value: "[tags]" }
-        ]
-    },
-    "key-values": {
-        label: "Key-Value Pairs",
-        keywords: ["kv", "map", "annotation"],
-        options: [
-            { label: "Key-Value pairs", value: "[key-values]" }
-        ]
-    },
     "time": {
         label: "Time",
         keywords: ["t", "timestamp"],
@@ -48,6 +34,17 @@ const LABEL_DICTIONARY = {
         extraOptions: [
             { key: "precision", default: "2" },
             { key: "offset", default: "0" }
+        ]
+    },
+    "z": {
+        label: "Z Coordinate",
+        keywords: ["stack", "slice", "pixel", "unit"],
+        options: [
+            { label: "Pixel", value: "[z.pixel]" },
+            { label: "Unit", value: "[z.unit]" }
+        ],
+        extraOptions: [
+            { key: "precision", default: "2" },
         ]
     },
     "x": {
@@ -94,15 +91,18 @@ const LABEL_DICTIONARY = {
             { key: "precision", default: "2" },
         ]
     },
-    "z": {
-        label: "Z Coordinate",
-        keywords: ["stack", "slice", "pixel", "unit"],
+    "tags": {
+        label: "Tags",
+        keywords: [],
         options: [
-            { label: "Pixel", value: "[z.pixel]" },
-            { label: "Unit", value: "[z.unit]" }
-        ],
-        extraOptions: [
-            { key: "precision", default: "2" },
+            { label: "Tags", value: "[tags]" }
+        ]
+    },
+    "key-values": {
+        label: "Key-Value Pairs",
+        keywords: ["kv", "map", "annotation"],
+        options: [
+            { label: "Key-Value pairs", value: "[key-values]" }
         ]
     },
     "zoom": {
