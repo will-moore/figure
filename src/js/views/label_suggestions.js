@@ -14,9 +14,10 @@ const LABEL_DICTIONARY = {
         label: "Channels",
         keywords: ["labels", "separate", "single"],
         options: [
-            { label: "Single label", value: "[channels]" },
-            { label: "Separate labels", value: "[channels labels]" }
-        ]
+            { label: "Single label", value: "[channels]", hint: "All active channel labels together in one line" },
+            { label: "Separate labels", value: "[channels labels]", hint: "Must be added on its own. Will generate one label per active channel." }
+        ],
+        hint: "Shows the name of the active channels."
     },
     "tags": {
         label: "Tags",
@@ -37,12 +38,12 @@ const LABEL_DICTIONARY = {
         keywords: ["t", "timestamp"],
         options: [
             { label: "Index", value: "[time.index]" },
-            { label: "Milliseconds", value: "[time.milliseconds]" },
-            { label: "Seconds", value: "[time.secs]" },
-            { label: "Minutes", value: "[time.mins]" },
-            { label: "m:s", value: "[time.mins:secs]" },
-            { label: "h:m", value: "[time.hrs:mins]" },
-            { label: "h:m:s", value: "[time.hrs:mins:secs]" }
+            { label: "Milliseconds", value: "[time.ms]" },
+            { label: "Seconds", value: "[time.s]" },
+            { label: "Minutes", value: "[time.m]" },
+            { label: "min:sec", value: "[time.m:s]" },
+            { label: "hrs:min", value: "[time.h:m]" },
+            { label: "hrs:min:sec", value: "[time.h:m:s]" }
         ],
         extraOptions: [
             { key: "precision", default: "2" },
@@ -440,7 +441,8 @@ export class LabelSuggestions {
 
         var html = "<div class='dropdown-header'>Options for " + _.escape(entry.label) + "</div>";
         html += entry.options.map(function(opt) {
-            return "<button type='button' class='dropdown-item' data-value='" + _.escape(opt.value) + "'>" + _.escape(opt.label) + "</button>";
+            var hint = opt.hint || "";
+            return "<button type='button' class='dropdown-item' data-value='" + _.escape(opt.value) + "' title='" + _.escape(hint) + "'>" + _.escape(opt.label) + "</button>";
         }).join("");
 
         // Add extra options if available
@@ -534,9 +536,10 @@ export class LabelSuggestions {
         html += filtered.map(function(item) {
             var entry = item.entry;
             var value = entry.value || "[" + item.key + "]";
+            var hint = entry.hint || "";
             var dataAttrs = "";
 
-            return "<button type='button' class='dropdown-item'" + dataAttrs + " data-value='" + _.escape(value) + "'>" + _.escape(entry.label) + "</button>";
+            return "<button type='button' class='dropdown-item'" + dataAttrs + " data-value='" + _.escape(value) + "' title='" + _.escape(hint) + "'>" + _.escape(entry.label) + "</button>";
         }).join("");
 
         this.$menu.html(html).addClass('show');
