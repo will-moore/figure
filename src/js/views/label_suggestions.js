@@ -1,7 +1,7 @@
 import $ from "jquery";
 import _ from "underscore";
 
-const LIMIT_SUGGESTIONS = 8;  // Max number of suggestions to show
+const LIMIT_SUGGESTIONS = 16;  // Max number of suggestions to show
 const SEPARATOR_CHARS = ", ;:";  // Characters that separate label segments
 
 /**
@@ -153,7 +153,7 @@ const LABEL_DICTIONARY = {
             { label: "Well Label", value: "[well.label]" }
         ]
     },
-    "Run": {
+    "run": {
         label: "Run",
         keywords: ["plateacquisition", "name", "id"],
         options: [
@@ -191,10 +191,12 @@ export class LabelSuggestions {
     constructor($container) {
         this.$container = $container;
         this.have_time = false;
-        this.have_project = false;
-        this.have_dataset = false;
-        this.have_screen = false;
-        this.have_plate = false;
+        this.parents_flags = {
+            project: false,
+            dataset: false,
+            screen: false,
+            plate: false
+        };
         this.$menu = $container.find('.label-suggestions');
         this.$input = $container.find('.label-text');
         this.preventBlurHide = false;
@@ -494,10 +496,10 @@ export class LabelSuggestions {
 
                 // Filters out labels
                 if (key === "time" && !this.have_time) continue;
-                if (key === "project" && !this.have_project) continue;
-                if (key === "dataset" && !this.have_dataset) continue;
-                if (key === "screen" && !this.have_screen) continue;
-                if (key === "plate" && !this.have_plate) continue;
+                if (key === "project" && !this.parents_flags.project) continue;
+                if (key === "dataset" && !this.parents_flags.dataset) continue;
+                if (key === "screen" && !this.parents_flags.screen) continue;
+                if (["plate", "well", "wellsample", "run"].includes(key) && !this.parents_flags.plate) continue;
 
                 // Match by label, value, or keywords
                 if (!lower) {
