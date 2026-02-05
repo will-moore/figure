@@ -3,9 +3,9 @@
         <input type="text" class="label-text form-control input-sm"
                 placeholder="Label" value="<% print(_.escape(l.text)) %>" />
         <% if (!edit){ %>
-            <span class="input-group-text" title="Suggestions appear as you type">
+            <button type="button" class="suggestions-toggle btn btn-outline-secondary btn-sm" title="Suggestions appear as you type. Click to disable suggestions">
                 <i class="bi-lightbulb"></i>
-            </span>
+            </button>
         <% } %>
     </div>
 

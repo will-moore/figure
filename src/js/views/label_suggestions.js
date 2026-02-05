@@ -199,10 +199,52 @@ export class LabelSuggestions {
         };
         this.$menu = $container.find('.label-suggestions');
         this.$input = $container.find('.label-text');
+        this.$suggestions_toggle = $container.find('.suggestions-toggle');
         this.prevent_blur_hide = false;
+        this.suggestions_enabled = true;
         // Cached state about the current input cursor/segment to avoid
         // re-parsing when handling suggestion clicks.
         this._cursor_state = null;
+
+        // Set up event listeners
+        this._setup_event_listeners();
+    }
+
+    /**
+     * Set up event listeners for the suggestions toggle button
+     */
+    _setup_event_listeners() {
+        var self = this;
+        if (this.$suggestions_toggle.length) {
+            this.$suggestions_toggle.on('click', function(e) {
+                e.preventDefault();
+                self.toggle_suggestions();
+            });
+        }
+    }
+
+    /**
+     * Toggle suggestions enabled/disabled state
+     * Updates the button appearance and hides/shows the menu accordingly
+     */
+    toggle_suggestions() {
+        this.suggestions_enabled = !this.suggestions_enabled;
+
+        // Update button and icon appearance
+        var $icon = this.$suggestions_toggle.find('i');
+        if (this.suggestions_enabled) {
+            this.$suggestions_toggle.removeClass('suggestions-disabled');
+            $icon.removeClass('opacity-50');
+            this.$suggestions_toggle.attr('title', 'Suggestions appear as you type. Click to disable suggestions');
+        } else {
+            this.$suggestions_toggle.addClass('suggestions-disabled');
+            $icon.addClass('opacity-50');
+            this.$suggestions_toggle.attr('title', 'Click to enable suggestions');
+            this.$menu.removeClass('show').empty();
+        }
+
+        // Remove focus to hide selection state
+        this.$suggestions_toggle[0].blur();
     }
 
     /**
@@ -384,6 +426,10 @@ export class LabelSuggestions {
      * If the label type has no options or doesn't exist, hides the menu.
      */
     render_type_options(label_type, current_segment) {
+        if (!this.suggestions_enabled) {
+            return;
+        }
+
         var entry = LABEL_DICTIONARY[label_type];
         if (!entry || !entry.options) {
             this.$menu.removeClass('show').empty();
@@ -428,6 +474,10 @@ export class LabelSuggestions {
      * Limits results to top LIMIT_SUGGESTIONS matches.
      */
     render_suggestions(query) {
+        if (!this.suggestions_enabled) {
+            return;
+        }
+
         var lower = query.toLowerCase();
         var filtered = [];
 
