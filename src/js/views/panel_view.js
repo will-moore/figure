@@ -40,7 +40,7 @@
                 'change:zoom change:dx change:dy change:width change:height change:channels change:theZ change:theT change:z_start change:z_end change:z_projection change:min_export_dpi change:pixel_range change:vertical_flip change:horizontal_flip',
                 this.render_image);
             this.listenTo(this.model,
-                'change:channels change:zoom change:dx change:dy change:width change:height change:rotation change:labels change:theT change:deltaT change:theZ change:deltaZ change:z_projection change:z_start change:z_end',
+                'change:channels change:zoom change:dx change:dy change:width change:height change:rotation change:labels change:theT change:deltaT change:theZ change:deltaZ change:z_projection change:z_start change:z_end change:parents',
                 this.render_labels);
             this.listenTo(this.model, 'change:shapes change:rotation change:vertical_flip change:horizontal_flip', this.render_shapes);
             this.listenTo(this.model, 'change:border', this.render_layout);
@@ -266,11 +266,33 @@
                             format = prop_nf[1] ? prop_nf[1] : "index";
                             precision = param_dict["precision"] !== undefined ? param_dict["precision"] : 0; // decimal places default to 0
                             label_value = self.model.get_time_label_text(format, param_dict["offset"], precision);
-                        } else if (['image', 'dataset'].includes(prop_nf[0])){
-                            format = prop_nf[1] ? prop_nf[1] : "name";
-                            label_value = self.model.get_name_label_text(prop_nf[0], format);
-                            //Escape the underscore for markdown
-                            label_value = label_value.replaceAll("_", "\\_");
+                        } else if (['image', 'project', 'dataset', 'screen', 'plate', 'well', 'wellsample', 'acquisition', 'run', 'field'].includes(prop_nf[0])){
+                            // Map aliases:
+                            // 'field' -> 'wellsample' (because backend stores field under 'wellsample')
+                            // 'run' -> 'acquisition'
+                            prop_nf[0] = prop_nf[0] === 'field' ? 'wellsample' : prop_nf[0];
+                            prop_nf[0] = prop_nf[0] === 'run' ? 'acquisition' : prop_nf[0];
+
+                            // Determine default format based on property type
+                            let defaultFormat = "name";
+                            let otherFormats = [];  // place to add more supported formats
+                            if (prop_nf[0] === 'wellsample') {
+                                defaultFormat = "index";
+                                otherFormats.push("index_run");
+                            } else if (prop_nf[0] === 'well') {
+                                defaultFormat = "label";
+                            }
+
+                            format = prop_nf[1] ? prop_nf[1] : defaultFormat;
+                            if (["id", defaultFormat].concat(otherFormats).indexOf(format) === -1) {
+                                label_value = "";
+                                // when format is not in allowed formats, will set to original expression
+                            } else {
+                                label_value = self.model.get_name_label_text(prop_nf[0], format);
+                                //Escape the underscore for markdown
+                                label_value = ("" + label_value).replaceAll("_", "\\_");
+                            }
+
                         } else if (['x', 'y', 'z', 'width', 'height', 'w', 'h', 'rotation', 'rot'].includes(prop_nf[0])){
                             format = prop_nf[1] ? prop_nf[1] : "pixel";
                             precision = param_dict["precision"] !== undefined ? param_dict["precision"] : 2; // decimal places default to 2

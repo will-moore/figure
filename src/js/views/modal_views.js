@@ -312,6 +312,7 @@ import { hideModal } from "./util";
                     // 'x': px,
                     // 'y': py,
                     'datasetName': data.meta.datasetName,
+                    'parents': data.parents,
                     'pixel_size_x': data.pixel_size.valueX,
                     'pixel_size_y': data.pixel_size.valueY,
                     'pixel_size_z': data.pixel_size.valueZ,
