@@ -521,7 +521,7 @@
 
         handle_label_input: function(event) {
             if (this.labelSuggestions) {
-                this.labelSuggestions.handleInput();
+                this.labelSuggestions.handle_input();
             }
         },
 
@@ -538,11 +538,11 @@
             event.preventDefault();
             var $item = $(event.target);
             var value = $item.attr('data-value');
-            var extraOption = $item.attr('data-extra-option');
-            var defaultValue = $item.attr('data-default-value');
+            var extra_option = $item.attr('data-extra-option');
+            var default_value = $item.attr('data-default-value');
 
             if (this.labelSuggestions) {
-                this.labelSuggestions.handleSuggestionClick(value, extraOption, defaultValue);
+                this.labelSuggestions.handle_suggestion_click(value, extra_option, default_value);
             }
         },
 

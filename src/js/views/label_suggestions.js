@@ -199,10 +199,10 @@ export class LabelSuggestions {
         };
         this.$menu = $container.find('.label-suggestions');
         this.$input = $container.find('.label-text');
-        this.preventBlurHide = false;
+        this.prevent_blur_hide = false;
         // Cached state about the current input cursor/segment to avoid
         // re-parsing when handling suggestion clicks.
-        this._cursorState = null;
+        this._cursor_state = null;
     }
 
     /**
@@ -216,7 +216,7 @@ export class LabelSuggestions {
      * bracket as the segment. Otherwise, returns the full segment containing the cursor.
      *
      * @param {string} text - The full text content
-     * @param {number} cursorPos - The current cursor position (0-based index)
+     * @param {number} cursor_pos - The current cursor position (0-based index)
      * @returns {Object} An object with:
      *   - prefix: Text before the segment (including delimiter)
      *   - segment: The segment containing the cursor (bracket expr or plain text)
@@ -224,91 +224,91 @@ export class LabelSuggestions {
      *   - hasBracket: Boolean flag - true if segment is a bracket expression, false otherwise
      *
      * Examples:
-     *   text = "[image.name], [time.secs|], [tags]", cursorPos = 20 (inside time.secs)
+     *   text = "[image.name], [time.secs|], [tags]", cursor_pos = 20 (inside time.secs)
      *   returns: { prefix: "[image.name], ", segment: "[time.secs]", suffix: ", [tags]", hasBracket: true }
      *
-     *   text = "hello| world", cursorPos = 5
+     *   text = "hello| world", cursor_pos = 5
      *   returns: { prefix: "", segment: "hello world", suffix: "", hasBracket: false }
      */
-    getCurrentSegment(text, cursorPos) {
+    get_current_segment(text, cursor_pos) {
         if (!text) {
             return { prefix: "", segment: "", suffix: "", hasBracket: false };
         }
 
-        var safeCursorPos = Math.min(Math.max(cursorPos, 0), text.length);
-        var isSeparator = function(ch) {
+        var safe_cursor_pos = Math.min(Math.max(cursor_pos, 0), text.length);
+        var is_separator = function(ch) {
             return SEPARATOR_CHARS.indexOf(ch) !== -1;
         };
 
         // Find last separator before cursor, ignoring separators inside brackets
-        var lastSepBefore = -1;
+        var last_sep_before = -1;
         var depth = 0;
-        for (var i = 0; i < safeCursorPos; i++) {
+        for (var i = 0; i < safe_cursor_pos; i++) {
             var ch = text[i];
             if (ch === "[") {
                 depth += 1;
             } else if (ch === "]" && depth > 0) {
                 depth -= 1;
             }
-            if (depth === 0 && isSeparator(ch)) {
-                lastSepBefore = i;
+            if (depth === 0 && is_separator(ch)) {
+                last_sep_before = i;
             }
         }
-        var segmentStart = lastSepBefore === -1 ? 0 : lastSepBefore + 1;
+        var segment_start = last_sep_before === -1 ? 0 : last_sep_before + 1;
 
         // Find first separator after cursor, ignoring separators inside brackets
-        var nextSepAfter = -1;
-        var depthAfter = depth;
-        for (var j = safeCursorPos; j < text.length; j++) {
-            var nextCh = text[j];
-            if (nextCh === "[") {
-                depthAfter += 1;
-            } else if (nextCh === "]" && depthAfter > 0) {
-                depthAfter -= 1;
+        var next_sep_after = -1;
+        var depth_after = depth;
+        for (var j = safe_cursor_pos; j < text.length; j++) {
+            var next_ch = text[j];
+            if (next_ch === "[") {
+                depth_after += 1;
+            } else if (next_ch === "]" && depth_after > 0) {
+                depth_after -= 1;
             }
-            if (depthAfter === 0 && isSeparator(nextCh)) {
-                nextSepAfter = j;
+            if (depth_after === 0 && is_separator(next_ch)) {
+                next_sep_after = j;
                 break;
             }
         }
-        var segmentEnd = nextSepAfter === -1 ? text.length : nextSepAfter;
+        var segment_end = next_sep_after === -1 ? text.length : next_sep_after;
 
-        var fullSegment = text.slice(segmentStart, segmentEnd);
-        var relativePos = safeCursorPos - segmentStart;
+        var full_segment = text.slice(segment_start, segment_end);
+        var relative_pos = safe_cursor_pos - segment_start;
 
 
-        if (relativePos > 0 && fullSegment[relativePos - 1] === "]") {
-            relativePos -= 1;  // Count as it could be inside bracket
+        if (relative_pos > 0 && full_segment[relative_pos - 1] === "]") {
+            relative_pos -= 1;  // Count as it could be inside bracket
         }
 
         // Check if cursor is inside a bracket expression
-        var beforeCursor = fullSegment.slice(0, relativePos);
-        var afterCursor = fullSegment.slice(relativePos);
-        var openIdx = beforeCursor.lastIndexOf('[');
-        var closeIdx = afterCursor.indexOf(']');
-        if (openIdx !== -1 && closeIdx !== -1) {
-            var bracketExpr = fullSegment.slice(openIdx, relativePos + closeIdx + 1);
-            var suffixPart = fullSegment.slice(relativePos + closeIdx + 1);
+        var before_cursor = full_segment.slice(0, relative_pos);
+        var after_cursor = full_segment.slice(relative_pos);
+        var open_idx = before_cursor.lastIndexOf('[');
+        var close_idx = after_cursor.indexOf(']');
+        if (open_idx !== -1 && close_idx !== -1) {
+            var bracket_expr = full_segment.slice(open_idx, relative_pos + close_idx + 1);
+            var suffix_part = full_segment.slice(relative_pos + close_idx + 1);
             return {
-                prefix: text.slice(0, segmentStart + openIdx),
-                segment: bracketExpr,
-                suffix: suffixPart + text.slice(segmentEnd),
+                prefix: text.slice(0, segment_start + open_idx),
+                segment: bracket_expr,
+                suffix: suffix_part + text.slice(segment_end),
                 hasBracket: true
             };
-        } else if (openIdx !== -1 && closeIdx === -1) {
+        } else if (open_idx !== -1 && close_idx === -1) {
             // Cursor is inside an unclosed bracket - extract from opening bracket onwards
-            var partialSegment = fullSegment.slice(openIdx);
+            var partial_segment = full_segment.slice(open_idx);
             return {
-                prefix: text.slice(0, segmentStart + openIdx),
-                segment: partialSegment,
-                suffix: text.slice(segmentEnd),
+                prefix: text.slice(0, segment_start + open_idx),
+                segment: partial_segment,
+                suffix: text.slice(segment_end),
                 hasBracket: false
             };
         } else {
             return {
-                prefix: text.slice(0, segmentStart),
-                segment: fullSegment,
-                suffix: text.slice(segmentEnd),
+                prefix: text.slice(0, segment_start),
+                segment: full_segment,
+                suffix: text.slice(segment_end),
                 hasBracket: false
             };
         }
@@ -330,7 +330,7 @@ export class LabelSuggestions {
      *   "[channels" -> "channels"
      *   "no brackets" -> null
      */
-    getLabelTypeFromBracket(segment) {  // LIKELY SHOULD BE KEPT
+    get_label_type(segment) {  // LIKELY SHOULD BE KEPT
         var match = segment.match(/\[([^\];]+)/);
         if (!match) return null;
         var inner = match[1].trim().split(";")[0].trim();
@@ -348,13 +348,12 @@ export class LabelSuggestions {
      * @returns {Object} An object with:
      *   - base: The base label (e.g., "time.secs")
      *   - options: A map of option keys to values (e.g., {precision: "2", offset: "0"})
-     *   - raw: The original segment text
      *
      * Examples:
-     *   "[time.secs]" -> { base: "time.secs", options: {}, raw: "[time.secs]" }
-     *   "[time.secs; precision=2; offset=3]" -> { base: "time.secs", options: {precision: "2", offset: "3"}, raw: "[time.secs; precision=2; offset=3]" }
+     *   "[time.secs]" -> { base: "time.secs", options: {} }
+     *   "[time.secs; precision=2; offset=3]" -> { base: "time.secs", options: {precision: "2", offset: "3"} }
      */
-    parseBracketExpr(segment) {
+    parse_bracket_expr(segment) {
         var match = segment.match(/\[([^\]]+)\]/);
         if (!match) {
             return { base: "", options: {}, raw: segment };
@@ -366,58 +365,15 @@ export class LabelSuggestions {
         var options = {};
 
         for (var i = 1; i < parts.length; i++) {
-            var keyValue = parts[i].split("=");
-            if (keyValue.length === 2) {
-                var key = keyValue[0].trim();
-                var value = keyValue[1].trim();
+            var key_value = parts[i].split("=");
+            if (key_value.length === 2) {
+                var key = key_value[0].trim();
+                var value = key_value[1].trim();
                 options[key] = value;
             }
         }
 
-        return { base: base, options: options, raw: segment };
-    }
-
-    /**
-     * Build a bracket expression from base label and options
-     *
-     * Constructs a bracket expression string by combining the base label with
-     * semicolon-separated key=value options.
-     *
-     * @param {string} base - The base label (e.g., "time.milliseconds")
-     * @param {Object} options - A map of option keys to values
-     * @returns {string} The complete bracket expression
-     *
-     * Examples:
-     *   ("time.secs", {}) -> "[time.secs]"
-     *   ("time.secs", {precision: "2", offset: "3"}) -> "[time.secs; precision=2; offset=3]"
-     */
-    buildBracketExpr(base, options) {
-        var expr = "[" + base;
-        for (var key in options) {
-            if (options.hasOwnProperty(key)) {
-                expr += "; " + key + "=" + options[key];
-            }
-        }
-        expr += "]";
-        return expr;
-    }
-
-    /**
-     * Merge a new option into an existing options map
-     *
-     * Adds or updates an option key-value pair. If the key already exists,
-     * it is not overwritten (to avoid duplicates).
-     *
-     * @param {Object} options - Existing options map
-     * @param {string} key - The option key to add
-     * @param {string} value - The option value to add
-     * @returns {Object} The updated options map
-     */
-    mergeOption(options, key, value) {
-        if (!options.hasOwnProperty(key)) {
-            options[key] = value;
-        }
-        return options;
+        return { base: base, options: options };
     }
 
     /**
@@ -426,16 +382,9 @@ export class LabelSuggestions {
      * Displays a dropdown menu with all available options for a specific label type.
      * For example, when cursor is in "[time]", shows options like "Index", "Milliseconds", etc.
      * If the label type has no options or doesn't exist, hides the menu.
-     *
-     * @param {string} labelType - The label type (e.g., "time", "image", "x")
-     *
-     * Side effects:
-     *   - Updates the dropdown menu HTML with type-specific options
-     *   - Shows or hides the menu based on availability of options
-     *   - Each option is rendered as a clickable button with data-value attribute
      */
-    renderTypeOptions(labelType, currentSegment) {
-        var entry = LABEL_DICTIONARY[labelType];
+    render_type_options(label_type, current_segment) {
+        var entry = LABEL_DICTIONARY[label_type];
         if (!entry || !entry.options) {
             this.$menu.removeClass('show').empty();
             return;
@@ -450,18 +399,18 @@ export class LabelSuggestions {
         // Add extra options if available
         if (entry.extraOptions && entry.extraOptions.length > 0) {
             // Parse current segment to check which options are already present
-            var parsed = currentSegment ? this.parseBracketExpr(currentSegment) : { options: {} };
-            var existingOptions = parsed.options;
+            var parsed = current_segment ? this.parse_bracket_expr(current_segment) : { options: {} };
+            var existing_options = parsed.options;
 
             html += "<div class='dropdown-divider'></div>";
             html += "<div class='dropdown-header'>Extra Options</div>";
             var self = this;
-            html += entry.extraOptions.map(function(extraOpt) {
-                var optLabel = extraOpt.key + "=" + extraOpt.default;
-                var alreadyAdded = existingOptions.hasOwnProperty(extraOpt.key);
-                var disabled = alreadyAdded ? " disabled" : "";
-                var title = alreadyAdded ? " title='Already added'" : "";
-                return "<button type='button' class='dropdown-item'" + disabled + title + " data-extra-option='" + _.escape(extraOpt.key) + "' data-default-value='" + _.escape(extraOpt.default) + "'>" + _.escape(optLabel) + "</button>";
+            html += entry.extraOptions.map(function(extra_opt) {
+                var opt_label = extra_opt.key + "=" + extra_opt.default;
+                var already_added = existing_options.hasOwnProperty(extra_opt.key);
+                var disabled = already_added ? " disabled" : "";
+                var title = already_added ? " title='Already added'" : "";
+                return "<button type='button' class='dropdown-item'" + disabled + title + " data-extra-option='" + _.escape(extra_opt.key) + "' data-default-value='" + _.escape(extra_opt.default) + "'>" + _.escape(opt_label) + "</button>";
             }).join("");
         }
 
@@ -477,15 +426,8 @@ export class LabelSuggestions {
      *   - The label's keywords
      * Shows all labels if query is empty.
      * Limits results to top LIMIT_SUGGESTIONS matches.
-     *
-     * @param {string} query - The search query (case-insensitive)
-     *
-     * Side effects:
-     *   - Updates the dropdown menu HTML with filtered suggestions
-     *   - Shows menu if suggestions exist, hides if none found
-     *   - Each suggestion includes data attributes for value, type, and dynamic keys
      */
-    renderSuggestions(query) {
+    render_suggestions(query) {
         var lower = query.toLowerCase();
         var filtered = [];
 
@@ -539,9 +481,9 @@ export class LabelSuggestions {
             var entry = item.entry;
             var value = entry.value || "[" + item.key + "]";
             var hint = entry.hint || "";
-            var dataAttrs = "";
+            var data_attrs = "";
 
-            return "<button type='button' class='dropdown-item'" + dataAttrs + " data-value='" + _.escape(value) + "' title='" + _.escape(hint) + "'>" + _.escape(entry.label) + "</button>";
+            return "<button type='button' class='dropdown-item'" + data_attrs + " data-value='" + _.escape(value) + "' title='" + _.escape(hint) + "'>" + _.escape(entry.label) + "</button>";
         }).join("");
 
         this.$menu.html(html).addClass('show');
@@ -555,37 +497,66 @@ export class LabelSuggestions {
      *
      * 1. If cursor is inside brackets (e.g., "[time|]") or right after (e.g., "[time.index]|"), shows type-specific options
      * 2. Otherwise, shows general label suggestions filtered by any partial input
-     *
-     * The function analyzes the current segment (where cursor is), determines context,
-     * and delegates to either renderTypeOptions() or renderSuggestions().
-     *
-     * Side effects:
-     *   - Updates the suggestion menu based on current input and cursor position
      */
-    handleInput() {
+    handle_input() {
         var current = this.$input.val();
-        var cursorPos = this.$input[0].selectionStart || 0;
-        var parts = this.getCurrentSegment(current, cursorPos);
+        var cursor_pos = this.$input[0].selectionStart || 0;
+        var parts = this.get_current_segment(current, cursor_pos);
 
         // Cache the cursor/segment state so click handlers can reuse it
-        this._cursorState = {
+        this._cursor_state = {
             current: current,
-            cursorPos: cursorPos,
+            cursor_pos: cursor_pos,
             parts: parts
         };
 
         // If the cursor is inside brackets, suggest options for that label type
         if (parts.hasBracket) {
-            var labelType = this.getLabelTypeFromBracket(parts.segment);
-            if (labelType && LABEL_DICTIONARY[labelType]) {
-                this.renderTypeOptions(labelType, parts.segment);
+            var label_type = this.get_label_type(parts.segment);
+            if (label_type && LABEL_DICTIONARY[label_type]) {
+                this.render_type_options(label_type, parts.segment);
                 return;
             }
         }
 
         // Otherwise, show general suggestions
         var cleaned = parts.segment.replace(/^\[/, "").replace(/\]/, "");
-        this.renderSuggestions(cleaned);
+        this.render_suggestions(cleaned);
+    }
+
+    /**
+     * Build a bracket expression from base label and options
+     *
+     * Constructs a bracket expression string by combining the base label with
+     * semicolon-separated key=value options.
+     *
+     * @param {string} base - The base label (e.g., "time.milliseconds")
+     * @param {Object} options - A map of option keys to values
+     * @returns {string} The complete bracket expression
+     *
+     * Examples:
+     *   ("time.secs", {}) -> "[time.secs]"
+     *   ("time.secs", {precision: "2", offset: "3"}) -> "[time.secs; precision=2; offset=3]"
+     */
+    build_bracket_expr(base, options) {
+        var expr = "[" + base;
+        for (var key in options) {
+            if (options.hasOwnProperty(key)) {
+                expr += "; " + key + "=" + options[key];
+            }
+        }
+        expr += "]";
+        return expr;
+    }
+
+    /**
+     * Merge a new option into an existing options map
+     */
+    merge_option(options, key, value) {
+        if (!options.hasOwnProperty(key)) {
+            options[key] = value;
+        }
+        return options;
     }
 
     /**
@@ -602,79 +573,71 @@ export class LabelSuggestions {
      *
      * After insertion, positions the cursor after the inserted value and preserves
      * any text that was after the cursor (suffix).
-     *
-     * @param {string} value - The suggestion value to insert (e.g., "[time.index]")
-     *
-     * Side effects:
-     *   - Updates input field value
-     *   - Repositions cursor after inserted value
-     *   - Triggers input event to refresh suggestions
-     *   - Prevents blur from hiding menu during the operation
      */
-    handleSuggestionClick(value, extraOption, defaultValue) {
+    handle_suggestion_click(value, extra_option, default_value) {
         var current = this.$input.val();
-        var cursorPos = this.$input[0].selectionStart || 0;
+        var cursor_pos = this.$input[0].selectionStart || 0;
 
         // Prevent blur from hiding the menu
-        this.preventBlurHide = true;
+        this.prevent_blur_hide = true;
         var self = this;
         setTimeout(function() {
-            self.preventBlurHide = false;
+            self.prevent_blur_hide = false;
         }, 200);
 
         // Reuse cached cursor state if it matches the current input/caret,
-        // otherwise fall back to recomputing the segment/bracket info from getCurrentSegment.
-        var state = (this._cursorState && this._cursorState.current === current && this._cursorState.cursorPos === cursorPos) ? this._cursorState : null;
-        var parts = state ? state.parts : this.getCurrentSegment(current, cursorPos);
-        var startPos = parts.prefix.length;
-        var endPos = startPos + parts.segment.length;
-        var existingParsed = (parts.hasBracket && parts.segment) ? this.parseBracketExpr(parts.segment) : null;
+        // otherwise fall back to recomputing the segment/bracket info from get_current_segment.
+        var state = (this._cursor_state && this._cursor_state.current === current && this._cursor_state.cursor_pos === cursor_pos) ? this._cursor_state : null;
+        var parts = state ? state.parts : this.get_current_segment(current, cursor_pos);
+        var start_pos = parts.prefix.length;
+        var end_pos = start_pos + parts.segment.length;
+        var existing_parsed = (parts.hasBracket && parts.segment) ? this.parse_bracket_expr(parts.segment) : null;
 
-        var finalValue;
-        var newText;
-        var newCursorPos;
+        var final_value;
+        var new_text;
+        var new_cursor_pos;
 
-        if (extraOption) {
+        if (extra_option) {
             // Adding an extra option to existing bracket
             if (parts.segment) {
-                this.mergeOption(existingParsed.options, extraOption, defaultValue);
-                finalValue = this.buildBracketExpr(existingParsed.base, existingParsed.options);
+                this.merge_option(existing_parsed.options, extra_option, default_value);
+                final_value = this.build_bracket_expr(existing_parsed.base, existing_parsed.options);
 
-                newText = current.slice(0, startPos) + finalValue + current.slice(endPos);
-                newCursorPos = startPos + finalValue.length;
+                new_text = current.slice(0, start_pos) + final_value + current.slice(end_pos);
+                new_cursor_pos = start_pos + final_value.length;
             }
         } else if (parts.hasBracket && parts.segment) {
             // Replacing existing bracket expression with new value, preserving options
-            var newParsed = this.parseBracketExpr(value);
-            finalValue = this.buildBracketExpr(newParsed.base, existingParsed.options);
+            var new_parsed = this.parse_bracket_expr(value);
+            final_value = this.build_bracket_expr(new_parsed.base, existing_parsed.options);
 
-            newText = current.slice(0, startPos) + finalValue + current.slice(endPos);
-            newCursorPos = startPos + finalValue.length;
+            new_text = current.slice(0, start_pos) + final_value + current.slice(end_pos);
+            new_cursor_pos = start_pos + final_value.length;
         } else {
             // No bracket at cursor - insert new value at cursor position
-            finalValue = value;
-            newText = parts.prefix + finalValue + parts.suffix;
-            newCursorPos = parts.prefix.length + finalValue.length;
+            final_value = value;
+            new_text = parts.prefix + final_value + parts.suffix;
+            new_cursor_pos = parts.prefix.length + final_value.length;
         }
 
-        this.$input.val(newText);
-        this.$input[0].setSelectionRange(newCursorPos, newCursorPos);
+        this.$input.val(new_text);
+        this.$input[0].setSelectionRange(new_cursor_pos, new_cursor_pos);
         this.$input.trigger('input').focus();
     }
 
     /**
      * Hide the suggestions dropdown menu
      *
-     * Called when the input loses focus (blur event). Respects the preventBlurHide
+     * Called when the input loses focus (blur event). Respects the prevent_blur_hide
      * flag to avoid hiding the menu during suggestion clicks, which would prevent
      * the click from being registered.
      *
      * Side effects:
      *   - Removes 'show' class from menu if not prevented
-     *   - Does nothing if preventBlurHide is true
+     *   - Does nothing if prevent_blur_hide is true
      */
     hide() {
-        if (this.preventBlurHide) {
+        if (this.prevent_blur_hide) {
             return;
         }
         this.$menu.removeClass('show');
