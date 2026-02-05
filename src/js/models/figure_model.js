@@ -616,6 +616,7 @@
                         'deltaT': data.deltaT,
                         'pixelsType': data.meta.pixelsType,
                         'pixel_range': data.pixel_range,
+                        'parents': data.parents
                     };
                     if (baseUrl) {
                         n.baseUrl = baseUrl;

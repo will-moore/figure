@@ -275,6 +275,7 @@
                 'pixel_size_x_unit': data.pixel_size_x_unit,
                 'pixel_size_z_unit': data.pixel_size_z_unit,
                 'deltaT': data.deltaT,
+                'parents': data.parents
             };
 
             // theT and theZ are not changed unless we have to...
@@ -602,12 +603,10 @@
                     var pathnames = this.get('name').split('/');
                     text = pathnames[pathnames.length-1];
                 }
-            } else if (property === "dataset") {
-                if (format === "id") {
-                    text = ""+this.get('datasetId');
-                } else if (format === "name") {
-                    text = this.get('datasetName') ? this.get('datasetName') : "No/Many Datasets";
-                }
+            } else {
+                // project, dataset, screen, plate, well, field (name, id, label, index)
+                var parentVal = this.get("parents")?.[property]?.[format];
+                text = parentVal == null ? "undefined" : "" + parentVal;
             }
             return text;
         },
