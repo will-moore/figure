@@ -425,9 +425,9 @@ var Arrow = function Arrow(options) {
       y1 = this._y1 * zf,
       x2 = this._x2 * zf,
       y2 = this._y2 * zf,
-      w = this._strokeWidth * 0.5;
+      w = this._strokeWidth * 0.5 * this.manager.getShapeScalingFraction();
 
-    var headSize = this._strokeWidth * 4 + 5,
+    var headSize = (this._strokeWidth * 4 + 5) * this.manager.getShapeScalingFraction(),
       dx = x2 - x1,
       dy = y2 - y1;
 
@@ -593,6 +593,7 @@ var CreateArrow = function CreateArrow(options) {
       strokeWidth: strokeWidth,
       zoom: zoom,
       strokeColor: strokeColor,
+      fillOpacity: 0,
     });
   };
 

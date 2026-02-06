@@ -1,0 +1,564 @@
+/*
+// Copyright (C) 2015-2024 University of Dundee & Open Microscopy Environment.
+// All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following
+// conditions are met:
+//
+// 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+//
+// 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following
+// disclaimer in the documentation // and/or other materials provided with the distribution.
+//
+// 3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived
+// from this software without specific prior written permission.
+
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+// BUT NOT LIMITED TO,
+// THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
+// THE COPYRIGHT HOLDER OR CONTRIBUTORS
+// BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+// PROCUREMENT OF SUBSTITUTE // GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+// ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT // LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+// IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
+
+import Raphael from "raphael";
+
+var Text = function Text(options) {
+  var self = this;
+  this.type = "Text";
+  this.manager = options.manager;
+  this.paper = options.paper;
+  this._x = options.x;
+  this._y = options.y;
+  this._fontSize = options.fontSize;
+  this._text = options.text;
+  this._strokeWidth = options.strokeWidth || 2;
+  this._strokeColor = options.strokeColor || "#ffffff";
+  
+  if(options.fillColor){
+    this._fillColor = options.fillColor;
+  }else{
+      this._fillColor = "#000000";
+  }
+  if(options.fillOpacity){
+      this._fillOpacity = options.fillOpacity;
+  }else{
+      this._fillOpacity = 0;
+  }
+  this._inModalView = options.inModalView || false;
+
+  this._id = options.id || this.manager.getRandomId();
+  if(this._id == -1){
+    this._id = this.manager.getRandomId();
+  }
+  this._zoomFraction = options.zoom ? options.zoom / 100 : 1
+  this._textAnchor = options.textAnchor || "start"
+  this._rotation = options.rotation || 0;
+
+  this._selected = false;
+  this._area = 0;
+  this.handle_wh = 6;
+
+  this.bkgdRect = this.paper.rect();
+  this.bkgdRect.attr({"fill-opacity": this._fillOpacity, fill: this._fillColor});
+
+  this.element = this.paper.text();
+  this.element.attr({"fill-opacity": 0.01, fill: "#fff"});
+
+  if (this.manager.canEdit) {
+    // Drag handling of element
+    this.element.drag(
+      function (dx, dy) {
+        // DRAG, update location and redraw
+        dx = dx / self._zoomFraction;
+        dy = dy / self._zoomFraction;
+
+        var offsetX = dx - this.prevX;
+        var offsetY = dy - this.prevY;
+        this.prevX = dx;
+        this.prevY = dy;
+
+        // Manager handles move and redraw
+        self.manager.moveSelectedShapes(offsetX, offsetY, true);
+      },
+      function () {
+        self._handleMousedown();
+        this.prevX = 0;
+        this.prevY = 0;
+        return false;
+      },
+      function () {
+        // STOP
+        // notify manager if rectangle has moved
+        if (this.prevX !== 0 || this.prevY !== 0) {
+          self.manager.notifySelectedShapesChanged();
+        }
+        return false;
+      }
+    );
+  }
+
+  this.createHandles();
+
+  this.drawShape();
+};
+
+Text.prototype.toJson = function toJson() {
+  var rv = {
+    type: "Text",
+    x: this._x,
+    y: this._y,
+    area: this._area,
+    fontSize: this._fontSize,
+    strokeColor: this._strokeColor,
+    fillColor: this._fillColor,
+    fillOpacity: this._fillOpacity,
+    text: this._text,
+    textAnchor: this._textAnchor,
+    rotation: this._rotation,
+  };
+  if (this._id) {
+    rv.id = this._id;
+  }
+  return rv;
+};
+
+Text.prototype.offsetShape = function offsetShape(dx, dy) {
+  this._x = this._x + dx;
+  this._y = this._y + dy;
+  this.drawShape();
+};
+
+Text.prototype.compareCoords = function compareCoords(json) {
+  if (json.type !== "Text") {
+    return false;
+  }
+  var selfJson = this.toJson(),
+    match = true;
+  ["x", "y", "text"].forEach(function (c) {
+    if (json[c] !== selfJson[c]) {
+      match = false;
+    }
+  });
+  return match;
+};
+
+// Useful for pasting json with an offset
+Text.prototype.offsetCoords = function offsetCoords(json, dx, dy) {
+  json.x = json.x + dx;
+  json.y = json.y + dy;
+  return json;
+};
+
+Text.prototype.setStrokeColor = function setStrokeColor(color) {
+  this._strokeColor = color;
+  this.drawShape();
+};
+
+Text.prototype.getStrokeColor = function getStrokeColor() {
+  return this._strokeColor;
+};
+
+Text.prototype.setStrokeWidth = function setStrokeWidth(width) {
+  this._strokeWidth = width;
+  this.drawShape();
+};
+
+Text.prototype.getStrokeWidth = function getStrokeWidth() {
+  return this._strokeWidth;
+};
+
+Text.prototype.setFontSize = function setFontSize(fontSize) {
+  this._fontSize = fontSize;
+  this.drawShape();
+};
+
+Text.prototype.getFontSize = function getFontSize() {
+  return this._fontSize;
+};
+
+Text.prototype.setText = function setText(text) {
+  this._text = text;
+  this.drawShape();
+};
+
+Text.prototype.getText = function getText() {
+  return this._text;
+};
+
+Text.prototype.setTextAnchor = function setTextAnchor(textAnchor) {
+  this._textAnchor = textAnchor;
+  this.drawShape();
+};
+
+Text.prototype.getTextAnchor = function getTextAnchor() {
+  return this._textAnchor;
+};
+
+Text.prototype.setFillColor = function setFillColor(fillColor) {
+  this._fillColor = fillColor;
+  this.drawShape();
+};
+
+Text.prototype.getFillColor = function getFillColor() {
+  return this._fillColor;
+};
+
+Text.prototype.setFillOpacity = function setFillOpacity(fillOpacity) {
+  this._fillOpacity = fillOpacity;
+  this.drawShape();
+};
+
+Text.prototype.getFillOpacity = function getFillOpacity() {
+  return this._fillOpacity;
+};
+
+Text.prototype.setZoom = function setZoom(zoom) {
+   this._zoomFraction = zoom ? zoom / 100 : 1;
+   this.drawShape();
+};
+
+Text.prototype.setRotation = function setRotation(rotation) {
+  this._rotation = rotation;
+  this.drawShape();
+};
+
+Text.prototype.setInModalView = function setInModalView(inModalView) {
+  this._inModalView = inModalView
+  this.drawShape();
+};
+
+Text.prototype.destroy = function destroy() {
+  this.element.remove();
+  this.handles.remove();
+  this.bkgdRect.remove();
+  if(this._linkedShapeId != -1){
+    var parentShape = this.manager.getShape(this._linkedShapeId);
+    if(parentShape){
+      parentShape.destroyTextShape()
+    }
+  }
+};
+
+// handle start of drag by selecting this shape
+// if not already selected
+Text.prototype._handleMousedown = function _handleMousedown() {
+  if (!this._selected) {
+    this.manager.selectShapes([this]);
+  }
+};
+
+Text.prototype.isSelected = function isSelected() {
+  return this._selected;
+};
+
+Text.prototype.setSelected = function setSelected(selected) {
+  if((selected && this._selected) || (!selected && !this._selected)){
+    return
+  }
+  this._selected = !!selected;
+  this.drawShape();
+};
+
+Text.prototype.intersectRegion = function intersectRegion(region) {
+  var path = this.manager.regionToPath(region, this._zoomFraction * 100);
+  var f = this._zoomFraction,
+    x = parseInt(this._x * f, 10),
+    y = parseInt(this._y * f, 10);
+
+  if (Raphael.isPointInsidePath(path, x, y)) {
+    return true;
+  }
+  var path2 = this.getPath(),
+    i = Raphael.pathIntersection(path, path2);
+  return i.length > 0;
+};
+
+Text.prototype.getPath = function getPath() {
+  var f = this._zoomFraction;
+  var x = this.bkgdRect.attr("x"),
+      y = this.bkgdRect.attr("y"),
+      width = this.bkgdRect.attr("width"),
+      height = this.bkgdRect.attr("height");
+
+  var cornerPoints = [
+    [x, y],
+    [x + width, y],
+    [x + width, y + height],
+    [x, y + height],
+  ];
+  var path = [];
+  for (var i = 0; i <= 3; i++) {
+    if (i === 0) {
+      path.push("M" + cornerPoints[0].join(","));
+    }
+    if (i < 3) {
+      path.push("L" + cornerPoints[i + 1].join(","));
+    } else {
+      path.push("Z");
+    }
+  }
+  return path.join(",");
+};
+
+
+Text.prototype.drawShape = function drawShape() {
+  var f = this._zoomFraction,
+      shapeScalingFraction = this.manager.getShapeScalingFraction(),
+      y = this._y;
+
+  this.element.attr({
+    x: this._x * f,
+    y: this._y * f,
+    fill: this._strokeColor,
+    "fill-opacity": 1,
+    "font-size": this._fontSize * shapeScalingFraction,
+    "text": this._text,
+    // text-anchor: [“start”, “middle”, “end”], default is “middle”
+    "text-anchor": this._textAnchor
+  });
+
+  // remove transform before getting bbox
+  this.element.transform("r0");
+  var bbox = this.element.getBBox();
+
+  const PADDING = 1;
+  this.bkgdRect.attr({
+    x: bbox.x - PADDING,
+    y: bbox.y,
+    width: bbox.width + 2 * PADDING,
+    height: bbox.height + PADDING/2,
+    fill: this._fillColor,
+    "fill-opacity": this._fillOpacity,
+    "stroke-width": 0,
+  })
+
+  this.bkgdRect.toFront();
+  this.element.toFront()
+
+  if(!this._inModalView){
+    let hFlip = this.manager.getHorizontalFlip();
+    let vFlip = this.manager.getVerticalFlip();
+    let textRotation = this.manager.getTextRotation();
+    let rotOriginX = (this._textAnchor === "start") ? (bbox.x) : (this._textAnchor === "end") ? (bbox.x + bbox.width) : (bbox.x + bbox.width/2);
+    let rotOriginY = (y * f);
+    this.element.transform(`r${-textRotation},${rotOriginX},${rotOriginY} s${hFlip}, ${vFlip}`);
+    this.bkgdRect.transform(`r${-textRotation},${rotOriginX},${rotOriginY} s${hFlip}, ${vFlip}`);
+  }else{
+    this.element.transform("r" + 0);
+    this.bkgdRect.transform("r" + 0);
+  }
+
+  this._area = bbox.width * bbox.height;
+
+  if (this.isSelected()) {
+    this.handles.show().toFront();
+  } else {
+    this.handles.hide();
+  }
+
+  // update Handles
+  var handleIds = this.getHandleCoords();
+  var handleColours = this.getHandleColours();
+  var hnd, h_id, hx, hy;
+  for (var i = 0, l = this.handles.length; i < l; i++) {
+    hnd = this.handles[i];
+    h_id = hnd.h_id;
+    hx = handleIds[h_id][0];
+    hy = handleIds[h_id][1];
+    hnd.attr({
+      x: hx - this.handle_wh / 2,
+      y: hy - this.handle_wh / 2,
+      fill: handleColours[h_id]
+    });
+  }
+};
+
+Text.prototype.getHandleCoords = function getHandleCoords() {
+  var bbox = this.element.getBBox();
+  var x = bbox.x,
+    y = bbox.y,
+    w = bbox.width,
+    h = bbox.height;
+
+  var handleIds = {
+    nw: [x, y],
+    n: [x + w / 2, y],
+    ne: [x + w, y],
+    w: [x, y + h / 2],
+    e: [x + w, y + h / 2],
+    sw: [x, y + h],
+    s: [x + w / 2, y + h],
+    se: [x + w, y + h],
+  };
+  return handleIds;
+};
+
+Text.prototype.getHandleColours = function getHandleColours() {
+  // Use colours to indicate text anchor - start, middle, end
+  let txtA = this._textAnchor;
+  let mark ="#000000"; // black
+  let unmark ="#FFFFFF";
+  var handleIds = {
+    nw: txtA === "start" ? mark : unmark,
+    n: txtA === "middle" ? mark : unmark,
+    ne: txtA === "end" ? mark : unmark,
+    w: txtA === "start" ? mark : unmark,
+    e: txtA === "end" ? mark : unmark,
+    sw: txtA === "start" ? mark : unmark,
+    s: txtA === "middle" ? mark : unmark,
+    se: txtA === "end" ? mark : unmark,
+  };
+  return handleIds;
+};
+
+function correct_rotation(dx, dy, rotation) {
+  if (dx === 0 && dy === 0) {
+      return {x: dx, y: dy};
+  }
+  var length = Math.sqrt(dx * dx + dy * dy),
+      ang1 = Math.atan(dy/dx);
+  if (dx < 0) {
+      ang1 = Math.PI + ang1;
+  }
+  var angr = rotation * (Math.PI/180),  // deg -> rad
+      ang2 = ang1 - angr;
+  dx = Math.cos(ang2) * length;
+  dy = Math.sin(ang2) * length;
+  return {x: dx, y: dy};
+}
+
+// ---- Create Handles -----
+Text.prototype.createHandles = function createHandles() {
+  var self = this,
+    handle_attrs = {
+      stroke: "#4b80f9",
+      fill: "#fff",
+      cursor: "default",
+      "fill-opacity": 1.0,
+    };
+
+  // map of centre-points for each handle
+  var handleIds = this.getHandleCoords();
+
+  // draw handles
+  self.handles = this.paper.set();
+  var _handle_drag = function () {
+    return function (dx, dy, mouseX, mouseY, event) {
+      dx = dx / self._zoomFraction;
+      dy = dy / self._zoomFraction;
+      // need to handle rotation...
+      if (self._rotation != 0) {
+        let xy = correct_rotation(dx, dy, self._rotation);
+        dx = xy.x;
+        dy = xy.y;
+      }
+
+      // Use dx & dy to update the location of the handle and the corresponding point of the parent
+      var new_x = this.ox + dx;
+      var new_y = this.oy + dy;
+
+      self._x = new_x;
+      self._y = new_y;
+
+      self.drawShape();
+      return false;
+    };
+  };
+  var _handle_drag_start = function () {
+    return function () {
+      // START drag: simply note the location we started
+      this.ox = this.attr("x") / self._zoomFraction;
+      this.oy = this.attr("y") / self._zoomFraction;
+      return false;
+    };
+  };
+  var _handle_drag_end = function () {
+    return function () {
+      return false;
+    };
+  };
+
+  for (var key in handleIds) {
+    var hx = handleIds[key][0];
+    var hy = handleIds[key][1];
+    var handle = this.paper
+      .rect(
+        hx - self.handle_wh / 2,
+        hy - self.handle_wh / 2,
+        self.handle_wh,
+        self.handle_wh
+      )
+      .attr(handle_attrs)
+   //   .rotate(self._rotation, cx, cy);
+    handle.attr({ cursor: key + "-resize" }); // css, E.g. ne-resize
+    handle.h_id = key;
+    handle.rect = self;
+
+    if (self.manager.canEdit) {
+      handle.drag(_handle_drag(), _handle_drag_start(), _handle_drag_end());
+    }
+    // handle.mousedown(_stop_event_propagation);
+    self.handles.push(handle);
+  }
+  self.handles.hide(); // show on selection
+};
+
+// Class for creating Text.
+var CreateText = function CreateText(options) {
+  this.paper = options.paper;
+  this.manager = options.manager;
+}
+
+CreateText.prototype.startDrag = function startDrag(startX, startY) {
+  var strokeColor = this.manager.getStrokeColor(),
+      fillColor = this.manager.getFillColor(),
+      fillOpacity = this.manager.getFillOpacity(),
+      strokeWidth = this.manager.getStrokeWidth(),
+      fontSize = this.manager.getFontSize(),
+      zoom = this.manager.getZoom(),
+      inModalView = this.manager.getInModalView(),
+      text = this.manager.getText(),
+      textAnchor = this.manager.getTextAnchor();
+
+  this.startX = startX;
+  this.startY = startY;
+
+  this.text = new Text({
+    manager: this.manager,
+    paper: this.paper,
+    zoom: zoom,
+    text: text || "Text",
+    textAnchor: textAnchor,
+    showText: true,
+    inModalView: inModalView,
+    linkedShapeId: -1,
+    x: startX,
+    y: startY,
+    fontSize: fontSize,
+    strokeColor: strokeColor,
+    strokeWidth: strokeWidth,
+    fillColor: fillColor,
+    fillOpacity: fillOpacity,
+  })
+
+};
+
+CreateText.prototype.drag = function drag(dragX, dragY, shiftKey) {
+
+};
+
+CreateText.prototype.stopDrag = function stopDrag() {
+  // on the 'new:shape' trigger, this shape will already be selected
+  this.text.setSelected(true);
+  this.manager.addShape(this.text);
+};
+
+CreateText.prototype.getShape = function getShape() {
+  return this.text;
+};
+
+export { CreateText, Text };

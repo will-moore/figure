@@ -168,7 +168,7 @@
       role="dialog"
       aria-hidden="true"
     >
-      <div class="modal-dialog" style="width: 920px; max-width: 920px;">
+      <div class="modal-dialog" style="width: 950px; max-width: 950px;">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" style="float: left; padding-right: 20px">
@@ -178,16 +178,19 @@
               Draw & edit ROIs and load ROIs from OMERO
             </p>
           </div>
-          <form class="roiModalForm" role="form">
-            <div
+          <div
             id="roi_toolbar"
             class="roi_toolbar btn-toolbar"
             role="toolbar"
             aria-label="..."
           ></div>
+          <form class="roiModalForm" role="form">
+            <div id="roi_zt_buttons" style="margin-left: 25px"></div>
             <div class="modal-body row">
               <div class="col-8">
+
                 <div id="roiViewer" class="roiViewer">
+
                   <!-- Show / add ROIs on image -->
                   <!-- <div id="roi_image" style="position: absolute"> -->
                   <img class="roi_image" style="position: absolute" />
@@ -204,41 +207,16 @@
                   >
                     <!-- svg is added here by Raphael.js -->
                   </div>
-
-                  <div
-                    id="roi_zt_buttons"
-                    style="position: absolute; top: 5px; left: 5px"
-                  ></div>
                 </div>
               </div>
-              <div id="roiModalSidebar" class="col-4" style="padding: 0">
-                <span
-                  id="roiPageControls"
-                  style="color: #999; line-height: 30px"
-                >
-                </span>
-                <div style="clear: both"></div>
-                <div style="padding: 0; height: 550px; overflow-y: auto; position: relative;">
-                  <div id="roiModalRoiList">
-                    <table
-                      style="width: 100%"
-                      class="table table-hover table-condensed"
-                    ></table>
-                  </div>
-                  <p id="roiModalTip" style="position: absolute; top: 0"></p>
-                </div>
-              </div>
+              <div id="roiModalSidebar" class="col-4" style="padding: 0"></div>
             </div>
+
             <div class="modal-footer" style="margin-top: 0">
-              <button
-                type="button"
-                class="btn btn-default"
-                data-bs-dismiss="modal"
-              >
-                Cancel
-              </button>
+              <button type="button" class="btn btn-default" data-bs-dismiss="modal">Cancel</button>
               <button type="submit" class="btn btn-primary">OK</button>
             </div>
+
           </form>
         </div>
       </div>
@@ -990,6 +968,26 @@
                 <th>Dataset ID</th>
                 <td>Dataset ID: [dataset.id]</td>
                 <td>Dataset ID: 1654</td>
+              </tr>
+              <tr>
+                <th>Well, Field</th>
+                <td>Well: [well.label], Field#[field.index]</td>
+                <td>Well: B2, Field#3</td>
+              </tr>
+              <tr>
+                <th>Run</th>
+                <td>[run.name]</td>
+                <td>Run_3_ExpB</td>
+              </tr>
+              <tr>
+                <th>Plate</th>
+                <td>[plate.name]</td>
+                <td>Plate_C2</td>
+              </tr>
+              <tr>
+                <th>Screen</th>
+                <td>[screen.name]</td>
+                <td>CRISPR_KO_Screen1</td>
               </tr>
               <tr>
                 <th>Zoom</th>

@@ -1,5 +1,3 @@
-
-
 /* Copyright (C) 2014 University of Dundee & Open Microscopy Environment.
  All rights reserved.
 
@@ -367,7 +365,6 @@
 
     .scalebar {
         position: absolute;
-        margin: 5% !important;
     }
 
     .scalebar-label {
@@ -927,6 +924,10 @@
         padding-left: 3px;
         padding-right: 3px;
     }
+    .text-group{
+        padding-left: 0px;
+        padding-right: 0px;
+    }
     .navbar-nav > li > a {
         padding-bottom: 12px;
         padding-top: 12px;
@@ -1021,6 +1022,8 @@
     .fill-color span:first-child,
     .label-color span:first-child,
     .border-color span:first-child,
+    .text-color span:first-child,
+    .text-background-color span:first-child,
     .shape-color span:first-child {
         border: solid 1px #bbb;
     }
@@ -1124,6 +1127,15 @@
         cursor:  crosshair;
         cursor:  url("../images/crop20.png") 10 10, crosshair;
         z-index: 10;
+    }
+
+    #crop_paper {
+        position: relative !important;
+        overflow: visible !important;
+        top: auto !important;
+        left: auto !important;
+        right: auto !important;
+        bottom: auto !important;
     }
 
     .roiPickMe {
@@ -1253,8 +1265,14 @@
 
     .roi_toolbar {
         overflow: visible;
-        margin: 15px;
+        margin: 25px;
         margin-bottom: 5px;
+        margin-top: 15px;
+    }
+
+    .text_toolbar {
+        overflow: hidden;
+        margin: 15px;
     }
 
     .roi_toolbar .pressed {
@@ -1284,6 +1302,10 @@
     }
     .point-icon{
         background-image: url("../images/point-icon-24.png");
+        background-position: center;
+    }
+    .text-icon{
+        background-image: url("../images/text-icon-24.png");
         background-position: center;
     }
     .polygon-icon{

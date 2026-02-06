@@ -25,6 +25,7 @@
 
 import Raphael from "raphael";
 
+
 var Rect = function Rect(options) {
   var self = this;
   this.paper = options.paper;
@@ -64,6 +65,9 @@ var Rect = function Rect(options) {
     this._zoomFraction = options.zoom / 100;
   }
   this._rotation = options.rotation || 0;
+
+  this._textId = options.textId || undefined;
+
   this.handle_wh = 6;
 
   this.element = this.paper.rect();
@@ -119,7 +123,8 @@ Rect.prototype.toJson = function toJson() {
     strokeColor: this._strokeColor,
     rotation: this._rotation,
     fillColor: this._fillColor,
-    fillOpacity: this._fillOpacity
+    fillOpacity: this._fillOpacity,
+    textId: this._textId,
   };
   if (this._id) {
     rv.id = this._id;
@@ -207,12 +212,25 @@ Rect.prototype._handleMousedown = function _handleMousedown() {
 };
 
 Rect.prototype.setSelected = function setSelected(selected) {
+  if((selected && this._selected) || (!selected && !this._selected)){
+    return
+  }
   this._selected = !!selected;
+  // IF there is a text shape, set its selected state too
+  let textShape = this.loadTextShape();
+  if (textShape) {
+    textShape.setSelected(this._selected);
+  }
   this.drawShape();
 };
 
 Rect.prototype.isSelected = function isSelected() {
   return this._selected;
+};
+
+Rect.prototype.loadTextShape = function loadTextShape(){
+  this._textShape = this.manager.getShape(this._textId);
+  return this._textShape;
 };
 
 Rect.prototype.setZoom = function setZoom(zoom) {
@@ -268,6 +286,14 @@ Rect.prototype.getStrokeWidth = function getStrokeWidth() {
   return this._strokeWidth;
 };
 
+Rect.prototype.getTextId = function getTextId() {
+  return this._textId;
+};
+
+Rect.prototype.setTextId = function setTextId(textId) {
+  this._textId = textId;
+};
+
 Rect.prototype.destroy = function destroy() {
   this.element.remove();
   this.handles.remove();
@@ -291,7 +317,7 @@ Rect.prototype.drawShape = function drawShape() {
     width: w,
     height: h,
     stroke: strokeColor,
-    "stroke-width": lineW,
+    "stroke-width": lineW * this.manager.getShapeScalingFraction(),
     fill: fillColor,
     "fill-opacity": fillOpacity
   });
@@ -370,6 +396,7 @@ Rect.prototype.createHandles = function createHandles() {
   self.handles = this.paper.set();
   var _handle_drag = function () {
     return function (dx, dy, mouseX, mouseY, event) {
+      let textShape = self.loadTextShape();
       dx = dx / self._zoomFraction;
       dy = dy / self._zoomFraction;
       // need to handle rotation...
@@ -418,15 +445,26 @@ Rect.prototype.createHandles = function createHandles() {
         // if we're dragging an 'NORTH' handle, update y and height
         newRect.y = new_y + self.handle_wh / 2;
         newRect.height = this.oheight - dy;
+        // if we have a text shape, assume it is positioned relative to the rect
+        if (textShape) {
+          textShape._y = this.text_offset_y + newRect.y;
+        }
       }
       if (this.h_id.indexOf("w") > -1) {
         // if we're dragging an 'WEST' handle, update x and width
         newRect.x = new_x + self.handle_wh / 2;
         newRect.width = this.owidth - dx;
+        if (textShape) {
+          textShape._x = this.text_offset_x + newRect.x;
+        }
       }
       // Don't allow zero sized rect.
       if (newRect.width < 1 || newRect.height < 1) {
         return false;
+      }
+
+      if (textShape) {
+        textShape.drawShape();
       }
 
       self._x = newRect.x;
@@ -446,6 +484,12 @@ Rect.prototype.createHandles = function createHandles() {
       this.owidth = self._width;
       this.oheight = self._height;
       this.aspect = self._width / self._height;
+      // Also note textShape position if relevant
+      let textShape = self.loadTextShape();
+      if (textShape) {
+        this.text_offset_x = textShape._x - self._zoomFraction - this.ox;
+        this.text_offset_y = textShape._y - self._zoomFraction - this.oy;
+      }
       return false;
     };
   };
@@ -495,12 +539,15 @@ var CreateRect = function CreateRect(options) {
 };
 
 CreateRect.prototype.startDrag = function startDrag(startX, startY) {
+  // reset the text in the manager
+  this.manager.setText("")
+  this.manager.setShowText(false)
+
   var strokeColor = this.manager.getStrokeColor(),
     strokeWidth = this.manager.getStrokeWidth(),
     fillColor = this.manager.getFillColor(),
     fillOpacity = this.manager.getFillOpacity(),
     zoom = this.manager.getZoom();
-  // Also need to get strokeWidth and zoom/size etc.
 
   this.startX = startX;
   this.startY = startY;
@@ -517,7 +564,8 @@ CreateRect.prototype.startDrag = function startDrag(startX, startY) {
     zoom: zoom,
     strokeColor: strokeColor,
     fillColor: fillColor,
-    fillOpacity: fillOpacity
+    fillOpacity: fillOpacity,
+    textId: -1,
   });
 };
 
@@ -544,12 +592,14 @@ CreateRect.prototype.drag = function drag(dragX, dragY, shiftKey) {
     dragY = (dy - this.startY) * -1;
   }
 
-  this.rect.setCoords({
+  var newCoords = {
     x: Math.min(dragX, this.startX),
     y: Math.min(dragY, this.startY),
     width: Math.abs(dx),
     height: Math.abs(dy),
-  });
+  }
+
+  this.rect.setCoords(newCoords);
   this.rect._area = Math.abs(dx) * Math.abs(dy);
 };
 

@@ -1,0 +1,51 @@
+
+<div class="btn-group me-2"
+    <% if (omeroRoiCount > 0) { %>
+        title="Load <%=omeroRoiCount%> ROIs from OMERO"
+    <% } else { %>
+        title="This image has no ROIs on the OMERO server"
+    <% } %>>
+    <button type="button" id= "loadRois" class="loadRoisBtn btn btn-success"
+        <% if (omeroRoiCount == 0) { %>
+            disabled='disabled'
+        <% } %>
+    >
+        <% if (roisLoaded) {%>
+            Refresh ROIs
+        <% } else { %>
+            Load ROIs
+        <% } %>
+    </button>
+</div>
+
+
+<div>
+    <span
+        id="roiPageControls"
+        style="color: #999; line-height: 30px"
+    >
+    </span>
+</div>
+
+<div style="clear: both"></div>
+
+<div style="padding: 0; height: 550px; overflow-y: auto; position: relative;">
+    <div id="roiModalTip", style="margin-top: 10px">
+        <span class='badge text-bg-primary'>
+            <% if (rotated) { %>
+                Warning
+            <% } else { %>
+                Tip
+            <% } %>
+        </span>
+
+        <p><%= tip %></p>
+    </div>
+
+    <div id="roiModalRoiList">
+    <table
+        style="width: 100%"
+        class="table table-hover table-condensed"
+    ></table>
+    </div>
+</div>
