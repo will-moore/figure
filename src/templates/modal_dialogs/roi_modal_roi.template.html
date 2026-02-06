@@ -38,9 +38,9 @@
             <%= roi.minT + 1 %><% if (roi.maxT !== roi.minT) print("-" + (roi.maxT + 1)); %>
         <% } %>
     </td>
-    <td style="padding-left: 0; padding-right: 0">
+    <td style="padding-left: 0; padding-right: 0; max-width: 100px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
         <% if (roi.Text !== undefined) { %>
-            <%= roi.Text.length > 15 ? roi.Text.substring(0, 15) + "..." : roi.Text %>
+            <%= roi.Text %>
         <% } %>
     </td>
     <td style="padding: 4px;">

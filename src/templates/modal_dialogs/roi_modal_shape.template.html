@@ -20,9 +20,9 @@
                 <%= shape.theT + 1 %>
             <% } %>
         </td>
-        <td>
+        <td style="padding-left: 0; padding-right: 0; max-width: 100px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
             <% if (shape.Text !== undefined) { %>
-                <%= shape.Text.length > 15 ? shape.Text.substring(0, 15) + "..." : shape.Text %>
+                <%= shape.Text %>
             <% } %>
         </td>
         <td>
