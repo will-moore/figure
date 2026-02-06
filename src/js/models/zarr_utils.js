@@ -113,32 +113,42 @@ export async function loadZarrForPanel(zarrUrl) {
     "00FFFF",
     "FFFFFF",
   ];
-  let channels = omero?.channels;
+  let chs = omero?.channels;
   let indices = {};
   if (axesNames.includes("z")) {
     indices["z"] = defaultZ;
   }
-  if (!channels) {
+  // placeholder minmax values
+  let minMaxs = _.range(sizeC).map((idx) => [0, 255]);
+  let minMaxProvided = chs && chs.every((ch) => ch.window && ch.window.min != undefined && ch.window.max != undefined);
+  if (!minMaxProvided) {
     // load smallest array to get min/max values for every channel
     let slices = omezarr.getSlices(_.range(sizeC), arr.shape, axesNames, indices, shapes[0]);
     let promises = slices.map((chSlice) => zarr.get(arr, chSlice));
     let ndChunks = await Promise.all(promises);
 
-    channels = _.range(sizeC).map((idx) => {
-      let mm = omezarr.getMinMaxValues(ndChunks[idx]);
-      return {
-        label: "Ch" + idx,
-        active: true,
-        color: default_colors[idx],
-        window: {
-          min: mm[0],
-          max: mm[1],
-          start: mm[0],
-          end: mm[1],
-        },
-      };
+    minMaxs = _.range(sizeC).map((idx) => {
+      return omezarr.getMinMaxValues(ndChunks[idx]);
     });
   }
+
+  // use channel metadata if provided, otherwise default values or values from smallest array
+  let channels = _.range(sizeC).map((idx) => {
+    let ch = chs ? chs[idx] : null;
+    let mm = [ch?.window?.min ?? minMaxs[idx][0], ch?.window?.max ?? minMaxs[idx][1]];
+
+    return {
+      label: ch?.label || "Ch" + idx,
+      active: ch?.active !== undefined ? ch.active : true,
+      color: ch?.color || default_colors[idx % default_colors.length],
+      window: {
+        min: mm[0],
+        max: mm[1],
+        start: ch?.window?.start ?? mm[0],
+        end: ch?.window?.end ?? mm[1],
+      },
+    };
+  });
 
   let deltaT = [];
   if (axesNames.includes("t")) {
