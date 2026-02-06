@@ -685,7 +685,8 @@
                                 'name': data.meta.imageName,
                                 'datasetName': data.meta.datasetName,
                                 'datasetId': data.meta.datasetId,
-                                'channels': new_channels
+                                'channels': new_channels,
+                                'parents': data.parents
                             };
 
                             // Unset to start afresh
@@ -852,7 +853,7 @@
                 right = this.get_right_panel(sel),
                 bottom = this.get_bottom_panel(sel),
                 left_x = left.get('x'),
-                right_x = right.get('x') + right.get('width'), 
+                right_x = right.get('x') + right.get('width'),
                 top_y = top.get('y'),
                 bottom_y = bottom.get('y') + bottom.get('height'),
                 grid = [],
@@ -889,7 +890,7 @@
                 }else{
                     c = {'x': left_x + left.get('width')/2, 'y': c.y + row[0].get('height')}
                     grid.push(row);
-                }               
+                }
             }
 
             // get the row id of the most left panel
@@ -899,7 +900,7 @@
                     left_panel_row = i;
                 }
             });
-            
+
             // define the spacer between images
             var spacer = left.get('width')/20;
             if (!isNaN(parseFloat(gridGap))) {
@@ -941,7 +942,7 @@
             }
 
             // set the row position (i.e. y coordinate) of each row
-            var ref_y_offset = max_h    
+            var ref_y_offset = max_h
             var rows_position = {}
             max_h = 0
             // for rows above the reference row
@@ -964,15 +965,15 @@
                     max_h = Math.max(max_h,  row[c].get('height'));
                 }
             }
-            
-            // update position of panels 
+
+            // update position of panels
             for (var [r, y] of Object.entries(rows_position)){
                 var row = grid[r];
                 var last_column_id = -1
                 for (var c=0; c<row.length; c++) {
                     let panel = row[c];
                     var closest_column = this.get_closest_column(panel, reference_grid, last_panel_width)
-										
+
                     if(closest_column >= 0){
                         // update closest_column id to take into account spare panel positions
 						if(last_column_id == closest_column){
@@ -1012,7 +1013,7 @@
                 if(current_distance < min_x_distance){
                     closest_col = col_id
                     min_x_distance = current_distance
-                } 
+                }
             }
 
             // if the panel is located far away from the last reference column,
@@ -1037,7 +1038,7 @@
                     return p;
                 } else {
                     return top_left;
-                }                
+                }
             });
         },
 
