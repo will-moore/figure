@@ -169,9 +169,9 @@ var RoiLoaderView = Backbone.View.extend({
             coords = ['x1', 'y1', 'x2', 'y2'];
         }
         coords = coords.map(function(c){
-            return c + ": " + shape[c];
+            return c + ": " + Math.round(shape[c]);
         });
-        return 'ID: ' + shape.id + ' ' + coords.join(" ")
+        return 'ID: ' + shape.id + ' ' + coords.join(" ") + (shape.Text ? (" Comment: " + shape.Text) : "");
     },
 
     render: function() {
@@ -213,6 +213,7 @@ var RoiLoaderView = Backbone.View.extend({
 
             roiJson.type = roiJson.shapes[0].type;
             roiJson.icon = roiJson.shapes[0].icon;
+            roiJson.Text = roiJson.shapes.length > 1 ? "" : roiJson.shapes[0].Text;
             roiJson.minZ = minZ;
             roiJson.maxZ = maxZ;
             roiJson.minT = minT;

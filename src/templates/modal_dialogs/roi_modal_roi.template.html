@@ -4,6 +4,7 @@
     <th></th>
     <th>Z</th>
     <th>T</th>
+    <th>Comment</th>
     <th></th>
 </tr>
 <% _.each(rois, function(roi) { %>
@@ -35,6 +36,11 @@
     <td style="padding-left: 0; padding-right: 0">
         <% if (roi.minT !== undefined) { %>
             <%= roi.minT + 1 %><% if (roi.maxT !== roi.minT) print("-" + (roi.maxT + 1)); %>
+        <% } %>
+    </td>
+    <td style="padding-left: 0; padding-right: 0">
+        <% if (roi.Text !== undefined) { %>
+            <%= roi.Text.length > 20 ? roi.Text.substring(0, 20) + "..." : roi.Text %>
         <% } %>
     </td>
     <td style="padding: 4px;">

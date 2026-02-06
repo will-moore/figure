@@ -21,6 +21,11 @@
             <% } %>
         </td>
         <td>
+            <% if (shape.Text !== undefined) { %>
+                <%= shape.Text.length > 20 ? shape.Text.substring(0, 20) + "..." : shape.Text %>
+            <% } %>
+        </td>
+        <td>
             <% if (shape.icon) { %>
             <button type="button" class="addOmeroShape btn btn-success btn-sm"
                     title="Add Shape to image">
