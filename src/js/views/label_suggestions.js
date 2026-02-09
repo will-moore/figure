@@ -100,7 +100,7 @@ const LABEL_DICTIONARY = {
     },
     "key-values": {
         label: "Key-Value Pairs",
-        keywords: ["kv", "map", "annotation"],
+        keywords: ["kv", "keyvalue", "map", "annotation"],
         options: [
             { label: "Key-Value pairs", value: "[key-values]" }
         ]
@@ -496,9 +496,9 @@ export class LabelSuggestions {
                 // Match by label, value, or keywords
                 if (!lower) {
                     filtered.push({ key: key, entry: entry });
-                } else if (entry.label.toLowerCase().includes(lower)) {
+                } else if (entry.label.toLowerCase().startsWith(lower)) {
                     filtered.push({ key: key, entry: entry });
-                } else if ((entry.keywords || []).some(function(k) { return k.includes(lower); })) {
+                } else if ((entry.keywords || []).some(function(k) { return k.startsWith(lower); })) {
                     filtered.push({ key: key, entry: entry });
                 }
             }
