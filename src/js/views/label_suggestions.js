@@ -190,12 +190,12 @@ export class LabelSuggestions {
      */
     constructor($container) {
         this.$container = $container;
-        this.have_time = false;
+        this.have_time = true;
         this.parents_flags = {
-            project: false,
-            dataset: false,
-            screen: false,
-            plate: false
+            project: true,
+            dataset: true,
+            screen: true,
+            plate: true
         };
         this.$menu = $container.find('.label-suggestions');
         this.$input = $container.find('.label-text');
