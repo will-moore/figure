@@ -651,16 +651,21 @@
                 // if none of the selected panels have time data, disable 'add_time_label's
                 var have_time = false, dTs;
                 var parents_flags = {"project": false, "dataset": false, "screen": false, "plate": false};
+                var parents_defined = false;
                 selected.forEach(function(p){
                     dTs = p.get('deltaT');
                     if (dTs && dTs.length > 0) {
                         have_time = true;
                     }
-                    Object.keys(p.get("parents")).forEach(function(parentType){
-                        if (parents_flags.hasOwnProperty(parentType)) {
-                            parents_flags[parentType] = true;
-                        }
-                    });
+                    var parents = p.get("parents");
+                    if (parents) {
+                        Object.keys(parents).forEach(function(parentType){
+                            if (parents_flags.hasOwnProperty(parentType)) {
+                                parents_flags[parentType] = true;
+                            }
+                        });
+                        parents_defined = true;
+                    }
                 });
                 if (have_time) {
                     $(".add_time_label", this.$el).removeClass('disabled');
@@ -670,7 +675,9 @@
                 // Update label suggestions with time availability
                 if (this.labelSuggestions) {
                     this.labelSuggestions.have_time = have_time;
-                    this.labelSuggestions.parents_flags = parents_flags;
+                    if (parents_defined) {
+                        this.labelSuggestions.parents_flags = parents_flags;
+                    }
                 }
             }
 
