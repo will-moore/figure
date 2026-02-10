@@ -22,6 +22,10 @@ const figureModel = new FigureModel();
 // make this global so we can access it from the browser console
 window.figureModel = figureModel;
 
+// This will be '/' unless deployed from gh-pages, when it will be '/omero-figure/'
+console.log("import.meta.env", import.meta.env)
+const BASE_URL = import.meta.env.BASE_URL.slice(1);  // remove leading slash
+console.log("BASE_URL", BASE_URL);
 const RELEASE_VERSION = import.meta.env.VITE_VERSION;
 console.log("RELEASE_VERSION", RELEASE_VERSION);
 document.getElementById("release_version").innerHTML = RELEASE_VERSION;
@@ -73,27 +77,13 @@ var undoManager = new UndoManager({ figureModel: figureModel }),
 // Finally, start listening for changes to panels
 undoManager.listenToCollection(figureModel.panels);
 
-
-let routes = {
-  "": "index",
-  "new(/)": "newFigure",
-  "recover(/)": "recoverFigure",
-  "open(/)": "openFigure",
-  "file/:id(/)": "loadFigure",
-};
-
-if (!APP_SERVED_BY_OMERO) {
-  // vite.config.js has base: "/omero-figure/"
-  // so we deploy with gh-pages to https://ome.github.io/omero-figure/
-  routes = {
-    "omero-figure(/)": "index",
-    "omero-figure/new(/)": "newFigure",
-    "omero-figure/recover(/)": "recoverFigure",
-    "omero-figure/open(/)": "openFigure",
-    // only for development
-    "omero-figure/file/:id(/)": "loadFigure",
-  };
-}
+// All routes based on BASE_URL, which is either '/' or '/omero-figure/' depending on deployment
+let routes = {};
+routes[`${BASE_URL}(/)`] = "index";
+routes[`${BASE_URL}new(/)`] = "newFigure";
+routes[`${BASE_URL}recover(/)`] = "recoverFigure";
+routes[`${BASE_URL}open(/)`] = "openFigure";
+routes[`${BASE_URL}file/:id(/)`] = "loadFigure";
 
 var FigureRouter = Backbone.Router.extend({
   routes: routes,

@@ -1,8 +1,9 @@
+import { defineConfig } from "vite";
 import injectHTML from 'vite-plugin-html-inject';
 
 const path = require('path')
 
-export default {
+let config = {
   root: path.resolve(__dirname, 'src'),
   plugins: [injectHTML()],
   resolve: {
@@ -24,5 +25,11 @@ export default {
   },
 
   assetsInclude: ["**/*.template.html"],
-  base: "/omero-figure/"
 }
+
+// this will be undefined when deployed from netlify, but is used by gh-pages
+if (process.env.GITHUB_REPOSITORY_OWNER) {
+  config.base = "/omero-figure/";
+}
+
+export default defineConfig(config);
