@@ -92,20 +92,25 @@
                 self.model.set('curr_zoom', event.target.value);
             });
 
-            // enable export (script is available)
-            if (EXPORT_ENABLED) {
-                $("button.export_pdf").removeAttr("disabled");
-                // check script version
-                if (SCRIPT_VERSION != RELEASE_VERSION) {
+            if (APP_SERVED_BY_OMERO) {
+                // enable export (script is available)
+                if (EXPORT_ENABLED) {
+                    $("button.export_pdf").removeAttr("disabled");
+                    // check script version
+                    if (SCRIPT_VERSION != RELEASE_VERSION) {
+                        $(".script_version_warning").show()
+                        .attr("title", "Script Version Warning");
+                    }
+                } else if (IS_ADMIN) {
                     $(".script_version_warning").show()
-                    .attr("title", "Script Version Warning");
+                        .attr("title", "Script missing! Click to Upload...");
+                } else {
+                    $(".script_version_warning").show()
+                        .attr("title", "Export script not installed. Contact your OMERO administrator.");
                 }
-            } else if (IS_ADMIN) {
-                $(".script_version_warning").show()
-                    .attr("title", "Script missing! Click to Upload...");
             } else {
-                $(".script_version_warning").show()
-                    .attr("title", "Export script not installed. Contact your OMERO administrator.");
+                // enable export (no script needed in stand-alone)
+                $("button.export_pdf").removeAttr("disabled");
             }
 
             // if we're NOT served by OMERO, hide elements such as Delete and Chgrp menu-items
@@ -296,17 +301,9 @@
             event.preventDefault();
 
             // Status is indicated by showing / hiding 3 buttons
-            var figureModel = this.model,
-                $create_figure_pdf = $(event.target),
+            var $create_figure_pdf = $(event.target),
                 export_opt = $create_figure_pdf.attr('data-export-option'),
-                $pdf_inprogress = $("#pdf_inprogress"),
-                $pdf_download = $("#pdf_download"),
-                $script_error = $("#script_error"),
                 exportOption = "PDF";
-            $create_figure_pdf.hide();
-            $pdf_download.hide();
-            $script_error.hide();
-            $pdf_inprogress.show();
 
             // Map from HTML to script options
             const opts = {"PDF": "PDF",
@@ -316,11 +313,30 @@
                 "to OMERO": "OMERO"};
             exportOption = opts[export_opt];
 
+            if (!APP_SERVED_BY_OMERO) {
+                let title = "Figure Export Options";
+                let buttons = ["OK"];
+                let message = `The standalone app doesn't support export to PDF.
+                <p>You can download the figure via 'Save' and run the Figure_To_Pdf.py python script locally. TODO: add link & instructions.</p>`;
+
+                figureConfirmDialog(title, message, buttons);
+                return;
+            }
+
+            var url = MAKE_WEBFIGURE_URL;
+            this.run_export_script(url, exportOption);
+        },
+
+        run_export_script: function(url, exportOption) {
+
+            let $pdf_inprogress = $("#pdf_inprogress").show();
+            let $create_figure_pdf = $(".export_pdf").hide();
+            let $pdf_download = $("#pdf_download").hide();
+            let $script_error = $("#script_error").hide();
+
             // Get figure as json
             var figureJSON = this.model.figure_toJSON();
-
-            var url = MAKE_WEBFIGURE_URL,
-                data = {
+            var data = {
                     figureJSON: JSON.stringify(figureJSON),
                     exportOption: exportOption,
                 };
@@ -391,6 +407,10 @@
                         });
 
                 }, 1000);
+            }).fail(function(err) {
+                alert("Error starting export script", err);
+                $create_figure_pdf.show();
+                $pdf_inprogress.hide();
             });
         },
 
