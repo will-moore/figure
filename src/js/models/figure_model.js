@@ -716,7 +716,7 @@
                             }
 
                             panel.set(newData);
-                            panel.trigger('change:labels');
+                            panel.trigger('change:labels', panel);
                         }
                     });
                 });
