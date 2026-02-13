@@ -704,6 +704,7 @@
                                 if (data.pixel_size.valueX) {
                                     newData.pixel_size_x = data.pixel_size.valueX;
                                     newData.pixel_size_x_symbol = data.pixel_size.symbolX;
+                                    newData.pixel_size_x_unit = data.pixel_size.unitX;
                                 }
                                 if (data.pixel_size.valueY) {
                                     newData.pixel_size_y = data.pixel_size.valueY;
@@ -712,6 +713,7 @@
                                 if (data.pixel_size.valueZ) {
                                     newData.pixel_size_z = data.pixel_size.valueZ;
                                     newData.pixel_size_z_symbol = data.pixel_size.symbolZ;
+                                    newData.pixel_size_z_unit = data.pixel_size.unitZ;
                                 }
                             }
 
