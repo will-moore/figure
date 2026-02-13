@@ -147,7 +147,7 @@
                                 let txtShape = shape;
                                 // apply any translation and rotation to Text
                                 let newCoords = {x: txtShape.x, y: txtShape.y};
-                                // If the Inset was previously rotated, we need to 'undo' that rotation first 
+                                // If the Inset was previously rotated, we need to 'undo' that rotation first
                                 if (prevCoords.rotation && prevCoords.rotation != 360) {
                                     let prevCx = prevCoords.x + prevCoords.width / 2;
                                     let prevCy = prevCoords.y + prevCoords.height / 2;
@@ -267,34 +267,23 @@
                 'orig_height': data.orig_height,
                 'datasetName': data.datasetName,
                 'datasetId': data.datasetId,
+                'pixel_size_x': data.pixel_size_x,
+                'pixel_size_y': data.pixel_size_y,
+                'pixel_size_z': data.pixel_size_z,
+                'pixel_size_x_symbol': data.pixel_size_x_symbol,
+                'pixel_size_z_symbol': data.pixel_size_z_symbol,
+                'pixel_size_x_unit': data.pixel_size_x_unit,
+                'pixel_size_z_unit': data.pixel_size_z_unit,
                 'deltaT': data.deltaT,
                 'parents': data.parents
             };
 
-            // Unset to start afresh
-            this.unset('pixel_size_x');
-            this.unset('pixel_size_y');
-            this.unset('pixel_size_z');
-            this.unset('pixel_size_x_symbol');
-            this.unset('pixel_size_z_symbol');
-            this.unset('pixel_size_x_unit');
-            this.unset('pixel_size_z_unit');
-            newData.pixel_size_x_unit = 'MICROMETER';  // Set back to panel model default
-            newData.pixel_size_x_symbol = '\xB5m'; // µm
-
-            if (data.pixel_size) {
-                if (data.pixel_size.valueX) {
-                    newData.pixel_size_x = data.pixel_size.valueX;
-                    newData.pixel_size_x_symbol = data.pixel_size.symbolX;
-                }
-                if (data.pixel_size.valueY) {
-                    newData.pixel_size_y = data.pixel_size.valueY;
-                    newData.pixel_size_y_symbol = data.pixel_size.symbolY;
-                }
-                if (data.pixel_size.valueZ) {
-                    newData.pixel_size_z = data.pixel_size.valueZ;
-                    newData.pixel_size_z_symbol = data.pixel_size.symbolZ;
-                }
+            if (data.pixel_size_x == undefined ||
+                data.pixel_size_x_unit == undefined ||
+                data.pixel_size_x_symbol == undefined) {
+                // Set back to panel model default
+                newData.pixel_size_x_unit = 'MICROMETER';
+                newData.pixel_size_x_symbol = '\xB5m'; // µm
             }
 
             // theT and theZ are not changed unless we have to...
