@@ -613,8 +613,17 @@
                 }
             } else {
                 // project, dataset, screen, plate, well, field (name, id, label, index)
-                var parentVal = this.get("parents")?.[property]?.[format];
-                text = parentVal == null ? "undefined" : "" + parentVal;
+                if (this.get("parents") == null && property === "dataset"){
+                    // fallback on old property
+                    if (format === "id") {
+                        text = ""+this.get('datasetId');
+                    } else if (format === "name") {
+                        text = this.get('datasetName') ? this.get('datasetName') : "No/Many Datasets";
+                    }
+                } else {
+                    var parentVal = this.get("parents")?.[property]?.[format];
+                    text = parentVal == null ? "undefined" : "" + parentVal;
+                }
             }
             return text;
         },
