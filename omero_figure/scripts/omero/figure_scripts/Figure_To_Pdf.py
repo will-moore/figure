@@ -2329,13 +2329,7 @@ class FigureExport(object):
             next_scale_x = next_size_x / orig_width
             expected_next_size = region_width * next_scale_x
             # if next level is closer to target size, use it
-            print(" level %d: size_x %d, expected_size %.1f" %
-                  (level, current_size_x, expected_size))
-            print("target_size %d" % (target_size))
-            print("nxt", expected_next_size - target_size, "curr", expected_size - target_size)
             if abs(expected_next_size - target_size) < abs(expected_size - target_size):
-                print("  picking next level %d: size_x %d, expected_size %.1f" %
-                        (level + 1, next_size_x, expected_next_size))
                 img_data = pyramid[level + 1]
 
         size_x = img_data.shape[-1]
