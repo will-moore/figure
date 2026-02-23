@@ -41,6 +41,10 @@
       const MAX_PLANE_SIZE = 10188864;
       const MAX_PROJECTION_BYTES = 1024 * 1024 * 256;
 
+      // Max active channels for multi-channel images
+      const MAX_ACTIVE_CHANNELS = 10;
+      window.MAX_ACTIVE_CHANNELS = MAX_ACTIVE_CHANNELS;
+
       const LOCAL_STORAGE_RECOVERED_FIGURE = "recoveredFigure" + USER_ID;
 
       // Hack! Since the iviewer openwith.js evaluates in global scope and it
