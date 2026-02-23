@@ -133,6 +133,7 @@
             "click .upload_omero_script": "upload_omero_script",
             "click .export_options li": "export_options",
             "click .add_panel": "addPanel",
+            "click .reload_metadata": "reloadMetadata",
             "click .delete_panel": "deleteSelectedPanels",
             "click .copy": "copy_selected_panels",
             "click .paste": "paste_panels",
@@ -730,6 +731,12 @@
             event.preventDefault();
             if (this.modal_visible()) return true;
             this.model.select_all();
+        },
+
+        reloadMetadata: function(event) {
+            event.preventDefault();
+            if (this.modal_visible()) return true;
+            this.model.reloadMetadata();
         },
 
         deleteSelectedPanels: function(event) {

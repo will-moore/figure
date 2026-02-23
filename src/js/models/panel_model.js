@@ -147,7 +147,7 @@
                                 let txtShape = shape;
                                 // apply any translation and rotation to Text
                                 let newCoords = {x: txtShape.x, y: txtShape.y};
-                                // If the Inset was previously rotated, we need to 'undo' that rotation first 
+                                // If the Inset was previously rotated, we need to 'undo' that rotation first
                                 if (prevCoords.rotation && prevCoords.rotation != 360) {
                                     let prevCx = prevCoords.x + prevCoords.width / 2;
                                     let prevCy = prevCoords.y + prevCoords.height / 2;
@@ -277,6 +277,14 @@
                 'deltaT': data.deltaT,
                 'parents': data.parents
             };
+
+            if (data.pixel_size_x == undefined ||
+                data.pixel_size_x_unit == undefined ||
+                data.pixel_size_x_symbol == undefined) {
+                // Set back to panel model default
+                newData.pixel_size_x_unit = 'MICROMETER';
+                newData.pixel_size_x_symbol = '\xB5m'; // µm
+            }
 
             // theT and theZ are not changed unless we have to...
             if (this.get('theT') >= newData.sizeT) {
@@ -605,8 +613,17 @@
                 }
             } else {
                 // project, dataset, screen, plate, well, field (name, id, label, index)
-                var parentVal = this.get("parents")?.[property]?.[format];
-                text = parentVal == null ? "undefined" : "" + parentVal;
+                if (this.get("parents") == null && property === "dataset"){
+                    // fallback on old property
+                    if (format === "id") {
+                        text = ""+this.get('datasetId');
+                    } else if (format === "name") {
+                        text = this.get('datasetName') ? this.get('datasetName') : "No/Many Datasets";
+                    }
+                } else {
+                    var parentVal = this.get("parents")?.[property]?.[format];
+                    text = parentVal == null ? "undefined" : "" + parentVal;
+                }
             }
             return text;
         },
