@@ -24,7 +24,7 @@ window.figureModel = figureModel;
 
 // This will be '/' unless deployed from gh-pages, when it will be '/omero-figure/'
 console.log("import.meta.env", import.meta.env)
-const BASE_URL = import.meta.env.BASE_URL.slice(1);  // remove leading slash
+window.BASE_URL = import.meta.env.BASE_URL.slice(1);  // remove leading slash
 console.log("BASE_URL", BASE_URL);
 const RELEASE_VERSION = import.meta.env.VITE_VERSION;
 console.log("RELEASE_VERSION", RELEASE_VERSION);

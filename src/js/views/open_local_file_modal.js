@@ -61,7 +61,7 @@ export const OpenLocalFileModalView = Backbone.View.extend({
         } else if (figureFileUrl) {
             console.log("/omero-figure/?file=" + figureFileUrl);
             // go to ?file=figureFileUrl
-            this.app.navigate("/omero-figure/?file=" + figureFileUrl, {trigger: true});
+            this.app.navigate(`${BASE_URL}?file=${figureFileUrl}`, {trigger: true});
         }
         hideModal("openLocalFileModal");
         return false;

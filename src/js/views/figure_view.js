@@ -485,7 +485,7 @@
                 self.model.clearFigure();
                 self.addImagesModal.modal.show();
                 // navigate will be ignored if we're already on /new
-                self.app.navigate("new/", {trigger: true});
+                self.app.navigate(BASE_URL + "new/", {trigger: true});
             };
 
             if (this.model.get("unsaved")) {
@@ -521,7 +521,7 @@
                     $.post( BASE_WEBFIGURE_URL + "delete_web_figure/", { fileId: fileId})
                         .done(function(){
                             self.figureFiles.removeFile(fileId);
-                            self.app.navigate("", {trigger: true});
+                            self.app.navigate(BASE_URL, {trigger: true});
                         });
                 }
             }
@@ -618,7 +618,7 @@
 
             var nav = function(data){
                 // Update URL to new file (with ID)
-                self.app.navigate("file/"+data);
+                self.app.navigate(`${BASE_URL}file/${data}`);
                 // in case you've Saved a copy of a file you can't edit
                 self.model.set('canEdit', true);
             };
