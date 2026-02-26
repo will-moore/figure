@@ -652,9 +652,8 @@ class ShapeToPilExport(ShapeExport):
         self.scale = pil_img.size[0] / crop['width']
         self.draw = ImageDraw.Draw(pil_img)
 
-        if omero_installed:
-            from omero.gateway import THISPATH
-            self.GATEWAYPATH = THISPATH
+        from omero.gateway import THISPATH
+        self.GATEWAYPATH = THISPATH
 
         super(ShapeToPilExport, self).__init__(panel)
 
@@ -713,15 +712,12 @@ class ShapeToPilExport(ShapeExport):
         # bump up alpha a bit to make text more readable
         rgba = (r, g, b, int(128 + a / 2))
         font_name = "FreeSans.ttf"
-        if omero_installed:
-            path_to_font = os.path.join(self.GATEWAYPATH, "pilfonts", font_name)
-            try:
-                font = ImageFont.truetype(path_to_font, size)
-            except Exception:
-                font = ImageFont.load(
-                    '%s/pilfonts/B%0.2d.pil' % (self.GATEWAYPATH, size))
-        else:
-            font = ImageFont.load_default()
+        path_to_font = os.path.join(self.GATEWAYPATH, "pilfonts", font_name)
+        try:
+            font = ImageFont.truetype(path_to_font, size)
+        except Exception:
+            font = ImageFont.load(
+                '%s/pilfonts/B%0.2d.pil' % (self.GATEWAYPATH, size))
         box = font.getbbox(text)
         width = box[2] - box[0]
         height = box[3] - box[1]
@@ -2915,9 +2911,8 @@ class TiffExport(FigureExport):
 
         super(TiffExport, self).__init__(conn, script_params, export_images)
 
-        if omero_installed:
-            from omero.gateway import THISPATH
-            self.GATEWAYPATH = THISPATH
+        from omero.gateway import THISPATH
+        self.GATEWAYPATH = THISPATH
 
         self.ns = "omero.web.figure.tiff"
         self.mimetype = "image/tiff"
@@ -2928,8 +2923,6 @@ class TiffExport(FigureExport):
 
     def get_font(self, fontsize, bold=False, italics=False):
         """ Try to load font from known location in OMERO """
-        if not omero_installed:
-            return ImageFont.load_default()
         font_name = "FreeSans.ttf"
         if bold and italics:
             font_name = "FreeSansBoldOblique.ttf"
