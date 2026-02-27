@@ -41,6 +41,7 @@ var Line = function Line(options) {
   this._y2 = options.y2;
   this._strokeColor = options.strokeColor;
   this._strokeWidth = options.strokeWidth || 2;
+  this._textId = options.textId || undefined;
   this._area =
     Math.pow(
       Math.pow(this._x2 - this._x1, 2) + Math.pow(this._y2 - this._y1, 2),
@@ -113,6 +114,9 @@ Line.prototype.toJson = function toJson() {
   };
   if (this._id) {
     rv.id = this._id;
+  }
+  if (this._textId) {
+    rv.textId = this._textId;
   }
   return rv;
 };
@@ -278,6 +282,11 @@ Line.prototype.drawShape = function drawShape() {
 
 Line.prototype.setSelected = function setSelected(selected) {
   this._selected = !!selected;
+  // IF there is a text shape, set its selected state too
+  let textShape = this.manager.getShape(this._textId);
+  if (textShape) {
+    textShape.setSelected(this._selected);
+  }
   this.drawShape();
 };
 

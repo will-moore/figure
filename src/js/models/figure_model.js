@@ -463,7 +463,7 @@
                 // show the confirm dialog...
                 let buttons = ["Don't Save", saveBtnTxt];
                 if (allowCancel) {
-                    buttons = ["Canel"].concat(buttons);
+                    buttons = ["Cancel"].concat(buttons);
                 }
                 figureConfirmDialog(
                     "Save Changes to Figure?",
