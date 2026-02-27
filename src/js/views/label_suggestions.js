@@ -112,6 +112,11 @@ const LABEL_DICTIONARY = {
         keywords: ["scale", "percent"],
         hint: "The current zoom level percentage."
     },
+    "rotation": {
+        label: "Rotation (°)",
+        keywords: ["degree", "angle"],
+        hint: "The current rotation in degrees."
+    },
     "image": {
         label: "Image",
         keywords: ["name", "id", "filename"],
