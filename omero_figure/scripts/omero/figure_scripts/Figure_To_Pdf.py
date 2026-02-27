@@ -1489,18 +1489,34 @@ class FigureExport(object):
                     # Escaping "_" for markdown
                     label_value = label_value.replace("_", "\\_")
 
-                elif prop_nf[0] == "dataset":
-                    format = prop_nf[1] if len(prop_nf) > 1 else "name"
-                    if format == "name":
-                        if panel['datasetName']:
-                            label_value = panel['datasetName']
+                elif prop_nf[0] in ["dataset", "project", "plate", "screen",
+                                    "run", "acquisition", "well",
+                                    "field", "wellsample"]:
+
+                    default_frmt = "name"  # default property format
+                    if prop_nf[0] == "well":
+                        default_frmt = "label"
+                    if prop_nf[0] == "field":
+                        default_frmt = "index"
+                        prop_nf[0] = "wellsample"  # Also handle aliases
+                    if prop_nf[0] == "run":
+                        prop_nf[0] = "acquisition"
+
+                    format = prop_nf[1] if len(prop_nf) > 1 else default_frmt
+
+                    if format in ["id", default_frmt]:
+                        parent = panel.get("parents", {}).get(prop_nf[0], {})
+                        if parent:
+                            label_value = str(
+                                parent.get(format, '')
+                            )
                         else:
-                            label_value = "No/Many Datasets"
-                    elif format == "id":
-                        if panel['datasetId']:
-                            label_value = str(panel['datasetId'])
-                        else:
-                            label_value = "null"
+                            # undefined value for valid format
+                            # e.g the screen id of an image in a dataset
+                            label_value = 'undefined'
+                    else:
+                        # Unknown format, will use original [label]
+                        label_value = ''
                     # Escaping "_" for markdown
                     label_value = label_value.replace("_", "\\_")
 
