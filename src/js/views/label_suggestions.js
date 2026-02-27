@@ -144,13 +144,13 @@ const LABEL_DICTIONARY = {
         ],
         hint: "The name or ID of the image's project."
     },
-    "wellsample": {
-        label: "WellSample",
-        keywords: ["index", "id", "sample"],
+    "field": {
+        label: "Field / Well Sample",
+        keywords: ["index", "id", "sample", "wellsample"],
         options: [
-            { label: "WellSample ID", value: "[wellsample.id]", hint: "Well sample ID of the image." },
-            { label: "WellSample Index", value: "[wellsample.index]", hint: "Well sample index of the image within the whole plate." },
-            { label: "WellSample Run Index", value: "[wellsample.index_run]", hint: "Well sample index of the image within its run." }
+            { label: "Field ID", value: "[field.id]", hint: "Field ID of the image." },
+            { label: "Field Index", value: "[field.index]", hint: "Field index of the image within the whole plate." },
+            { label: "Field Run Index", value: "[field.index_run]", hint: "Field index of the image within its run." }
         ],
         hint: "The name or index of the image's WellSample within the whole plate or the run."
     },
@@ -164,7 +164,7 @@ const LABEL_DICTIONARY = {
         hint: "The name or ID of the image's Well."
     },
     "run": {
-        label: "Run",
+        label: "Run / Plate Acquisition",
         keywords: ["plateacquisition", "name", "id", "acquisition"],
         options: [
             { label: "Run ID", value: "[run.id]", hint: "The ID of the current Run." },
