@@ -8,7 +8,8 @@
         clearFigureFromStorage,
         figureConfirmDialog,
         getJson,
-        saveFigureToStorage} from "../views/util";
+        saveFigureToStorage,
+        normalizeZProjectionBounds} from "../views/util";
 
     // Version of the json file we're saving.
     // This only needs to increment when we make breaking changes (not linked to release versions.)
@@ -105,6 +106,20 @@
 
             _.each(data.panels, function(p){
                 p.selected = false;
+
+                // If one of z_start, z_end or z_projection is defined, ensure that they are within bounds
+                if (p.z_start !== undefined || p.z_end !== undefined || p.z_projection !== undefined) {
+                    var normalized = normalizeZProjectionBounds(
+                        p.z_start,
+                        p.z_end,
+                        p.z_projection,
+                        p.sizeZ
+                    );
+                    p.z_projection = normalized.z_projection;
+                    p.z_start = normalized.z_start;
+                    p.z_end = normalized.z_end;
+                }
+
                 self.panels.create(p);
             });
 

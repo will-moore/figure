@@ -309,3 +309,30 @@ export function updateRoiIds(panelsJson) {
 
     return updatedPanels;
 }
+
+// Normalize z-projection bounds to be within [0, sizeZ-1] and ensure start <= end
+// Takes z_start, z_end, z_projection values and sizeZ, returns normalized bounds
+// If sizeZ is 1, disables z_projection and resets to 0
+export function normalizeZProjectionBounds(z_start, z_end, z_projection, sizeZ) {
+    var result = {
+        z_projection: (z_projection === undefined) ? false : z_projection,
+        z_start: (z_start === undefined) ? 0 : z_start,
+        z_end: (z_end === undefined) ? 0 : z_end
+    };
+
+    if (sizeZ === 1) {
+        result.z_projection = false;
+        result.z_start = 0;
+        result.z_end = 0;
+    } else {
+        // bounds checking and ensures start <= end
+        result.z_end = Math.max(Math.min(result.z_end, sizeZ - 1), 0);
+        result.z_start = Math.max(Math.min(result.z_start, sizeZ - 1), 0);
+        if (result.z_start > result.z_end) {
+            var tmp = result.z_start;
+            result.z_start = result.z_end;
+            result.z_end = tmp;
+        }
+    }
+    return result;
+}
