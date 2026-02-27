@@ -12,7 +12,7 @@ const SEPARATOR_CHARS = ", ;:";  // Characters that separate label segments
 const LABEL_DICTIONARY = {
     "channels": {
         label: "Channels",
-        keywords: ["labels", "separate", "single"],
+        keywords: ["labels", "separate", "single", "color"],
         options: [
             { label: "Single label", value: "[channels]", hint: "All active channel labels together in one line" },
             { label: "Separate labels - ⚠ overwrites input", value: "[channels labels]", hint: "Will generate one label per active channel." }
@@ -21,7 +21,7 @@ const LABEL_DICTIONARY = {
     },
     "time": {
         label: "Time",
-        keywords: ["t", "timestamp"],
+        keywords: ["t", "timestamp", "frame", "hours", "minutes", "seconds", "milliseconds"],
         options: [
             { label: "Index", value: "[time.index]", hint: "The timepoint index (1-based) of the current frame" },
             { label: "Milliseconds", value: "[time.ms]", hint: "The time in milliseconds for the current frame" },
@@ -39,7 +39,7 @@ const LABEL_DICTIONARY = {
     },
     "z": {
         label: "Z Coordinate",
-        keywords: ["stack", "slice", "pixel", "unit"],
+        keywords: ["stack", "slice", "pixel", "unit", "coordinate"],
         options: [
             { label: "Pixel", value: "[z.pixel]", hint: "The Z coordinate in pixels for the current slice." },
             { label: "Unit", value: "[z.unit]", hint: "The Z coordinate in physical size units for the current slice." }
@@ -51,7 +51,7 @@ const LABEL_DICTIONARY = {
     },
     "x": {
         label: "X Coordinate",
-        keywords: ["position", "pixel", "unit"],
+        keywords: ["position", "pixel", "unit", "coordinate"],
         options: [
             { label: "Pixel", value: "[x.pixel]", hint: "The X coordinate in pixels." },
             { label: "Unit", value: "[x.unit]", hint: "The X coordinate in physical size." }
@@ -63,7 +63,7 @@ const LABEL_DICTIONARY = {
     },
     "y": {
         label: "Y Coordinate",
-        keywords: ["position", "pixel", "unit"],
+        keywords: ["position", "pixel", "unit", "coordinate"],
         options: [
             { label: "Pixel", value: "[y.pixel]", hint: "The Y coordinate in pixels." },
             { label: "Unit", value: "[y.unit]", hint: "The Y coordinate in physical size." }
@@ -75,7 +75,7 @@ const LABEL_DICTIONARY = {
     },
     "width": {
         label: "Width",
-        keywords: ["length", "size", "pixel", "unit"],
+        keywords: ["length", "size", "pixel", "unit", "coordinate"],
         options: [
             { label: "Pixel", value: "[width.pixel]", hint: "The width in pixels" },
             { label: "Unit", value: "[width.unit]", hint: "The width in physical size." }
@@ -87,7 +87,7 @@ const LABEL_DICTIONARY = {
     },
     "height": {
         label: "Height",
-        keywords: ["length", "size", "pixel", "unit"],
+        keywords: ["length", "size", "pixel", "unit", "coordinate"],
         options: [
             { label: "Pixel", value: "[height.pixel]", hint: "The height in pixels" },
             { label: "Unit", value: "[height.unit]", hint: "The height in physical size." }
@@ -141,7 +141,7 @@ const LABEL_DICTIONARY = {
     },
     "wellsample": {
         label: "WellSample",
-        keywords: ["index", "id"],
+        keywords: ["index", "id", "sample"],
         options: [
             { label: "WellSample ID", value: "[wellsample.id]", hint: "Well sample ID of the image." },
             { label: "WellSample Index", value: "[wellsample.index]", hint: "Well sample index of the image within the whole plate." },
@@ -160,7 +160,7 @@ const LABEL_DICTIONARY = {
     },
     "run": {
         label: "Run",
-        keywords: ["plateacquisition", "name", "id"],
+        keywords: ["plateacquisition", "name", "id", "acquisition"],
         options: [
             { label: "Run ID", value: "[run.id]", hint: "The ID of the current Run." },
             { label: "Run Name", value: "[run.name]", hint: "The name of the current Run." }
