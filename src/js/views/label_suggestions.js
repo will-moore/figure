@@ -15,7 +15,7 @@ const LABEL_DICTIONARY = {
         keywords: ["labels", "separate", "single", "color"],
         options: [
             { label: "Single label", value: "[channels]", hint: "All active channel labels together in one line" },
-            { label: "Separate labels - ⚠ overwrites input", value: "[channels labels]", hint: "Will generate one label per active channel." }
+            { label: "Separate labels - ⚠ overwrites input", value: "[channels labels]", hint: "Will generate one label per active channel.", preformatted: true }
         ],
         hint: "The name of the active channels."
     },
@@ -54,7 +54,8 @@ const LABEL_DICTIONARY = {
         keywords: ["position", "pixel", "unit", "coordinate"],
         options: [
             { label: "Pixel", value: "[x.pixel]", hint: "The X coordinate in pixels." },
-            { label: "Unit", value: "[x.unit]", hint: "The X coordinate in physical size." }
+            { label: "Unit", value: "[x.unit]", hint: "The X coordinate in physical size." },
+            { label: "X & Y - ⚠ overwrites input", value: "X: [x.pixel] - Y: [y.pixel]", hint: "Preformatted X & Y coordinates in pixels.", preformatted: true }
         ],
         extraOptions: [
             { key: "precision", default: "2", hint: "Unit only. Number of decimal places to show." },
@@ -66,7 +67,8 @@ const LABEL_DICTIONARY = {
         keywords: ["position", "pixel", "unit", "coordinate"],
         options: [
             { label: "Pixel", value: "[y.pixel]", hint: "The Y coordinate in pixels." },
-            { label: "Unit", value: "[y.unit]", hint: "The Y coordinate in physical size." }
+            { label: "Unit", value: "[y.unit]", hint: "The Y coordinate in physical size." },
+            { label: "X & Y - ⚠ overwrites input", value: "X: [x.pixel] - Y: [y.pixel]", hint: "Preformatted X & Y coordinates in pixels.", preformatted: true }
         ],
         extraOptions: [
             { key: "precision", default: "2", hint: "Unit only. Number of decimal places to show." },
@@ -100,12 +102,14 @@ const LABEL_DICTIONARY = {
     "tags": {
         label: "Tags - ⚠ overwrites input",
         keywords: ["annotation"],
-        hint: "⚠ Clears other inputs. All tags for the current image as separate labels (including the tags of the parent objects)."
+        hint: "⚠ Clears other inputs. All tags for the current image as separate labels (including the tags of the parent objects).",
+        preformatted: true
     },
     "key-values": {
         label: "Key-Value Pairs - ⚠ overwrites input",
         keywords: ["kv", "keyvalue", "map", "annotation"],
-        hint: "⚠ Clears other inputs. Opens a menu to select a key-value pair on the image or its parent objects."
+        hint: "⚠ Clears other inputs. Opens a menu to select a key-value pair on the image or its parent objects.",
+        preformatted: true
     },
     "zoom": {
         label: "Zoom level (%)",
@@ -150,7 +154,8 @@ const LABEL_DICTIONARY = {
         options: [
             { label: "Field ID", value: "[field.id]", hint: "Field ID of the image." },
             { label: "Field Index", value: "[field.index]", hint: "Field index of the image within the whole plate." },
-            { label: "Field Run Index", value: "[field.index_run]", hint: "Field index of the image within its run." }
+            { label: "Field Run Index", value: "[field.index_run]", hint: "Field index of the image within its run." },
+            { label: "Well and Field - ⚠ overwrites input", value: "[well.label], Field#[field.index]", hint: "Preformatted option.", preformatted: true }
         ],
         hint: "The name or index of the image's WellSample within the whole plate or the run."
     },
@@ -159,7 +164,8 @@ const LABEL_DICTIONARY = {
         keywords: ["label", "id", "name"],
         options: [
             { label: "Well ID", value: "[well.id]", hint: "The ID of the image's Well." },
-            { label: "Well Label", value: "[well.label]", hint: "The label of the image's Well." }
+            { label: "Well Label", value: "[well.label]", hint: "The label of the image's Well." },
+            { label: "Well and Field - ⚠ overwrites input", value: "[well.label], Field#[field.index]", hint: "Preformatted option.", preformatted: true }
         ],
         hint: "The name or ID of the image's Well."
     },
@@ -191,6 +197,20 @@ const LABEL_DICTIONARY = {
         hint: "The name or ID of the image's Screen."
     }
 };
+
+var preformatted_label_options = new Set();
+Object.keys(LABEL_DICTIONARY).forEach(function(key) {
+    var entry = LABEL_DICTIONARY[key];
+    if (entry.preformatted) {
+        preformatted_label_options.add("[" + key + "]");
+    } else if (entry.options) {
+        entry.options.forEach(function(opt) {
+            if (opt.preformatted) {
+                preformatted_label_options.add(opt.value);
+            }
+        });
+    }
+});
 
 export class LabelSuggestions {
     /**
@@ -638,7 +658,7 @@ export class LabelSuggestions {
      * any text that was after the cursor (suffix).
      */
     handle_suggestion_click(value, extra_option, default_value) {
-        if (["[tags]", "[key-values]", "[channels labels]"].indexOf(value) !== -1) {
+        if (preformatted_label_options.has(value)) {
             this.$input.val(value);
             return;
         }
