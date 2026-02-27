@@ -172,7 +172,12 @@ var RoiLoaderView = Backbone.View.extend({
         coords = coords.map(function(c){
             return c + ": " + Math.round(shape[c]);
         });
-        return 'ID: ' + shape.id + ' ' + coords.join(" ") + (shape.Text ? (" Comment: " + shape.Text) : "");
+        var comment = "";
+        if (shape.Text) {
+            // Escape comment text to safely embed in HTML attribute context (e.g. title="")
+            comment = " Comment: " + _.escape(shape.Text);
+        }
+        return 'ID: ' + shape.id + ' ' + coords.join(" ") + comment;
     },
 
     render: function() {
