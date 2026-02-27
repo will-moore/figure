@@ -93,8 +93,9 @@ var RoiLoaderView = Backbone.View.extend({
                         y: y,
                         textAnchor: "middle",  // center ROI labels by default
                         fillOpacity: 0,
+                        fillColor: "#ffffff",
                         strokeColor: shapeJson.strokeColor
-                        // fontSize and fillColor will be populated by the ShapeManager
+                        // fontSize will be populated by the ShapeManager
                     }
                     shapeJson.textId = textShape.id;  // link text shape to parent shape
                     shapeList.push(textShape)
