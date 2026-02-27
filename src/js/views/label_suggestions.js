@@ -15,7 +15,7 @@ const LABEL_DICTIONARY = {
         keywords: ["labels", "separate", "single"],
         options: [
             { label: "Single label", value: "[channels]", hint: "All active channel labels together in one line" },
-            { label: "Separate labels", value: "[channels labels]", hint: "⚠ Clears other inputs. Will generate one label per active channel." }
+            { label: "Separate labels - ⚠ overwrites input", value: "[channels labels]", hint: "Will generate one label per active channel." }
         ],
         hint: "The name of the active channels."
     },
@@ -98,27 +98,18 @@ const LABEL_DICTIONARY = {
         hint: "The height of the current field of view."
     },
     "tags": {
-        label: "Tags",
-        keywords: [],
-        options: [
-            { label: "Tags", value: "[tags]", hint: "⚠ Clears other inputs. All tags for the current image as separate labels (including the tags of the parent objects)." }
-        ],
+        label: "Tags - ⚠ overwrites input",
+        keywords: ["annotation"],
         hint: "⚠ Clears other inputs. All tags for the current image as separate labels (including the tags of the parent objects)."
     },
     "key-values": {
-        label: "Key-Value Pairs",
+        label: "Key-Value Pairs - ⚠ overwrites input",
         keywords: ["kv", "keyvalue", "map", "annotation"],
-        options: [
-            { label: "Key-Value pairs", value: "[key-values]", hint: "⚠ Clears other inputs. Opens a menu to select a key-value pair for the current image." }
-        ],
         hint: "⚠ Clears other inputs. Opens a menu to select a key-value pair on the image or its parent objects."
     },
     "zoom": {
         label: "Zoom level (%)",
         keywords: ["scale", "percent"],
-        options: [
-            { label: "Zoom level", value: "[zoom]", hint: "The current zoom level percentage." }
-        ],
         hint: "The current zoom level percentage."
     },
     "image": {
@@ -642,6 +633,11 @@ export class LabelSuggestions {
      * any text that was after the cursor (suffix).
      */
     handle_suggestion_click(value, extra_option, default_value) {
+        if (["[tags]", "[key-values]", "[channels labels]"].indexOf(value) !== -1) {
+            this.$input.val(value);
+            return;
+        }
+
         var current = this.$input.val();
         var cursor_pos = this.$input[0].selectionStart || 0;
 
