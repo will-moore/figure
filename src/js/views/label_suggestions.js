@@ -15,167 +15,184 @@ const LABEL_DICTIONARY = {
         keywords: ["labels", "separate", "single"],
         options: [
             { label: "Single label", value: "[channels]", hint: "All active channel labels together in one line" },
-            { label: "Separate labels", value: "[channels labels]", hint: "Must be added on its own. Will generate one label per active channel." }
+            { label: "Separate labels", value: "[channels labels]", hint: "⚠ Clears other inputs. Will generate one label per active channel." }
         ],
-        hint: "Shows the name of the active channels."
+        hint: "The name of the active channels."
     },
     "time": {
         label: "Time",
         keywords: ["t", "timestamp"],
         options: [
-            { label: "Index", value: "[time.index]" },
-            { label: "Milliseconds", value: "[time.ms]" },
-            { label: "Seconds", value: "[time.s]" },
-            { label: "Minutes", value: "[time.m]" },
-            { label: "min:sec", value: "[time.m:s]" },
-            { label: "hrs:min", value: "[time.h:m]" },
-            { label: "hrs:min:sec", value: "[time.h:m:s]" }
+            { label: "Index", value: "[time.index]", hint: "The timepoint index (1-based) of the current frame" },
+            { label: "Milliseconds", value: "[time.ms]", hint: "The time in milliseconds for the current frame" },
+            { label: "Seconds", value: "[time.s]", hint: "The time in seconds for the current frame" },
+            { label: "Minutes", value: "[time.m]", hint: "The time in minutes for the current frame" },
+            { label: "min:sec", value: "[time.m:s]", hint: "The time in minutes and seconds for the current frame" },
+            { label: "hrs:min", value: "[time.h:m]", hint: "The time in hours and minutes for the current frame" },
+            { label: "hrs:min:sec", value: "[time.h:m:s]", hint: "The time in hours, minutes and seconds for the current frame" }
         ],
         extraOptions: [
-            { key: "precision", default: "2" },
-            { key: "offset", default: "0" }
-        ]
+            { key: "precision", default: "2", hint: "Number of decimal places to show." },
+            { key: "offset", default: "0", hint: "Frame index reference (1-based) to offset the displayed time." }
+        ],
+        hint: "The time metadata for the current frame."
     },
     "z": {
         label: "Z Coordinate",
         keywords: ["stack", "slice", "pixel", "unit"],
         options: [
-            { label: "Pixel", value: "[z.pixel]" },
-            { label: "Unit", value: "[z.unit]" }
+            { label: "Pixel", value: "[z.pixel]", hint: "The Z coordinate in pixels for the current slice." },
+            { label: "Unit", value: "[z.unit]", hint: "The Z coordinate in physical size units for the current slice." }
         ],
         extraOptions: [
-            { key: "precision", default: "2" },
-        ]
+            { key: "precision", default: "2", hint: "Unit only. Number of decimal places to show." },
+        ],
+        hint: "The Z coordinate of the current slice."
     },
     "x": {
         label: "X Coordinate",
         keywords: ["position", "pixel", "unit"],
         options: [
-            { label: "Pixel", value: "[x.pixel]" },
-            { label: "Unit", value: "[x.unit]" }
+            { label: "Pixel", value: "[x.pixel]", hint: "The X coordinate in pixels." },
+            { label: "Unit", value: "[x.unit]", hint: "The X coordinate in physical size." }
         ],
         extraOptions: [
-            { key: "precision", default: "2" },
-        ]
+            { key: "precision", default: "2", hint: "Unit only. Number of decimal places to show." },
+        ],
+        hint: "The X coordinate of the current position."
     },
     "y": {
         label: "Y Coordinate",
         keywords: ["position", "pixel", "unit"],
         options: [
-            { label: "Pixel", value: "[y.pixel]" },
-            { label: "Unit", value: "[y.unit]" }
+            { label: "Pixel", value: "[y.pixel]", hint: "The Y coordinate in pixels." },
+            { label: "Unit", value: "[y.unit]", hint: "The Y coordinate in physical size." }
         ],
         extraOptions: [
-            { key: "precision", default: "2" },
-        ]
+            { key: "precision", default: "2", hint: "Unit only. Number of decimal places to show." },
+        ],
+        hint: "The Y coordinate of the current position."
     },
     "width": {
         label: "Width",
         keywords: ["length", "size", "pixel", "unit"],
         options: [
-            { label: "Pixel", value: "[width.pixel]" },
-            { label: "Unit", value: "[width.unit]" }
+            { label: "Pixel", value: "[width.pixel]", hint: "The width in pixels" },
+            { label: "Unit", value: "[width.unit]", hint: "The width in physical size." }
         ],
         extraOptions: [
-            { key: "precision", default: "2" },
-        ]
+            { key: "precision", default: "2", hint: "Unit only. Number of decimal places to show." },
+        ],
+        hint: "The width of the current field of view."
     },
     "height": {
         label: "Height",
         keywords: ["length", "size", "pixel", "unit"],
         options: [
-            { label: "Pixel", value: "[height.pixel]" },
-            { label: "Unit", value: "[height.unit]" }
+            { label: "Pixel", value: "[height.pixel]", hint: "The height in pixels" },
+            { label: "Unit", value: "[height.unit]", hint: "The height in physical size." }
         ],
         extraOptions: [
-            { key: "precision", default: "2" },
-        ]
+            { key: "precision", default: "2", hint: "Unit only. Number of decimal places to show." },
+        ],
+        hint: "The height of the current field of view."
     },
     "tags": {
         label: "Tags",
         keywords: [],
         options: [
-            { label: "Tags", value: "[tags]" }
-        ]
+            { label: "Tags", value: "[tags]", hint: "⚠ Clears other inputs. All tags for the current image as separate labels (including the tags of the parent objects)." }
+        ],
+        hint: "⚠ Clears other inputs. All tags for the current image as separate labels (including the tags of the parent objects)."
     },
     "key-values": {
         label: "Key-Value Pairs",
         keywords: ["kv", "keyvalue", "map", "annotation"],
         options: [
-            { label: "Key-Value pairs", value: "[key-values]" }
-        ]
+            { label: "Key-Value pairs", value: "[key-values]", hint: "⚠ Clears other inputs. Opens a menu to select a key-value pair for the current image." }
+        ],
+        hint: "⚠ Clears other inputs. Opens a menu to select a key-value pair on the image or its parent objects."
     },
     "zoom": {
         label: "Zoom level (%)",
         keywords: ["scale", "percent"],
         options: [
-            { label: "Zoom level", value: "[zoom]" }
-        ]
+            { label: "Zoom level", value: "[zoom]", hint: "The current zoom level percentage." }
+        ],
+        hint: "The current zoom level percentage."
     },
     "image": {
         label: "Image",
         keywords: ["name", "id", "filename"],
         options: [
-            { label: "Image ID", value: "[image.id]" },
-            { label: "Image Name", value: "[image.name]" }
-        ]
+            { label: "Image ID", value: "[image.id]", hint: "The ID of the image." },
+            { label: "Image Name", value: "[image.name]", hint: "The name of the image." }
+        ],
+        hint: "The name or ID of the image."
     },
     "dataset": {
         label: "Dataset",
         keywords: ["name", "id"],
         options: [
-            { label: "Dataset ID", value: "[dataset.id]" },
-            { label: "Dataset Name", value: "[dataset.name]" }
-        ]
+            { label: "Dataset ID", value: "[dataset.id]", hint: "The ID of the image's dataset." },
+            { label: "Dataset Name", value: "[dataset.name]", hint: "The name of the image's dataset." }
+        ],
+        hint: "The name or ID of the image's dataset."
     },
     "project": {
         label: "Project",
         keywords: ["name", "id"],
         options: [
-            { label: "Project ID", value: "[project.id]" },
-            { label: "Project Name", value: "[project.name]" }
-        ]
+            { label: "Project ID", value: "[project.id]", hint: "The ID of the image's project." },
+            { label: "Project Name", value: "[project.name]", hint: "The name of the image's project." }
+        ],
+        hint: "The name or ID of the image's project."
     },
     "wellsample": {
         label: "WellSample",
         keywords: ["index", "id"],
         options: [
-            { label: "WellSample ID", value: "[wellsample.id]" },
-            { label: "WellSample Index", value: "[wellsample.index]" },
-            { label: "WellSample Run Index", value: "[wellsample.index_run]" }
-        ]
+            { label: "WellSample ID", value: "[wellsample.id]", hint: "Well sample ID of the image." },
+            { label: "WellSample Index", value: "[wellsample.index]", hint: "Well sample index of the image within the whole plate." },
+            { label: "WellSample Run Index", value: "[wellsample.index_run]", hint: "Well sample index of the image within its run." }
+        ],
+        hint: "The name or index of the image's WellSample within the whole plate or the run."
     },
     "well": {
         label: "Well",
         keywords: ["label", "id", "name"],
         options: [
-            { label: "Well ID", value: "[well.id]" },
-            { label: "Well Label", value: "[well.label]" }
-        ]
+            { label: "Well ID", value: "[well.id]", hint: "The ID of the image's Well." },
+            { label: "Well Label", value: "[well.label]", hint: "The label of the image's Well." }
+        ],
+        hint: "The name or ID of the image's Well."
     },
     "run": {
         label: "Run",
         keywords: ["plateacquisition", "name", "id"],
         options: [
-            { label: "Run ID", value: "[run.id]" },
-            { label: "Run Name", value: "[run.name]" }
-        ]
+            { label: "Run ID", value: "[run.id]", hint: "The ID of the current Run." },
+            { label: "Run Name", value: "[run.name]", hint: "The name of the current Run." }
+        ],
+        hint: "The name or ID of the image's Run."
     },
     "plate": {
         label: "Plate",
         keywords: ["name", "id"],
         options: [
-            { label: "Plate ID", value: "[plate.id]" },
-            { label: "Plate Name", value: "[plate.name]" }
-        ]
+            { label: "Plate ID", value: "[plate.id]", hint: "The ID of the image's Plate." },
+            { label: "Plate Name", value: "[plate.name]", hint: "The name of the image's Plate." }
+        ],
+        hint: "The name or ID of the image's Plate."
     },
     "screen": {
         label: "Screen",
         keywords: ["name", "id"],
         options: [
-            { label: "Screen ID", value: "[screen.id]" },
-            { label: "Screen Name", value: "[screen.name]" }
-        ]
+            { label: "Screen ID", value: "[screen.id]", hint: "The ID of the image's Screen." },
+            { label: "Screen Name", value: "[screen.name]", hint: "The name of the image's Screen." }
+        ],
+        hint: "The name or ID of the image's Screen."
     }
 };
 
@@ -235,11 +252,11 @@ export class LabelSuggestions {
         if (this.suggestions_enabled) {
             this.$suggestions_toggle.removeClass('suggestions-disabled');
             $icon.removeClass('opacity-50');
-            this.$suggestions_toggle.attr('title', 'Suggestions appear as you type. Click to disable suggestions');
+            this.$suggestions_toggle.attr('title', 'Suggestions appear as you type. Click to disable.');
         } else {
             this.$suggestions_toggle.addClass('suggestions-disabled');
             $icon.addClass('opacity-50');
-            this.$suggestions_toggle.attr('title', 'Click to enable suggestions');
+            this.$suggestions_toggle.attr('title', 'Click to enable suggestions.');
             this.$menu.removeClass('show').empty();
         }
 
@@ -438,8 +455,8 @@ export class LabelSuggestions {
 
         var html = "<div class='dropdown-header'>Options for " + _.escape(entry.label) + "</div>";
         html += entry.options.map(function(opt) {
-            var hint = opt.hint || "";
-            return "<button type='button' class='dropdown-item' data-value='" + _.escape(opt.value) + "' title='" + _.escape(hint) + "'>" + _.escape(opt.label) + "</button>";
+            var title = " title='"+_.escape(opt.hint || "")+"'";
+            return "<button type='button' class='dropdown-item' data-value='" + _.escape(opt.value) + "' " + title + ">" + _.escape(opt.label) + "</button>";
         }).join("");
 
         // Add extra options if available
@@ -455,7 +472,7 @@ export class LabelSuggestions {
                 var opt_label = extra_opt.key + "=" + extra_opt.default;
                 var already_added = existing_options.hasOwnProperty(extra_opt.key);
                 var disabled = already_added ? " disabled" : "";
-                var title = already_added ? " title='Already added'" : "";
+                var title = " title='"+_.escape(extra_opt.hint || "")+"'";
                 return "<button type='button' class='dropdown-item'" + disabled + title + " data-extra-option='" + _.escape(extra_opt.key) + "' data-default-value='" + _.escape(extra_opt.default) + "'>" + _.escape(opt_label) + "</button>";
             }).join("");
         }
