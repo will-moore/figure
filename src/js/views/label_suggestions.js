@@ -59,7 +59,7 @@ const LABEL_DICTIONARY = {
         extraOptions: [
             { key: "precision", default: "2", hint: "Unit only. Number of decimal places to show." },
         ],
-        hint: "The X coordinate of the current position."
+        hint: "The X coordinate of the field of view."
     },
     "y": {
         label: "Y Coordinate",
@@ -71,7 +71,7 @@ const LABEL_DICTIONARY = {
         extraOptions: [
             { key: "precision", default: "2", hint: "Unit only. Number of decimal places to show." },
         ],
-        hint: "The Y coordinate of the current position."
+        hint: "The Y coordinate of the field of view."
     },
     "width": {
         label: "Width",
