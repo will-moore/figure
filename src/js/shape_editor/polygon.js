@@ -47,6 +47,7 @@ var Polygon = function Polygon(options) {
 
   this._strokeWidth = options.strokeWidth || 2;
   this._selected = false;
+  this._textId = options.textId || undefined;
   this._zoomFraction = 1;
   if (options.zoom) {
     this._zoomFraction = options.zoom / 100;
@@ -125,10 +126,13 @@ Polygon.prototype.toJson = function toJson() {
     strokeWidth: this._strokeWidth,
     strokeColor: this._strokeColor,
     fillColor: this._fillColor,
-    fillOpacity:this._fillOpacity
+    fillOpacity:this._fillOpacity,
   };
   if (this._id) {
     rv.id = this._id;
+  }
+  if (this._textId) {
+    rv.textId = this._textId;
   }
   return rv;
 };
@@ -356,6 +360,11 @@ Polygon.prototype.drawShape = function drawShape() {
 
 Polygon.prototype.setSelected = function setSelected(selected) {
   this._selected = !!selected;
+  // IF there is a text shape, set its selected state too
+  let textShape = this.manager.getShape(this._textId);
+  if (textShape) {
+    textShape.setSelected(this._selected);
+  }
   this.drawShape();
 };
 

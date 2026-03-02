@@ -2,8 +2,9 @@
     import Backbone from "backbone";
     import _ from "underscore";
     import $ from "jquery";
-    import { rotatePoint } from "../views/util";
+    import { rotatePoint, figureConfirmDialog, normalizeZProjectionBounds } from "../views/util";
     import {renderZarrToSrc} from "./zarr_utils";
+
     // Corresponds to css - allows us to calculate size of labels
     var LINE_HEIGHT = 1.43;
 
@@ -147,7 +148,7 @@
                                 let txtShape = shape;
                                 // apply any translation and rotation to Text
                                 let newCoords = {x: txtShape.x, y: txtShape.y};
-                                // If the Inset was previously rotated, we need to 'undo' that rotation first 
+                                // If the Inset was previously rotated, we need to 'undo' that rotation first
                                 if (prevCoords.rotation && prevCoords.rotation != 360) {
                                     let prevCx = prevCoords.x + prevCoords.width / 2;
                                     let prevCy = prevCoords.y + prevCoords.height / 2;
@@ -222,6 +223,18 @@
                 }
                 return ch;
             });
+            // Enforce max active channels limit
+            const maxActive = window.MAX_ACTIVE_CHANNELS || 10;
+            let activeCount = 0;
+            data.channels.forEach(ch => {
+                if (ch.active) {
+                    activeCount += 1;
+                    if (activeCount > maxActive) {
+                        ch.active = false;  // disable extra active channels
+                    }
+                }
+
+            });
             return data;
         },
 
@@ -275,14 +288,37 @@
                 'pixel_size_x_unit': data.pixel_size_x_unit,
                 'pixel_size_z_unit': data.pixel_size_z_unit,
                 'deltaT': data.deltaT,
+                'parents': data.parents
             };
+
+            if (data.pixel_size_x == undefined ||
+                data.pixel_size_x_unit == undefined ||
+                data.pixel_size_x_symbol == undefined) {
+                // Set back to panel model default
+                newData.pixel_size_x_unit = 'MICROMETER';
+                newData.pixel_size_x_symbol = '\xB5m'; // µm
+            }
 
             // theT and theZ are not changed unless we have to...
             if (this.get('theT') >= newData.sizeT) {
                 newData.theT = newData.sizeT - 1;
             }
+
             if (this.get('theZ') >= newData.sizeZ) {
                 newData.theZ = newData.sizeZ - 1;
+            }
+
+            // Ensure z-projection parameters are within bounds of the new image
+            if (this.get('z_start') !== undefined || this.get('z_end') !== undefined || this.get('z_projection') !== undefined) {
+                var normalized = normalizeZProjectionBounds(
+                    this.get('z_start'),
+                    this.get('z_end'),
+                    this.get('z_projection'),
+                    newData.sizeZ
+                );
+                newData.z_projection = normalized.z_projection;
+                newData.z_start = normalized.z_start;
+                newData.z_end = normalized.z_end;
             }
 
             // Make sure dx and dy are not outside the new image
@@ -602,11 +638,18 @@
                     var pathnames = this.get('name').split('/');
                     text = pathnames[pathnames.length-1];
                 }
-            } else if (property === "dataset") {
-                if (format === "id") {
-                    text = ""+this.get('datasetId');
-                } else if (format === "name") {
-                    text = this.get('datasetName') ? this.get('datasetName') : "No/Many Datasets";
+            } else {
+                // project, dataset, screen, plate, well, field (name, id, label, index)
+                if (this.get("parents") == null && property === "dataset"){
+                    // fallback on old property
+                    if (format === "id") {
+                        text = ""+this.get('datasetId');
+                    } else if (format === "name") {
+                        text = this.get('datasetName') ? this.get('datasetName') : "No/Many Datasets";
+                    }
+                } else {
+                    var parentVal = this.get("parents")?.[property]?.[format];
+                    text = parentVal == null ? "undefined" : "" + parentVal;
                 }
             }
             return text;
@@ -753,6 +796,19 @@
         toggle_channel: function(cIndex, active) {
             if (typeof active == "undefined") {
                 active = !this.get('channels')[cIndex].active;
+            }
+
+            // Enforce max active channels - block if trying to activate beyond limit.
+            const MAX_ACTIVE_CHANNELS = window.MAX_ACTIVE_CHANNELS || 10;
+            if (active) {
+                const channels = this.get('channels') || [];
+                const activeCount = channels.reduce((acc, ch) => acc + (ch.active ? 1 : 0), 0);
+                if (!channels[cIndex].active && activeCount >= MAX_ACTIVE_CHANNELS) {
+                    figureConfirmDialog(
+                        "Channels Limit", "Cannot activate the channel. The maximum number of channels is already active.",
+                         ["OK"]);
+                    return;
+                }
             }
 
             if (this.get("hilo_enabled") && active) {

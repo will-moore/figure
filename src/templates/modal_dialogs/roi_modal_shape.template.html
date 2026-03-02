@@ -20,6 +20,11 @@
                 <%= shape.theT + 1 %>
             <% } %>
         </td>
+        <td style="padding-left: 0; padding-right: 0; max-width: 100px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+            <% if (shape.Text !== undefined) { %>
+                <%= shape.Text %>
+            <% } %>
+        </td>
         <td>
             <% if (shape.icon) { %>
             <button type="button" class="addOmeroShape btn btn-success btn-sm"

@@ -970,6 +970,21 @@
     .dropdown-menu input + span { visibility: hidden; }
     .dropdown-menu input:checked + span { visibility: visible; }
 
+    /* Label suggestions styling */
+    .label-suggestions-wrap {
+        position: relative;
+    }
+
+    .label-suggestions {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        margin-top: 30px;
+        z-index: 1050;
+        min-width: 200px;
+    }
+
     .atop i, .aheight i {
         transform: rotate(90deg);
         display: inline-block;
