@@ -10,6 +10,7 @@
 
     import {figureConfirmDialog, showModal, rotatePoint, getRandomId} from "./util";
     import FigureColorPicker from "../views/colorpicker";
+    import LabelSuggestions from "../views/label_suggestions";
 
     import FigureModel from "../models/figure_model";
     import InfoPanelView from "./info_panel_view";
@@ -495,18 +496,54 @@
             $('.new-label-form', this.$el).html(this.template(json));
             // $('.btn-sm').tooltip({container: 'body', placement:'bottom', toggle:"tooltip"});
 
+            // Initialize label suggestions after template is rendered
+            this.labelSuggestions = new LabelSuggestions($('.new-label-form', this.$el));
+
             this.render();
         },
 
         events: {
             "submit .new-label-form": "handle_new_label",
             "click .dropdown-menu a": "select_dropdown_option",
+            "input .new-label-form .label-text": "handle_label_input",
+            "focus .new-label-form .label-text": "handle_label_input",
+            "click .new-label-form .label-text": "handle_label_input",
+            "keyup .new-label-form .label-text": "handle_label_input",
+            "blur .new-label-form .label-text": "handle_label_blur",
+            "click .label-suggestions .dropdown-item": "handle_label_suggestion_click",
             "click .markdown-info": "markdownInfo",
         },
 
         markdownInfo: function(event) {
             event.preventDefault();
             showModal("markdownInfoModal");
+        },
+
+        handle_label_input: function(event) {
+            if (this.labelSuggestions) {
+                this.labelSuggestions.handle_input();
+            }
+        },
+
+        handle_label_blur: function() {
+            if (this.labelSuggestions) {
+                var self = this;
+                setTimeout(function(){
+                    self.labelSuggestions.hide();
+                }, 150);
+            }
+        },
+
+        handle_label_suggestion_click: function(event) {
+            event.preventDefault();
+            var $item = $(event.target);
+            var value = $item.attr('data-value');
+            var extra_option = $item.attr('data-extra-option');
+            var default_value = $item.attr('data-default-value');
+
+            if (this.labelSuggestions) {
+                this.labelSuggestions.handle_suggestion_click(value, extra_option, default_value);
+            }
         },
 
         // Handles all the various drop-down menus in the 'New' AND 'Edit Label' forms
@@ -613,16 +650,34 @@
                 $(".new-label-form", this.$el).show();
                 // if none of the selected panels have time data, disable 'add_time_label's
                 var have_time = false, dTs;
+                var parents_flags = {"project": false, "dataset": false, "screen": false, "plate": false};
+                var parents_defined = false;
                 selected.forEach(function(p){
                     dTs = p.get('deltaT');
                     if (dTs && dTs.length > 0) {
                         have_time = true;
+                    }
+                    var parents = p.get("parents");
+                    if (parents) {
+                        Object.keys(parents).forEach(function(parentType){
+                            if (parents_flags.hasOwnProperty(parentType)) {
+                                parents_flags[parentType] = true;
+                            }
+                        });
+                        parents_defined = true;
                     }
                 });
                 if (have_time) {
                     $(".add_time_label", this.$el).removeClass('disabled');
                 } else {
                     $(".add_time_label", this.$el).addClass('disabled');
+                }
+                // Update label suggestions with time availability
+                if (this.labelSuggestions) {
+                    this.labelSuggestions.have_time = have_time;
+                    if (parents_defined) {
+                        this.labelSuggestions.parents_flags = parents_flags;
+                    }
                 }
             }
 
