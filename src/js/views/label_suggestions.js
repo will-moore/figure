@@ -15,7 +15,7 @@ const LABEL_DICTIONARY = {
         keywords: ["labels", "separate", "single", "color"],
         options: [
             { label: "Single label", value: "[channels]", hint: "All active channel labels together in one line" },
-            { label: "Separate labels - ⚠ overwrites input", value: "[channels labels]", hint: "Will generate one label per active channel.", preformatted: true }
+            { label: "Separate labels - ⚠ overwrites input", value: "[channels labels]", hint: "Will generate one label per active channel.", preformatted: true } // an exceptional label format
         ],
         hint: "The name of the active channels."
     },
@@ -54,8 +54,7 @@ const LABEL_DICTIONARY = {
         keywords: ["position", "pixel", "unit", "coordinate"],
         options: [
             { label: "Pixel", value: "[x.pixel]", hint: "The X coordinate in pixels." },
-            { label: "Unit", value: "[x.unit]", hint: "The X coordinate in physical size." },
-            { label: "X & Y - ⚠ overwrites input", value: "X: [x.pixel] - Y: [y.pixel]", hint: "Preformatted X & Y coordinates in pixels.", preformatted: true }
+            { label: "Unit", value: "[x.unit]", hint: "The X coordinate in physical size." }
         ],
         extraOptions: [
             { key: "precision", default: "2", hint: "Unit only. Number of decimal places to show." },
@@ -67,8 +66,7 @@ const LABEL_DICTIONARY = {
         keywords: ["position", "pixel", "unit", "coordinate"],
         options: [
             { label: "Pixel", value: "[y.pixel]", hint: "The Y coordinate in pixels." },
-            { label: "Unit", value: "[y.unit]", hint: "The Y coordinate in physical size." },
-            { label: "X & Y - ⚠ overwrites input", value: "X: [x.pixel] - Y: [y.pixel]", hint: "Preformatted X & Y coordinates in pixels.", preformatted: true }
+            { label: "Unit", value: "[y.unit]", hint: "The Y coordinate in physical size." }
         ],
         extraOptions: [
             { key: "precision", default: "2", hint: "Unit only. Number of decimal places to show." },
@@ -154,8 +152,7 @@ const LABEL_DICTIONARY = {
         options: [
             { label: "Field ID", value: "[field.id]", hint: "Field ID of the image." },
             { label: "Field Index", value: "[field.index]", hint: "Field index of the image within the whole plate." },
-            { label: "Field Run Index", value: "[field.index_run]", hint: "Field index of the image within its run." },
-            { label: "Well and Field - ⚠ overwrites input", value: "[well.label], Field#[field.index]", hint: "Preformatted option.", preformatted: true }
+            { label: "Field Run Index", value: "[field.index_run]", hint: "Field index of the image within its run." }
         ],
         hint: "The name or index of the image's WellSample within the whole plate or the run."
     },
@@ -164,8 +161,7 @@ const LABEL_DICTIONARY = {
         keywords: ["label", "id", "name"],
         options: [
             { label: "Well ID", value: "[well.id]", hint: "The ID of the image's Well." },
-            { label: "Well Label", value: "[well.label]", hint: "The label of the image's Well." },
-            { label: "Well and Field - ⚠ overwrites input", value: "[well.label], Field#[field.index]", hint: "Preformatted option.", preformatted: true }
+            { label: "Well Label", value: "[well.label]", hint: "The label of the image's Well." }
         ],
         hint: "The name or ID of the image's Well."
     },
@@ -198,6 +194,11 @@ const LABEL_DICTIONARY = {
     }
 };
 
+const PREFORMATTED_OPTIONS = [
+    { label: "Well name and Field index", value: "[well.label], Field#[field.index]", hint: "Preformatted option.", applies_to: ["field", "well", "run"] },
+    { label: "Viewport coordinates (x, y, w, h)", value: "X: [x.pixel] Y: [y.pixel] Width: [width] Height: [height]", hint: "Preformatted X & Y coordinates in pixels.", applies_to: ["x", "y", "width", "height"] }
+]
+
 var preformatted_label_options = new Set();
 Object.keys(LABEL_DICTIONARY).forEach(function(key) {
     var entry = LABEL_DICTIONARY[key];
@@ -210,6 +211,9 @@ Object.keys(LABEL_DICTIONARY).forEach(function(key) {
             }
         });
     }
+});
+PREFORMATTED_OPTIONS.forEach(function(entry) {
+    preformatted_label_options.add(entry.value);
 });
 
 export class LabelSuggestions {
@@ -490,6 +494,20 @@ export class LabelSuggestions {
                 var disabled = already_added ? " disabled" : "";
                 var title = " title='"+_.escape(extra_opt.hint || "")+"'";
                 return "<button type='button' class='dropdown-item'" + disabled + title + " data-extra-option='" + _.escape(extra_opt.key) + "' data-default-value='" + _.escape(extra_opt.default) + "'>" + _.escape(opt_label) + "</button>";
+            }).join("");
+        }
+
+        // Add preformatted options if available
+        var preformatted_for_type = PREFORMATTED_OPTIONS.filter(function(opt) {
+            return opt.applies_to && opt.applies_to.indexOf(label_type) !== -1;
+        });
+
+        if (preformatted_for_type.length > 0) {
+            html += "<div class='dropdown-divider'></div>";
+            html += "<div class='dropdown-header'>Preformatted Options - ⚠ overwrites input</div>";
+            html += preformatted_for_type.map(function(opt) {
+                var title = " title='"+_.escape(opt.hint || "")+"'";
+                return "<button type='button' class='dropdown-item' data-value='" + _.escape(opt.value) + "' " + title + ">" + _.escape(opt.label) + "</button>";
             }).join("");
         }
 
