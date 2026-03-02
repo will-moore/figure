@@ -196,7 +196,7 @@ const LABEL_DICTIONARY = {
 
 const PREFORMATTED_OPTIONS = [
     { label: "Well name and Field index", value: "[well.label], Field#[field.index]", hint: "Preformatted option.", applies_to: ["field", "well", "run"] },
-    { label: "Viewport coordinates (x, y, w, h)", value: "X: [x.pixel] Y: [y.pixel] Width: [width] Height: [height]", hint: "Preformatted X & Y coordinates in pixels.", applies_to: ["x", "y", "width", "height"] }
+    { label: "Viewport coordinates (x, y, w, h)", value: "X: [x] Y: [y] Width: [width] Height: [height]", hint: "Coordinates of the field of view in pixels.", applies_to: ["x", "y", "width", "height"] }
 ]
 
 var preformatted_label_options = new Set();
