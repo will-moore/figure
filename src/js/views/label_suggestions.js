@@ -33,7 +33,7 @@ const LABEL_DICTIONARY = {
         ],
         extraOptions: [
             { key: "precision", default: "2", hint: "Number of decimal places to show." },
-            { key: "offset", default: "0", hint: "Frame index reference (1-based) to offset the displayed time." }
+            { key: "offset", default: "1", hint: "Frame index reference (1-based) to offset the displayed time." }
         ],
         hint: "The time metadata for the current frame."
     },
