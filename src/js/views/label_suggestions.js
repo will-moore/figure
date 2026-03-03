@@ -542,7 +542,7 @@ export class LabelSuggestions {
                 if (key === "project" && !this.parents_flags.project) continue;
                 if (key === "dataset" && !this.parents_flags.dataset) continue;
                 if (key === "screen" && !this.parents_flags.screen) continue;
-                if (["plate", "well", "wellsample", "run"].includes(key) && !this.parents_flags.plate) continue;
+                if (["plate", "well", "field", "run"].includes(key) && !this.parents_flags.plate) continue;
 
                 // Match by label, value, or keywords
                 if (!lower) {
