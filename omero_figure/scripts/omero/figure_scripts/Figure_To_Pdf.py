@@ -1039,6 +1039,8 @@ class FigureExport(object):
         self.conn = conn
         self.script_params = script_params
         self.export_images = export_images
+        # For standalone script, we may have relative or absolute output path
+        self.output_path_name = script_params.get("outputPathName")
 
         self.ns = "omero.web.figure.pdf"
         self.mimetype = "application/pdf"
@@ -1130,18 +1132,22 @@ class FigureExport(object):
         # Extension is pdf or tiff
         fext = self.get_figure_file_ext()
 
-        name = self.figure_name
-        # in case we have path/to/name, just use name
-        name = path.basename(name)
+        # For standalone script, we may have relative or absolute output path
+        if self.output_path_name is not None:
+            name = self.output_path_name
+        else:
+            # Remove commas: causes problems 'duplicate headers' in file download
+            name = self.figure_name.replace(",", ".")
+            # in case we have path/to/name, just use name
+            name = path.basename(name)
 
-        # if ends with E.g. .pdf, remove extension
-        if name.endswith("." + fext):
-            name = name[0: -len("." + fext)]
+        # remove extension
+        for ext in ("pdf", "tiff", "tif"):
+            if name.endswith("." + ext):
+                name = name[0: -len("." + ext)]
 
         # Name with extension and folder
         full_name = "%s.%s" % (name, fext)
-        # Remove commas: causes problems 'duplicate headers' in file download
-        full_name = full_name.replace(",", ".")
 
         index = page if page is not None else 1
         if fext == "tiff" and self.page_count > 1:
@@ -3470,6 +3476,8 @@ def handle_main():
         if omero_installed:
             # normal script workflow - uses OMERO connection
             run_script()
+
+            # If script ran successfully, we're done!
             return
     except (PermissionDeniedException, ConnectionRefusedException):
         # This is a workaround for the fact that the script is not run in a
@@ -3481,20 +3489,25 @@ def handle_main():
     import argparse
     parser = argparse.ArgumentParser(description='Test Figure to PDF export')
     parser.add_argument("file", help="Path to Figure JSON file")
-
+    parser.add_argument('outputPathName',
+                        help=("Relative or absolute path/to/output.pdf."
+                              " Extension will be used to determine export file type"))
     parser.add_argument('--omero', action='store_true',
                         help='Run with OMERO connection')
-    parser.add_argument('--file_type', choices=['pdf', 'tiff'], default='pdf',
-                        help='Type of file to export (default: pdf)')
     args = parser.parse_args()
 
     fpath = args.file
     with open(fpath, 'r') as f:
         figure_json = json.load(f)
 
+    output_path_name = args.outputPathName
+    fext = output_path_name.split('.')[-1].lower()
+    file_type = "TIFF" if fext in ['tif', 'tiff'] else "PDF"
+
     script_args = {
                     "Figure_JSON": json.dumps(figure_json),
-                    "Export_Option": args.file_type.upper(),
+                    "Export_Option": file_type,
+                    "outputPathName": output_path_name,
                     "Webclient_URI": "http://localhost/webclient/"
                 }
 
