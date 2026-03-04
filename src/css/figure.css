@@ -909,13 +909,15 @@
         padding-top: 0;
         top:55px;
         right: 20px;
-        width: 375px;
+        width: 385px;
         z-index: 50;
         pointer-events: none;
         /* restrict height to avoid hidden behind footer */
         position: absolute;
         bottom: 40px;
         height: inherit;
+        overflow-y: auto;
+        scrollbar-gutter: stable;
     }
     .tab-pane {
         padding: 10px;
