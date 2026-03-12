@@ -351,6 +351,7 @@
     .scalebar_form .row {
         align-items: center;
         display: flex;
+        flex-wrap: nowrap;
         gap: 3px;
         margin-top: 3px;
     }
@@ -383,6 +384,10 @@
 
     .edit-label-form {
         position: relative;
+        display: flex;
+        flex-wrap: nowrap;
+        align-items: center;
+        gap: 4px;
     }
 
     .edit-label-form .input-group {
@@ -916,6 +921,8 @@
         position: absolute;
         bottom: 40px;
         height: inherit;
+        overflow-y: auto;
+        scrollbar-gutter: stable;
     }
     .tab-pane {
         padding: 10px;
@@ -1414,6 +1421,7 @@
     .colorbar_form .input-group {
         width:80px;
         margin-right: 4px;
+
     }
 
     .colorbar_form .form-group {
@@ -1423,6 +1431,7 @@
     .colorbar_form .row {
         align-items: center;
         display: flex;
+        flex-wrap: nowrap;
         gap: 3px;
         margin-top: 3px;
     }
