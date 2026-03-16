@@ -13,7 +13,7 @@ import shape_toolbar_template from '../../templates/shapes/shape_toolbar.templat
 import shape_sidebar_template from '../../templates/shapes/shape_sidebar.template.html?raw';
 import roi_zt_buttons from '../../templates/modal_dialogs/roi_zt_buttons.template.html?raw';
 import RoiLoaderView from './roi_loader_view';
-import { hideModal, getJson } from "./util";
+import { hideModal, getJsonWithCredentials } from "./util";
 
 const TEXT_ANCHOR_ICONS = {
     "start": "bi-text-left",
@@ -182,7 +182,7 @@ export const RoiModalView = Backbone.View.extend({
                 .attr({'disabled': 'disabled'});
             $btn.parent().attr('title', 'Checking for ROIs...');  // title on parent div - still works if btn disabled
 
-            getJson(url).then((data) => {
+            getJsonWithCredentials(url).then((data) => {
                 this.omeroRoiCount = data.roi;
                 this.renderSidebar();
             });
@@ -222,7 +222,7 @@ export const RoiModalView = Backbone.View.extend({
             var iid = this.m.get('imageId');
             let url = BASE_OMEROWEB_URL + 'api/v0/m/rois/';
             var roiUrl = url + '?image=' + iid + '&limit=' + this.roisPageSize + '&offset=' + (this.roisPageSize * this.roisPage);
-            getJson(roiUrl).then((data) => {
+            getJsonWithCredentials(roiUrl).then((data) => {
                 this.Rois.set(data.data);
                 $("#loadRois").prop('disabled', false);
                 $("#roiModalRoiList table").empty();
@@ -551,48 +551,9 @@ export const RoiModalView = Backbone.View.extend({
             $("#roiModalSidebar", this.$el).html(this.sidebar_template(json));
         },
 
-        // for rendering bounding-box viewports for shapes
-        getBboxJson: function(bbox, theZ, theT) {
-            var size = 50;   // longest side
-            var orig_width = this.m.get('orig_width'),
-                orig_height = this.m.get('orig_height');
-                // origT = this.m.get('theT'),
-                // origZ = this.m.get('theZ');
-            // theT = (theT !== undefined ? theT : this.m.get('theT'))
-            var div_w, div_h;
-            // get src for image by temp setting Z & T
-            if (theT !== undefined) this.m.set('theT', bbox.theT, {'silent': true});
-            if (theZ !== undefined) this.m.set('theZ', bbox.theZ, {'silent': true});
-            var src = this.m.get_img_src();
-            if (bbox.width > bbox.height) {
-                div_w = size;
-                div_h = (bbox.height/bbox.width) * div_w;
-            } else {
-                div_h = size;
-                div_w = (bbox.width/bbox.height) * div_h;
-            }
-            var zoom = div_w/bbox.width;
-            var img_w = orig_width * zoom;
-            var img_h = orig_height * zoom;
-            var top = -(zoom * bbox.y);
-            var left = -(zoom * bbox.x);
-            // bbox.theT = bbox.theT !== undefined ? bbox.theT : origT;
-            // bbox.theZ = bbox.theZ !== undefined ? bbox.theZ : origZ;
-
-            return {
-                'src': src,
-                'w': div_w,
-                'h': div_h,
-                'top': top,
-                'left': left,
-                'img_w': img_w,
-                'img_h': img_h
-            };
-        },
-
         renderImagePlane: function() {
-            var src = this.m.get_img_src();
-            this.$roiImg.attr('src', src);
+            this.m.get_img_src()
+                .then(src => this.$roiImg.attr('src', src));
 
             var orig_model = this.model.getSelected().head();
             var json = {'theZ': this.m.get('theZ'),

@@ -522,42 +522,13 @@ import { hideModal } from "./util";
             if (!idInput || idInput.length === 0)    return;
 
             // test for E.g: http://localhost:8000/webclient/?show=image-25|image-26|image-27
-            if (idInput.indexOf('?') > 10) {
+            if (idInput.indexOf('?show') > 10) {
                 iIds = idInput.split('image-').slice(1);
-            } else if (idInput.indexOf('img_detail') > 0) {
-                // url of image viewer...
-                this.importFromRemote(idInput);
-                return;
             } else {
+                // iIds could be Zarr URLs - NB: this will fail if a Zarr URL contains ','
                 iIds = idInput.split(',');
             }
 
             this.model.addImages(iIds);
-        },
-
-        importFromRemote: function(img_detail_url) {
-            var iid = parseInt(img_detail_url.split('img_detail/')[1], 10),
-                baseUrl = img_detail_url.split('/img_detail')[0],
-                // http://jcb-dataviewer.rupress.org/jcb/imgData/25069/
-                imgDataUrl = baseUrl + '/imgData/' + iid + "/";
-
-            var colCount = 1,
-                rowCount = 1,
-                paper_width = this.model.get('paper_width'),
-                c = this.figureView.getCentre(),
-                col = 0,
-                row = 0,
-                px, py, spacer, scale,
-                coords = {'px': px,
-                          'py': py,
-                          'c': c,
-                          'spacer': spacer,
-                          'colCount': colCount,
-                          'rowCount': rowCount,
-                          'col': col,
-                          'row': row,
-                          'paper_width': paper_width};
-
-            this.model.importImage(imgDataUrl, coords, baseUrl);
         },
     });
