@@ -48,7 +48,7 @@ export async function loadZarrForPanel(zarrUrl) {
     return {"Error": error.toString()};
   }
   console.log("msWithArray", msWithArray);
-  const {arr, shapes, multiscale, omero, scales, zarr_version} = msWithArray;
+  const {arr, multiscale, omero, scales, zarr_version} = msWithArray;
   let zarrName = zarrUrl.split("/").pop();
   console.log("multiscale", multiscale);
   if (!multiscale) {
@@ -80,7 +80,7 @@ export async function loadZarrForPanel(zarrUrl) {
     zarr_attrs["version"] = zarrJson.version;
   }
 
-  let zarray = zarrays[0];
+  let zarray = zarrays[datasets[0].path];
   console.log("zarray", zarray);
 
   let dtype = zarray.dtype;
@@ -123,7 +123,7 @@ export async function loadZarrForPanel(zarrUrl) {
   let minMaxProvided = chs && chs.every((ch) => ch.window && ch.window.min != undefined && ch.window.max != undefined);
   if (!minMaxProvided) {
     // load smallest array to get min/max values for every channel
-    let slices = omezarr.getSlices(_.range(sizeC), arr.shape, axesNames, indices, shapes[0]);
+    let slices = omezarr.getSlices(_.range(sizeC), arr.shape, axesNames, indices, shape);
     let promises = slices.map((chSlice) => zarr.get(arr, chSlice));
     let ndChunks = await Promise.all(promises);
 
@@ -153,7 +153,7 @@ export async function loadZarrForPanel(zarrUrl) {
   let deltaT = [];
   if (axesNames.includes("t")) {
     // if we have time units...
-    let timeAxis = axes.find((a) => a.name == "t");
+    let timeAxis = axes?.find((a) => a.name == "t");
     if (timeAxis && timeAxis.unit) {
       let secsIncrement = 1;
       let scaleTransform0 = multiscale.datasets[0].coordinateTransformations?.find(

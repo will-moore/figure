@@ -40,6 +40,7 @@ var Ellipse = function Ellipse(options) {
   this._radiusX = options.radiusX;
   this._radiusY = options.radiusY;
   this._rotation = options.rotation || 0;
+  this._textId = options.textId || undefined;
 
   // We handle transform matrix by creating this.Matrix
   // This is used as a one-off transform of the handles positions
@@ -153,6 +154,9 @@ Ellipse.prototype.toJson = function toJson() {
   };
   if (this._id) {
     rv.id = this._id;
+  }
+  if (this._textId) {
+    rv.textId = this._textId;
   }
   return rv;
 };
@@ -425,6 +429,11 @@ Ellipse.prototype.drawShape = function drawShape() {
 
 Ellipse.prototype.setSelected = function setSelected(selected) {
   this._selected = !!selected;
+  // IF there is a text shape, set its selected state too
+  let textShape = this.manager.getShape(this._textId);
+  if (textShape) {
+    textShape.setSelected(this._selected);
+  }
   this.drawShape();
 };
 
