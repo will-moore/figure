@@ -2737,7 +2737,6 @@ class FigureExport(object):
             raise ImportError(
                 "Need to install https://bitbucket.org/rptlab/reportlab")
         name = self.get_figure_file_name()
-        print("Saving PDF figure to %s" % name)
         self.figure_canvas = canvas.Canvas(
             name, pagesize=(self.page_width, self.page_height))
 
