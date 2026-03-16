@@ -1198,12 +1198,17 @@ class FigureExport(object):
         self.create_figure()
 
         panels_json = self.figure_json['panels']
-        image_ids = set()
 
         group_id = None
         # We get our group from the first image
-        id1 = panels_json[0]['imageId']
-        group_id = self.conn.getObject("Image", id1).getDetails().group.id.val
+        if self.conn is not None and len(panels_json) > 0:
+            try:
+                id1 = int(panels_json[0]['imageId'])
+                group_id = self.conn.getObject(
+                    "Image", id1).getDetails().group.id.val
+            except ValueError:
+                # e.g. imageId is zarr url
+                pass
 
         # For each page, add panels...
         col = 0
@@ -1216,7 +1221,7 @@ class FigureExport(object):
             py = row * (self.page_height + paper_spacing)
             page = {'x': px, 'y': py}
 
-            self.add_panels_to_page(panels_json, image_ids, page)
+            self.add_panels_to_page(panels_json, page)
 
             # complete page and save
             self.save_page(p)
@@ -1232,17 +1237,36 @@ class FigureExport(object):
         # Saves the completed figure file
         self.save_figure()
 
+        if self.conn is None:
+            # TODO: Return something else??
+            return None
+
         # PDF will get created in this group
         if group_id is None:
             group_id = self.conn.getEventContext().groupId
         self.conn.SERVICE_OPTS.setOmeroGroup(group_id)
 
-        return self.create_file_annotation(image_ids)
+        return self.create_file_annotation()
 
-    def create_file_annotation(self, image_ids):
+    def create_file_annotation(self):
         output_file = self.figure_file_name
         ns = self.ns
         mimetype = self.mimetype
+
+        all_image_ids = set()
+        for p in self.figure_json['panels']:
+            try:
+                iid = int(p['imageId'])
+                all_image_ids.add(iid)
+            except ValueError:
+                # e.g. imageId is zarr url
+                pass
+        # Check we can annotate...
+        image_ids = set()
+        for iid in list(all_image_ids):
+            image = self.conn.getObject("Image", iid)
+            if image is not None and image.canAnnotate():
+                image_ids.add(iid)
 
         if self.zip_folder_name is not None:
             zip_name = self.get_zip_name()
@@ -1275,7 +1299,7 @@ class FigureExport(object):
 
         return file_ann
 
-    def apply_rdefs(self, image, channels):
+    def apply_rdefs(self, image, panel):
         """ Apply the channel levels and colors to the image """
         c_idxs = []
         windows = []
@@ -1285,7 +1309,7 @@ class FigureExport(object):
         # OMERO.figure doesn't support greyscale rendering
         image.setColorRenderingModel()
 
-        for i, c in enumerate(channels):
+        for i, c in enumerate(panel['channels']):
             if c['active']:
                 c_idxs.append(i + 1)
                 windows.append([c['window']['start'], c['window']['end']])
@@ -1293,6 +1317,32 @@ class FigureExport(object):
                 reverses.append(c.get('reverseIntensity', False))
 
         image.setActiveChannels(c_idxs, windows, colors, reverses)
+
+        size_x = image.getSizeX()
+        size_y = image.getSizeY()
+        size_z = image.getSizeZ()
+        size_c = image.getSizeC()
+
+        if 'z_projection' in panel and panel['z_projection']:
+            if 'z_start' in panel and 'z_end' in panel:
+                # check max_projection_bytes
+                pixel_range = image.getPixelRange()
+                bytes_per_pixel = ceil(log2(pixel_range[1]) / 8.0)
+                proj_bytes = (size_z * size_x * size_y
+                              * size_c * bytes_per_pixel)
+
+                cfg = self.conn.getConfigService()
+                max_bytes = int(cfg.getConfigValue(
+                    'omero.pixeldata.max_projection_bytes'))
+
+                if proj_bytes <= max_bytes:
+                    image.setProjection('intmax')
+                    image.setProjectionRange(panel['z_start'], panel['z_end'])
+                else:
+                    print(f'projected_bytes {proj_bytes} exceeds '
+                          f'MAX_PROJECTED_BYTES limit: {max_bytes}')
+                    # Turn off all channels to render a black panel
+                    image.setActiveChannels([])
 
     def get_crop_region(self, panel):
         """
@@ -2056,10 +2106,11 @@ class FigureExport(object):
 
         self.draw_scalebar_line(x1, y1, x2, y2, tick_thickness, rgb)
 
-    def is_big_image(self, image):
+    def is_big_image(self, panel):
         """Return True if this is a 'big' tiled image."""
-        max_w, max_h = self.conn.getMaxPlaneSize()
-        return image.getSizeX() * image.getSizeY() > max_w * max_h
+        max_w, max_h = (self.conn.getMaxPlaneSize()
+                        if self.conn else (3000, 3000))
+        return panel['orig_width'] * panel['orig_height'] > max_w * max_h
 
     def get_zoom_level_scale(self, image, region, max_width):
         """Calculate the scale and zoom level we want to use for big image."""
@@ -2088,38 +2139,27 @@ class FigureExport(object):
         scale = zm_levels[zm]
         return scale, level
 
-    def render_big_image_region(self, image, panel, z, t, region, max_width):
+    def render_big_image_region(self, panel, z, t, region, max_width):
         """
         Render region of a big image at an appropriate zoom level
         so width < max_width
         """
-        scale, level = self.get_zoom_level_scale(image, region, max_width)
-        # cache the 'zoom_level_scale', in the panel dict.
-        # since we need it for scalebar, and don't want to calculate again
-        # since rendering engine will be closed by then
-        panel['zoom_level_scale'] = scale
 
         width = region['width']
         height = region['height']
         x = region['x']
         y = region['y']
-        size_x = image.getSizeX()
-        size_y = image.getSizeY()
-        x = int(x * scale)
-        y = int(y * scale)
-        width = int(width * scale)
-        height = int(height * scale)
-        size_x = int(size_x * scale)
-        size_y = int(size_y * scale)
+        size_x = panel['orig_width']
+        size_y = panel['orig_height']
 
-        canvas = None
-        # Coordinates below are all final jpeg coordinates & sizes
+        region_outside_image = False
+        paste_x = 0
+        paste_y = 0
+
         if x < 0 or y < 0 or (x + width) > size_x or (y + height) > size_y:
+            region_outside_image = True
             # If we're outside the bounds of the image...
             # Need to render reduced region and paste on to full size image
-            canvas = Image.new("RGBA", (width, height), (221, 221, 221))
-            paste_x = 0
-            paste_y = 0
             if x < 0:
                 paste_x = -x
                 width = width + x
@@ -2128,24 +2168,68 @@ class FigureExport(object):
                 paste_y = -y
                 height = height + y
                 y = 0
+            if x + width > size_x:
+                width = size_x - x
+            if y + height > size_y:
+                height = size_y - y
 
-        # Render the region...
-        jpeg_data = image.renderJpegRegion(z, t, x, y, width, height,
-                                           level=level)
-        if jpeg_data is None:
-            return
+        image_id = None
+        try:
+            image_id = int(panel['imageId'])
+        except Exception:
+            pass
 
-        i = BytesIO(jpeg_data)
-        pil_img = Image.open(i)
+        image = None
+        if image_id is not None:
+            image = self.conn.getObject("Image", image_id)
+            if image is None:
+                return None
+
+            # Render the region...
+            scale, level = self.get_zoom_level_scale(image, region, max_width)
+
+            # We need to use final rendered jpeg coordinates
+            # Convert from original image coordinates by scaling
+            x = int(x * scale)
+            y = int(y * scale)
+            width = int(width * scale)
+            height = int(height * scale)
+            size_x = int(size_x * scale)
+            size_y = int(size_y * scale)
+
+            try:
+                self.apply_rdefs(image, panel)
+                jpeg_data = image.renderJpegRegion(z, t, x, y, width, height,
+                                                   level=level)
+                if jpeg_data is None:
+                    return
+                i = BytesIO(jpeg_data)
+                pil_img = Image.open(i)
+            finally:
+                if image._re is not None:
+                    image._re.close()
+        else:
+            # Zarr image - TODO: how to decide target_size?
+            scale, pil_img = self.render_zarr_to_pil(
+                panel, xywh=(x, y, width, height))
+
+        # cache the 'zoom_level_scale', in the panel dict.
+        # since we need it for scalebar, and don't want to calculate again
+        # since rendering engine will be closed by then
+        panel['zoom_level_scale'] = scale
 
         # paste to canvas if needed
-        if canvas is not None:
-            canvas.paste(pil_img, (paste_x, paste_y))
+        if region_outside_image:
+            canvas_width = int(region['width'] * scale)
+            canvas_height = int(region['height'] * scale)
+            canvas = Image.new("RGBA", (canvas_width, canvas_height),
+                               (221, 221, 221, 255))
+            canvas.paste(pil_img, (int(paste_x * scale), int(paste_y * scale)))
             pil_img = canvas
 
         return pil_img
 
-    def get_panel_big_image(self, image, panel):
+    def get_panel_big_image(self, panel):
         """Render the viewport region for BIG images"""
 
         viewport_region = self.get_crop_region(panel)
@@ -2173,7 +2257,7 @@ class FigureExport(object):
                                'height': vp_h + extra_h}
             max_width = max_width * (viewport_region['width'] / vp_w)
 
-        pil_img = self.render_big_image_region(image, panel, z, t,
+        pil_img = self.render_big_image_region(panel, z, t,
                                                viewport_region, max_width)
 
         # Optional rotation
@@ -2201,7 +2285,137 @@ class FigureExport(object):
 
         return pil_img
 
-    def get_panel_image(self, image, panel, orig_name=None):
+    def render_zarr_to_pil(self, panel, target_size=4000, xywh=None):
+        # TODO: pick default target_size (based on dpi?) - e.g. 10000?
+
+        import zarr
+        import dask.array as da
+
+        zarr_url = panel['imageId']
+        channels = panel['channels']
+        print("render_zarr_to_pil: URL %s" % (zarr_url))
+
+        img_group = zarr.open(zarr_url, mode='r')
+        zattrs = img_group.attrs
+        if "ome" in zattrs:
+            zattrs = zattrs["ome"]
+
+        paths = [ds["path"] for ds in zattrs["multiscales"][0]["datasets"]]
+        axes = zattrs["multiscales"][0].get("axes", ["t", "c", "z", "y", "x"])
+
+        pyramid = []
+        img_data = da.from_zarr(img_group[paths[0]])
+        pyramid.append(img_data)
+
+        # pick the right pyramid level based on target_size
+        orig_width = pyramid[0].shape[-1]
+        scale_x = 1.0
+        region_width = orig_width if xywh is None else xywh[2]
+        # start big, and go smaller until we reach target size
+        for level in range(len(paths) - 1):
+            level_data = pyramid[level]
+            # if the next level is closer to target_size, use it
+            current_size_x = level_data.shape[-1]
+            this_scale = current_size_x / orig_width    # e.g. 0.5, 0.25, etc
+            this_size = region_width * this_scale
+            if this_size <= target_size:
+                break
+            # load next level, add to pyramid
+            next_data = da.from_zarr(img_group[paths[level + 1]])
+            pyramid.append(next_data)
+            next_size_x = next_data.shape[-1]
+            next_scale_x = next_size_x / orig_width
+            next_size = region_width * next_scale_x
+            # if next level is closer to target size, use it
+            # True for every loop, except maybe the last
+            if abs(next_size - target_size) < abs(this_size - target_size):
+                img_data = pyramid[level + 1]
+                scale_x = next_scale_x
+
+        size_x = img_data.shape[-1]
+        size_y = img_data.shape[-2]
+        crop_x = 0
+        crop_y = 0
+
+        # crop if needed
+        if xywh is not None:
+            # slicing happens below...
+            crop_x = int(scale_x * xywh[0])
+            crop_y = int(scale_x * xywh[1])
+            size_x = int(scale_x * xywh[2])
+            size_y = int(scale_x * xywh[3])
+
+        rgb_plane = numpy.zeros((size_y, size_x, 3), numpy.uint16)
+
+        def display(image, display_min, display_max):
+            # https://stackoverflow.com/questions/14464449/using-numpy-to-efficiently-convert-16-bit-image-data-to-8-bit-for-display-with
+            image.clip(display_min, display_max, out=image)
+            image -= display_min
+            numpy.floor_divide(image, (display_max - display_min + 1) / 256,
+                               out=image, casting='unsafe')
+            return image.astype(numpy.uint8)
+
+        def render_plane(dask_data, t, c, z, window=None):
+            # slice 5D -> 2D
+            indices = []
+            for dim in axes:
+                # handle v0.3 dims (str) and v0.4 dims (dict)
+                dim_name = dim if isinstance(dim, str) else dim['name']
+                if dim_name == 't':
+                    size_t = dask_data.shape[axes.index(dim)]
+                    if size_t == 1:
+                        indices.append(0)
+                    else:
+                        indices.append(t)
+                elif dim_name == 'c':
+                    size_c = dask_data.shape[axes.index(dim)]
+                    if size_c == 1:
+                        indices.append(0)
+                    else:
+                        indices.append(c)
+                elif dim_name == 'z':
+                    size_z = dask_data.shape[axes.index(dim)]
+                    if size_z == 1:
+                        indices.append(0)
+                    else:
+                        indices.append(z)
+                elif dim_name == 'y':
+                    indices.append(numpy.s_[crop_y: crop_y + size_y:])
+                elif dim_name == 'x':
+                    indices.append(numpy.s_[crop_x: crop_x + size_x:])
+
+            channel0 = dask_data[tuple(indices)]
+            channel0 = channel0.compute()
+
+            if window is None:
+                min_val = channel0.min()
+                max_val = channel0.max()
+                window = [min_val, max_val]
+
+            return display(channel0, window[0], window[1])
+
+        the_z = panel['theZ']
+        the_t = panel['theT']
+        for ch_index, ch in enumerate(channels):
+            hex_color = ch['color']
+            r = int(hex_color[0:2], 16)
+            g = int(hex_color[2:4], 16)
+            b = int(hex_color[4:6], 16)
+            color = (r / 255.0, g / 255.0, b / 255.0)
+            window = ch['window']['start'], ch['window']['end']
+            plane = render_plane(img_data, the_t, ch_index, the_z, window)
+
+            for index, fraction in enumerate(color):
+                if fraction > 0:
+                    color_plane = (fraction * plane).astype(numpy.uint16)
+                    rgb_plane[:, :, index] += color_plane
+
+        rgb_plane.clip(0, 255, out=rgb_plane)
+        rgb_plane = rgb_plane.astype(numpy.uint8)
+
+        return scale_x, Image.fromarray(rgb_plane, mode='RGB')
+
+    def get_panel_image(self, panel, orig_name=None):
         """
         Gets the rendered image from OMERO, then crops & rotates as needed.
         Optionally saving original and cropped images as TIFFs.
@@ -2209,37 +2423,31 @@ class FigureExport(object):
         """
         z = panel['theZ']
         t = panel['theT']
-        size_x = image.getSizeX()
-        size_y = image.getSizeY()
-        size_z = image.getSizeZ()
-        size_c = image.getSizeC()
-
-        if 'z_projection' in panel and panel['z_projection']:
-            if 'z_start' in panel and 'z_end' in panel:
-                # check max_projection_bytes
-                pixel_range = image.getPixelRange()
-                bytes_per_pixel = ceil(log2(pixel_range[1]) / 8.0)
-                proj_bytes = (size_z * size_x * size_y
-                              * size_c * bytes_per_pixel)
-
-                cfg = self.conn.getConfigService()
-                max_bytes = int(cfg.getConfigValue(
-                    'omero.pixeldata.max_projection_bytes'))
-
-                if proj_bytes <= max_bytes:
-                    image.setProjection('intmax')
-                    image.setProjectionRange(panel['z_start'], panel['z_end'])
-                else:
-                    print(f'projected_bytes {proj_bytes} exceeds '
-                          f'MAX_PROJECTED_BYTES limit: {max_bytes}')
-                    # Turn off all channels to render a black panel
-                    image.setActiveChannels([])
 
         # If big image, we don't want to render the whole plane
-        if self.is_big_image(image):
-            pil_img = self.get_panel_big_image(image, panel)
+        if self.is_big_image(panel):
+            pil_img = self.get_panel_big_image(panel)
         else:
-            pil_img = image.renderImage(z, t, compression=1.0)
+            # Handle Image ID being either int or Zarr URL
+            image_id = None
+            try:
+                image_id = int(panel['imageId'])
+            except Exception:
+                pass
+
+            if image_id is not None:
+                image = self.conn.getObject("Image", image_id)
+                if image is None:
+                    return None
+                try:
+                    self.apply_rdefs(image, panel)
+                    pil_img = image.renderImage(z, t, compression=1.0)
+                finally:
+                    if image._re is not None:
+                        image._re.close()
+            else:
+                # handle Zarr URL
+                scale, pil_img = self.render_zarr_to_pil(panel)
 
         if pil_img is None:
             return
@@ -2248,10 +2456,11 @@ class FigureExport(object):
             pil_img.save(orig_name)
 
         # big image will already be cropped...
-        if self.is_big_image(image):
+        if self.is_big_image(panel):
             return pil_img
 
         # Need to crop around centre before rotating...
+        size_x, size_y = pil_img.size
         cx = size_x / 2
         cy = size_y / 2
         dx = panel['dx']
@@ -2313,30 +2522,20 @@ class FigureExport(object):
         Gets the image from OMERO, processes (and saves) it then
         calls self.paste_image() to add it to PDF or TIFF figure.
         """
-        image_id = panel['imageId']
-        channels = panel['channels']
 
-        image = self.conn.getObject("Image", image_id)
-        if image is None:
-            return None, None
+        # create name to save image
+        # TODO: do we need real name?
+        # original_name = image.getName()
+        # img_name = os.path.basename(original_name)
+        img_name = "panel"
+        img_name = "%s_%s.tiff" % (idx, img_name)
 
-        try:
-            self.apply_rdefs(image, channels)
-
-            # create name to save image
-            original_name = image.getName()
-            img_name = os.path.basename(original_name)
-            img_name = "%s_%s.tiff" % (idx, img_name)
-
-            # get cropped image (saving original)
-            orig_name = None
-            if self.export_images:
-                orig_name = os.path.join(
-                    self.zip_folder_name, ORIGINAL_DIR, img_name)
-            pil_img = self.get_panel_image(image, panel, orig_name)
-        finally:
-            if image._re is not None:
-                image._re.close()
+        # get cropped image (saving original)
+        orig_name = None
+        if self.export_images:
+            orig_name = os.path.join(
+                self.zip_folder_name, ORIGINAL_DIR, img_name)
+        pil_img = self.get_panel_image(panel, orig_name)
 
         # for PDF export, we might have a target dpi
         dpi = panel.get('min_export_dpi', None)
@@ -2344,19 +2543,22 @@ class FigureExport(object):
         # Paste the panel to PDF or TIFF image
         self.paste_image(pil_img, img_name, panel, page, dpi)
 
-        return image, pil_img
+        return pil_img
 
-    def get_thumbnail(self, image_id):
+    def get_thumbnail(self, panel, idx):
         """ Saves thumb as local jpg and returns name """
 
-        conn = self.conn
-        image = conn.getObject("Image", image_id)
-        if image is None:
-            return
-        thumb_data = image.getThumbnail(size=(96, 96))
-        i = BytesIO(thumb_data)
-        pil_img = Image.open(i)
-        temp_name = str(image_id) + "thumb.jpg"
+        try:
+            image_id = int(panel['imageId'])
+            image = self.conn.getObject("Image", image_id)
+            if image is None:
+                return
+            thumb_data = image.getThumbnail(size=(96, 96))
+            i = BytesIO(thumb_data)
+            pil_img = Image.open(i)
+        except ValueError:
+            scale, pil_img = self.render_zarr_to_pil(panel, target_size=96)
+        temp_name = str(idx) + "_thumb.jpg"
         pil_img.save(temp_name)
         return temp_name
 
@@ -2454,7 +2656,7 @@ class FigureExport(object):
             "Figure contains the following images:", page_y, style=style_h3)
 
         # Go through sorted panels, adding paragraph for each unique image
-        for p in panels_json:
+        for idx, p in enumerate(panels_json):
             iid = p['imageId']
             # list unique scalebar lengths
             if 'scalebar' in p and p['scalebar'].get('show'):
@@ -2467,12 +2669,15 @@ class FigureExport(object):
             if iid in img_ids:
                 continue  # ignore images we've already handled
             img_ids.add(iid)
-            thumb_src = self.get_thumbnail(iid)
+            thumb_src = self.get_thumbnail(p, idx)
             # thumb = "<img src='%s' width='%s' height='%s' " \
             #         "valign='middle' />" % (thumbSrc, thumbSize, thumbSize)
             lines = []
             lines.append(p['name'])
-            img_url = "%s?show=image-%s" % (base_url, iid)
+            try:
+                img_url = "%s?show=image-%s" % (base_url, int(iid))
+            except ValueError:
+                img_url = iid
             lines.append(
                 "<a href='%s' color='blue'>%s</a>" % (img_url, img_url))
             # addPara([" ".join(line)])
@@ -2501,22 +2706,18 @@ class FigureExport(object):
         # overlap needs overlap on x-axis...
         return px < cx2 and cx < px2 and py < cy2 and cy < py2
 
-    def add_panels_to_page(self, panels_json, image_ids, page):
+    def add_panels_to_page(self, panels_json, page):
         """ Add panels that are within the bounds of this page """
         for i, panel in enumerate(panels_json):
 
             if not self.panel_is_on_page(panel, page):
                 continue
 
-            image_id = panel['imageId']
             # draw_panel() creates PIL image then applies it to the page.
             # For TIFF export, draw_panel() also adds shapes to the
             # PIL image before pasting onto the page...
-            image, pil_img = self.draw_panel(panel, page, i)
-            if image is None:
-                continue
-            if image.canAnnotate():
-                image_ids.add(image_id)
+            pil_img = self.draw_panel(panel, page, i)
+
             # ... but for PDF we have to add shapes to the whole PDF page
             self.add_rois(panel, page)  # This does nothing for TIFF export
 
@@ -3159,7 +3360,7 @@ class OmeroExport(TiffExport):
         # Create a new blank tiffFigure for subsequent pages
         self.create_figure()
 
-    def create_file_annotation(self, image_ids):
+    def create_file_annotation(self):
         """Return result of script."""
 
         # We don't need to create file annotation, but we can return
@@ -3169,7 +3370,8 @@ class OmeroExport(TiffExport):
 
 def export_figure(conn, script_params):
     # make sure we can find all images
-    conn.SERVICE_OPTS.setOmeroGroup(-1)
+    if conn is not None:
+        conn.SERVICE_OPTS.setOmeroGroup(-1)
 
     export_option = script_params['Export_Option']
 
