@@ -499,10 +499,12 @@ import { hideModal } from "./util";
                 setTimeout(this.keyPressed, 50);
                 return;
             }
-            if (re.test(idInput)) {
+            if (re.test(idInput) || idInput.indexOf('zarr') > 0 || idInput.startsWith('http')) {
                 submitBtn.removeAttr("disabled");
+                submitBtn.attr("title", "Add Images to figure");
             } else {
                 submitBtn.attr("disabled", "disabled");
+                submitBtn.attr("title", "Enter a valid image ID or OME-Zarr URL");
             }
         },
 
