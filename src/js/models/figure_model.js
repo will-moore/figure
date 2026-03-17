@@ -416,7 +416,7 @@
                 figureJSON.figureName = options.figureName;
             }
             let fileName = figureJSON.figureName || "figure";
-            let jsonText = JSON.stringify(this.figure_toJSON());
+            let jsonText = JSON.stringify(this.figure_toJSON(), null, 2);
             downloadAsFile(jsonText, "application/json", fileName + ".json");
             this.set({unsaved: false});
         },
