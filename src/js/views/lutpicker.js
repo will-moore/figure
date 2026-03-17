@@ -23,7 +23,7 @@ import _ from 'underscore';
 import * as bootstrap from "bootstrap"
 
 import lut_picker_template from '../../templates/lut_picker.template.html?raw';
-import { showModal, getJson } from "./util";
+import { showModal } from "./util";
 
 // Need to handle dev vv built (omero-web) paths
 import lutsPng from "../../images/luts_10.png";

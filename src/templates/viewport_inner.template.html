@@ -1,6 +1,7 @@
 
     <% _.each(imgs_css, function(css, i) { %>
-    <img class="vp_img<% if (css.pixelated) {%> pixelated<% } %>"
+    <img id='<%= css.id %>'
+        class="vp_img<% if (css.pixelated) {%> pixelated<% } %>"
         style="opacity:<%= opacity %>; left:<%= css.left %>px; top:<%= css.top %>px;
             width:<%= css.width %>px; height:<%= css.height %>px;
             -webkit-transform-origin:<%= css['transform-origin'] %>;

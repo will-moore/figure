@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<script type="module">
+  import * as zarr from "https://cdn.jsdelivr.net/npm/zarrita@next/+esm";
+  const store = new zarr.FetchStore("https://raw.githubusercontent.com/zarr-developers/zarr_implementations/5dc998ac72/examples/zarr.zr/blosc");
+  const arr = await zarr.open(store, { kind: "array" });
+  console.log(arr);
+  // {
+  //   store: FetchStore,
+  //   path: "/",
+  //   dtype: "uint8",
+  //   shape: [512, 512, 3],
+  //   chunks: [100, 100, 1],
+  // }
+  const view = await zarr.get(arr, [null, null, 0]);
+  // {
+  //   data: Uint8Array,
+  //   shape: [512, 512],
+  //   stride: [512, 1],
+  // }
+    console.log(view);
+</script>
+
+<body>
+    Test
+</body>

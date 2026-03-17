@@ -41,6 +41,7 @@ var Point = function Point(options) {
   this._radiusX = POINT_RADIUS;
   this._radiusY = POINT_RADIUS;
   this._rotation = options.rotation || 0;
+  this._textId = options.textId || undefined;
 
   if (this._radiusX === 0 || this._radiusY === 0) {
     this._yxRatio = 0.5;
@@ -134,6 +135,9 @@ Point.prototype.toJson = function toJson() {
   };
   if (this._id) {
     rv.id = this._id;
+  }
+  if (this._textId) {
+    rv.textId = this._textId;
   }
   return rv;
 };
@@ -402,6 +406,11 @@ Point.prototype.drawShape = function drawShape() {
 
 Point.prototype.setSelected = function setSelected(selected) {
   this._selected = !!selected;
+  // IF there is a text shape, set its selected state too
+  let textShape = this.manager.getShape(this._textId);
+  if (textShape) {
+    textShape.setSelected(this._selected);
+  }
   this.drawShape();
 };
 

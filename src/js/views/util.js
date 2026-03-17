@@ -256,9 +256,55 @@ export function hideModal(modalId) {
     thisModal.hide();
 }
 
-export async function getJson (url) {
+export async function getJsonWithCredentials (url) {
+    // $.getJSON() also works for OMERO.web requests
     let cors_headers = { mode: 'cors', credentials: 'include' };
     return fetch(url, cors_headers).then(rsp => rsp.json());
+}
+
+export const FILE_NOT_FOUND = "File not found";
+export async function getJson(url) {
+    // This will throw an Error if 404 or CORS fails etc
+    return fetchHandleError(url).then(rsp => rsp.json());
+}
+
+async function fetchHandleError(url) {
+  let msg = `Error Loading ${url}:`;
+  let rsp;
+  try {
+    rsp = await fetch(url).then(function (response) {
+      if (!response.ok) {
+        // make the promise be rejected if we didn't get a 2xx response
+        // NB. statusText could be "Not Found" or "File not found" depending on server
+        // Standardise based on response.status
+        if (response.status == 404) {
+          msg += ` ${FILE_NOT_FOUND}`;
+        } else {
+          msg += ` ${response.statusText}`;
+        }
+      } else {
+        return response;
+      }
+    });
+  } catch (error) {
+    console.log("check for CORS...");
+    console.log(error);
+    try {
+      let corsRsp = await fetch(url, { mode: "no-cors" });
+      console.log("corsRsp", corsRsp);
+      // If the 'no-cors' mode allows this to return, then we
+      // likely failed due to CORS in the original request
+      msg += " Failed due to CORS issues.";
+    } catch (anotherError) {
+      console.log("Even `no-cors` request failed!", anotherError);
+      // return the original error (same as anotherError?)
+      msg += ` ${error}`;
+    }
+  }
+  if (rsp) {
+    return rsp;
+  }
+  throw Error(msg);
 }
 
 export const RANDOM_NUMBER_RANGE = 100000000;
@@ -308,4 +354,31 @@ export function updateRoiIds(panelsJson) {
     });
 
     return updatedPanels;
+}
+
+// Normalize z-projection bounds to be within [0, sizeZ-1] and ensure start <= end
+// Takes z_start, z_end, z_projection values and sizeZ, returns normalized bounds
+// If sizeZ is 1, disables z_projection and resets to 0
+export function normalizeZProjectionBounds(z_start, z_end, z_projection, sizeZ) {
+    var result = {
+        z_projection: (z_projection === undefined) ? false : z_projection,
+        z_start: (z_start === undefined) ? 0 : z_start,
+        z_end: (z_end === undefined) ? 0 : z_end
+    };
+
+    if (sizeZ === 1) {
+        result.z_projection = false;
+        result.z_start = 0;
+        result.z_end = 0;
+    } else {
+        // bounds checking and ensures start <= end
+        result.z_end = Math.max(Math.min(result.z_end, sizeZ - 1), 0);
+        result.z_start = Math.max(Math.min(result.z_start, sizeZ - 1), 0);
+        if (result.z_start > result.z_end) {
+            var tmp = result.z_start;
+            result.z_start = result.z_end;
+            result.z_end = tmp;
+        }
+    }
+    return result;
 }

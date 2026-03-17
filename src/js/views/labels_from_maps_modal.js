@@ -4,7 +4,7 @@ import $ from "jquery";
 import _ from "underscore";
 
 import FigureModel from "../models/figure_model";
-import { getJson, hideModal } from "./util";
+import { getJsonWithCredentials, hideModal } from "./util";
 
 
 export var LabelFromMapsModal = Backbone.View.extend({
@@ -39,13 +39,19 @@ export var LabelFromMapsModal = Backbone.View.extend({
      */
     loadMapAnns() {
         let imageIds = this.model.getSelected().map(function(m){return m.get('imageId')});
+        imageIds = _.uniq(imageIds).filter(id => !isNaN(id));    // ignore zarr images
+        if (imageIds.length === 0) {
+            this.annotations = [];
+            this.render();
+            return;
+        }
         this.isLoading = true;
         $('select', this.el).html("<option>Loading data...</option>");
 
         var url = WEBINDEX_URL + "api/annotations/?type=map&parents=true&image=";
         url += imageIds.join("&image=");
 
-        getJson(url).then(data => {
+        getJsonWithCredentials(url).then(data => {
             if (data.hasOwnProperty('parents')){
                 data.parents.annotations.forEach(function(ann) {
                     let class_ = ann.link.parent.class;

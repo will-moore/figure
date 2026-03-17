@@ -6,7 +6,7 @@ import Raphael from "raphael";
 import FigureModel from "../models/figure_model";
 import RectView from "./raphael-rect";
 
-import {figureConfirmDialog, hideModal, getJson, rotatePoint} from "./util";
+import {figureConfirmDialog, hideModal, getJsonWithCredentials, rotatePoint} from "./util";
 
 import crop_modal_roi_template from '../../templates/modal_dialogs/crop_modal_roi.template.html?raw';
 
@@ -399,7 +399,7 @@ export const CropModalView = Backbone.View.extend({
                 iid = self.m.get('imageId');
             var offset = this.roisPageSize * this.roisPage;
             var url = BASE_WEBFIGURE_URL + 'roiRectangles/' + iid + '/?limit=' + self.roisPageSize + '&offset=' + offset;
-            getJson(url).then(rsp => {
+            getJsonWithCredentials(url).then(rsp => {
                 var data = rsp.data;
                 self.roisLoaded += data.length;
                 self.roisPage += 1;
@@ -513,7 +513,6 @@ export const CropModalView = Backbone.View.extend({
                 let rotation = rect.rotation || 0;
                 if (rect.theT > -1) this.m.set('theT', rect.theT, {'silent': true});
                 if (rect.theZ > -1) this.m.set('theZ', rect.theZ, {'silent': true});
-                src = this.m.get_img_src(true);
                 if (rect.width > rect.height) {
                     div_w = size;
                     div_h = (rect.height/rect.width) * div_w;
@@ -529,8 +528,12 @@ export const CropModalView = Backbone.View.extend({
                 rect.theT = rect.theT !== undefined ? rect.theT : origT;
                 rect.theZ = rect.theZ !== undefined ? rect.theZ : origZ;
                 let css = this.m._viewport_css(left, top, img_w, img_h, size, size, rotation);
+                let random_id = "rect_" + Math.random();
+                this.m.get_img_src(true)
+                    .then(src => document.getElementById(random_id).src = src);
 
                 var json = {
+                    'id': random_id,
                     'msg': msg,
                     'src': src,
                     'rect': rect,
@@ -586,7 +589,8 @@ export const CropModalView = Backbone.View.extend({
             this.m.set('zoom', 100);
             this.m.set('width', newW);
             this.m.set('height', newH);
-            var src = this.m.get_img_src(true);
+            this.m.get_img_src(true)
+                .then(src => this.$cropImg.attr('src', src));
             var rotation = this.m.get('rotation') || 0;
             
             // Calculate bounding box for rotated image

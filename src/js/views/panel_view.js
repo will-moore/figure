@@ -194,15 +194,18 @@
             // But we don't want the previous image showing while we wait...
             if (this.model.is_big_image()) {
                 this.$img_panel.hide();
-                $(".image_panel_spinner", this.$el).show();
             }
+            let timeoutId = setTimeout(() => {
+                $(".image_panel_spinner", this.$el).show();
+            }, 100); // Show spinner only if image load takes longer than 100ms
             this.$img_panel.one("load", function(){
+                clearTimeout(timeoutId);
                 $(".image_panel_spinner", this.$el).hide();
                 this.$img_panel.show();
             }.bind(this));
 
-            var src = this.model.get_img_src();
-            this.$img_panel.attr('src', src);
+            this.model.get_img_src()
+                .then(src => this.$img_panel.attr('src', src));
 
             // if a 'reasonable' dpi is set, we don't pixelate
             if (this.model.get('min_export_dpi') > 100) {

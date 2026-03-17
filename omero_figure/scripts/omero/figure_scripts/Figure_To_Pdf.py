@@ -75,7 +75,7 @@ except ImportError:
     reportlab_installed = False
     logger.error("Reportlab not installed.")
 
-VERSION = "7.3.2.dev0"
+VERSION = "7.4.2.dev0"
 DEFAULT_OFFSET = 0
 
 ORIGINAL_DIR = "1_originals"
@@ -677,6 +677,26 @@ class ShapeToPilExport(ShapeExport):
             self.FONTPATH = os.path.join(this_path, "pilfonts")
 
         super(ShapeToPilExport, self).__init__(panel)
+
+    def get_font(self, fontsize, bold=False, italics=False):
+        """ Try to load font from known location in OMERO or local """
+        font_name = "FreeSans.ttf"
+        if bold and italics:
+            font_name = "FreeSansBoldOblique.ttf"
+        elif bold:
+            font_name = "FreeSansBold.ttf"
+        elif italics:
+            font_name = "FreeSansOblique.ttf"
+        path_to_font = os.path.join(self.FONTPATH, font_name)
+        try:
+            font = ImageFont.truetype(path_to_font, fontsize)
+        except Exception:
+            try:
+                font_path = os.path.join(self.FONTPATH, "B24.pil")
+                font = ImageFont.load(font_path)
+            except Exception:
+                font = ImageFont.load_default()
+        return font
 
     def get_panel_coords(self, shape_x, shape_y):
         """
@@ -2750,7 +2770,6 @@ class FigureExport(object):
             raise ImportError(
                 "Need to install https://bitbucket.org/rptlab/reportlab")
         name = self.get_figure_file_name()
-        print("Saving PDF figure to %s" % name)
         self.figure_canvas = canvas.Canvas(
             name, pagesize=(self.page_width, self.page_height))
 

@@ -137,6 +137,9 @@ var ChannelSliderView = Backbone.View.extend({
             return false;
         }
         var c = this.hexToRgb(color);
+        if (!c) {
+            return false;
+        }
         var min, max, delta;
         var v, s, h;
         min = Math.min(c.r, c.g, c.b);

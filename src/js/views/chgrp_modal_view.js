@@ -5,7 +5,11 @@ import _ from "underscore";
 
 import FigureModel from "../models/figure_model";
 
-import {figureConfirmDialog, hideModal, getJson} from "./util";
+import {
+    figureConfirmDialog,
+    hideModal,
+    getJsonWithCredentials
+} from "./util";
 
 export const ChgrpModalView = Backbone.View.extend({
 
@@ -41,7 +45,7 @@ export const ChgrpModalView = Backbone.View.extend({
     loadImageDetails: function() {
         var imgIds = this.model.panels.pluck('imageId');
         var url = `${BASE_WEBFIGURE_URL}images_details/?image=${_.uniq(imgIds).join(',')}`;
-        getJson(url).then(data => {
+        getJsonWithCredentials(url).then(data => {
             // Sort images by Group
             this.imagesByGroup = data.data.reduce(function(prev, img){
                 if (!prev[img.group.id]) {
@@ -56,7 +60,7 @@ export const ChgrpModalView = Backbone.View.extend({
 
     loadGroups: function() {
         var url = `${API_BASE_URL_V0}m/experimenters/${USER_ID}/experimentergroups/`;
-        getJson(url).then(data => {
+        getJsonWithCredentials(url).then(data => {
             this.omeroGroups = data.data.map(group => {return {id: group['@id'], name: group.Name}})
                 .filter(group => group.name != 'user');
             this.render();
