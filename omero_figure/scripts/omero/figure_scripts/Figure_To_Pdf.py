@@ -1156,7 +1156,7 @@ class FigureExport(object):
         if self.output_path_name is not None:
             name = self.output_path_name
         else:
-            # Remove commas: causes problems 'duplicate headers' in file download
+            # Remove commas: causes problems 'duplicate headers' in download
             name = self.figure_name.replace(",", ".")
             # in case we have path/to/name, just use name
             name = path.basename(name)
@@ -3509,8 +3509,8 @@ def handle_main():
     parser = argparse.ArgumentParser(description='Test Figure to PDF export')
     parser.add_argument("file", help="Path to Figure JSON file")
     parser.add_argument('outputPathName',
-                        help=("Relative or absolute path/to/output.pdf."
-                              " Extension will be used to determine export file type"))
+                        help=("Relative or absolute path/to/output.pdf. "
+                              "Extension is used to set export file type"))
     parser.add_argument('--omero', action='store_true',
                         help='Run with OMERO connection')
     args = parser.parse_args()
