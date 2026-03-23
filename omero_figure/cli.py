@@ -16,6 +16,7 @@
 #
 
 import argparse
+import os
 
 from omero_figure.scripts.omero.figure_scripts.Figure_To_Pdf \
     import export_figure
@@ -33,6 +34,10 @@ def figure_export() -> None:
     output_path = args.output
     print(f"input:  {args.input}")
     print(f"output: {args.output}")
+
+    if os.path.exists(output_path):
+        print(f"Output file {output_path} already exists; Exiting.")
+        return
 
     # open and read the input file
     with open(args.input, 'r') as f:
