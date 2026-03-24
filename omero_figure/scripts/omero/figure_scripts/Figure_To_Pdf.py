@@ -2434,6 +2434,8 @@ class FigureExport(object):
         the_z = panel['theZ']
         the_t = panel['theT']
         for ch_index, ch in enumerate(channels):
+            if not ch['active']:
+                continue
             hex_color = ch['color']
             if "lut" in hex_color:
                 # LUTs not supported for Zarr images yet
