@@ -1918,7 +1918,7 @@ class FigureExport(object):
         """
         color = channel["color"]
 
-        # If LUT but no OMERO conn, we can't get the LUT, so return a greyscale ramp
+        # If LUT but no OMERO conn, we return a greyscale ramp
         if self.conn is None and color.endswith(".lut"):
             color = "FFFFFF"
 
