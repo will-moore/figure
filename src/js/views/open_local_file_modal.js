@@ -22,10 +22,11 @@ export const OpenLocalFileModalView = Backbone.View.extend({
         $(".figureFileUrl", this.el).val(demoUrl);
         this.enableSubmit();
 
-        // when dialog is shown, clear and render
-        // document.getElementById('openLocalFileModal').addEventListener('shown.bs.modal', () => {
-            // self.render();
-        //});
+        // when dialog is shown...
+        document.getElementById('openLocalFileModal').addEventListener('shown.bs.modal', () => {
+            // clear file input
+            $("input[type='file']", this.el).val("");
+        });
     },
 
     events: {
@@ -37,7 +38,6 @@ export const OpenLocalFileModalView = Backbone.View.extend({
     enableSubmit: function(event) {
         let figureFileUrl = $(".figureFileUrl", this.el).val();
         let localFile = $("input[type='file']", this.el).val();
-        console.log("enableSubmit", figureFileUrl, localFile);
 
         if (figureFileUrl || localFile) {
             $("button[type='submit'", this.el).prop("disabled", false);
@@ -51,15 +51,19 @@ export const OpenLocalFileModalView = Backbone.View.extend({
 
         let figureFileUrl = $(".figureFileUrl", this.el).val();
         let localFile = $("input[type='file']", this.el).val();
-
-        console.log("figureFileUrl", figureFileUrl);
-        console.log("localFile", localFile);
-        console.log("this.app", this.app);
         
         if (localFile) {
+            let file = $("input[type='file']", this.el)[0].files[0];
             // upload JSON file and open figure
+            const reader = new FileReader();
+            reader.onload = (evt) => {
+                let figureData = JSON.parse(evt.target.result);
+                this.model.clearFigure();
+                this.model.load_from_JSON(figureData);
+                this.model.set('unsaved', false);
+            };
+            reader.readAsBinaryString(file);
         } else if (figureFileUrl) {
-            console.log("/omero-figure/?file=" + figureFileUrl);
             // go to ?file=figureFileUrl
             this.app.navigate(`${BASE_URL}?file=${figureFileUrl}`, {trigger: true});
         }
