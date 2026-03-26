@@ -317,8 +317,12 @@
             if (!APP_SERVED_BY_OMERO) {
                 let title = "Figure Export Options";
                 let buttons = ["OK"];
-                let message = `The standalone app doesn't support export to PDF.
-                <p>You can download the figure via 'Save' and run the Figure_To_Pdf.py python script locally. TODO: add link & instructions.</p>`;
+                let message = `The standalone app doesn't support export to PDF or TIFF.
+                <p>You can download the figure via 'Save' and run the figure export script on your local machine.</p>
+                <p>For more details, see the
+                <a href="https://github.com/ome/omero-figure?tab=readme-ov-file#run-figure-export-locally" target="_blank">
+                figure export instructions</a>.
+                </p>`;
 
                 figureConfirmDialog(title, message, buttons);
                 return;
