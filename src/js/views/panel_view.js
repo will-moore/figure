@@ -416,6 +416,7 @@
             if (isLUT) {
                 lut_url = await FigureLutPicker.loadLuts();  // Ensure lut url and list are loaded
                 lutBgPos = FigureLutPicker.getLutBackgroundPosition(color);
+                lut_url = FigureLutPicker.getLutPng(color);
             }
             var inverted_pos = {  // convenience variable for the colorbar template.
                 "left": "right",

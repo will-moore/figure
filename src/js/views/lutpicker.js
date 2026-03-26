@@ -125,6 +125,9 @@ var LutPickerView = Backbone.View.extend({
     },
 
     getLutBackgroundPosition: function(lutName) {
+        if (!APP_SERVED_BY_OMERO) {
+            return '0px 0px';
+        }
         var lutIndex = this.lut_names.indexOf(lutName);
         if (lutIndex > -1) {
             return '0px -' + ((lutIndex * 1000) +2) + 'px';
