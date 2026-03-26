@@ -30,15 +30,7 @@ from math import atan2, atan, sin, cos, sqrt, radians, floor, ceil, log2
 from copy import deepcopy
 import re
 
-from omero.model import ImageAnnotationLinkI, ImageI, LengthI
-import omero.scripts as scripts
-from omero.gateway import BlitzGateway
-from omero.rtypes import rstring, robject
-from omero.model.enums import UnitsLength
-
 from io import BytesIO
-
-from reportlab.pdfbase.pdfmetrics import stringWidth
 
 try:
     from PIL import Image, ImageDraw, ImageFont
@@ -47,6 +39,19 @@ except ImportError:
     import ImageDraw
 
 logger = logging.getLogger('figure_to_pdf')
+
+omero_installed = True
+try:
+    from omero.model import ImageAnnotationLinkI, ImageI, LengthI
+    import omero.scripts as scripts
+    from omero.gateway import BlitzGateway
+    from omero.rtypes import rstring, robject
+    from omero.model.enums import UnitsLength
+    from Glacier2 import PermissionDeniedException
+    from Ice import ConnectionRefusedException
+except ImportError:
+    omero_installed = False
+    logger.info("OMERO libraries not installed.")
 
 try:
     import markdown
@@ -64,6 +69,7 @@ try:
     from reportlab.platypus import Paragraph
     from reportlab.lib.enums import TA_LEFT, TA_CENTER, TA_RIGHT
     from reportlab.lib.utils import ImageReader
+    from reportlab.pdfbase.pdfmetrics import stringWidth
     reportlab_installed = True
 except ImportError:
     reportlab_installed = False
@@ -96,17 +102,27 @@ processing steps:
 """
 
 # Create a dict we can use for scalebar unit conversions
-unit_symbols = {}
-for name in LengthI.SYMBOLS.keys():
-    if name in ("PIXEL", "REFERENCEFRAME"):
-        continue
-    klass = getattr(UnitsLength, name)
-    unit = LengthI(1, klass)
-    to_microns = LengthI(unit, UnitsLength.MICROMETER)
-    unit_symbols[name] = {
-        'symbol': unit.getSymbol(),
-        'microns': to_microns.getValue()
-    }
+unit_symbols = {
+    "ANGSTROM": {'symbol': "\u00c5", 'microns': 0.0001},
+    "CENTIMETER": {'symbol': "cm", 'microns': 10000.0},
+    "KILOMETER": {'symbol': "km", 'microns': 1000000000.0},
+    "METER": {'symbol': "m", 'microns': 1000000.0},
+    "MICROMETER": {'symbol': "\u00b5m", 'microns': 1},
+    "MILLIMETER": {'symbol': "mm", 'microns': 1000.0},
+    "NANOMETER": {'symbol': "nm", 'microns': 0.001},
+}
+if omero_installed:
+    units_symbols = {}
+    for name in LengthI.SYMBOLS.keys():
+        if name in ("PIXEL", "REFERENCEFRAME"):
+            continue
+        klass = getattr(UnitsLength, name)
+        unit = LengthI(1, klass)
+        to_microns = LengthI(unit, UnitsLength.MICROMETER)
+        unit_symbols[name] = {
+            'symbol': unit.getSymbol(),
+            'microns': to_microns.getValue()
+        }
 
 
 def scale_to_export_dpi(pixels):
@@ -652,10 +668,35 @@ class ShapeToPilExport(ShapeExport):
         self.scale = pil_img.size[0] / crop['width']
         self.draw = ImageDraw.Draw(pil_img)
 
-        from omero.gateway import THISPATH
-        self.GATEWAYPATH = THISPATH
+        if omero_installed:
+            from omero.gateway import THISPATH
+            self.FONTPATH = os.path.join(THISPATH, "pilfonts")
+        else:
+            # get location of this script... /pilfonts
+            this_path = os.path.dirname(os.path.abspath(__file__))
+            self.FONTPATH = os.path.join(this_path, "pilfonts")
 
         super(ShapeToPilExport, self).__init__(panel)
+
+    def get_font(self, fontsize, bold=False, italics=False):
+        """ Try to load font from known location in OMERO or local """
+        font_name = "FreeSans.ttf"
+        if bold and italics:
+            font_name = "FreeSansBoldOblique.ttf"
+        elif bold:
+            font_name = "FreeSansBold.ttf"
+        elif italics:
+            font_name = "FreeSansOblique.ttf"
+        path_to_font = os.path.join(self.FONTPATH, font_name)
+        try:
+            font = ImageFont.truetype(path_to_font, fontsize)
+        except Exception:
+            try:
+                font_path = os.path.join(self.FONTPATH, "B24.pil")
+                font = ImageFont.load(font_path)
+            except Exception:
+                font = ImageFont.load_default()
+        return font
 
     def get_panel_coords(self, shape_x, shape_y):
         """
@@ -711,13 +752,7 @@ class ShapeToPilExport(ShapeExport):
         r, g, b, a = self.get_rgba_int(shape['strokeColor'])
         # bump up alpha a bit to make text more readable
         rgba = (r, g, b, int(128 + a / 2))
-        font_name = "FreeSans.ttf"
-        path_to_font = os.path.join(self.GATEWAYPATH, "pilfonts", font_name)
-        try:
-            font = ImageFont.truetype(path_to_font, size)
-        except Exception:
-            font = ImageFont.load(
-                '%s/pilfonts/B%0.2d.pil' % (self.GATEWAYPATH, size))
+        font = self.get_font(size)
         box = font.getbbox(text)
         width = box[2] - box[0]
         height = box[3] - box[1]
@@ -738,15 +773,7 @@ class ShapeToPilExport(ShapeExport):
         x, y = text_coords['x'], text_coords['y']
 
         r, g, b, a = self.get_rgba_int(stroke_color)
-
-        font_name = "FreeSans.ttf"
-        path_to_font = os.path.join(self.GATEWAYPATH, "pilfonts", font_name)
-        try:
-            font = ImageFont.truetype(path_to_font, font_size)
-        except Exception:
-            font = ImageFont.load(
-                '%s/pilfonts/B%0.2d.pil' % (self.GATEWAYPATH, font_size))
-
+        font = self.get_font(font_size)
         box = font.getbbox(text)
         txt_w = box[2] - box[0]
         box = font.getbbox("Mg")  # height including acsenders & descenders
@@ -1032,6 +1059,8 @@ class FigureExport(object):
         self.conn = conn
         self.script_params = script_params
         self.export_images = export_images
+        # For standalone script, we may have relative or absolute output path
+        self.output_path_name = script_params.get("outputPathName")
 
         self.ns = "omero.web.figure.pdf"
         self.mimetype = "application/pdf"
@@ -1123,18 +1152,22 @@ class FigureExport(object):
         # Extension is pdf or tiff
         fext = self.get_figure_file_ext()
 
-        name = self.figure_name
-        # in case we have path/to/name, just use name
-        name = path.basename(name)
+        # For standalone script, we may have relative or absolute output path
+        if self.output_path_name is not None:
+            name = self.output_path_name
+        else:
+            # Remove commas: causes problems 'duplicate headers' in download
+            name = self.figure_name.replace(",", ".")
+            # in case we have path/to/name, just use name
+            name = path.basename(name)
 
-        # if ends with E.g. .pdf, remove extension
-        if name.endswith("." + fext):
-            name = name[0: -len("." + fext)]
+        # remove extension
+        for ext in ("pdf", "tiff", "tif"):
+            if name.endswith("." + ext):
+                name = name[0: -len("." + ext)]
 
         # Name with extension and folder
         full_name = "%s.%s" % (name, fext)
-        # Remove commas: causes problems 'duplicate headers' in file download
-        full_name = full_name.replace(",", ".")
 
         index = page if page is not None else 1
         if fext == "tiff" and self.page_count > 1:
@@ -1885,6 +1918,10 @@ class FigureExport(object):
         """
         color = channel["color"]
 
+        # If LUT but no OMERO conn, we return a greyscale ramp
+        if self.conn is None and color.endswith(".lut"):
+            color = "FFFFFF"
+
         # Convert the hexadecimal string to RGB
         color_ramp = None
         if len(color) == 6:
@@ -2397,7 +2434,12 @@ class FigureExport(object):
         the_z = panel['theZ']
         the_t = panel['theT']
         for ch_index, ch in enumerate(channels):
+            if not ch['active']:
+                continue
             hex_color = ch['color']
+            if "lut" in hex_color:
+                # LUTs not supported for Zarr images yet
+                hex_color = "FFFFFF"
             r = int(hex_color[0:2], 16)
             g = int(hex_color[2:4], 16)
             b = int(hex_color[4:6], 16)
@@ -2910,9 +2952,13 @@ class TiffExport(FigureExport):
 
         super(TiffExport, self).__init__(conn, script_params, export_images)
 
-        from omero.gateway import THISPATH
-        self.GATEWAYPATH = THISPATH
-
+        if omero_installed:
+            from omero.gateway import THISPATH
+            self.FONTPATH = os.path.join(THISPATH, "pilfonts")
+        else:
+            # get location of this script... /pilfonts
+            this_path = os.path.dirname(os.path.abspath(__file__))
+            self.FONTPATH = os.path.join(this_path, "pilfonts")
         self.ns = "omero.web.figure.tiff"
         self.mimetype = "image/tiff"
 
@@ -2929,12 +2975,15 @@ class TiffExport(FigureExport):
             font_name = "FreeSansBold.ttf"
         elif italics:
             font_name = "FreeSansOblique.ttf"
-        path_to_font = os.path.join(self.GATEWAYPATH, "pilfonts", font_name)
+        path_to_font = os.path.join(self.FONTPATH, font_name)
         try:
             font = ImageFont.truetype(path_to_font, fontsize)
         except Exception:
-            font = ImageFont.load(
-                '%s/pilfonts/B%0.2d.pil' % (self.GATEWAYPATH, 24))
+            try:
+                font_path = os.path.join(self.FONTPATH, "B24.pil")
+                font = ImageFont.load(font_path)
+            except Exception:
+                font = ImageFont.load_default()
         return font
 
     def get_figure_file_ext(self):
@@ -3446,5 +3495,68 @@ def run_script():
         client.closeSession()
 
 
+# usage:
+# python omero_figure/export_script/figure_to_pdf.py
+
+def handle_main():
+
+    try:
+        if omero_installed:
+            # normal script workflow - uses OMERO connection
+            run_script()
+
+            # If script ran successfully, we're done!
+            return
+    except (PermissionDeniedException, ConnectionRefusedException):
+        # This is a workaround for the fact that the script is not run in a
+        # session, so we need to create one manually.
+
+        print("ClientError: Could not connect to OMERO server.")
+
+    # argparse to allow testing without OMERO
+    import argparse
+    parser = argparse.ArgumentParser(description='Test Figure to PDF export')
+    parser.add_argument("file", help="Path to Figure JSON file")
+    parser.add_argument('outputPathName',
+                        help=("Relative or absolute path/to/output.pdf. "
+                              "Extension is used to set export file type"))
+    parser.add_argument('--omero', action='store_true',
+                        help='Run with OMERO connection')
+    args = parser.parse_args()
+
+    fpath = args.file
+    with open(fpath, 'r') as f:
+        figure_json = json.load(f)
+
+    output_path_name = args.outputPathName
+    fext = output_path_name.split('.')[-1].lower()
+    file_type = "TIFF" if fext in ['tif', 'tiff'] else "PDF"
+
+    script_args = {
+                    "Figure_JSON": json.dumps(figure_json),
+                    "Export_Option": file_type,
+                    "outputPathName": output_path_name,
+                    "Webclient_URI": "http://localhost/webclient/"
+                }
+
+    starttime = datetime.now()
+    if args.omero:
+        print("TESTING: Running with OMERO....")
+        if not omero_installed:
+            print("omero-py not installed.")
+            return
+
+        from omero.cli import cli_login
+        with cli_login() as cli:
+            conn = BlitzGateway(client_obj=cli.get_client())
+            export_figure(conn, script_args)
+    else:
+        print("Running without OMERO....")
+        export_figure(None, script_args)
+
+    endtime = datetime.now()
+    print(f"Elapsed time: {endtime - starttime}")
+
+
 if __name__ == "__main__":
-    run_script()
+    handle_main()
