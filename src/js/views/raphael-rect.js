@@ -204,6 +204,12 @@ const RectView = Backbone.View.extend({
              self.selectShape(e);
         });
 
+        // add touch support for mobile
+        this.element.touchstart(function(e){
+             e.stopImmediatePropagation();
+             self.selectShape(e);
+        });
+
         this.updateShape();  // sync position, selection etc.
 
         // Finally, we need to render when model changes
