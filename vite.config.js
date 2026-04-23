@@ -27,9 +27,6 @@ let config = {
   assetsInclude: ["**/*.template.html"],
 }
 
-// this will be undefined when deployed from netlify, but is used by gh-pages
-if (process.env.GITHUB_REPOSITORY_OWNER) {
-  config.base = "/omero-figure/";
-}
+// NB: config.base is set to "/omero-figure/" in ghpages build (see package.json)
 
 export default defineConfig(config);
