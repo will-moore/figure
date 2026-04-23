@@ -28,6 +28,10 @@ let config = {
 }
 
 // this will be undefined when deployed from netlify, but is used by gh-pages
+// if Unset, we get e.g. src="/assets/index-CQUJWFOE.js"> in index.html. (default behaviour)
+// If set, src="/omero-figure/assets/index-Tjqwbv6v.js"> which is needed for gh-pages deployed to https://ome.github.io/omero-figure/
+// NB: GITHUB_REPOSITORY_OWNER is *also* set when we do a release build via GitHub Actions...
+// ...but this is handled (removed) in views.py when serving the index.html.
 if (process.env.GITHUB_REPOSITORY_OWNER) {
   config.base = "/omero-figure/";
 }
