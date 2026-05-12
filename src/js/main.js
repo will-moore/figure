@@ -90,8 +90,11 @@ var FigureRouter = Backbone.Router.extend({
 
   index: function () {
     console.log("index");
+    var cb = () => {
+      showModal("welcomeModal");
+    };
     // Check for ?file=http://...json
-    // TODO: do we ONLY want to do this on index?
+    // OR ?image=1&image=2 (also handled for /new?image=1&image=2 below)
     if (window.location.search.length > 1) {
       const searchParams = new URLSearchParams(window.location.search.substring(1));
       if (searchParams.has("file")) {
@@ -99,14 +102,13 @@ var FigureRouter = Backbone.Router.extend({
         var cb = function () {
           figureModel.load_from_url(file);
         };
-        figureModel.checkSaveAndClear(cb);
-        return;
+      } else if (searchParams.has("image")) {
+        var cb = function () {
+          figureModel.addImages(searchParams.getAll("image"));
+        };
       }
     }
     hideModals();
-    var cb = () => {
-      showModal("welcomeModal");
-    };
     figureModel.checkSaveAndClear(cb);
   },
 
