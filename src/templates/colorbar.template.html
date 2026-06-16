@@ -5,7 +5,7 @@
 
             <div class="colorbar_bg "
                 style="height: <%= thickness + 1 %>px;
-                        background-image: <%= isLUT ? 'url(' + lut_url + ')' : 'linear-gradient(to left, #' + color + ', black)' %>;
+                        background-image: <%= isLUT ? lut_url : 'linear-gradient(to left, #' + color + ', black)' %>;
                         <%= isLUT ? 'background-position: ' + lutBgPos : '' %>;
                         <%= reverseIntensity ? 'transform: scaleX(-1);' : '' %>;">
             </div>
