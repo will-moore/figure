@@ -2165,8 +2165,8 @@ class FigureExport(object):
         zm = 0
         max_plane = max_sizes[0] * max_sizes[1]
         while (zm < max_level and
-               zm_levels[zm] * width > max_width or
-               zm_levels[zm] * width * zm_levels[zm] * height > max_plane):
+               (zm_levels[zm] * width > max_width or
+                zm_levels[zm] * width * zm_levels[zm] * height > max_plane)):
             zm = zm + 1
 
         level = max_level - zm
