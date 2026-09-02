@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ome-figure"
+version = "0.1.0"
+description = "OMERO.figure command-line export tools"
+requires-python = ">=3.9"
+license = { text = "AGPL-3.0-or-later" }
+dependencies = [
+    "pillow",
+    "reportlab",
+    "markdown",
+    "zarr",
+    "dask",
+    "fsspec[http]",
+]
+
+[project.scripts]
+figure_export = "cli:figure_export"
+
+[tool.setuptools]
+py-modules = ["cli"]
+packages = ["ome_figure"]

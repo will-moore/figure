@@ -18,7 +18,7 @@
 import argparse
 import os
 
-from python_scripts.Figure_To_Pdf import export_figure
+from ome_figure.Figure_To_Pdf import export_figure
 
 
 def figure_export() -> None:
