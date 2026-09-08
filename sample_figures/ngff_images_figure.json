@@ -1,0 +1,2345 @@
+{
+  "version": 9,
+  "panels": [
+    {
+      "x": 32.776939633609516,
+      "y": 299.60384546911166,
+      "width": 157,
+      "height": 160.5839416058394,
+      "zoom": 100,
+      "dx": 0,
+      "dy": 0,
+      "labels": [
+        {
+          "text": "LaminB1",
+          "size": "18",
+          "position": "topleft",
+          "color": "0000FF"
+        },
+        {
+          "text": "Dapi",
+          "size": "18",
+          "position": "topleft",
+          "color": "FFFF00"
+        }
+      ],
+      "deltaT": [],
+      "rotation": 0,
+      "selected": false,
+      "pixel_size_x_symbol": "µm",
+      "pixel_size_x_unit": "MICROMETER",
+      "rotation_symbol": "°",
+      "max_export_dpi": 1000,
+      "vertical_flip": false,
+      "horizontal_flip": false,
+      "imageId": "https://livingobjects.ebi.ac.uk/idr/zarr/v0.4/idr0062A/6001240.zarr",
+      "name": "6001240.zarr",
+      "sizeZ": 236,
+      "theZ": 118,
+      "sizeT": 1,
+      "theT": 0,
+      "channels": [
+        {
+          "active": true,
+          "coefficient": 1,
+          "color": "0000FF",
+          "family": "linear",
+          "inverted": false,
+          "label": "LaminB1",
+          "window": {
+            "end": 1500,
+            "max": 65535,
+            "min": 0,
+            "start": 0
+          }
+        },
+        {
+          "active": true,
+          "coefficient": 1,
+          "color": "FFFF00",
+          "family": "linear",
+          "inverted": false,
+          "label": "Dapi",
+          "window": {
+            "end": 1500,
+            "max": 65535,
+            "min": 0,
+            "start": 0
+          }
+        }
+      ],
+      "orig_width": 271,
+      "orig_height": 275,
+      "pixelsType": "uint16",
+      "zarr": {
+        "multiscales": [
+          {
+            "axes": [
+              {
+                "name": "c",
+                "type": "channel"
+              },
+              {
+                "name": "z",
+                "type": "space",
+                "unit": "micrometer"
+              },
+              {
+                "name": "y",
+                "type": "space",
+                "unit": "micrometer"
+              },
+              {
+                "name": "x",
+                "type": "space",
+                "unit": "micrometer"
+              }
+            ],
+            "datasets": [
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.5002025531914894,
+                      0.3603981534640209,
+                      0.3603981534640209
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "0"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.5002025531914894,
+                      0.7207963069280418,
+                      0.7207963069280418
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "1"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.5002025531914894,
+                      1.4415926138560835,
+                      1.4415926138560835
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "2"
+              }
+            ],
+            "version": "0.4"
+          }
+        ],
+        "arrays": {
+          "0": {
+            "chunks": [
+              1,
+              1,
+              275,
+              271
+            ],
+            "compressor": {
+              "blocksize": 0,
+              "clevel": 5,
+              "cname": "lz4",
+              "id": "blosc",
+              "shuffle": 1
+            },
+            "dimension_separator": "/",
+            "dtype": "<u2",
+            "fill_value": 0,
+            "filters": null,
+            "order": "C",
+            "shape": [
+              2,
+              236,
+              275,
+              271
+            ],
+            "zarr_format": 2
+          },
+          "1": {
+            "chunks": [
+              1,
+              1,
+              137,
+              135
+            ],
+            "compressor": {
+              "blocksize": 0,
+              "clevel": 5,
+              "cname": "lz4",
+              "id": "blosc",
+              "shuffle": 1
+            },
+            "dimension_separator": "/",
+            "dtype": "<u2",
+            "fill_value": 0,
+            "filters": null,
+            "order": "C",
+            "shape": [
+              2,
+              236,
+              137,
+              135
+            ],
+            "zarr_format": 2
+          },
+          "2": {
+            "chunks": [
+              1,
+              1,
+              68,
+              67
+            ],
+            "compressor": {
+              "blocksize": 0,
+              "clevel": 5,
+              "cname": "lz4",
+              "id": "blosc",
+              "shuffle": 1
+            },
+            "dimension_separator": "/",
+            "dtype": "<u2",
+            "fill_value": 0,
+            "filters": null,
+            "order": "C",
+            "shape": [
+              2,
+              236,
+              68,
+              67
+            ],
+            "zarr_format": 2
+          }
+        }
+      }
+    },
+    {
+      "x": 17.591322267118517,
+      "y": 74.21611062882681,
+      "width": 180.45352272222806,
+      "height": 154.1638724921538,
+      "zoom": 161,
+      "dx": -301.7739130434783,
+      "dy": 113.16521739130434,
+      "labels": [
+        {
+          "text": "H2B-eGFP",
+          "size": "21",
+          "position": "topleft",
+          "color": "00FF00"
+        },
+        {
+          "text": "myr-tdTomato",
+          "size": "21",
+          "position": "topleft",
+          "color": "FF0000"
+        }
+      ],
+      "deltaT": [],
+      "rotation": 0,
+      "selected": false,
+      "pixel_size_x_symbol": "µm",
+      "pixel_size_x_unit": "MICROMETER",
+      "rotation_symbol": "°",
+      "max_export_dpi": 1000,
+      "vertical_flip": false,
+      "horizontal_flip": false,
+      "imageId": "https://livingobjects.ebi.ac.uk/idr/zarr/v0.4/idr0044A/4007801.zarr",
+      "name": "4007801.zarr",
+      "sizeZ": 988,
+      "theZ": 430,
+      "sizeT": 532,
+      "theT": 39,
+      "channels": [
+        {
+          "active": true,
+          "coefficient": 1,
+          "color": "00FF00",
+          "family": "linear",
+          "inverted": false,
+          "label": "H2B-eGFP",
+          "window": {
+            "end": 1093,
+            "max": 65535,
+            "min": 0,
+            "start": 0
+          }
+        },
+        {
+          "active": true,
+          "coefficient": 1,
+          "color": "FF0000",
+          "family": "linear",
+          "inverted": false,
+          "label": "myr-tdTomato",
+          "window": {
+            "end": 439,
+            "max": 65535,
+            "min": 0,
+            "start": 0
+          }
+        }
+      ],
+      "orig_width": 2169,
+      "orig_height": 2048,
+      "pixelsType": "uint16",
+      "zarr": {
+        "multiscales": [
+          {
+            "axes": [
+              {
+                "name": "t",
+                "type": "time"
+              },
+              {
+                "name": "c",
+                "type": "channel"
+              },
+              {
+                "name": "z",
+                "type": "space",
+                "unit": "micrometer"
+              },
+              {
+                "name": "y",
+                "type": "space",
+                "unit": "micrometer"
+              },
+              {
+                "name": "x",
+                "type": "space",
+                "unit": "micrometer"
+              }
+            ],
+            "datasets": [
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      1,
+                      1,
+                      1
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "0"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      1,
+                      2,
+                      2
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "1"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      1,
+                      4,
+                      4
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "2"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      1,
+                      8,
+                      8
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "3"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      1,
+                      16,
+                      16
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "4"
+              }
+            ],
+            "metadata": {
+              "method": "loci.common.image.SimpleImageScaler",
+              "version": "Bio-Formats 6.9.1"
+            },
+            "version": "0.4"
+          }
+        ],
+        "arrays": {
+          "0": {
+            "chunks": [
+              1,
+              1,
+              1,
+              1024,
+              1024
+            ],
+            "compressor": {
+              "clevel": 5,
+              "blocksize": 0,
+              "shuffle": 1,
+              "cname": "lz4",
+              "id": "blosc"
+            },
+            "dtype": ">u2",
+            "fill_value": 0,
+            "filters": null,
+            "order": "C",
+            "shape": [
+              532,
+              2,
+              988,
+              2048,
+              2169
+            ],
+            "dimension_separator": "/",
+            "zarr_format": 2
+          },
+          "1": {
+            "chunks": [
+              1,
+              1,
+              1,
+              1024,
+              1024
+            ],
+            "compressor": {
+              "clevel": 5,
+              "blocksize": 0,
+              "shuffle": 1,
+              "cname": "lz4",
+              "id": "blosc"
+            },
+            "dtype": ">u2",
+            "fill_value": 0,
+            "filters": null,
+            "order": "C",
+            "shape": [
+              532,
+              2,
+              988,
+              1024,
+              1084
+            ],
+            "dimension_separator": "/",
+            "zarr_format": 2
+          },
+          "2": {
+            "chunks": [
+              1,
+              1,
+              1,
+              512,
+              542
+            ],
+            "compressor": {
+              "clevel": 5,
+              "blocksize": 0,
+              "shuffle": 1,
+              "cname": "lz4",
+              "id": "blosc"
+            },
+            "dtype": ">u2",
+            "fill_value": 0,
+            "filters": null,
+            "order": "C",
+            "shape": [
+              532,
+              2,
+              988,
+              512,
+              542
+            ],
+            "dimension_separator": "/",
+            "zarr_format": 2
+          },
+          "3": {
+            "chunks": [
+              1,
+              1,
+              1,
+              256,
+              271
+            ],
+            "compressor": {
+              "clevel": 5,
+              "blocksize": 0,
+              "shuffle": 1,
+              "cname": "lz4",
+              "id": "blosc"
+            },
+            "dtype": ">u2",
+            "fill_value": 0,
+            "filters": null,
+            "order": "C",
+            "shape": [
+              532,
+              2,
+              988,
+              256,
+              271
+            ],
+            "dimension_separator": "/",
+            "zarr_format": 2
+          },
+          "4": {
+            "chunks": [
+              1,
+              1,
+              1,
+              128,
+              135
+            ],
+            "compressor": {
+              "clevel": 5,
+              "blocksize": 0,
+              "shuffle": 1,
+              "cname": "lz4",
+              "id": "blosc"
+            },
+            "dtype": ">u2",
+            "fill_value": 0,
+            "filters": null,
+            "order": "C",
+            "shape": [
+              532,
+              2,
+              988,
+              128,
+              135
+            ],
+            "dimension_separator": "/",
+            "zarr_format": 2
+          }
+        }
+      }
+    },
+    {
+      "x": 31.08678861788615,
+      "y": 482.6662931054629,
+      "width": 297.18408647711055,
+      "height": 175.42303934270956,
+      "zoom": 100,
+      "dx": 0,
+      "dy": 0,
+      "labels": [],
+      "deltaT": [],
+      "rotation": 0,
+      "selected": true,
+      "pixel_size_x_symbol": "µm",
+      "pixel_size_x_unit": "MICROMETER",
+      "rotation_symbol": "°",
+      "max_export_dpi": 1000,
+      "vertical_flip": false,
+      "horizontal_flip": false,
+      "imageId": "https://livingobjects.ebi.ac.uk/idr/zarr/v0.4/idr0048A/9846152.zarr",
+      "name": "/",
+      "sizeZ": 91,
+      "theZ": 45,
+      "sizeT": 1,
+      "theT": 0,
+      "channels": [
+        {
+          "active": true,
+          "coefficient": 1,
+          "color": "FF0000",
+          "family": "linear",
+          "inverted": false,
+          "label": "0",
+          "window": {
+            "end": 25000,
+            "max": 65535,
+            "min": 0,
+            "start": 0
+          }
+        },
+        {
+          "active": true,
+          "coefficient": 1,
+          "color": "00FF00",
+          "family": "linear",
+          "inverted": false,
+          "label": "1",
+          "window": {
+            "end": 25000,
+            "max": 65535,
+            "min": 0,
+            "start": 0
+          }
+        },
+        {
+          "active": true,
+          "coefficient": 1,
+          "color": "0000FF",
+          "family": "linear",
+          "inverted": false,
+          "label": "2",
+          "window": {
+            "end": 25000,
+            "max": 65535,
+            "min": 0,
+            "start": 0
+          }
+        }
+      ],
+      "orig_width": 19120,
+      "orig_height": 13350,
+      "pixelsType": "uint16",
+      "zarr": {
+        "multiscales": [
+          {
+            "axes": [
+              {
+                "name": "c",
+                "type": "channel"
+              },
+              {
+                "name": "z",
+                "type": "space"
+              },
+              {
+                "name": "y",
+                "type": "space"
+              },
+              {
+                "name": "x",
+                "type": "space"
+              }
+            ],
+            "datasets": [
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      1,
+                      1
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "0"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      2,
+                      2
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "1"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      4,
+                      4
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "2"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      8,
+                      8
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "3"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      16,
+                      16
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "4"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      32,
+                      32
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "5"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      64,
+                      64
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "6"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      128,
+                      128
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "7"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      256,
+                      256
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "8"
+              }
+            ],
+            "name": "/",
+            "version": "0.4"
+          }
+        ],
+        "arrays": {
+          "0": {
+            "chunks": [
+              1,
+              1,
+              1024,
+              1024
+            ],
+            "compressor": {
+              "blocksize": 0,
+              "clevel": 5,
+              "cname": "lz4",
+              "id": "blosc",
+              "shuffle": 1
+            },
+            "dimension_separator": "/",
+            "dtype": "<u2",
+            "fill_value": 0,
+            "filters": null,
+            "order": "C",
+            "shape": [
+              3,
+              91,
+              13350,
+              19120
+            ],
+            "zarr_format": 2
+          },
+          "1": {
+            "chunks": [
+              1,
+              1,
+              1024,
+              1024
+            ],
+            "compressor": {
+              "blocksize": 0,
+              "clevel": 5,
+              "cname": "lz4",
+              "id": "blosc",
+              "shuffle": 1
+            },
+            "dimension_separator": "/",
+            "dtype": "<u2",
+            "fill_value": 0,
+            "filters": null,
+            "order": "C",
+            "shape": [
+              3,
+              91,
+              6675,
+              9560
+            ],
+            "zarr_format": 2
+          },
+          "2": {
+            "chunks": [
+              1,
+              1,
+              1024,
+              1024
+            ],
+            "compressor": {
+              "blocksize": 0,
+              "clevel": 5,
+              "cname": "lz4",
+              "id": "blosc",
+              "shuffle": 1
+            },
+            "dimension_separator": "/",
+            "dtype": "<u2",
+            "fill_value": 0,
+            "filters": null,
+            "order": "C",
+            "shape": [
+              3,
+              91,
+              3337,
+              4780
+            ],
+            "zarr_format": 2
+          },
+          "3": {
+            "chunks": [
+              1,
+              1,
+              1024,
+              1024
+            ],
+            "compressor": {
+              "blocksize": 0,
+              "clevel": 5,
+              "cname": "lz4",
+              "id": "blosc",
+              "shuffle": 1
+            },
+            "dimension_separator": "/",
+            "dtype": "<u2",
+            "fill_value": 0,
+            "filters": null,
+            "order": "C",
+            "shape": [
+              3,
+              91,
+              1668,
+              2390
+            ],
+            "zarr_format": 2
+          },
+          "4": {
+            "chunks": [
+              1,
+              1,
+              834,
+              1024
+            ],
+            "compressor": {
+              "blocksize": 0,
+              "clevel": 5,
+              "cname": "lz4",
+              "id": "blosc",
+              "shuffle": 1
+            },
+            "dimension_separator": "/",
+            "dtype": "<u2",
+            "fill_value": 0,
+            "filters": null,
+            "order": "C",
+            "shape": [
+              3,
+              91,
+              834,
+              1195
+            ],
+            "zarr_format": 2
+          },
+          "5": {
+            "chunks": [
+              1,
+              1,
+              417,
+              597
+            ],
+            "compressor": {
+              "blocksize": 0,
+              "clevel": 5,
+              "cname": "lz4",
+              "id": "blosc",
+              "shuffle": 1
+            },
+            "dimension_separator": "/",
+            "dtype": "<u2",
+            "fill_value": 0,
+            "filters": null,
+            "order": "C",
+            "shape": [
+              3,
+              91,
+              417,
+              597
+            ],
+            "zarr_format": 2
+          },
+          "6": {
+            "chunks": [
+              1,
+              1,
+              208,
+              298
+            ],
+            "compressor": {
+              "blocksize": 0,
+              "clevel": 5,
+              "cname": "lz4",
+              "id": "blosc",
+              "shuffle": 1
+            },
+            "dimension_separator": "/",
+            "dtype": "<u2",
+            "fill_value": 0,
+            "filters": null,
+            "order": "C",
+            "shape": [
+              3,
+              91,
+              208,
+              298
+            ],
+            "zarr_format": 2
+          },
+          "7": {
+            "chunks": [
+              1,
+              1,
+              104,
+              149
+            ],
+            "compressor": {
+              "blocksize": 0,
+              "clevel": 5,
+              "cname": "lz4",
+              "id": "blosc",
+              "shuffle": 1
+            },
+            "dimension_separator": "/",
+            "dtype": "<u2",
+            "fill_value": 0,
+            "filters": null,
+            "order": "C",
+            "shape": [
+              3,
+              91,
+              104,
+              149
+            ],
+            "zarr_format": 2
+          },
+          "8": {
+            "chunks": [
+              1,
+              1,
+              52,
+              74
+            ],
+            "compressor": {
+              "blocksize": 0,
+              "clevel": 5,
+              "cname": "lz4",
+              "id": "blosc",
+              "shuffle": 1
+            },
+            "dimension_separator": "/",
+            "dtype": "<u2",
+            "fill_value": 0,
+            "filters": null,
+            "order": "C",
+            "shape": [
+              3,
+              91,
+              52,
+              74
+            ],
+            "zarr_format": 2
+          }
+        }
+      },
+      "shapes": [
+        {
+          "type": "Rectangle",
+          "x": 11349.8910668446,
+          "y": 3665.792338572498,
+          "width": 3760.8375846206577,
+          "height": 3762.0772946859906,
+          "area": 14148561.68610308,
+          "strokeWidth": 2,
+          "strokeColor": "#FFFFFF",
+          "rotation": 360,
+          "fillColor": "#FFFFFF",
+          "fillOpacity": "0.0",
+          "textId": 30595028,
+          "id": 41526087
+        },
+        {
+          "type": "Rectangle",
+          "x": 7504.182611822813,
+          "y": 7552.344351520639,
+          "width": 471.40942424169754,
+          "height": 471.56481808548216,
+          "area": 222300.09938631798,
+          "strokeWidth": 2,
+          "strokeColor": "#FFFFFF",
+          "rotation": 360,
+          "fillColor": "#FFFFFF",
+          "fillOpacity": "0.0",
+          "textId": 76904124,
+          "id": 41363599
+        },
+        {
+          "type": "Text",
+          "x": 10201.827667791193,
+          "y": 10046.161121160334,
+          "area": 9943.501247689826,
+          "fontSize": 24,
+          "strokeColor": "#FF00FF",
+          "fillColor": "#0000FF",
+          "fillOpacity": "1.0",
+          "text": "Brain slice",
+          "textAnchor": "middle",
+          "rotation": 0,
+          "id": -3150972837592281
+        },
+        {
+          "type": "Text",
+          "x": 4797.381818181815,
+          "y": 2206.9477272727213,
+          "area": 8413.732233037648,
+          "fontSize": 18,
+          "strokeColor": "#FFFF00",
+          "fillColor": "#0000FF",
+          "fillOpacity": 0,
+          "text": "*Hippo*campus",
+          "textAnchor": "middle",
+          "rotation": 0,
+          "id": -3649127739165732
+        },
+        {
+          "type": "Text",
+          "x": 8373.273520913717,
+          "y": 8421.43526061155,
+          "area": 368.30176698000287,
+          "fontSize": 12,
+          "strokeColor": "#FFFFFF",
+          "fillColor": "#000000",
+          "fillOpacity": "0.0",
+          "text": "A",
+          "textAnchor": "middle",
+          "rotation": 0,
+          "id": 76904124
+        },
+        {
+          "type": "Text",
+          "x": 12218.981975935509,
+          "y": 4534.883247663408,
+          "area": 366.80902738503755,
+          "fontSize": 12,
+          "strokeColor": "#FFFFFF",
+          "fillColor": "#000000",
+          "fillOpacity": "0.0",
+          "text": "B",
+          "textAnchor": "middle",
+          "rotation": 0,
+          "id": 30595028
+        },
+        {
+          "type": "Arrow",
+          "x1": 3545.890909090909,
+          "x2": 6744.145454545454,
+          "y1": 3180.3295454545455,
+          "y2": 6065.711363636364,
+          "area": 8614.931311209597,
+          "strokeWidth": 2,
+          "strokeColor": "#FFFF00",
+          "id": -3459485257764895
+        }
+      ],
+      "lastInsetTextIndex": 66
+    },
+    {
+      "x": 283.1022701444024,
+      "y": 77.59274883519919,
+      "width": 246.41414141414134,
+      "height": 340.4438846136183,
+      "zoom": 100,
+      "dx": 0,
+      "dy": 0,
+      "labels": [
+        {
+          "text": "[image.name]",
+          "size": "21",
+          "position": "top",
+          "color": "927b07"
+        },
+        {
+          "text": "**Chick *Embryo*** image",
+          "size": 21,
+          "position": "topleft",
+          "color": "f0ce24"
+        }
+      ],
+      "deltaT": [],
+      "rotation": 0,
+      "selected": false,
+      "pixel_size_x_symbol": "µm",
+      "pixel_size_x_unit": "MICROMETER",
+      "rotation_symbol": "°",
+      "max_export_dpi": 1000,
+      "vertical_flip": false,
+      "horizontal_flip": false,
+      "imageId": "https://livingobjects.ebi.ac.uk/idr/zarr/v0.5/idr0066/ExpD_chicken_embryo_MIP.ome.zarr",
+      "name": "/",
+      "sizeZ": 1,
+      "theZ": 0,
+      "sizeT": 1,
+      "theT": 0,
+      "channels": [
+        {
+          "label": "Cy3",
+          "active": true,
+          "color": "FFFFFF",
+          "window": {
+            "min": 0,
+            "max": 255,
+            "start": 0,
+            "end": 55
+          }
+        }
+      ],
+      "orig_width": 6510,
+      "orig_height": 8978,
+      "pixelsType": "uint64",
+      "zarr": {
+        "multiscales": [
+          {
+            "axes": [
+              {
+                "name": "y",
+                "type": "space",
+                "unit": "micrometer"
+              },
+              {
+                "name": "x",
+                "type": "space",
+                "unit": "micrometer"
+              }
+            ],
+            "datasets": [
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1.6,
+                      1.6
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "0"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      3.2,
+                      3.2
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "1"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      6.4,
+                      6.4
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "2"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      12.8,
+                      12.8
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "3"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      25.6,
+                      25.6
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "4"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      51.2,
+                      51.2
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "5"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      102.4,
+                      102.4
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "6"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      204.8,
+                      204.8
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "7"
+              }
+            ],
+            "name": "/"
+          }
+        ],
+        "arrays": {
+          "0": {
+            "shape": [
+              8978,
+              6510
+            ],
+            "dtype": "uint8"
+          },
+          "1": {
+            "shape": [
+              4489,
+              3255
+            ],
+            "dtype": "uint8"
+          },
+          "2": {
+            "shape": [
+              2244,
+              1627
+            ],
+            "dtype": "uint8"
+          },
+          "3": {
+            "shape": [
+              1122,
+              813
+            ],
+            "dtype": "uint8"
+          },
+          "4": {
+            "shape": [
+              561,
+              406
+            ],
+            "dtype": "uint8"
+          },
+          "5": {
+            "shape": [
+              280,
+              203
+            ],
+            "dtype": "uint8"
+          },
+          "6": {
+            "shape": [
+              140,
+              101
+            ],
+            "dtype": "uint8"
+          },
+          "7": {
+            "shape": [
+              70,
+              50
+            ],
+            "dtype": "uint8"
+          }
+        },
+        "zarr_version": 3,
+        "version": "0.5"
+      },
+      "pixel_size_x": 1.6,
+      "pixel_size_y": 1.6,
+      "pixel_size_y_unit": "MICROMETER",
+      "pixel_size_y_symbol": "µm"
+    },
+    {
+      "x": 31.08797344543408,
+      "y": 668.2460999823337,
+      "width": 145.30262123694237,
+      "height": 145.35051831253077,
+      "zoom": 2831,
+      "dx": 1820.1126760563384,
+      "dy": -1113.1267605633802,
+      "labels": [
+        {
+          "text": "A",
+          "size": 18,
+          "position": "topleft",
+          "color": "FFFFFF",
+          "inset": true
+        }
+      ],
+      "deltaT": [],
+      "rotation": 0,
+      "selected": false,
+      "pixel_size_x_symbol": "µm",
+      "pixel_size_x_unit": "MICROMETER",
+      "rotation_symbol": "°",
+      "max_export_dpi": 1000,
+      "vertical_flip": false,
+      "horizontal_flip": false,
+      "imageId": "https://livingobjects.ebi.ac.uk/idr/zarr/v0.4/idr0048A/9846152.zarr",
+      "name": "/",
+      "sizeZ": 91,
+      "theZ": 45,
+      "sizeT": 1,
+      "theT": 0,
+      "channels": [
+        {
+          "active": true,
+          "coefficient": 1,
+          "color": "FF0000",
+          "family": "linear",
+          "inverted": false,
+          "label": "0",
+          "window": {
+            "end": 25000,
+            "max": 65535,
+            "min": 0,
+            "start": 0
+          }
+        },
+        {
+          "active": true,
+          "coefficient": 1,
+          "color": "00FF00",
+          "family": "linear",
+          "inverted": false,
+          "label": "1",
+          "window": {
+            "end": 25000,
+            "max": 65535,
+            "min": 0,
+            "start": 0
+          }
+        },
+        {
+          "active": true,
+          "coefficient": 1,
+          "color": "0000FF",
+          "family": "linear",
+          "inverted": false,
+          "label": "2",
+          "window": {
+            "end": 25000,
+            "max": 65535,
+            "min": 0,
+            "start": 0
+          }
+        }
+      ],
+      "orig_width": 19120,
+      "orig_height": 13350,
+      "pixelsType": "uint16",
+      "zarr": {
+        "multiscales": [
+          {
+            "axes": [
+              {
+                "name": "c",
+                "type": "channel"
+              },
+              {
+                "name": "z",
+                "type": "space"
+              },
+              {
+                "name": "y",
+                "type": "space"
+              },
+              {
+                "name": "x",
+                "type": "space"
+              }
+            ],
+            "datasets": [
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      1,
+                      1
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "0"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      2,
+                      2
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "1"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      4,
+                      4
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "2"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      8,
+                      8
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "3"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      16,
+                      16
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "4"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      32,
+                      32
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "5"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      64,
+                      64
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "6"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      128,
+                      128
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "7"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      256,
+                      256
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "8"
+              }
+            ],
+            "name": "/",
+            "version": "0.4"
+          }
+        ],
+        "arrays": {
+          "0": {
+            "chunks": [
+              1,
+              1,
+              1024,
+              1024
+            ],
+            "compressor": {
+              "blocksize": 0,
+              "clevel": 5,
+              "cname": "lz4",
+              "id": "blosc",
+              "shuffle": 1
+            },
+            "dimension_separator": "/",
+            "dtype": "<u2",
+            "fill_value": 0,
+            "filters": null,
+            "order": "C",
+            "shape": [
+              3,
+              91,
+              13350,
+              19120
+            ],
+            "zarr_format": 2
+          },
+          "1": {
+            "chunks": [
+              1,
+              1,
+              1024,
+              1024
+            ],
+            "compressor": {
+              "blocksize": 0,
+              "clevel": 5,
+              "cname": "lz4",
+              "id": "blosc",
+              "shuffle": 1
+            },
+            "dimension_separator": "/",
+            "dtype": "<u2",
+            "fill_value": 0,
+            "filters": null,
+            "order": "C",
+            "shape": [
+              3,
+              91,
+              6675,
+              9560
+            ],
+            "zarr_format": 2
+          },
+          "2": {
+            "chunks": [
+              1,
+              1,
+              1024,
+              1024
+            ],
+            "compressor": {
+              "blocksize": 0,
+              "clevel": 5,
+              "cname": "lz4",
+              "id": "blosc",
+              "shuffle": 1
+            },
+            "dimension_separator": "/",
+            "dtype": "<u2",
+            "fill_value": 0,
+            "filters": null,
+            "order": "C",
+            "shape": [
+              3,
+              91,
+              3337,
+              4780
+            ],
+            "zarr_format": 2
+          },
+          "3": {
+            "chunks": [
+              1,
+              1,
+              1024,
+              1024
+            ],
+            "compressor": {
+              "blocksize": 0,
+              "clevel": 5,
+              "cname": "lz4",
+              "id": "blosc",
+              "shuffle": 1
+            },
+            "dimension_separator": "/",
+            "dtype": "<u2",
+            "fill_value": 0,
+            "filters": null,
+            "order": "C",
+            "shape": [
+              3,
+              91,
+              1668,
+              2390
+            ],
+            "zarr_format": 2
+          },
+          "4": {
+            "chunks": [
+              1,
+              1,
+              834,
+              1024
+            ],
+            "compressor": {
+              "blocksize": 0,
+              "clevel": 5,
+              "cname": "lz4",
+              "id": "blosc",
+              "shuffle": 1
+            },
+            "dimension_separator": "/",
+            "dtype": "<u2",
+            "fill_value": 0,
+            "filters": null,
+            "order": "C",
+            "shape": [
+              3,
+              91,
+              834,
+              1195
+            ],
+            "zarr_format": 2
+          },
+          "5": {
+            "chunks": [
+              1,
+              1,
+              417,
+              597
+            ],
+            "compressor": {
+              "blocksize": 0,
+              "clevel": 5,
+              "cname": "lz4",
+              "id": "blosc",
+              "shuffle": 1
+            },
+            "dimension_separator": "/",
+            "dtype": "<u2",
+            "fill_value": 0,
+            "filters": null,
+            "order": "C",
+            "shape": [
+              3,
+              91,
+              417,
+              597
+            ],
+            "zarr_format": 2
+          },
+          "6": {
+            "chunks": [
+              1,
+              1,
+              208,
+              298
+            ],
+            "compressor": {
+              "blocksize": 0,
+              "clevel": 5,
+              "cname": "lz4",
+              "id": "blosc",
+              "shuffle": 1
+            },
+            "dimension_separator": "/",
+            "dtype": "<u2",
+            "fill_value": 0,
+            "filters": null,
+            "order": "C",
+            "shape": [
+              3,
+              91,
+              208,
+              298
+            ],
+            "zarr_format": 2
+          },
+          "7": {
+            "chunks": [
+              1,
+              1,
+              104,
+              149
+            ],
+            "compressor": {
+              "blocksize": 0,
+              "clevel": 5,
+              "cname": "lz4",
+              "id": "blosc",
+              "shuffle": 1
+            },
+            "dimension_separator": "/",
+            "dtype": "<u2",
+            "fill_value": 0,
+            "filters": null,
+            "order": "C",
+            "shape": [
+              3,
+              91,
+              104,
+              149
+            ],
+            "zarr_format": 2
+          },
+          "8": {
+            "chunks": [
+              1,
+              1,
+              52,
+              74
+            ],
+            "compressor": {
+              "blocksize": 0,
+              "clevel": 5,
+              "cname": "lz4",
+              "id": "blosc",
+              "shuffle": 1
+            },
+            "dimension_separator": "/",
+            "dtype": "<u2",
+            "fill_value": 0,
+            "filters": null,
+            "order": "C",
+            "shape": [
+              3,
+              91,
+              52,
+              74
+            ],
+            "zarr_format": 2
+          }
+        }
+      },
+      "shapes": [],
+      "lastInsetTextIndex": 64,
+      "insetRoiId": 41363599
+    },
+    {
+      "x": 183.65572574422353,
+      "y": 668.2460999823337,
+      "width": 145.30262123694226,
+      "height": 145.35051831253077,
+      "zoom": 354.85714285714283,
+      "dx": -3670.3098591549297,
+      "dy": 1128.1690140845067,
+      "labels": [
+        {
+          "text": "B",
+          "size": 18,
+          "position": "topleft",
+          "color": "FFFFFF",
+          "inset": true
+        }
+      ],
+      "deltaT": [],
+      "rotation": 0,
+      "selected": false,
+      "pixel_size_x_symbol": "µm",
+      "pixel_size_x_unit": "MICROMETER",
+      "rotation_symbol": "°",
+      "max_export_dpi": 1000,
+      "vertical_flip": false,
+      "horizontal_flip": false,
+      "imageId": "https://livingobjects.ebi.ac.uk/idr/zarr/v0.4/idr0048A/9846152.zarr",
+      "name": "/",
+      "sizeZ": 91,
+      "theZ": 45,
+      "sizeT": 1,
+      "theT": 0,
+      "channels": [
+        {
+          "active": true,
+          "coefficient": 1,
+          "color": "FF0000",
+          "family": "linear",
+          "inverted": false,
+          "label": "0",
+          "window": {
+            "end": 25000,
+            "max": 65535,
+            "min": 0,
+            "start": 0
+          }
+        },
+        {
+          "active": true,
+          "coefficient": 1,
+          "color": "00FF00",
+          "family": "linear",
+          "inverted": false,
+          "label": "1",
+          "window": {
+            "end": 25000,
+            "max": 65535,
+            "min": 0,
+            "start": 0
+          }
+        },
+        {
+          "active": true,
+          "coefficient": 1,
+          "color": "0000FF",
+          "family": "linear",
+          "inverted": false,
+          "label": "2",
+          "window": {
+            "end": 25000,
+            "max": 65535,
+            "min": 0,
+            "start": 0
+          }
+        }
+      ],
+      "orig_width": 19120,
+      "orig_height": 13350,
+      "pixelsType": "uint16",
+      "zarr": {
+        "multiscales": [
+          {
+            "axes": [
+              {
+                "name": "c",
+                "type": "channel"
+              },
+              {
+                "name": "z",
+                "type": "space"
+              },
+              {
+                "name": "y",
+                "type": "space"
+              },
+              {
+                "name": "x",
+                "type": "space"
+              }
+            ],
+            "datasets": [
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      1,
+                      1
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "0"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      2,
+                      2
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "1"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      4,
+                      4
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "2"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      8,
+                      8
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "3"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      16,
+                      16
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "4"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      32,
+                      32
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "5"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      64,
+                      64
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "6"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      128,
+                      128
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "7"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      256,
+                      256
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "8"
+              }
+            ],
+            "name": "/",
+            "version": "0.4"
+          }
+        ],
+        "arrays": {
+          "0": {
+            "chunks": [
+              1,
+              1,
+              1024,
+              1024
+            ],
+            "compressor": {
+              "blocksize": 0,
+              "clevel": 5,
+              "cname": "lz4",
+              "id": "blosc",
+              "shuffle": 1
+            },
+            "dimension_separator": "/",
+            "dtype": "<u2",
+            "fill_value": 0,
+            "filters": null,
+            "order": "C",
+            "shape": [
+              3,
+              91,
+              13350,
+              19120
+            ],
+            "zarr_format": 2
+          },
+          "1": {
+            "chunks": [
+              1,
+              1,
+              1024,
+              1024
+            ],
+            "compressor": {
+              "blocksize": 0,
+              "clevel": 5,
+              "cname": "lz4",
+              "id": "blosc",
+              "shuffle": 1
+            },
+            "dimension_separator": "/",
+            "dtype": "<u2",
+            "fill_value": 0,
+            "filters": null,
+            "order": "C",
+            "shape": [
+              3,
+              91,
+              6675,
+              9560
+            ],
+            "zarr_format": 2
+          },
+          "2": {
+            "chunks": [
+              1,
+              1,
+              1024,
+              1024
+            ],
+            "compressor": {
+              "blocksize": 0,
+              "clevel": 5,
+              "cname": "lz4",
+              "id": "blosc",
+              "shuffle": 1
+            },
+            "dimension_separator": "/",
+            "dtype": "<u2",
+            "fill_value": 0,
+            "filters": null,
+            "order": "C",
+            "shape": [
+              3,
+              91,
+              3337,
+              4780
+            ],
+            "zarr_format": 2
+          },
+          "3": {
+            "chunks": [
+              1,
+              1,
+              1024,
+              1024
+            ],
+            "compressor": {
+              "blocksize": 0,
+              "clevel": 5,
+              "cname": "lz4",
+              "id": "blosc",
+              "shuffle": 1
+            },
+            "dimension_separator": "/",
+            "dtype": "<u2",
+            "fill_value": 0,
+            "filters": null,
+            "order": "C",
+            "shape": [
+              3,
+              91,
+              1668,
+              2390
+            ],
+            "zarr_format": 2
+          },
+          "4": {
+            "chunks": [
+              1,
+              1,
+              834,
+              1024
+            ],
+            "compressor": {
+              "blocksize": 0,
+              "clevel": 5,
+              "cname": "lz4",
+              "id": "blosc",
+              "shuffle": 1
+            },
+            "dimension_separator": "/",
+            "dtype": "<u2",
+            "fill_value": 0,
+            "filters": null,
+            "order": "C",
+            "shape": [
+              3,
+              91,
+              834,
+              1195
+            ],
+            "zarr_format": 2
+          },
+          "5": {
+            "chunks": [
+              1,
+              1,
+              417,
+              597
+            ],
+            "compressor": {
+              "blocksize": 0,
+              "clevel": 5,
+              "cname": "lz4",
+              "id": "blosc",
+              "shuffle": 1
+            },
+            "dimension_separator": "/",
+            "dtype": "<u2",
+            "fill_value": 0,
+            "filters": null,
+            "order": "C",
+            "shape": [
+              3,
+              91,
+              417,
+              597
+            ],
+            "zarr_format": 2
+          },
+          "6": {
+            "chunks": [
+              1,
+              1,
+              208,
+              298
+            ],
+            "compressor": {
+              "blocksize": 0,
+              "clevel": 5,
+              "cname": "lz4",
+              "id": "blosc",
+              "shuffle": 1
+            },
+            "dimension_separator": "/",
+            "dtype": "<u2",
+            "fill_value": 0,
+            "filters": null,
+            "order": "C",
+            "shape": [
+              3,
+              91,
+              208,
+              298
+            ],
+            "zarr_format": 2
+          },
+          "7": {
+            "chunks": [
+              1,
+              1,
+              104,
+              149
+            ],
+            "compressor": {
+              "blocksize": 0,
+              "clevel": 5,
+              "cname": "lz4",
+              "id": "blosc",
+              "shuffle": 1
+            },
+            "dimension_separator": "/",
+            "dtype": "<u2",
+            "fill_value": 0,
+            "filters": null,
+            "order": "C",
+            "shape": [
+              3,
+              91,
+              104,
+              149
+            ],
+            "zarr_format": 2
+          },
+          "8": {
+            "chunks": [
+              1,
+              1,
+              52,
+              74
+            ],
+            "compressor": {
+              "blocksize": 0,
+              "clevel": 5,
+              "cname": "lz4",
+              "id": "blosc",
+              "shuffle": 1
+            },
+            "dimension_separator": "/",
+            "dtype": "<u2",
+            "fill_value": 0,
+            "filters": null,
+            "order": "C",
+            "shape": [
+              3,
+              91,
+              52,
+              74
+            ],
+            "zarr_format": 2
+          }
+        }
+      },
+      "shapes": [],
+      "lastInsetTextIndex": 64,
+      "insetRoiId": 41526087
+    }
+  ],
+  "paper_width": 595,
+  "paper_height": 842,
+  "page_size": "A4",
+  "page_count": 1,
+  "paper_spacing": 50,
+  "page_col_count": 1,
+  "height_mm": 297,
+  "width_mm": 210,
+  "orientation": "vertical",
+  "legend": "",
+  "legend_collapsed": true,
+  "page_color": "FFFFFF",
+  "figureName": "OME-Zarr demo"
+}
