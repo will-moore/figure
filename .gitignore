@@ -1,0 +1,5 @@
+*.pyc
+.DS_Store
+node_modules/
+dist
+ome_figure.egg-info
