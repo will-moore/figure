@@ -1103,8 +1103,26 @@
                 baseUrl += '/render_image/';
             }
 
-            return baseUrl + imageId + "/" + theZ + "/" + theT
+            let imgUrl = baseUrl + imageId + "/" + theZ + "/" + theT
                     + '/?c=' + renderString + proj + maps + region + "&m=c";
+
+            // We want to return data: src. Load the URL to canvas and render to data: URL
+            return new Promise((resolve, reject) => {
+                let img = new Image();
+                img.crossOrigin = "Anonymous";
+                img.onload = function() {
+                    let canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    let ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+                    resolve(canvas.toDataURL());
+                };
+                img.onerror = function(err) {
+                    reject(err);
+                };
+                img.src = imgUrl;
+            });
         },
 
         // Turn coordinates into css object with rotation transform
