@@ -220,6 +220,82 @@
 
         render_src: function() {
             this.$img_panel.attr('src', this.model.get('src'));
+
+            // TEMP: test get_viewport_src on each render
+            this.get_viewport_src();
+        },
+        
+
+        get_viewport_src() {
+            // We also want to crop a copy of the image according to the panel's viewport
+            // and display it in a overlay canvas for debugging or visual feedback
+            let canvasId = "overlay_canvas";
+            let canvas = document.getElementById(canvasId);
+            if (!canvas) {
+                canvas = document.createElement('canvas');
+                canvas.id = canvasId;
+                // append to body
+                document.body.appendChild(canvas);
+            }
+            let ctx = canvas.getContext('2d');
+            // set image from dataurl
+            let img = new Image();
+            let self = this;
+            // let longestSide = Math.max(this.model.get('width'), this.model.get('height'));
+            let aspectRatio = this.model.get('width') / this.model.get('height');
+
+            img.onload = function() {
+                let w = img.width;
+                let h = img.height;
+                let x = 0;
+                let y = 0;
+
+                canvas.width = w;
+                canvas.height = h;
+
+                // If panel is rotated, rotate around the center of the canvas before drawing the image
+                if (self.model.get("rotation")) {
+                    let rotDeg = self.model.get("rotation");
+                    ctx.translate(w/2, h/2);
+                    ctx.rotate(rotDeg * Math.PI / 180);
+                    ctx.translate(-w/2, -h/2);
+                }
+                ctx.drawImage(img, x, y, w, h, 0, 0, w, h);
+                // Reset transformation matrix to the identity matrix
+                ctx.setTransform(1, 0, 0, 1, 0, 0);
+
+
+                let cropX = 0, cropY = 0, cropWidth = w, cropHeight = h;
+
+                if (self.model.is_big_image()) {
+                    // we have rendered a square image, need to crop it to the original aspect ratio
+                    if (aspectRatio > 1) {
+                        // landscape
+                        cropWidth = w * 2 / 3;
+                        cropHeight = cropWidth / aspectRatio;
+                    } else {
+                        // portrait
+                        cropHeight = h * 2 / 3;
+                        cropWidth = cropHeight * aspectRatio;
+                    }
+                    cropX = (w - cropWidth) / 2;
+                    cropY = (h - cropHeight) / 2;
+                }
+
+                let imgData = ctx.getImageData(cropX, cropY, cropWidth, cropHeight);
+
+                // clear
+                ctx.rect(0, 0, w, h);
+                ctx.fillStyle = "green";
+                ctx.fill();
+
+                canvas.width = cropWidth;
+                canvas.height = cropHeight;
+                // putImageData(imageData, dx, dy, sourceX, sourceY, sourceWidth, sourceHeight)
+                ctx.putImageData(imgData, 0, 0);
+
+            };
+            img.src = this.model.get('src');
         },
 
         render_labels: function() {
