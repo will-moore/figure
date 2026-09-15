@@ -196,18 +196,19 @@
             if (this.model.is_big_image()) {
                 this.$img_panel.hide();
             }
-            let timeoutId = setTimeout(() => {
-                $(".image_panel_spinner", this.$el).show();
-            }, 100); // Show spinner only if image load takes longer than 100ms
+
+            $(".image_panel_spinner", this.$el).show();
             this.$img_panel.one("load", function(){
-                clearTimeout(timeoutId);
                 $(".image_panel_spinner", this.$el).hide();
                 this.$img_panel.show();
             }.bind(this));
 
             // Update 'src' in the model. Applied to img by render_src() below.
             this.model.get_img_src()
-                .then(src => this.model.set('src', src));
+                .then(src => {
+                    this.model.set('src', src);
+                    $(".image_panel_spinner", this.$el).hide();
+                });
 
             // if a 'reasonable' dpi is set, we don't pixelate
             if (this.model.get('min_export_dpi') > 100) {
