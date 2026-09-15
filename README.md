@@ -25,7 +25,11 @@ The workflow for creating figures can be summarised as follows:
  - Export your figure to PDF or TIFF. The python script will read the OME-Zarr images from the specified URLs and generate a figure as a PDF or TIFF, depending on the chosen file extension:
 
 ```
-    $ pip install ome-figure
+    # first create a python environment, e.g. with conda:
+    $ conda create --name ome_figure python=3.12
+    $ conda activate ome_figure
+
+    $ pip install git+https://github.com/ome/figure.git
 
     # export to PDF
     $ figure_export downloaded_figure.json my_figure.pdf
