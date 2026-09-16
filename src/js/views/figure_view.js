@@ -339,83 +339,84 @@
             let $pdf_download = $("#pdf_download").hide();
             let $script_error = $("#script_error").hide();
 
-            // Get figure as json
-            var figureJSON = this.model.figure_toJSON();
-            var data = {
+            // Get figure as json - with viewport src data
+            this.model.figure_toJSON(true).then(figureJSON => {
+                var data = {
                     figureJSON: JSON.stringify(figureJSON),
                     exportOption: exportOption,
                 };
 
-            // Start the Figure_To_Pdf.py script
-            $.post( url, data).done(function( data ) {
+                // Start the Figure_To_Pdf.py script
+                $.post( url, data).done(function( data ) {
 
-                // {"status": "in progress", "jobId": "ProcessCallback/64be7a9e-2abb-4a48-9c5e-6d0938e1a3e2 -t:tcp -h 192.168.1.64 -p 64592"}
-                var jobId = data.jobId;
+                    // {"status": "in progress", "jobId": "ProcessCallback/64be7a9e-2abb-4a48-9c5e-6d0938e1a3e2 -t:tcp -h 192.168.1.64 -p 64592"}
+                    var jobId = data.jobId;
 
-                // E.g. Handle 'No Processor Available';
-                if (!jobId) {
-                    if (data.error) {
-                        alert(data.error);
-                    } else {
-                        alert("Error exporting figure");
+                    // E.g. Handle 'No Processor Available';
+                    if (!jobId) {
+                        if (data.error) {
+                            alert(data.error);
+                        } else {
+                            alert("Error exporting figure");
+                        }
+                        $create_figure_pdf.show();
+                        $pdf_inprogress.hide();
+                        return;
                     }
+
+                    // Now we keep polling for script completion, every second...
+
+                    var i = setInterval(function (){
+
+                        $.getJSON(ACTIVITIES_JSON_URL, function(act_data) {
+
+                                var pdf_job = act_data[jobId];
+
+                                // We're waiting for this flag...
+                                if (pdf_job.status == "finished") {
+                                    clearInterval(i);
+
+                                    $create_figure_pdf.show();
+                                    $pdf_inprogress.hide();
+
+                                    // Show result
+                                    if (pdf_job.results.New_Figure) {
+                                        var fa_id = pdf_job.results.New_Figure.id;
+                                        if (pdf_job.results.New_Figure.type === "FileAnnotation") {
+                                            var fa_download = WEBINDEX_URL + "annotation/" + fa_id + "/";
+                                            $pdf_download
+                                                .attr({'href': fa_download, 'data-original-title': 'Download Figure'})
+                                                .show()
+                                                .children('span').prop('class', 'glyphicon glyphicon-download-alt');
+                                        } else if (pdf_job.results.New_Figure.type === "Image") {
+                                            var fa_download = pdf_job.results.New_Figure.browse_url;
+                                            $pdf_download
+                                                .attr({'href': fa_download, 'data-original-title': 'Go to Figure Image'})
+                                                .show()
+                                                .tooltip()
+                                                .children('span').prop('class', 'glyphicon glyphicon-share');
+                                        }
+                                    } else if (pdf_job.stderr) {
+                                        // Only show any errors if NO result
+                                        var stderr_url = WEBINDEX_URL + "get_original_file/" + pdf_job.stderr + "/";
+                                        $script_error.attr('href', stderr_url).show();
+                                    }
+                                }
+
+                                if (act_data.inprogress === 0) {
+                                    clearInterval(i);
+                                }
+
+                            }).fail(function() {
+                                clearInterval(i);
+                            });
+
+                    }, 1000);
+                }).fail(function(err) {
+                    alert("Error starting export script", err);
                     $create_figure_pdf.show();
                     $pdf_inprogress.hide();
-                    return;
-                }
-
-                // Now we keep polling for script completion, every second...
-
-                var i = setInterval(function (){
-
-                    $.getJSON(ACTIVITIES_JSON_URL, function(act_data) {
-
-                            var pdf_job = act_data[jobId];
-
-                            // We're waiting for this flag...
-                            if (pdf_job.status == "finished") {
-                                clearInterval(i);
-
-                                $create_figure_pdf.show();
-                                $pdf_inprogress.hide();
-
-                                // Show result
-                                if (pdf_job.results.New_Figure) {
-                                    var fa_id = pdf_job.results.New_Figure.id;
-                                    if (pdf_job.results.New_Figure.type === "FileAnnotation") {
-                                        var fa_download = WEBINDEX_URL + "annotation/" + fa_id + "/";
-                                        $pdf_download
-                                            .attr({'href': fa_download, 'data-original-title': 'Download Figure'})
-                                            .show()
-                                            .children('span').prop('class', 'glyphicon glyphicon-download-alt');
-                                    } else if (pdf_job.results.New_Figure.type === "Image") {
-                                        var fa_download = pdf_job.results.New_Figure.browse_url;
-                                        $pdf_download
-                                            .attr({'href': fa_download, 'data-original-title': 'Go to Figure Image'})
-                                            .show()
-                                            .tooltip()
-                                            .children('span').prop('class', 'glyphicon glyphicon-share');
-                                    }
-                                } else if (pdf_job.stderr) {
-                                    // Only show any errors if NO result
-                                    var stderr_url = WEBINDEX_URL + "get_original_file/" + pdf_job.stderr + "/";
-                                    $script_error.attr('href', stderr_url).show();
-                                }
-                            }
-
-                            if (act_data.inprogress === 0) {
-                                clearInterval(i);
-                            }
-
-                        }).fail(function() {
-                            clearInterval(i);
-                        });
-
-                }, 1000);
-            }).fail(function(err) {
-                alert("Error starting export script", err);
-                $create_figure_pdf.show();
-                $pdf_inprogress.hide();
+                });
             });
         },
 
