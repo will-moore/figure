@@ -1332,51 +1332,6 @@ class FigureExport(object):
 
         return file_ann
 
-    def apply_rdefs(self, image, panel):
-        """ Apply the channel levels and colors to the image """
-        c_idxs = []
-        windows = []
-        colors = []
-        reverses = []
-
-        # OMERO.figure doesn't support greyscale rendering
-        image.setColorRenderingModel()
-
-        for i, c in enumerate(panel['channels']):
-            if c['active']:
-                c_idxs.append(i + 1)
-                windows.append([c['window']['start'], c['window']['end']])
-                colors.append(c['color'])
-                reverses.append(c.get('reverseIntensity', False))
-
-        image.setActiveChannels(c_idxs, windows, colors, reverses)
-
-        size_x = image.getSizeX()
-        size_y = image.getSizeY()
-        size_z = image.getSizeZ()
-        size_c = image.getSizeC()
-
-        if 'z_projection' in panel and panel['z_projection']:
-            if 'z_start' in panel and 'z_end' in panel:
-                # check max_projection_bytes
-                pixel_range = image.getPixelRange()
-                bytes_per_pixel = ceil(log2(pixel_range[1]) / 8.0)
-                proj_bytes = (size_z * size_x * size_y
-                              * size_c * bytes_per_pixel)
-
-                cfg = self.conn.getConfigService()
-                max_bytes = int(cfg.getConfigValue(
-                    'omero.pixeldata.max_projection_bytes'))
-
-                if proj_bytes <= max_bytes:
-                    image.setProjection('intmax')
-                    image.setProjectionRange(panel['z_start'], panel['z_end'])
-                else:
-                    print(f'projected_bytes {proj_bytes} exceeds '
-                          f'MAX_PROJECTED_BYTES limit: {max_bytes}')
-                    # Turn off all channels to render a black panel
-                    image.setActiveChannels([])
-
     def get_crop_region(self, panel):
         """
         Gets the width and height in points/pixels for a panel in the
@@ -1856,6 +1811,7 @@ class FigureExport(object):
 
         # If we previously calculated the zoom scale for big image rendering
         # Use this again here to scale the pixel size
+        # TODO: FIXME: need to calculate scale from the size of the image, zoom etc.
         if 'zoom_level_scale' in panel:
             scale = panel['zoom_level_scale']
             pixel_size_x = pixel_size_x / scale
@@ -2143,320 +2099,6 @@ class FigureExport(object):
 
         self.draw_scalebar_line(x1, y1, x2, y2, tick_thickness, rgb)
 
-    def is_big_image(self, panel):
-        """Return True if this is a 'big' tiled image."""
-        max_w, max_h = (self.conn.getMaxPlaneSize()
-                        if self.conn else (3000, 3000))
-        return panel['orig_width'] * panel['orig_height'] > max_w * max_h
-
-    def get_zoom_level_scale(self, image, region, max_width):
-        """Calculate the scale and zoom level we want to use for big image."""
-        width = region['width']
-        height = region['height']
-
-        zm_levels = image.getZoomLevelScaling()
-        # e.g. {0: 1.0, 1: 0.25, 2: 0.0625, 3: 0.03123, 4: 0.01440}
-        # Pick zoom such that returned image is below MAX size
-        max_level = len(zm_levels.keys()) - 1
-        # Maximum size that the rendering engine will render
-        max_sizes = self.conn.getMaxPlaneSize()
-
-        # start big, and go until we reach target size
-        zm = 0
-        max_plane = max_sizes[0] * max_sizes[1]
-        while (zm < max_level and
-               zm_levels[zm] * width > max_width or
-                zm_levels[zm] * width * zm_levels[zm] * height > max_plane):
-            zm = zm + 1
-
-        level = max_level - zm
-
-        # We need to use final rendered jpeg coordinates
-        # Convert from original image coordinates by scaling
-        scale = zm_levels[zm]
-        return scale, level
-
-    def render_big_image_region(self, panel, z, t, region, max_width):
-        """
-        Render region of a big image at an appropriate zoom level
-        so width < max_width
-        """
-
-        width = region['width']
-        height = region['height']
-        x = region['x']
-        y = region['y']
-        size_x = panel['orig_width']
-        size_y = panel['orig_height']
-
-        region_outside_image = False
-        paste_x = 0
-        paste_y = 0
-
-        if x < 0 or y < 0 or (x + width) > size_x or (y + height) > size_y:
-            region_outside_image = True
-            # If we're outside the bounds of the image...
-            # Need to render reduced region and paste on to full size image
-            if x < 0:
-                paste_x = -x
-                width = width + x
-                x = 0
-            if y < 0:
-                paste_y = -y
-                height = height + y
-                y = 0
-            if x + width > size_x:
-                width = size_x - x
-            if y + height > size_y:
-                height = size_y - y
-
-        image_id = None
-        try:
-            image_id = int(panel['imageId'])
-        except Exception:
-            pass
-
-        image = None
-        if image_id is not None:
-            image = self.conn.getObject("Image", image_id)
-            if image is None:
-                return None
-
-            # Render the region...
-            scale, level = self.get_zoom_level_scale(image, region, max_width)
-
-            # We need to use final rendered jpeg coordinates
-            # Convert from original image coordinates by scaling
-            x = int(x * scale)
-            y = int(y * scale)
-            width = int(width * scale)
-            height = int(height * scale)
-            size_x = int(size_x * scale)
-            size_y = int(size_y * scale)
-
-            try:
-                self.apply_rdefs(image, panel)
-                jpeg_data = image.renderJpegRegion(z, t, x, y, width, height,
-                                                   level=level)
-                if jpeg_data is None:
-                    return
-                i = BytesIO(jpeg_data)
-                pil_img = Image.open(i)
-            finally:
-                if image._re is not None:
-                    image._re.close()
-        else:
-            # Zarr image - TODO: how to decide target_size?
-            scale, pil_img = self.render_zarr_to_pil(
-                panel, xywh=(x, y, width, height))
-
-        # cache the 'zoom_level_scale', in the panel dict.
-        # since we need it for scalebar, and don't want to calculate again
-        # since rendering engine will be closed by then
-        panel['zoom_level_scale'] = scale
-
-        # paste to canvas if needed
-        if region_outside_image:
-            canvas_width = int(region['width'] * scale)
-            canvas_height = int(region['height'] * scale)
-            canvas = Image.new("RGBA", (canvas_width, canvas_height),
-                               (221, 221, 221, 255))
-            canvas.paste(pil_img, (int(paste_x * scale), int(paste_y * scale)))
-            pil_img = canvas
-
-        return pil_img
-
-    def get_panel_big_image(self, panel):
-        """Render the viewport region for BIG images"""
-
-        viewport_region = self.get_crop_region(panel)
-        rotation = int(panel.get('rotation', 0))
-        vp_x = viewport_region['x']
-        vp_y = viewport_region['y']
-        vp_w = viewport_region['width']
-        vp_h = viewport_region['height']
-        z = panel['theZ']
-        t = panel['theT']
-
-        # E.g. target is 300 dpi and width & height is '72 dpi'
-        # so we need image to be width * dpi/72 pixels
-        max_dpi = panel.get('max_export_dpi', 1000)
-        max_width = (panel['width'] * max_dpi) / 72
-
-        # Render a larger region than viewport, to allow for rotation...
-        if rotation != 0:
-            max_length = 1.5 * max(vp_w, vp_h)
-            extra_w = max_length - vp_w
-            extra_h = max_length - vp_h
-            viewport_region = {'x': vp_x - (extra_w / 2),
-                               'y': vp_y - (extra_h / 2),
-                               'width': vp_w + extra_w,
-                               'height': vp_h + extra_h}
-            max_width = max_width * (viewport_region['width'] / vp_w)
-
-        pil_img = self.render_big_image_region(panel, z, t,
-                                               viewport_region, max_width)
-
-        # Optional rotation
-        if rotation != 0 and pil_img is not None:
-            w, h = pil_img.size
-            # How much smaller is the scaled image compared to viewport?
-            # This will be the same 'scale' used in render_big_image_region()
-            scale = panel['zoom_level_scale']
-            # The size we want to crop to
-            crop_target_w = scale * vp_w
-            crop_target_h = scale * vp_h
-
-            # Now we can rotate...
-            pil_img = pil_img.rotate(-rotation, Image.BICUBIC, expand=1)
-            rot_w, rot_h = pil_img.size
-
-            # ...and crop all round (keep same centre point)
-            crop_left = int((rot_w - crop_target_w) / 2)
-            crop_top = int((rot_h - crop_target_h) / 2)
-            crop_right = rot_w - crop_left
-            crop_bottom = rot_h - crop_top
-
-            pil_img = pil_img.crop((crop_left, crop_top,
-                                    crop_right, crop_bottom))
-
-        return pil_img
-
-    def render_zarr_to_pil(self, panel, target_size=4000, xywh=None):
-        # TODO: pick default target_size (based on dpi?) - e.g. 10000?
-
-        import zarr
-        import dask.array as da
-
-        zarr_url = panel['imageId']
-        channels = panel['channels']
-        print("render_zarr_to_pil: URL %s" % (zarr_url))
-
-        img_group = zarr.open(zarr_url, mode='r')
-        zattrs = img_group.attrs
-        if "ome" in zattrs:
-            zattrs = zattrs["ome"]
-
-        paths = [ds["path"] for ds in zattrs["multiscales"][0]["datasets"]]
-        axes = zattrs["multiscales"][0].get("axes", ["t", "c", "z", "y", "x"])
-
-        pyramid = []
-        img_data = da.from_zarr(img_group[paths[0]])
-        pyramid.append(img_data)
-
-        # pick the right pyramid level based on target_size
-        orig_width = pyramid[0].shape[-1]
-        scale_x = 1.0
-        region_width = orig_width if xywh is None else xywh[2]
-        # start big, and go smaller until we reach target size
-        for level in range(len(paths) - 1):
-            level_data = pyramid[level]
-            # if the next level is closer to target_size, use it
-            current_size_x = level_data.shape[-1]
-            this_scale = current_size_x / orig_width    # e.g. 0.5, 0.25, etc
-            this_size = region_width * this_scale
-            if this_size <= target_size:
-                break
-            # load next level, add to pyramid
-            next_data = da.from_zarr(img_group[paths[level + 1]])
-            pyramid.append(next_data)
-            next_size_x = next_data.shape[-1]
-            next_scale_x = next_size_x / orig_width
-            next_size = region_width * next_scale_x
-            # if next level is closer to target size, use it
-            # True for every loop, except maybe the last
-            if abs(next_size - target_size) < abs(this_size - target_size):
-                img_data = pyramid[level + 1]
-                scale_x = next_scale_x
-
-        size_x = img_data.shape[-1]
-        size_y = img_data.shape[-2]
-        crop_x = 0
-        crop_y = 0
-
-        # crop if needed
-        if xywh is not None:
-            # slicing happens below...
-            crop_x = int(scale_x * xywh[0])
-            crop_y = int(scale_x * xywh[1])
-            size_x = int(scale_x * xywh[2])
-            size_y = int(scale_x * xywh[3])
-
-        rgb_plane = numpy.zeros((size_y, size_x, 3), numpy.uint16)
-
-        def display(image, display_min, display_max):
-            # https://stackoverflow.com/questions/14464449/using-numpy-to-efficiently-convert-16-bit-image-data-to-8-bit-for-display-with
-            image.clip(display_min, display_max, out=image)
-            image -= display_min
-            numpy.floor_divide(image, (display_max - display_min + 1) / 256,
-                               out=image, casting='unsafe')
-            return image.astype(numpy.uint8)
-
-        def render_plane(dask_data, t, c, z, window=None):
-            # slice 5D -> 2D
-            indices = []
-            for dim in axes:
-                # handle v0.3 dims (str) and v0.4 dims (dict)
-                dim_name = dim if isinstance(dim, str) else dim['name']
-                if dim_name == 't':
-                    size_t = dask_data.shape[axes.index(dim)]
-                    if size_t == 1:
-                        indices.append(0)
-                    else:
-                        indices.append(t)
-                elif dim_name == 'c':
-                    size_c = dask_data.shape[axes.index(dim)]
-                    if size_c == 1:
-                        indices.append(0)
-                    else:
-                        indices.append(c)
-                elif dim_name == 'z':
-                    size_z = dask_data.shape[axes.index(dim)]
-                    if size_z == 1:
-                        indices.append(0)
-                    else:
-                        indices.append(z)
-                elif dim_name == 'y':
-                    indices.append(numpy.s_[crop_y: crop_y + size_y:])
-                elif dim_name == 'x':
-                    indices.append(numpy.s_[crop_x: crop_x + size_x:])
-
-            channel0 = dask_data[tuple(indices)]
-            channel0 = channel0.compute()
-
-            if window is None:
-                min_val = channel0.min()
-                max_val = channel0.max()
-                window = [min_val, max_val]
-
-            return display(channel0, window[0], window[1])
-
-        the_z = panel['theZ']
-        the_t = panel['theT']
-        for ch_index, ch in enumerate(channels):
-            if not ch['active']:
-                continue
-            hex_color = ch['color']
-            if "lut" in hex_color:
-                # LUTs not supported for Zarr images yet
-                hex_color = "FFFFFF"
-            r = int(hex_color[0:2], 16)
-            g = int(hex_color[2:4], 16)
-            b = int(hex_color[4:6], 16)
-            color = (r / 255.0, g / 255.0, b / 255.0)
-            window = ch['window']['start'], ch['window']['end']
-            plane = render_plane(img_data, the_t, ch_index, the_z, window)
-
-            for index, fraction in enumerate(color):
-                if fraction > 0:
-                    color_plane = (fraction * plane).astype(numpy.uint16)
-                    rgb_plane[:, :, index] += color_plane
-
-        rgb_plane.clip(0, 255, out=rgb_plane)
-        rgb_plane = rgb_plane.astype(numpy.uint8)
-
-        return scale_x, Image.fromarray(rgb_plane, mode='RGB')
-
     def get_panel_image(self, panel, orig_name=None):
         """
         Gets the rendered image from OMERO, then crops & rotates as needed.
@@ -2466,30 +2108,18 @@ class FigureExport(object):
         z = panel['theZ']
         t = panel['theT']
 
-        # If big image, we don't want to render the whole plane
-        if self.is_big_image(panel):
-            pil_img = self.get_panel_big_image(panel)
-        else:
-            # Handle Image ID being either int or Zarr URL
-            image_id = None
-            try:
-                image_id = int(panel['imageId'])
-            except Exception:
-                pass
+        pil_img = None
 
-            if image_id is not None:
-                image = self.conn.getObject("Image", image_id)
-                if image is None:
-                    return None
-                try:
-                    self.apply_rdefs(image, panel)
-                    pil_img = image.renderImage(z, t, compression=1.0)
-                finally:
-                    if image._re is not None:
-                        image._re.close()
-            else:
-                # handle Zarr URL
-                scale, pil_img = self.render_zarr_to_pil(panel)
+        # open PIL Image from "src": "data:image/png;base64,..."
+        import base64
+        from io import BytesIO
+        src = panel.get('src')
+        print("src:", len(src))
+        if src and src.startswith("data:image/png;base64,"):
+            base64_data = src.split(",")[1]
+            image_data = base64.b64decode(base64_data)
+            pil_img = Image.open(BytesIO(image_data))
+            print("pil_img", pil_img)
 
         if pil_img is None:
             return
@@ -2497,67 +2127,7 @@ class FigureExport(object):
         if orig_name is not None:
             pil_img.save(orig_name)
 
-        # big image will already be cropped...
-        if self.is_big_image(panel):
-            return pil_img
-
-        # Need to crop around centre before rotating...
-        size_x, size_y = pil_img.size
-        cx = size_x / 2
-        cy = size_y / 2
-        dx = panel['dx']
-        dy = panel['dy']
-
-        cx += dx
-        cy += dy
-
-        crop_left = 0
-        crop_top = 0
-        crop_right = size_x
-        crop_bottom = size_y
-
-        # We 'inverse crop' to make the image bigger, centred by dx, dy.
-        # This is really only needed for rotation, but also gets us centered...
-        if dx > 0:
-            crop_left = int(dx * -2)
-        else:
-            crop_right = crop_right - int(dx * 2)
-        if dy > 0:
-            crop_top = int(dy * -2)
-        else:
-            crop_bottom = crop_bottom - int(dy * 2)
-
-        # convert to RGBA so we can control background after crop/rotate...
-        # See http://stackoverflow.com/questions/5252170/
-        mde = pil_img.mode
-        pil_img = pil_img.convert('RGBA')
-        pil_img = pil_img.crop((crop_left, crop_top, crop_right, crop_bottom))
-
-        # Optional rotation
-        if 'rotation' in panel and panel['rotation'] > 0:
-            rotation = -int(panel['rotation'])
-            pil_img = pil_img.rotate(rotation, Image.BICUBIC)
-
-        # Final crop to size
-        panel_size = self.get_crop_region(panel)
-
-        w, h = pil_img.size
-        tile_w = panel_size['width']
-        tile_h = panel_size['height']
-        crop_left = int((w - tile_w) / 2)
-        crop_top = int((h - tile_h) / 2)
-        crop_right = w - crop_left
-        crop_bottom = h - crop_top
-
-        pil_img = pil_img.crop((crop_left, crop_top, crop_right, crop_bottom))
-
-        # ...paste image with transparent blank areas onto white background
-        fff = Image.new('RGBA', pil_img.size, (255, 255, 255, 255))
-        out = Image.composite(pil_img, fff, pil_img)
-        # and convert back to original mode
-        out.convert(mde)
-
-        return out
+        return pil_img
 
     def draw_panel(self, panel, page, idx):
         """
@@ -2590,17 +2160,17 @@ class FigureExport(object):
     def get_thumbnail(self, panel, idx):
         """ Saves thumb as local jpg and returns name """
 
-        try:
-            image_id = int(panel['imageId'])
-            image = self.conn.getObject("Image", image_id)
-            if image is None:
-                return
-            thumb_data = image.getThumbnail(size=(96, 96))
-            i = BytesIO(thumb_data)
-            pil_img = Image.open(i)
-        except ValueError:
-            scale, pil_img = self.render_zarr_to_pil(panel, target_size=96)
-        temp_name = str(idx) + "_thumb.jpg"
+        pil_img = self.get_panel_image(panel)
+        # resize so that longest side is 96 pixels
+        w, h = pil_img.size
+        if w > h:
+            new_w = 96
+            new_h = int(h * (96 / w))
+        else:
+            new_h = 96
+            new_w = int(w * (96 / h))
+        pil_img = pil_img.resize((new_w, new_h))
+        temp_name = str(idx) + "_thumb.png"
         pil_img.save(temp_name)
         return temp_name
 
