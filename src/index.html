@@ -11,6 +11,7 @@
       // These are updated by views.py when serving this page...
       // Flag for knowing if app is served from OMERO (or standalone)
       const APP_SERVED_BY_OMERO = false;
+      const OMERO_FIGURE_VERSION = "";
       const BASE_OMEROWEB_URL = dev_omeroweb_url;
       const EXPORT_ENABLED = false;
       const SCRIPT_VERSION = "";
@@ -135,13 +136,23 @@
               <strong>Version</strong>:
               <span id="release_version"></span>
             </p>
+            <p class="omero_only_element">
+                <strong>OMERO Figure Version</strong>:
+                <script>
+                  document.write(OMERO_FIGURE_VERSION);
+                </script>
+            </p>
             <p>
               For more information, visit the
               <a
                 target="new"
-                href="https://www.openmicroscopy.org/omero/figure/"
-                >figure Home Page</a
-              >
+                href="https://github.com/ome/figure"
+                >OME figure github Page</a
+              ><br>or the <a
+                target="new"
+                href="https://openmicroscopy.org/omero/figure/"
+                >OMERO.figure Home Page</a
+              >.
             </p>
             <p>
               &copy; 2026 University of Dundee &amp; Open
