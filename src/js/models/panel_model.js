@@ -1125,6 +1125,117 @@
             });
         },
 
+        async get_viewport_src() {
+            // Returns the 'data:url' that corresponds to the panel viewport.
+            // The full panel 'src', is rendered by OMERO or zarr and extends outside the viewport
+            // This function rotates, offsets and crops the full 'src' image to match the panel viewport.
+            let canvasId = "overlay_canvas";
+            let canvas = document.getElementById(canvasId);
+            if (!canvas) {
+                canvas = document.createElement('canvas');
+                canvas.id = canvasId;
+                // Debugging: append canvas to body
+                // document.body.appendChild(canvas);
+            }
+            let ctx = canvas.getContext('2d');
+            let img = new Image();
+            let self = this;
+
+            // return a Promise that resolves with the data URL of the viewport
+            return new Promise((resolve, reject) => {
+
+                // Once the Image loads the panel's 'src', we can manipulate it on the canvas...
+                img.onload = function() {
+                    let w = img.width;
+                    let h = img.height;
+                    let x = 0;
+                    let y = 0;
+                    let aspectRatio = w / h;
+                    let dx = 0, dy = 0;
+
+                    // For BIG images, we have a region 1.5 x larger than viewport, centered on the viewport
+                    if (self.is_big_image()) {
+                        canvas.width = w;
+                        canvas.height = h;
+                    } else {
+                        // ...but for non-big images, we draw on a canvas twice as large, centered on the viewport
+                        canvas.width = w * 2;
+                        canvas.height = h * 2;
+                        dx = (w / 2) + self.get('dx');
+                        dy = (h / 2) + self.get('dy');
+                    }
+
+                    // Debug: fill, so we can see extent of canvas
+                    ctx.rect(0, 0, canvas.width, canvas.height);
+                    ctx.fillStyle = "yellow";
+                    ctx.fill();
+
+                    // BEFORE we draw on canvas, apply any rotation if specified
+                    if (self.get("rotation")) {
+                        let rotDeg = self.get("rotation");
+                        ctx.translate(canvas.width/2, canvas.height/2);
+                        ctx.rotate(rotDeg * Math.PI / 180);
+                        ctx.translate(-canvas.width/2, -canvas.height/2);
+                    }
+
+                    // Draw the WHOLE image onto the enlarged canvas, taking into account any offsets
+                    ctx.drawImage(img, x, y, w, h, dx, dy, w, h);
+
+                    // Reset transformation matrix to the identity matrix
+                    ctx.setTransform(1, 0, 0, 1, 0, 0);
+
+
+                    let cropX = 0, cropY = 0, cropWidth = w, cropHeight = h;
+
+                    let viewportAspectRatio = self.get('width') / self.get('height');
+                    if (self.is_big_image()) {
+                        // we have rendered a square image, need to crop it to the original aspect ratio
+                        if (viewportAspectRatio > 1) {
+                            // landscape
+                            cropWidth = w * 2 / 3;
+                            cropHeight = cropWidth / viewportAspectRatio;
+                        } else {
+                            // portrait
+                            cropHeight = h * 2 / 3;
+                            cropWidth = cropHeight * viewportAspectRatio;
+                        }
+                        cropX = (w - cropWidth) / 2;
+                        cropY = (h - cropHeight) / 2;
+                    } else {
+                        // crop around the centre
+                        let zoom = self.get('zoom') / 100;
+                        cropX = (w / 2);
+                        cropY = (h / 2);
+
+                        // image is wider than viewport - zoom defined by height
+                        if (aspectRatio > viewportAspectRatio) {
+                            cropHeight = h / zoom;
+                            cropWidth = cropHeight * viewportAspectRatio;
+                        } else {
+                            // zoom defined by the width
+                            cropWidth = w / zoom;
+                            cropHeight = cropWidth / viewportAspectRatio;
+                        }
+                        cropX = cropX + (w - cropWidth) / 2;
+                        cropY = cropY + (h - cropHeight) / 2;
+                    }
+
+                    let imgData = ctx.getImageData(cropX, cropY, cropWidth, cropHeight);
+
+                    // paste cropped region onto the smaller canvas
+                    canvas.width = cropWidth;
+                    canvas.height = cropHeight;
+
+                    ctx.putImageData(imgData, 0, 0);
+
+                    resolve(canvas.toDataURL());
+                };
+
+                // start loading the image
+                img.src = this.get('src');
+            });
+        },
+
         // Turn coordinates into css object with rotation transform
         _viewport_css: function(img_x, img_y, img_w, img_h, frame_w, frame_h, rotation) {
             var transform_x = 100 * (frame_w/2 - img_x) / img_w,

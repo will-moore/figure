@@ -1549,3 +1549,12 @@
     .colorbar_tick_vertical {
         display: flex;
     }
+
+    /* Only shown when debugging (canvas added to body) */
+    #overlay_canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 100; /* Ensure overlay is on top */
+        max-width: 500px;
+    }

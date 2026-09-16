@@ -341,13 +341,20 @@
             return json;
         },
 
-        figure_toJSON: function() {
+        figure_toJSON: async function(with_src) {
             // Turn panels into json
-            var p_json = [],
-                self = this;
-            this.panels.each(function(m) {
-                p_json.push(m.toJSON());
-            });
+            var p_json = [];
+            for (let i = 0; i < this.panels.length; i++) {
+                let m = this.panels.at(i);
+                let panel_json = m.toJSON();
+                if (with_src) {
+                    // We want to export the cropped viewport src data:url, not full src
+                    panel_json['src'] = await m.get_viewport_src();
+                } else {
+                    delete panel_json.src;
+                }
+                p_json.push(panel_json);
+            }
 
             var figureJSON = {
                 version: VERSION,
@@ -410,21 +417,22 @@
         },
 
         save_to_download: function(options) {
-            // Downloads the FigureJSON as a file
-            let figureJSON = this.figure_toJSON();
-            if (options.figureName) {
-                figureJSON.figureName = options.figureName;
-            }
-            let fileName = figureJSON.figureName || "figure";
-            let jsonText = JSON.stringify(this.figure_toJSON(), null, 2);
-            downloadAsFile(jsonText, "application/json", fileName + ".json");
-            this.set({unsaved: false});
+            // Downloads the FigureJSON as a file. Include viewport_src (true)
+            this.figure_toJSON(true).then(figureJSON => {
+                if (options.figureName) {
+                    figureJSON.figureName = options.figureName;
+                }
+                let fileName = figureJSON.figureName || "figure";
+                let jsonText = JSON.stringify(figureJSON, null, 2);
+                downloadAsFile(jsonText, "application/json", fileName + ".json");
+                this.set({unsaved: false});
+            });
         },
 
-        save_to_OMERO: function(options) {
+        save_to_OMERO: async function(options) {
 
-            var self = this,
-                figureJSON = this.figure_toJSON();
+            var self = this;
+            var figureJSON = await this.figure_toJSON();
 
             var url = BASE_OMEROWEB_URL + "figure/save_web_figure/";
                 // fileId = self.get('fileId'),

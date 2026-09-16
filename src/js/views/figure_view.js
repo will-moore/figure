@@ -645,7 +645,9 @@
 
         export_json: function(event) {
             event.preventDefault();
-            showExportAsJsonModal(this.model.figure_toJSON());
+            this.model.figure_toJSON().then(figureJSON => {
+                showExportAsJsonModal(figureJSON);
+            });
         },
 
         import_json: function(event) {
