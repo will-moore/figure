@@ -26,7 +26,9 @@
         showModal,
         hideModals,
         hideModal,
-        updateRoiIds} from "./util";
+        updateRoiIds,
+        downloadAsFile} from "./util";
+    import {buildFigurePdf} from "../export/figure_to_pdf";
     const RELEASE_VERSION = import.meta.env.VITE_VERSION;
 
     // This extends Backbone to support keyboardEvents
@@ -315,21 +317,32 @@
             exportOption = opts[export_opt];
 
             if (!APP_SERVED_BY_OMERO) {
-                let title = "Figure Export Options";
-                let buttons = ["OK"];
-                let message = `The standalone app doesn't support export to PDF or TIFF.
-                <p>You can download the figure via 'Save' and run the figure export script on your local machine.</p>
-                <p>For more details, see the
-                <a href="https://github.com/ome/omero-figure?tab=readme-ov-file#run-figure-export-locally" target="_blank">
-                figure export instructions</a>.
-                </p>`;
-
-                figureConfirmDialog(title, message, buttons);
+                this.export_pdf_in_browser();
                 return;
             }
 
             var url = MAKE_WEBFIGURE_URL;
             this.run_export_script(url, exportOption);
+        },
+
+        // Client-side PDF export (single page, panels + labels only for now)
+        export_pdf_in_browser: function() {
+            let $pdf_inprogress = $("#pdf_inprogress").show();
+            let $create_figure_pdf = $(".export_pdf").hide();
+            let $script_error = $("#script_error").hide();
+
+            this.model.figure_toJSON(true).then(figureJSON => {
+                return buildFigurePdf(figureJSON).then(blob => {
+                    let fileName = (figureJSON.figureName || "figure") + ".pdf";
+                    downloadAsFile(blob, "application/pdf", fileName);
+                });
+            }).catch(err => {
+                console.error("Error generating PDF:", err);
+                $script_error.show();
+            }).then(() => {
+                $create_figure_pdf.show();
+                $pdf_inprogress.hide();
+            });
         },
 
         run_export_script: function(url, exportOption) {
