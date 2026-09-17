@@ -1,11 +1,12 @@
 // Client-side port of the relevant parts of ome_figure/export_script.py
-// Scope (first pass): single page, panel images + panel labels only.
-// No scalebar, colorbar or ROI/shape export yet.
+// Scope (first pass): single page, panel images + panel labels + ROI/shapes.
+// No scalebar or colorbar export yet.
 
 import { jsPDF } from "jspdf";
 import { marked } from "marked";
 
 const DEFAULT_OFFSET = 0;
+const POINT_RADIUS = 5;
 
 // Same geometry as FigureExport.get_crop_region() in export_script.py
 function getCropRegion(panel) {
@@ -365,8 +366,333 @@ async function addPanelToPdf(doc, panel) {
     const dataUrl = await getPanelImageDataUrl(panel);
     doc.addImage(dataUrl, "PNG", panel.x, panel.y, panel.width, panel.height);
     drawPanelBorder(doc, panel);
+    drawShapes(doc, panel);
     for (const draw of computeLabelDraws(panel)) {
         drawLabel(doc, draw);
+    }
+}
+
+// -------------------- ROI / shape drawing --------------------
+// Port of ShapeExport / ShapeToPdfExport in export_script.py. Uses jsPDF's
+// canvas-compatible context2d API, whose coordinate system (top-left origin,
+// y increasing downward) already matches panel.x/y, so no y-axis flip is
+// needed here (unlike the reportlab version, which draws bottom-up).
+
+function getRgb(color) {
+    color = color || "#000000";
+    return [
+        parseInt(color.slice(1, 3), 16) || 0,
+        parseInt(color.slice(3, 5), 16) || 0,
+        parseInt(color.slice(5, 7), 16) || 0,
+    ];
+}
+
+function getRgbaInt(color) {
+    color = color || "#000000";
+    const hex = (s, fallback) => {
+        const v = parseInt(s, 16);
+        return isNaN(v) ? fallback : v;
+    };
+    return [
+        hex(color.slice(1, 3), 0),
+        hex(color.slice(3, 5), 0),
+        hex(color.slice(5, 7), 0),
+        hex(color.slice(7, 9), 255),
+    ];
+}
+
+function getRgba(color) {
+    const [r, g, b, a] = getRgbaInt(color);
+    return [r, g, b, a / 255];
+}
+
+function rgbaCss([r, g, b, a]) {
+    return `rgba(${r},${g},${b},${a === undefined ? 1 : a})`;
+}
+
+function applyTransform(tf, [x, y]) {
+    if (!tf) return [x, y];
+    return [x * tf.A00 + y * tf.A01 + tf.A02, x * tf.A10 + y * tf.A11 + tf.A12];
+}
+
+function applyRotation([x, y], [cx, cy], rotationDeg) {
+    const dx = cx - x, dy = cy - y;
+    const h = Math.sqrt(dx * dx + dy * dy);
+    const angle1 = Math.atan2(dx, dy);
+    const angle2 = angle1 - (rotationDeg * Math.PI) / 180;
+    const newo = Math.sin(angle2) * h;
+    const newa = Math.cos(angle2) * h;
+    return [cx - newo, cy - newa];
+}
+
+// Same geometry as ShapeToPdfExport.panel_to_page_coords() in export_script.py
+function panelToPageCoords(panel, crop, scale, shapeX, shapeY) {
+    let x = shapeX, y = shapeY;
+    const hFlip = panel.horizontal_flip;
+    const vFlip = panel.vertical_flip;
+    if (hFlip) x = crop.width - x + 2 * crop.x;
+    if (vFlip) y = crop.height - y + 2 * crop.y;
+
+    let rotation = panel.rotation || 0;
+    if (vFlip !== hFlip) rotation = -rotation;
+    if (rotation !== 0) {
+        const cx = crop.x + crop.width / 2;
+        const cy = crop.y + crop.height / 2;
+        const dx = cx - x, dy = cy - y;
+        const h = Math.sqrt(dx * dx + dy * dy);
+        const angle1 = Math.atan2(dx, dy);
+        const angle2 = angle1 - (rotation * Math.PI) / 180;
+        x = cx - Math.sin(angle2) * h;
+        y = cy - Math.cos(angle2) * h;
+    }
+
+    x = x - crop.x;
+    y = y - crop.y;
+    const inPanel = !(x < 0 || x > crop.width || y < 0 || y > crop.height);
+
+    x = x * scale + panel.x;
+    y = y * scale + panel.y;
+    return { x, y, inPanel };
+}
+
+function boundsOf(points) {
+    const xs = points.map((p) => p[0]), ys = points.map((p) => p[1]);
+    return {
+        cx: (Math.min(...xs) + Math.max(...xs)) / 2,
+        cy: (Math.min(...ys) + Math.max(...ys)) / 2,
+    };
+}
+
+function drawShapeLabel(ctx, shape, center) {
+    const text = shape.text;
+    if (!text || !center) return;
+    const size = (shape.fontSize || 12) * (2 / 3);
+    const [r, g, b, a] = getRgba(shape.strokeColor);
+    ctx.save();
+    ctx.font = `${size}pt helvetica`;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillStyle = rgbaCss([r, g, b, 0.5 + a / 2]);
+    ctx.fillText(text, center.cx, center.cy);
+    ctx.restore();
+}
+
+function drawLineShape(ctx, panel, crop, scale, shape) {
+    const start = panelToPageCoords(panel, crop, scale, shape.x1, shape.y1);
+    const end = panelToPageCoords(panel, crop, scale, shape.x2, shape.y2);
+    if (!start.inPanel && !end.inPanel) return;
+
+    ctx.save();
+    ctx.strokeStyle = rgbaCss([...getRgb(shape.strokeColor), 1]);
+    ctx.lineWidth = parseFloat(shape.strokeWidth || 1);
+    ctx.beginPath();
+    ctx.moveTo(start.x, start.y);
+    ctx.lineTo(end.x, end.y);
+    ctx.stroke();
+    ctx.restore();
+
+    drawShapeLabel(ctx, shape, boundsOf([[start.x, start.y], [end.x, end.y]]));
+}
+
+function drawArrowShape(ctx, panel, crop, scale, shape) {
+    const start = panelToPageCoords(panel, crop, scale, shape.x1, shape.y1);
+    const end = panelToPageCoords(panel, crop, scale, shape.x2, shape.y2);
+    if (!start.inPanel && !end.inPanel) return;
+
+    const strokeWidth = parseFloat(shape.strokeWidth || 1);
+    const headSize = strokeWidth * 4 + 5;
+    const angle = Math.atan2(end.y - start.y, end.x - start.x);
+    const wing1 = angle + Math.PI - 0.4;
+    const wing2 = angle + Math.PI + 0.4;
+    const notch = {
+        x: end.x + Math.cos(angle + Math.PI) * headSize * 0.5,
+        y: end.y + Math.sin(angle + Math.PI) * headSize * 0.5,
+    };
+    const wingPoint1 = { x: end.x + Math.cos(wing1) * headSize, y: end.y + Math.sin(wing1) * headSize };
+    const wingPoint2 = { x: end.x + Math.cos(wing2) * headSize, y: end.y + Math.sin(wing2) * headSize };
+
+    const [r, g, b] = getRgb(shape.strokeColor);
+    ctx.save();
+    ctx.strokeStyle = rgbaCss([r, g, b, 1]);
+    ctx.fillStyle = rgbaCss([r, g, b, 1]);
+    ctx.lineWidth = strokeWidth;
+    ctx.beginPath();
+    ctx.moveTo(start.x, start.y);
+    ctx.lineTo(notch.x, notch.y);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(wingPoint1.x, wingPoint1.y);
+    ctx.lineTo(wingPoint2.x, wingPoint2.y);
+    ctx.lineTo(end.x, end.y);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+
+    drawShapeLabel(ctx, shape, boundsOf([[start.x, start.y], [end.x, end.y]]));
+}
+
+function drawPolygonShape(ctx, panel, crop, scale, shape, rawPoints, closed) {
+    let inViewport = false;
+    const pagePoints = rawPoints.map(([px, py]) => {
+        const c = panelToPageCoords(panel, crop, scale, px, py);
+        if (c.inPanel) inViewport = true;
+        return [c.x, c.y];
+    });
+    if (!inViewport || pagePoints.length === 0) return;
+
+    ctx.save();
+    ctx.lineWidth = parseFloat(shape.strokeWidth || 1);
+    ctx.strokeStyle = rgbaCss(getRgba(shape.strokeColor));
+
+    let hasFill = false;
+    if (shape.fillColor !== undefined) {
+        const rgba = getRgba(shape.fillColor);
+        if (shape.fillOpacity !== undefined) rgba[3] = parseFloat(shape.fillOpacity);
+        ctx.fillStyle = rgbaCss(rgba);
+        hasFill = true;
+    }
+
+    ctx.beginPath();
+    ctx.moveTo(pagePoints[0][0], pagePoints[0][1]);
+    for (const [x, y] of pagePoints.slice(1)) ctx.lineTo(x, y);
+    if (closed) ctx.closePath();
+    if (hasFill && closed) ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+
+    drawShapeLabel(ctx, shape, boundsOf(pagePoints));
+}
+
+function rectangleToPoints(shape) {
+    let points = [
+        [shape.x, shape.y],
+        [shape.x + shape.width, shape.y],
+        [shape.x + shape.width, shape.y + shape.height],
+        [shape.x, shape.y + shape.height],
+    ];
+    if (shape.rotation) {
+        const cx = shape.x + shape.width / 2;
+        const cy = shape.y + shape.height / 2;
+        points = points.map((p) => applyRotation(p, [cx, cy], shape.rotation));
+    }
+    return points.map((p) => applyTransform(shape.transform, p));
+}
+
+function parsePointsString(pointsStr) {
+    return pointsStr.split(" ").filter(Boolean).map((pair) => {
+        const [x, y] = pair.split(",");
+        return [parseFloat(x), parseFloat(y)];
+    });
+}
+
+function drawEllipseShape(ctx, panel, crop, scale, shape) {
+    const c = panelToPageCoords(panel, crop, scale, shape.x, shape.y);
+    if (!c.inPanel) return;
+
+    const rx = shape.radiusX * scale;
+    const ry = shape.radiusY * scale;
+
+    let rotation = shape.rotation || 0;
+    const hFlip = panel.horizontal_flip;
+    const vFlip = panel.vertical_flip;
+    if (vFlip) rotation = -rotation;
+    if (hFlip) rotation = 180 - rotation;
+    rotation = vFlip !== hFlip ? (rotation - panel.rotation) * -1 : (rotation + panel.rotation) * -1;
+
+    ctx.save();
+    ctx.translate(c.x, c.y);
+    ctx.rotate((rotation * Math.PI) / 180);
+    ctx.lineWidth = parseFloat(shape.strokeWidth || 1);
+    ctx.strokeStyle = rgbaCss(getRgba(shape.strokeColor));
+
+    ctx.beginPath();
+    ctx.ellipse(0, 0, Math.abs(rx), Math.abs(ry), 0, 0, 2 * Math.PI);
+    if (shape.fillColor !== undefined) {
+        const rgba = getRgba(shape.fillColor);
+        if (shape.fillOpacity !== undefined) rgba[3] = parseFloat(shape.fillOpacity);
+        ctx.fillStyle = rgbaCss(rgba);
+        ctx.fill();
+    }
+    ctx.stroke();
+    ctx.restore();
+
+    drawShapeLabel(ctx, shape, { cx: c.x, cy: c.y });
+}
+
+function drawPointShape(ctx, panel, crop, scale, shape) {
+    drawEllipseShape(ctx, panel, crop, scale, {
+        ...shape,
+        radiusX: POINT_RADIUS / scale,
+        radiusY: POINT_RADIUS / scale,
+    });
+}
+
+function drawTextShape(doc, ctx, panel, crop, scale, shape) {
+    const text = shape.text || "";
+    if (shape.showText === false || text === "") return;
+
+    const fontSize = shape.fontSize || 12;
+    const strokeColor = shape.strokeColor || "#FFFFFF";
+    const fillColor = shape.fillColor || "#000000";
+    const fillOpacity = parseFloat(shape.fillOpacity || 0);
+    const anchor = shape.textAnchor || "start";
+    const coords = panelToPageCoords(panel, crop, scale, shape.x, shape.y);
+    const hFlip = panel.horizontal_flip;
+
+    let align = "left";
+    if (anchor === "middle") align = "center";
+    else if ((anchor === "end" && !hFlip) || (anchor === "start" && hFlip)) align = "right";
+
+    doc.setFont("helvetica");
+    doc.setFontSize(fontSize);
+    const textWidth = doc.getTextWidth(text);
+    let x0 = 0;
+    if (align === "center") x0 = textWidth / 2;
+    else if (align === "right") x0 = textWidth;
+
+    ctx.save();
+    if (fillOpacity > 0) {
+        const pad = 1;
+        ctx.fillStyle = rgbaCss([...getRgb(fillColor), fillOpacity]);
+        ctx.fillRect(
+            coords.x - x0 - pad,
+            coords.y - fontSize * 0.8 - pad,
+            textWidth + pad * 2,
+            fontSize * 1.1 + pad * 2
+        );
+    }
+    ctx.font = `${fontSize}pt helvetica`;
+    ctx.textAlign = align;
+    ctx.textBaseline = "alphabetic";
+    ctx.fillStyle = rgbaCss([...getRgb(strokeColor), 1]);
+    ctx.fillText(text, coords.x, coords.y);
+    ctx.restore();
+}
+
+function drawShapes(doc, panel) {
+    if (!panel.shapes || panel.shapes.length === 0) return;
+    const crop = getCropRegion(panel);
+    const scale = panel.width / crop.width;
+    const ctx = doc.context2d;
+
+    // Draw text shapes last, same ordering as ShapeExport in export_script.py
+    const shapes = [...panel.shapes].sort((a, b) => {
+        const aText = a.type.toLowerCase() === "text" ? 1 : 0;
+        const bText = b.type.toLowerCase() === "text" ? 1 : 0;
+        return aText - bText;
+    });
+
+    for (const shape of shapes) {
+        const type = (shape.type || "").toLowerCase();
+        if (type === "line") drawLineShape(ctx, panel, crop, scale, shape);
+        else if (type === "arrow") drawArrowShape(ctx, panel, crop, scale, shape);
+        else if (type === "rectangle") drawPolygonShape(ctx, panel, crop, scale, shape, rectangleToPoints(shape), true);
+        else if (type === "polygon") drawPolygonShape(ctx, panel, crop, scale, shape, parsePointsString(shape.points), true);
+        else if (type === "polyline") drawPolygonShape(ctx, panel, crop, scale, shape, parsePointsString(shape.points), false);
+        else if (type === "ellipse") drawEllipseShape(ctx, panel, crop, scale, shape);
+        else if (type === "point") drawPointShape(ctx, panel, crop, scale, shape);
+        else if (type === "text") drawTextShape(doc, ctx, panel, crop, scale, shape);
     }
 }
 
