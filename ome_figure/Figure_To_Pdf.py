@@ -102,6 +102,7 @@ processing steps:
 """
 
 # Create a dict we can use for scalebar unit conversions
+# TODO: add more units as needed
 unit_symbols = {
     "ANGSTROM": {'symbol': "\u00c5", 'microns': 0.0001},
     "CENTIMETER": {'symbol': "cm", 'microns': 10000.0},
@@ -111,18 +112,13 @@ unit_symbols = {
     "MILLIMETER": {'symbol': "mm", 'microns': 1000.0},
     "NANOMETER": {'symbol': "nm", 'microns': 0.001},
 }
-if omero_installed:
-    units_symbols = {}
-    for name in LengthI.SYMBOLS.keys():
-        if name in ("PIXEL", "REFERENCEFRAME"):
-            continue
-        klass = getattr(UnitsLength, name)
-        unit = LengthI(1, klass)
-        to_microns = LengthI(unit, UnitsLength.MICROMETER)
-        unit_symbols[name] = {
-            'symbol': unit.getSymbol(),
-            'microns': to_microns.getValue()
-        }
+
+
+def get_font(self, fontsize, bold=False, italics=False):
+    """ Try to load font from known location """
+    # TODO load font from URL
+    font = ImageFont.load_default()
+    return font
 
 
 def scale_to_export_dpi(pixels):
@@ -668,35 +664,7 @@ class ShapeToPilExport(ShapeExport):
         self.scale = pil_img.size[0] / crop['width']
         self.draw = ImageDraw.Draw(pil_img)
 
-        if omero_installed:
-            from omero.gateway import THISPATH
-            self.FONTPATH = os.path.join(THISPATH, "pilfonts")
-        else:
-            # get location of this script... /pilfonts
-            this_path = os.path.dirname(os.path.abspath(__file__))
-            self.FONTPATH = os.path.join(this_path, "pilfonts")
-
         super(ShapeToPilExport, self).__init__(panel)
-
-    def get_font(self, fontsize, bold=False, italics=False):
-        """ Try to load font from known location in OMERO or local """
-        font_name = "FreeSans.ttf"
-        if bold and italics:
-            font_name = "FreeSansBoldOblique.ttf"
-        elif bold:
-            font_name = "FreeSansBold.ttf"
-        elif italics:
-            font_name = "FreeSansOblique.ttf"
-        path_to_font = os.path.join(self.FONTPATH, font_name)
-        try:
-            font = ImageFont.truetype(path_to_font, fontsize)
-        except Exception:
-            try:
-                font_path = os.path.join(self.FONTPATH, "B24.pil")
-                font = ImageFont.load(font_path)
-            except Exception:
-                font = ImageFont.load_default()
-        return font
 
     def get_panel_coords(self, shape_x, shape_y):
         """
@@ -752,7 +720,7 @@ class ShapeToPilExport(ShapeExport):
         r, g, b, a = self.get_rgba_int(shape['strokeColor'])
         # bump up alpha a bit to make text more readable
         rgba = (r, g, b, int(128 + a / 2))
-        font = self.get_font(size)
+        font = get_font(size)
         box = font.getbbox(text)
         width = box[2] - box[0]
         height = box[3] - box[1]
@@ -773,7 +741,7 @@ class ShapeToPilExport(ShapeExport):
         x, y = text_coords['x'], text_coords['y']
 
         r, g, b, a = self.get_rgba_int(stroke_color)
-        font = self.get_font(font_size)
+        font = get_font(font_size)
         box = font.getbbox(text)
         txt_w = box[2] - box[0]
         box = font.getbbox("Mg")  # height including acsenders & descenders
@@ -1866,16 +1834,15 @@ class FigureExport(object):
 
     def get_color_ramp(self, channel):
         """
-        Return the 256 1D array of the LUT from the server or
+        Return the (1, 256, 3) array of the LUT from
         the color gradient.
 
-        LUT files on the server are read with the script service, and
-        file content is parsed with a custom implementation.
+        TODO: figure app should provide color_ramp in the figure.json for LUTs
         """
         color = channel["color"]
 
-        # If LUT but no OMERO conn, we return a greyscale ramp
-        if self.conn is None and color.endswith(".lut"):
+        # FIXME: if lut, we return a greyscale ramp
+        if color.endswith(".lut"):
             color = "FFFFFF"
 
         # Convert the hexadecimal string to RGB
@@ -1890,47 +1857,6 @@ class FigureExport(object):
                 color_ramp = color_ramp.astype(numpy.uint8)
             except ValueError:
                 pass
-
-        else:
-            script_service = self.conn.getScriptService()
-            luts = script_service.getScriptsByMimetype("text/x-lut")
-            self.conn.SERVICE_OPTS.setOmeroGroup(  # required to get LUT files
-                self.conn.getEventContext().groupId)
-            for lut in luts:
-                if lut.name.val != color:
-                    continue
-
-                orig_file = self.conn.getObject(
-                    "OriginalFile", lut.getId()._val)
-                lut_data = bytearray()
-                # Collect the LUT data in byte form
-                for chunk in orig_file.getFileInChunks():
-                    lut_data.extend(chunk)
-
-                if len(lut_data) in [768, 800]:
-                    lut_arr = numpy.array(lut_data, dtype="uint8")[-768:]
-                    color_ramp = lut_arr.reshape(3, 256).T
-                else:
-                    lut_data = lut_data.decode()
-                    r, g, b = [], [], []
-
-                    lines = lut_data.split("\n")
-                    sep = None
-                    if "\t" in lines[0]:
-                        sep = "\t"
-                    for line in lines:
-                        val = line.split(sep)
-                        if len(val) < 3 or not val[-1].isnumeric():
-                            continue
-                        r.append(int(val[-3]))
-                        g.append(int(val[-2]))
-                        b.append(int(val[-1]))
-                    color_ramp = numpy.array([r, g, b], dtype=numpy.uint8).T
-                break
-
-            # Set back the group to -1 to make sure we can find all images
-            self.conn.SERVICE_OPTS.setOmeroGroup(-1)
-
         if channel.get("reverseIntensity", False):
             color_ramp = color_ramp[::-1]
 
@@ -2101,12 +2027,8 @@ class FigureExport(object):
 
     def get_panel_image(self, panel, orig_name=None):
         """
-        Gets the rendered image from OMERO, then crops & rotates as needed.
-        Optionally saving original and cropped images as TIFFs.
-        Returns image as PIL image.
+        Renders the 'src' data:url of the panel as a PIL image
         """
-        z = panel['theZ']
-        t = panel['theT']
 
         pil_img = None
 
@@ -2114,12 +2036,10 @@ class FigureExport(object):
         import base64
         from io import BytesIO
         src = panel.get('src')
-        print("src:", len(src))
         if src and src.startswith("data:image/png;base64,"):
             base64_data = src.split(",")[1]
             image_data = base64.b64decode(base64_data)
             pil_img = Image.open(BytesIO(image_data))
-            print("pil_img", pil_img)
 
         if pil_img is None:
             return
@@ -2131,14 +2051,10 @@ class FigureExport(object):
 
     def draw_panel(self, panel, page, idx):
         """
-        Gets the image from OMERO, processes (and saves) it then
+        Renders image to PIL image, then
         calls self.paste_image() to add it to PDF or TIFF figure.
         """
 
-        # create name to save image
-        # TODO: do we need real name?
-        # original_name = image.getName()
-        # img_name = os.path.basename(original_name)
         img_name = "panel"
         img_name = "%s_%s.tiff" % (idx, img_name)
 
@@ -2522,39 +2438,12 @@ class TiffExport(FigureExport):
 
         super(TiffExport, self).__init__(conn, script_params, export_images)
 
-        if omero_installed:
-            from omero.gateway import THISPATH
-            self.FONTPATH = os.path.join(THISPATH, "pilfonts")
-        else:
-            # get location of this script... /pilfonts
-            this_path = os.path.dirname(os.path.abspath(__file__))
-            self.FONTPATH = os.path.join(this_path, "pilfonts")
         self.ns = "omero.web.figure.tiff"
         self.mimetype = "image/tiff"
 
     def add_rois(self, panel, page):
         """ TIFF export doesn't add ROIs to page (does it to panel)"""
         pass
-
-    def get_font(self, fontsize, bold=False, italics=False):
-        """ Try to load font from known location in OMERO """
-        font_name = "FreeSans.ttf"
-        if bold and italics:
-            font_name = "FreeSansBoldOblique.ttf"
-        elif bold:
-            font_name = "FreeSansBold.ttf"
-        elif italics:
-            font_name = "FreeSansOblique.ttf"
-        path_to_font = os.path.join(self.FONTPATH, font_name)
-        try:
-            font = ImageFont.truetype(path_to_font, fontsize)
-        except Exception:
-            try:
-                font_path = os.path.join(self.FONTPATH, "B24.pil")
-                font = ImageFont.load(font_path)
-            except Exception:
-                font = ImageFont.load_default()
-        return font
 
     def get_figure_file_ext(self):
         return "tiff"
@@ -2668,7 +2557,7 @@ class TiffExport(FigureExport):
         widths = []
         heights = []
         for t in tokens:
-            font = self.get_font(fontsize, t['bold'], t['italics'])
+            font = get_font(fontsize, t['bold'], t['italics'])
             box = font.getbbox(t['text'])
             txt_w = box[2] - box[0]
             txt_h = box[3] - box[1]
@@ -2683,7 +2572,7 @@ class TiffExport(FigureExport):
 
         w = 0
         for t in tokens:
-            font = self.get_font(fontsize, t['bold'], t['italics'])
+            font = get_font(fontsize, t['bold'], t['italics'])
             box = font.getbbox(t['text'])
             txt_w = box[2] - box[0]
             txt_h = box[3] - box[1]
