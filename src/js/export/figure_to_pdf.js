@@ -1,12 +1,23 @@
 // Client-side port of the relevant parts of ome_figure/export_script.py
-// Scope (first pass): single page, panel images + panel labels + ROI/shapes.
-// No scalebar or colorbar export yet.
+// Scope (first pass): single page, panel images + panel labels + ROI/shapes + scalebar.
+// No colorbar export yet.
 
 import { jsPDF } from "jspdf";
 import { marked } from "marked";
 
 const DEFAULT_OFFSET = 0;
 const POINT_RADIUS = 5;
+
+// Same as unit_symbols in export_script.py, used for scalebar unit conversion
+const UNIT_SYMBOLS = {
+    ANGSTROM: { symbol: "\u00c5", microns: 0.0001 },
+    CENTIMETER: { symbol: "cm", microns: 10000.0 },
+    KILOMETER: { symbol: "km", microns: 1000000000.0 },
+    METER: { symbol: "m", microns: 1000000.0 },
+    MICROMETER: { symbol: "\u00b5m", microns: 1 },
+    MILLIMETER: { symbol: "mm", microns: 1000.0 },
+    NANOMETER: { symbol: "nm", microns: 0.001 },
+};
 
 // Same geometry as FigureExport.get_crop_region() in export_script.py
 function getCropRegion(panel) {
@@ -367,8 +378,89 @@ async function addPanelToPdf(doc, panel) {
     doc.addImage(dataUrl, "PNG", panel.x, panel.y, panel.width, panel.height);
     drawPanelBorder(doc, panel);
     drawShapes(doc, panel);
+    drawScalebar(doc, panel);
     for (const draw of computeLabelDraws(panel)) {
         drawLabel(doc, draw);
+    }
+}
+
+// -------------------- Scalebar drawing --------------------
+// Port of FigureExport.draw_scalebar()/draw_scalebar_line() in export_script.py
+
+function drawScalebarLine(doc, x1, y1, x2, y2, width, [r, g, b]) {
+    const ctx = doc.context2d;
+    ctx.save();
+    ctx.strokeStyle = rgbaCss([r, g, b, 1]);
+    ctx.lineWidth = width;
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+    ctx.restore();
+}
+
+function drawPageText(doc, text, x, y, fontSize, [r, g, b], align) {
+    const ctx = doc.context2d;
+    ctx.save();
+    ctx.font = `${fontSize}pt helvetica`;
+    ctx.textAlign = align;
+    ctx.textBaseline = "middle";
+    ctx.fillStyle = rgbaCss([r, g, b, 1]);
+    ctx.fillText(markdownToPlainText(text), x, y);
+    ctx.restore();
+}
+
+function drawScalebar(doc, panel) {
+    const sb = panel.scalebar;
+    if (!sb || !sb.show) return;
+    if (!(panel.pixel_size_x > 0)) return;
+
+    const x = panel.x, y = panel.y, width = panel.width, height = panel.height;
+    const spacer = sb.margin !== undefined ? sb.margin : 10;
+    const rgb = getRgb(sb.color);
+    const position = sb.position || "bottomright";
+    const barHeight = sb.height !== undefined ? sb.height : 3;
+    const halfHeight = Math.floor(barHeight / 2);
+
+    let lx, ly, align = "left";
+    if (position === "topleft") { lx = x + spacer; ly = y + spacer + halfHeight; }
+    else if (position === "topright") { lx = x + width - spacer; ly = y + spacer + halfHeight; align = "right"; }
+    else if (position === "bottomleft") { lx = x + spacer; ly = y + height - spacer - halfHeight; }
+    else { lx = x + width - spacer; ly = y + height - spacer - halfHeight; align = "right"; } // bottomright
+
+    let pixelSizeX = panel.pixel_size_x;
+    if (panel.zoom_level_scale) pixelSizeX = pixelSizeX / panel.zoom_level_scale;
+
+    const crop = getCropRegion(panel);
+    const pixelsLength = sb.length / pixelSizeX;
+    const scaleToCanvas = panel.width / crop.width;
+    let canvasLength = pixelsLength * scaleToCanvas;
+
+    const pixelUnit = panel.pixel_size_x_unit;
+    const scalebarUnit = sb.units || pixelUnit;
+    if (UNIT_SYMBOLS[pixelUnit] && UNIT_SYMBOLS[scalebarUnit]) {
+        const convertFactor = UNIT_SYMBOLS[scalebarUnit].microns / UNIT_SYMBOLS[pixelUnit].microns;
+        canvasLength = convertFactor * canvasLength;
+    }
+
+    const lxEnd = align === "left" ? lx + canvasLength : lx - canvasLength;
+
+    drawScalebarLine(doc, lx, ly, lxEnd, ly, barHeight, rgb);
+
+    if (sb.show_label) {
+        let symbol = "\u00B5m";
+        if (panel.pixel_size_x_symbol) symbol = panel.pixel_size_x_symbol;
+        if (scalebarUnit && UNIT_SYMBOLS[scalebarUnit]) symbol = UNIT_SYMBOLS[scalebarUnit].symbol;
+        const label = `${sb.length} ${symbol}`;
+
+        let fontSize = 10;
+        const parsedFontSize = parseInt(sb.font_size, 10);
+        if (!isNaN(parsedFontSize)) fontSize = parsedFontSize;
+
+        let textY = position.includes("bottom") ? ly - fontSize - 5 : ly + 5;
+        const sign = position === "bottomleft" || position === "bottomright" ? -1 : 1;
+
+        drawPageText(doc, label, (lx + lxEnd) / 2, textY + sign * halfHeight, fontSize, rgb, "center");
     }
 }
 
@@ -380,6 +472,9 @@ async function addPanelToPdf(doc, panel) {
 
 function getRgb(color) {
     color = color || "#000000";
+    if (!color.startsWith("#") && color.length === 6) {
+        color = "#" + color;
+    }
     return [
         parseInt(color.slice(1, 3), 16) || 0,
         parseInt(color.slice(3, 5), 16) || 0,
