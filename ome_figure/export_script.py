@@ -1516,11 +1516,12 @@ class FigureExport(object):
         w, h = pil_img.size
         if w > h:
             new_w = 96
-            new_h = int(h * (96 / w))
+            new_h = h/w * new_w
         else:
             new_h = 96
-            new_w = int(w * (96 / h))
-        pil_img = pil_img.resize((new_w, new_h))
+            new_w = w/h * new_h
+        print("Resizing thumbnail to:", int(new_w), int(new_h))
+        pil_img = pil_img.resize((int(new_w), int(new_h)))
         temp_name = str(idx) + "_thumb.png"
         pil_img.save(temp_name)
         return temp_name
@@ -1559,11 +1560,7 @@ class FigureExport(object):
 
     def add_info_page(self, panels_json):
         """Generates a PDF info page with figure title, links to images etc"""
-        script_params = self.script_params
         figure_name = self.figure_name
-        base_url = None
-        if 'Webclient_URI' in script_params:
-            base_url = script_params['Webclient_URI']
         page_height = self.page_height
 
         # Need to sort panels from top (left) -> bottom of Figure
@@ -1581,13 +1578,6 @@ class FigureExport(object):
         # Start adding at the top, update page_y as we add paragraphs
         page_y = page_height - self.margin
         page_y = self.add_para_with_thumb(figure_name, page_y, style=style_h)
-
-        if "Figure_URI" in script_params:
-            file_url = script_params["Figure_URI"]
-            figure_link = ("Link to Figure: <a href='%s' color='blue'>%s</a>"
-                           % (file_url, file_url))
-            page_y = self.add_para_with_thumb(figure_link, page_y,
-                                              style=style_n)
 
         # Add Figure Legend
         if ('legend' in self.figure_json and
@@ -1614,7 +1604,7 @@ class FigureExport(object):
 
         # Go through sorted panels, adding paragraph for each unique image
         for idx, p in enumerate(panels_json):
-            iid = p['imageId']
+            img_url = p['imageId']
             # list unique scalebar lengths
             if 'scalebar' in p and p['scalebar'].get('show'):
                 sb_length = p['scalebar'].get('length')
@@ -1623,18 +1613,12 @@ class FigureExport(object):
                 if sb_units and sb_units in unit_symbols:
                     symbol = unit_symbols[sb_units]['symbol']
                 scalebars.append("%s %s" % (sb_length, symbol))
-            if iid in img_ids:
+            if img_url in img_ids:
                 continue  # ignore images we've already handled
-            img_ids.add(iid)
+            img_ids.add(img_url)
             thumb_src = self.get_thumbnail(p, idx)
-            # thumb = "<img src='%s' width='%s' height='%s' " \
-            #         "valign='middle' />" % (thumbSrc, thumbSize, thumbSize)
             lines = []
             lines.append(p['name'])
-            try:
-                img_url = "%s?show=image-%s" % (base_url, int(iid))
-            except ValueError:
-                img_url = iid
             lines.append(
                 "<a href='%s' color='blue'>%s</a>" % (img_url, img_url))
             # addPara([" ".join(line)])
@@ -1867,9 +1851,7 @@ def handle_main():
 
     script_args = {
         "Figure_JSON": json.dumps(figure_json),
-        "Export_Option": file_type,
-        "outputPathName": output_path_name,
-        "Webclient_URI": "http://localhost/webclient/"
+        "outputPathName": output_path_name
     }
 
     fig_export = FigureExport(script_args)
