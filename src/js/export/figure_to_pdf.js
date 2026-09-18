@@ -1,6 +1,6 @@
 // Client-side port of the relevant parts of ome_figure/export_script.py
-// Scope (first pass): single page, panel images + panel labels + ROI/shapes + scalebar.
-// No colorbar export yet.
+// Scope (first pass): single page, panel images + panel labels + ROI/shapes + scalebar + colorbar.
+// No multi-page or info/legend page support yet.
 
 import { jsPDF } from "jspdf";
 import { marked } from "marked";
@@ -382,6 +382,7 @@ async function addPanelToPdf(doc, panel) {
     for (const draw of computeLabelDraws(panel)) {
         drawLabel(doc, draw);
     }
+    drawColorbar(doc, panel);
 }
 
 // -------------------- Scalebar drawing --------------------
@@ -462,6 +463,141 @@ function drawScalebar(doc, panel) {
 
         drawPageText(doc, label, (lx + lxEnd) / 2, textY + sign * halfHeight, fontSize, rgb, "center");
     }
+}
+
+// -------------------- Colorbar drawing --------------------
+// Port of FigureExport.get_color_ramp()/draw_colorbar()/draw_colorbar_ticks() in export_script.py.
+// The ramp gradient is rendered directly with a canvas linear-gradient instead
+// of building a pixel array, since it's mathematically the same black<->channel-color ramp.
+
+function buildColorRampDataUrl(channelColor, reverseIntensity, isVertical) {
+    let hex = channelColor || "";
+    if (hex.endsWith(".lut")) hex = "FFFFFF"; // TODO: app should provide the real LUT ramp
+    const rgb = hex.length === 6 ? getRgb("#" + hex) : [0, 0, 0];
+    const full = `rgb(${rgb[0]},${rgb[1]},${rgb[2]})`;
+    const black = "rgb(0,0,0)";
+
+    const canvas = document.createElement("canvas");
+    canvas.width = isVertical ? 2 : 256;
+    canvas.height = isVertical ? 256 : 2;
+    const ctx = canvas.getContext("2d");
+
+    const grad = isVertical
+        ? ctx.createLinearGradient(0, 0, 0, canvas.height)
+        : ctx.createLinearGradient(0, 0, canvas.width, 0);
+    // top->bottom (vertical) or left->right (horizontal), flipped by reverseIntensity
+    const [start, end] = isVertical
+        ? reverseIntensity ? [black, full] : [full, black]
+        : reverseIntensity ? [full, black] : [black, full];
+    grad.addColorStop(0, start);
+    grad.addColorStop(1, end);
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    return canvas.toDataURL("image/png");
+}
+
+function drawColorbarTicks(doc, colorbar, rampD, labels, labelsX, labelsY) {
+    const fontSize = parseInt(colorbar.font_size, 10);
+    const markLen = colorbar.mark_len;
+    const tickMargin = colorbar.tick_margin;
+    const pos = colorbar.position;
+    const tickThickness = colorbar.tick_thickness !== undefined ? colorbar.tick_thickness : 1;
+    const rgb = getRgb("#" + colorbar.axis_color);
+    const align = rampD.align;
+
+    labels.forEach((label, i) => {
+        let posX = labelsX[i], posY = labelsY[i];
+        let shift = 0;
+        if (i === 0) shift = -tickThickness / 2;
+        else if (i === labels.length - 1) shift = tickThickness / 2;
+
+        let x1, y1, x2, y2, xText, yText;
+        if (pos === "left" || pos === "right") {
+            posY -= shift;
+            x1 = posX; y1 = posY; y2 = posY;
+            yText = posY;
+            if (pos === "left") { x2 = posX - markLen; xText = posX - markLen - tickMargin; }
+            else { x2 = posX + markLen; xText = posX + markLen + tickMargin; }
+        } else {
+            posX -= shift;
+            x1 = posX; x2 = posX; y1 = posY;
+            xText = posX;
+            if (pos === "top") { y2 = posY - markLen; yText = posY - fontSize - markLen - tickMargin; }
+            else { y2 = posY + markLen; yText = posY + markLen + tickMargin; }
+        }
+
+        if (markLen > 0) drawScalebarLine(doc, x1, y1, x2, y2, tickThickness, rgb);
+        drawPageText(doc, label, xText, yText, fontSize, rgb, align);
+    });
+
+    let x1, y1, x2, y2;
+    if (pos === "top" || pos === "bottom") {
+        x1 = rampD.x; x2 = rampD.x + rampD.width;
+        y1 = pos === "bottom" ? rampD.y + rampD.height : rampD.y;
+        y2 = y1;
+    } else {
+        x1 = pos === "right" ? rampD.x + rampD.width : rampD.x;
+        y1 = rampD.y; y2 = rampD.y + rampD.height;
+        x2 = x1;
+    }
+    drawScalebarLine(doc, x1, y1, x2, y2, tickThickness, rgb);
+}
+
+function drawColorbar(doc, panel) {
+    const colorbar = panel.colorbar;
+    if (!colorbar || !colorbar.show) return;
+
+    const channel = (panel.channels || []).find((c) => c.active);
+    if (!channel) return;
+
+    const gap = colorbar.gap;
+    const thickness = colorbar.thickness;
+    const position = colorbar.position;
+    const numTicks = colorbar.num_ticks;
+    const { start, end } = channel.window;
+
+    const decimals = Math.max(0, Math.ceil(-Math.log10((end - start) / numTicks)));
+    const posRatio = Array.from({ length: numTicks }, (_, i) => i / (numTicks - 1 || 1));
+    let labels = posRatio.map((r) => (start + (end - start) * r).toFixed(decimals));
+
+    const rampD = {};
+    let labelsX, labelsY;
+    const isVertical = position === "left" || position === "right";
+
+    if (isVertical) {
+        rampD.width = thickness;
+        rampD.height = panel.height;
+        rampD.y = panel.y;
+        rampD.x = panel.x - (gap + thickness);
+        rampD.align = "right";
+        let rampLabelX = rampD.x;
+        labelsY = posRatio.map((r) => rampD.y + panel.height * r);
+        labels = [...labels].reverse();
+        if (position === "right") {
+            rampD.x = panel.x + panel.width + gap;
+            rampD.align = "left";
+            rampLabelX = rampD.x + rampD.width;
+        }
+        labelsX = labels.map(() => rampLabelX);
+    } else {
+        rampD.width = panel.width;
+        rampD.height = thickness;
+        rampD.x = panel.x;
+        rampD.y = panel.y - (gap + thickness);
+        rampD.align = "center";
+        labelsX = posRatio.map((r) => rampD.x + panel.width * r);
+        let rampLabelY = rampD.y;
+        if (position === "bottom") {
+            rampD.y = panel.y + panel.height + gap;
+            rampLabelY = rampD.y + rampD.height;
+        }
+        labelsY = labels.map(() => rampLabelY);
+    }
+
+    const dataUrl = buildColorRampDataUrl(channel.color, channel.reverseIntensity, isVertical);
+    doc.addImage(dataUrl, "PNG", rampD.x, rampD.y, rampD.width, rampD.height);
+
+    drawColorbarTicks(doc, colorbar, rampD, labels, labelsX, labelsY);
 }
 
 // -------------------- ROI / shape drawing --------------------
