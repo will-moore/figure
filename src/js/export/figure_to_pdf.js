@@ -1,6 +1,6 @@
 // Client-side port of the relevant parts of ome_figure/export_script.py
-// Scope (first pass): single page, panel images + panel labels + ROI/shapes + scalebar + colorbar.
-// No multi-page or info/legend page support yet.
+// Scope (first pass): single panel page + labels/ROIs/shapes/scalebar/colorbar,
+// plus the trailing info/legend page. No multi-page figure support yet.
 
 import { jsPDF } from "jspdf";
 import { marked } from "marked";
@@ -947,5 +947,132 @@ export async function buildFigurePdf(figureJSON) {
         await addPanelToPdf(doc, panel);
     }
 
+    await addInfoPage(doc, figureJSON, pageWidth, pageHeight);
+
     return doc.output("blob");
+}
+
+// -------------------- Info / legend page --------------------
+// Port of FigureExport.add_info_page()/add_para_with_thumb()/get_thumbnail() in
+// export_script.py. Appends a final page with the figure title, legend and a
+// list of images used (with thumbnails + clickable links).
+
+// Splits markdown into block-level paragraphs of plain text (links become "text (url)")
+function markdownToParagraphs(text) {
+    let html = marked.parse(text || "");
+    html = html.replace(/<a[^>]*href="([^"]*)"[^>]*>(.*?)<\/a>/gi, "$2 ($1)");
+    const div = document.createElement("div");
+    div.innerHTML = html;
+    const paragraphs = [];
+    for (const child of div.children) {
+        const t = (child.textContent || "").trim();
+        if (t) paragraphs.push(t);
+    }
+    if (paragraphs.length === 0) {
+        const t = (div.textContent || "").trim();
+        if (t) paragraphs.push(t);
+    }
+    return paragraphs;
+}
+
+async function getThumbnailDataUrl(panel) {
+    const img = await loadImage(panel.src);
+    const w = img.width, h = img.height;
+    const newW = w > h ? 96 : (w / h) * 96;
+    const newH = w > h ? (h / w) * 96 : 96;
+    const canvas = document.createElement("canvas");
+    canvas.width = newW;
+    canvas.height = newH;
+    canvas.getContext("2d").drawImage(img, 0, 0, newW, newH);
+    return canvas.toDataURL("image/png");
+}
+
+const INFO_PAGE_STYLES = {
+    h1: { fontSize: 18, bold: true },
+    h3: { fontSize: 14, bold: true },
+    normal: { fontSize: 10, bold: false },
+};
+
+// state.topY tracks the current cursor distance from the top of the page
+function addPagedParagraph(doc, state, text, style) {
+    doc.setFont("helvetica", style.bold ? "bold" : "normal");
+    doc.setFontSize(style.fontSize);
+    const lines = doc.splitTextToSize(text, state.pageWidth - state.margin * 2);
+    const lineHeight = style.fontSize * 1.2;
+    const parah = lines.length * lineHeight;
+
+    if (state.topY + parah > state.pageHeight - state.margin) {
+        doc.addPage([state.pageWidth, state.pageHeight]);
+        state.topY = state.margin;
+    }
+    doc.setTextColor(0, 0, 0);
+    doc.text(lines, state.margin, state.topY + style.fontSize);
+    state.topY += parah + 10;
+}
+
+function addImageEntry(doc, state, panel, thumbDataUrl) {
+    const imgw = 25, imgh = 25, spacer = 10;
+    const style = INFO_PAGE_STYLES.normal;
+    const lineHeight = style.fontSize * 1.2;
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(style.fontSize);
+
+    const textX = state.margin + imgw + spacer;
+    const nameLines = doc.splitTextToSize(panel.name || "", state.pageWidth - state.margin * 2 - imgw - spacer);
+    const parah = Math.max((nameLines.length + 1) * lineHeight, imgh);
+
+    if (state.topY + parah > state.pageHeight - state.margin) {
+        doc.addPage([state.pageWidth, state.pageHeight]);
+        state.topY = state.margin;
+    }
+    doc.addImage(thumbDataUrl, "PNG", state.margin, state.topY, imgw, imgh);
+    doc.setTextColor(0, 0, 0);
+    doc.text(nameLines, textX, state.topY + style.fontSize);
+
+    const url = String(panel.imageId);
+    doc.setTextColor(0, 0, 255);
+    doc.textWithLink(url, textX, state.topY + style.fontSize + nameLines.length * lineHeight, { url });
+    doc.setTextColor(0, 0, 0);
+
+    state.topY += parah + spacer;
+}
+
+async function addInfoPage(doc, figureJSON, pageWidth, pageHeight) {
+    const margin = Math.min(pageWidth, pageHeight) / 9.0;
+    doc.addPage([pageWidth, pageHeight]);
+    const state = { pageWidth, pageHeight, margin, topY: margin };
+
+    addPagedParagraph(doc, state, figureJSON.figureName || "Figure", INFO_PAGE_STYLES.h1);
+
+    if (figureJSON.legend) {
+        addPagedParagraph(doc, state, "Legend:", INFO_PAGE_STYLES.h3);
+        for (const paragraph of markdownToParagraphs(figureJSON.legend)) {
+            addPagedParagraph(doc, state, paragraph, INFO_PAGE_STYLES.normal);
+        }
+    }
+
+    addPagedParagraph(doc, state, "Figure contains the following images:", INFO_PAGE_STYLES.h3);
+
+    // Sort panels top-to-bottom, then left-to-right, same as add_info_page()
+    const panels = [...(figureJSON.panels || [])].sort((a, b) => (a.y + a.x * 0.01) - (b.y + b.x * 0.01));
+    const seenImageIds = new Set();
+    const scalebarLengths = new Set();
+
+    for (const panel of panels) {
+        if (panel.scalebar && panel.scalebar.show) {
+            const unitSymbol = UNIT_SYMBOLS[panel.scalebar.units]
+                ? UNIT_SYMBOLS[panel.scalebar.units].symbol
+                : "\u00B5m";
+            scalebarLengths.add(`${panel.scalebar.length} ${unitSymbol}`);
+        }
+        if (seenImageIds.has(panel.imageId)) continue;
+        seenImageIds.add(panel.imageId);
+        const thumbDataUrl = await getThumbnailDataUrl(panel);
+        addImageEntry(doc, state, panel, thumbDataUrl);
+    }
+
+    if (scalebarLengths.size > 0) {
+        addPagedParagraph(doc, state, "Scalebars:", INFO_PAGE_STYLES.h3);
+        addPagedParagraph(doc, state, `Scalebar Lengths: ${[...scalebarLengths].join(", ")}`, INFO_PAGE_STYLES.normal);
+    }
 }
