@@ -1,6 +1,6 @@
 // Client-side port of the relevant parts of ome_figure/export_script.py
-// Scope (first pass): single panel page + labels/ROIs/shapes/scalebar/colorbar,
-// plus the trailing info/legend page. No multi-page figure support yet.
+// Covers multi-page figure grids, panel images, labels, ROIs/shapes, scalebar,
+// colorbar, and the trailing info/legend page.
 
 import { jsPDF } from "jspdf";
 import { marked } from "marked";
@@ -927,7 +927,28 @@ function drawShapes(doc, panel) {
     }
 }
 
-// Builds a single-page PDF (panels + labels only) from the figureJSON produced by
+// Same check as FigureExport.panel_is_on_page() in export_script.py
+function panelIsOnPage(panel, page, pageWidth, pageHeight) {
+    const px = panel.x, px2 = px + panel.width;
+    const py = panel.y, py2 = py + panel.height;
+    const cx = page.x, cx2 = cx + pageWidth;
+    const cy = page.y, cy2 = cy + pageHeight;
+    return px < cx2 && cx < px2 && py < cy2 && cy < py2;
+}
+
+// Same as FigureExport.add_page_color() in export_script.py
+function fillPageColor(doc, pageColor, pageWidth, pageHeight) {
+    if (!pageColor || pageColor.toLowerCase() === "ffffff") return;
+    const [r, g, b] = getRgb("#" + pageColor);
+    const ctx = doc.context2d;
+    ctx.save();
+    ctx.fillStyle = `rgb(${r},${g},${b})`;
+    ctx.fillRect(0, 0, pageWidth, pageHeight);
+    ctx.restore();
+}
+
+// Builds a PDF (multi-page figure grids, panels + labels/ROIs/scalebar/colorbar,
+// plus the trailing info/legend page) from the figureJSON produced by
 // FigureModel.figure_toJSON(true). Returns a Promise<Blob>.
 export async function buildFigurePdf(figureJSON) {
     const pageWidth = figureJSON.paper_width;
@@ -938,13 +959,36 @@ export async function buildFigurePdf(figureJSON) {
         format: [pageWidth, pageHeight],
     });
 
-    // First page only (narrower first-pass scope): panels with x,y within page bounds
-    const panels = (figureJSON.panels || []).filter(
-        (p) => p.x < pageWidth && p.y < pageHeight && p.x + p.width > 0 && p.y + p.height > 0
-    );
+    const pageCount = parseInt(figureJSON.page_count, 10) || 1;
+    const paperSpacing = figureJSON.paper_spacing !== undefined ? figureJSON.paper_spacing : 50;
+    const pageColCount = parseInt(figureJSON.page_col_count, 10) || 1;
+    const allPanels = figureJSON.panels || [];
 
-    for (const panel of panels) {
-        await addPanelToPdf(doc, panel);
+    let col = 0, row = 0;
+    for (let p = 0; p < pageCount; p++) {
+        if (p > 0) doc.addPage([pageWidth, pageHeight]);
+
+        // Page's offset within the grid of pages, in figure (panel) coordinates
+        const page = {
+            x: col * (pageWidth + paperSpacing),
+            y: row * (pageHeight + paperSpacing),
+        };
+
+        fillPageColor(doc, figureJSON.page_color, pageWidth, pageHeight);
+
+        const panelsOnPage = allPanels.filter((panel) => panelIsOnPage(panel, page, pageWidth, pageHeight));
+        for (const panel of panelsOnPage) {
+            // Shift into this page's local coordinates so existing draw code (which
+            // only reads panel.x/panel.y) needs no further changes.
+            const pagePanel = { ...panel, x: panel.x - page.x, y: panel.y - page.y };
+            await addPanelToPdf(doc, pagePanel);
+        }
+
+        col += 1;
+        if (col >= pageColCount) {
+            col = 0;
+            row += 1;
+        }
     }
 
     await addInfoPage(doc, figureJSON, pageWidth, pageHeight);
