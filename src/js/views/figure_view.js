@@ -114,7 +114,7 @@
             }
 
             // if we're NOT served by OMERO, hide elements such as Delete and Chgrp menu-items
-            if (!APP_SERVED_BY_OMERO) {
+            if (!window.APP_SERVED_BY_OMERO) {
                 $(".omero_only_element").hide();
             } else {
                 // otherwise hide elements with stand-alone specific content
@@ -147,7 +147,6 @@
             "click .script_version_warning": "script_version_warning",
             "click .upload_omero_script": "upload_omero_script",
             "click .export_options li": "export_options",
-            "click .add_panel": "addPanel",
             "click .reload_metadata": "reloadMetadata",
             "click .delete_panel": "deleteSelectedPanels",
             "click .copy": "copy_selected_panels",
@@ -314,7 +313,7 @@
                 "to OMERO": "OMERO"};
             exportOption = opts[export_opt];
 
-            if (!APP_SERVED_BY_OMERO) {
+            if (!window.APP_SERVED_BY_OMERO) {
                 let title = "Figure Export Options";
                 let buttons = ["OK"];
                 let message = `The standalone app doesn't support export to PDF or TIFF.
@@ -546,7 +545,7 @@
             var self = this;
             var callback = function() {
                 // Opening modal will trigger fetch of files
-                if (APP_SERVED_BY_OMERO) {
+                if (window.APP_SERVED_BY_OMERO) {
                     self.fileListViewModal.modal.show();
                 } else {
                     // Open local file or URL
@@ -589,7 +588,7 @@
 
             var fileId = this.model.get('fileId'),
                 canEdit = this.model.get('canEdit');
-            if (fileId && canEdit && APP_SERVED_BY_OMERO) {
+            if (fileId && canEdit && window.APP_SERVED_BY_OMERO) {
                 // Prevent double-click
                 this.$saveBtn.attr('disabled', 'disabled');
                 // Save
@@ -630,7 +629,7 @@
             if (figureName) {
                 options.figureName = figureName;
 
-                if (!APP_SERVED_BY_OMERO) {
+                if (!window.APP_SERVED_BY_OMERO) {
                     this.model.set('figureName', figureName);
                     this.model.save_to_download(options);
                     return;
