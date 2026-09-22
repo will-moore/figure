@@ -826,13 +826,15 @@ class ShapeToPilExport(ShapeExport):
         # Do some trigonometry to get the line angle can calculate arrow points
         dx = x2 - x1
         dy = y2 - y1
+        f = -1
         if dy == 0:
             line_angle = radians(90)
+            if dx < 0:
+                f = 1
         else:
             line_angle = atan(dx / dy)
-        f = -1
-        if dy < 0:
-            f = 1
+            if dy < 0:
+                f = 1
         # Angle of arrow head is 0.8 radians (0.4 either side of line_angle)
         arrow_point1_x = x2 + (f * sin(line_angle - 0.4) * head_size)
         arrow_point1_y = y2 + (f * cos(line_angle - 0.4) * head_size)
