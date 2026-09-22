@@ -2538,7 +2538,7 @@ class FigureExport(object):
         # Optional rotation
         if 'rotation' in panel and panel['rotation'] > 0:
             rotation = -int(panel['rotation'])
-            pil_img = pil_img.rotate(rotation, Image.BICUBIC)
+            pil_img = pil_img.rotate(rotation, Image.BICUBIC, expand=1)
 
         # Final crop to size
         panel_size = self.get_crop_region(panel)
