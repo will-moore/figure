@@ -16,6 +16,8 @@
     // Version of the json file we're saving.
     // This only needs to increment when we make breaking changes (not linked to release versions.)
     var VERSION = 9;
+    // App version
+    const RELEASE_VERSION = import.meta.env.VITE_VERSION;
 
 
     // ------------------------- Figure Model -----------------------------------
@@ -351,6 +353,7 @@
 
             var figureJSON = {
                 version: VERSION,
+                figure_version: RELEASE_VERSION,
                 panels: p_json,
                 paper_width: this.get('paper_width'),
                 paper_height: this.get('paper_height'),
