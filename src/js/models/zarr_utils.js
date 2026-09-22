@@ -274,6 +274,114 @@ function dtypeToPixelsType(dtype) {
   return dt;
 };
 
+// last path segment of a zarr URL, with any trailing ".zarr" extension removed
+function getZarrUrlName(url) {
+  let u = url.endsWith("/") ? url.slice(0, -1) : url;
+  let name = u.split("/").pop();
+  if (name.endsWith(".zarr")) {
+    name = name.slice(0, -".zarr".length);
+  }
+  return name;
+}
+
+// Converts a figure.json (as returned by FigureModel.figure_toJSON()) into
+// an OME-Zarr "collection" JSON document. See sample_figures/zarr_collection.json
+// for the target format and mapping rules.
+export function figure_to_ome_zarr_collection(figureJson) {
+  let nodes = [];
+  let nodeIndex = 0;
+
+  (figureJson.panels || []).forEach((panel) => {
+    let zarrAttrs = panel.zarr;
+    // Only OME-Zarr v0.5 (zarr v3) multiscale metadata is supported
+    if (!zarrAttrs || zarrAttrs.version !== "0.5") {
+      return;
+    }
+    let multiscale = zarrAttrs.multiscales?.[0];
+    if (!multiscale) {
+      return;
+    }
+
+    // append an incrementing index to guarantee a unique node name,
+    // even if the same image URL is used in multiple panels
+    nodeIndex++;
+    let baseUrl = panel.imageId;
+    let nodeName = `${getZarrUrlName(baseUrl)}_${nodeIndex}`;
+    let coordSystemId = `${nodeName}_physical`;
+
+    let datasetNodes = (multiscale.datasets || []).map((dataset, idx) => {
+      let datasetName = `s${idx}`;
+      let transforms = (dataset.coordinateTransformations || []).map((ct) => ({
+        ...ct,
+        input: {id: datasetName},
+        output: {id: coordSystemId},
+      }));
+      return {
+        name: datasetName,
+        type: "singlescale",
+        path: {
+          type: "zarr",
+          path: `${baseUrl}/${dataset.path}`,
+        },
+        attributes: {
+          coordinateTransformations: transforms,
+        },
+      };
+    });
+
+    let axes = (multiscale.axes || []).map((axis) => {
+      let a = {name: axis.name};
+      if (axis.unit) {
+        a.unit = axis.unit;
+      }
+      return a;
+    });
+
+    // dump all other panel attributes apart from 'zarr'
+    let panelAttrs = {};
+    Object.keys(panel).forEach((key) => {
+      if (key !== "zarr") {
+        panelAttrs[key] = panel[key];
+      }
+    });
+
+    nodes.push({
+      type: "multiscale",
+      name: nodeName,
+      nodes: datasetNodes,
+      attributes: {
+        coordinateSystems: [
+          {
+            id: coordSystemId,
+            axes: axes,
+          },
+        ],
+        "figure:panel": panelAttrs,
+      },
+    });
+  });
+
+  // all top-level figure attributes, apart from 'panels', go under figure:figure
+  let figureAttrs = {};
+  Object.keys(figureJson).forEach((key) => {
+    if (key !== "panels") {
+      figureAttrs[key] = figureJson[key];
+    }
+  });
+
+  return {
+    ome: {
+      version: "0.x",
+      type: "collection",
+      name: figureJson.figureName || "Untitled Figure",
+      nodes: nodes,
+      attributes: {
+        "figure:figure": figureAttrs,
+      },
+    },
+  };
+}
+
 export async function renderZarrToSrc(source, attrs, theZ, theT, channels, rect, targetSize=500) {
   let paths = attrs.multiscales[0].datasets.map((d) => d.path);
   // for v0.3 each axes is a string, for v0.4+ it is an object

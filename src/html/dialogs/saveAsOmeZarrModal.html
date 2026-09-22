@@ -1,0 +1,45 @@
+<div
+  class="modal"
+  id="saveAsOmeZarrModal"
+  tabindex="-1"
+  role="dialog"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Save as OME-Zarr?</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body" style="padding: 25px 25px 35px 25px">
+        <p>
+          Would you like to save this figure as an OME-Zarr Collection? <br>
+          Experimental RFC-8 spec (subject to change). <br>
+          NB: Only images in OME-Zarr v0.5 (zarr v3) are compatible.
+          Other images will not be included.
+        </p>
+      </div>
+      <div class="modal-footer" style="margin-top: 0">
+        <button
+          type="button"
+          class="btn btn-default save_as_ome_zarr_no"
+          data-bs-dismiss="modal"
+        >
+          Save as Normal
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary save_as_ome_zarr_yes"
+          data-bs-dismiss="modal"
+        >
+          Save as OME-Zarr
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

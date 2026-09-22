@@ -11,7 +11,7 @@
         getJsonWithCredentials,
         saveFigureToStorage,
         normalizeZProjectionBounds} from "../views/util";
-    import { loadZarrForPanel } from "./zarr_utils";
+    import { loadZarrForPanel, figure_to_ome_zarr_collection } from "./zarr_utils";
 
     // Version of the json file we're saving.
     // This only needs to increment when we make breaking changes (not linked to release versions.)
@@ -341,6 +341,11 @@
             return json;
         },
 
+        to_ome_zarr_collection: function() {
+            var figureJSON = this.figure_toJSON();
+            return figure_to_ome_zarr_collection(figureJSON);
+        },
+
         figure_toJSON: function() {
             // Turn panels into json
             var p_json = [],
@@ -415,9 +420,15 @@
             if (options.figureName) {
                 figureJSON.figureName = options.figureName;
             }
-            let fileName = figureJSON.figureName || "figure";
-            let jsonText = JSON.stringify(this.figure_toJSON(), null, 2);
-            downloadAsFile(jsonText, "application/json", fileName + ".json");
+            let fileName = (figureJSON.figureName || "figure") + ".json";
+            let jsonText; 
+            if (options.saveAsOmeZarr) {
+                fileName = "zarr.json";
+                jsonText = JSON.stringify(this.to_ome_zarr_collection(), null, 2);
+            } else {
+                jsonText = JSON.stringify(this.figure_toJSON(), null, 2);
+            }
+            downloadAsFile(jsonText, "application/json", fileName);
             this.set({unsaved: false});
         },
 

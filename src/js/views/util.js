@@ -230,6 +230,36 @@ $(function(){
 
 });
 
+var saveAsOmeZarrModal;
+
+// Shows the "Save as OME-Zarr?" dialog and invokes callback(true) if the user
+// chooses "Yes", or callback(false) if they choose "No" or dismiss the dialog.
+export function showSaveAsOmeZarrDialog(callback) {
+    var $modal = $("#saveAsOmeZarrModal");
+    if (!saveAsOmeZarrModal) {
+        saveAsOmeZarrModal = new bootstrap.Modal($modal[0]);
+    }
+
+    saveAsOmeZarrModal.show();
+
+    // default handler for 'cancel' or close - treat as "No"
+    $modal.one('hide.bs.modal', function() {
+        $(".modal-footer .btn", $modal).off('click');
+        if (callback) {
+            callback(false);
+        }
+    });
+
+    $(".modal-footer .btn", $modal).one('click', function(event) {
+        // remove the default 'one' handler above
+        $modal.off('hide.bs.modal');
+        var saveAsOmeZarr = $(event.target).hasClass('save_as_ome_zarr_yes');
+        if (callback) {
+            callback(saveAsOmeZarr);
+        }
+    });
+}
+
 export function hideModals() {
     // Calls hide() on all bootstrap Modal dialogs
     $(".modal").each(function() {

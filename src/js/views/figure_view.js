@@ -26,6 +26,7 @@
         showModal,
         hideModals,
         hideModal,
+        showSaveAsOmeZarrDialog,
         updateRoiIds} from "./util";
     const RELEASE_VERSION = import.meta.env.VITE_VERSION;
 
@@ -596,9 +597,14 @@
                 options.fileId = fileId;
                 this.model.save_to_OMERO(options);
             } else {
-                this.save_as(options);
+                var self = this;
+                showSaveAsOmeZarrDialog(function(saveAsOmeZarr) {
+                    if (saveAsOmeZarr) {
+                        options.saveAsOmeZarr = true;
+                    }
+                    self.save_as(options);
+                });
             }
-
         },
 
         save_as_event: function(event) {

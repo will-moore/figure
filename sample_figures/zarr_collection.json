@@ -1,0 +1,99 @@
+// we want to convert exisiting figure.json to ome-zarr collection format
+// the figure json will have "panels" and "figureName" keys
+{
+  "ome": {
+    "version": "0.x",
+    "type": "collection",
+    // the "name" of the collection is taken from the figure's "figureName" key
+    "name": "My figure",
+    // each panel in the figure will be represented as a node in this collection
+    "nodes": [
+      {
+        // the panel["zarr"] json contains info we use to create the multiscale nodes...
+        // if panel["zarr"]["version"] is NOT "0.5" then we IGNORE this panel (only zarr v3 supported)
+        "type": "multiscale",
+        // the panel 'imageId' is the zarr URL. We get the name from the ...url/image_name.zarr/ path segment
+        // BUT the name MUST be unique within the collection, even if the same image is used in multiple panels
+        // So we add a unique identifier to the name, e.g., "my_image_name_1"
+        "name": "my_image_name_1",
+        // panel["zarr"]["multiscales"][0]["datasets"] list maps to "nodes"
+        "nodes": [
+          {
+            // each node has name "s0", "s1", etc. corresponding to the dataset it represents
+            "name": "s0",
+            "type": "singlescale",
+            "path": {
+              "type": "zarr",
+              // Path is the URL, joined to the dataset "path". e.g. if "path": "0", the full path is "https://example.com/image.ome.zarr/0"
+              "path": "https://example.com/image.ome.zarr/0"
+            },
+            "attributes": {
+              // each dataset["coordinateTransformations"] maps to "coordinateTransformations" in the node's attributes
+              // with addition of "input" with "id" of the dataset name and "output" with "id" of the coordinate system
+              "coordinateTransformations": [
+                {
+                  "type": "scale",
+                  "scale": [1, 1, 1],
+                  "input": {"id": "s0"},
+                  "output": {"id": "my_image_name_1_physical"}
+                }
+              ]
+            }
+          },
+          {
+            "name": "s1",
+            "type": "singlescale",
+            "path": {
+              "type": "zarr",
+              "path": "https://example.com/image.ome.zarr/s1"
+            },
+            "attributes": {
+              "coordinateTransformations": [
+                {
+                  "type": "scale",
+                  "scale": [1, 2, 2],
+                  "input": {"id": "s1"},
+                  "output": {"id": "my_image_name_1_physical"}
+                }
+              ]
+            }
+          }
+        ],
+        "attributes": {
+          "coordinateSystems": [
+            {
+              // id MUST be unique within the collection. Let's use the "node_name_physical" convention
+              "id": "my_image_name_1_physical",
+              // the "axes" are defined in panel["zarr"]["multiscales"][0]["axes"]
+              "axes": [
+                {
+                  "name": "x",
+                  "unit": "micrometer"
+                },
+                {
+                  "name": "y",
+                  "unit": "micrometer"
+                },
+                {
+                  "name": "z",
+                  "unit": "micrometer"
+                }
+              ]
+            }
+          ],
+          "figure:panel": {
+            // here we dump all the other panel attributes apart from "zarr"
+
+          }
+        }
+      }
+    ],
+    // ALL top-level attributes for the collection can go here. Everything except the "panels" key should be included here.
+    "attributes": {
+      "figure:figure": {
+        "figureName": "my_figure_name"
+        // etc...
+      }
+    }
+  }
+}

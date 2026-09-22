@@ -1,0 +1,65 @@
+
+{
+  "ome": {
+    "version": "0.x",
+    "type": "collection",
+    "name": "My figure",
+    
+    "attributes": {
+      "scene": {
+        "coordinateSystems": [
+          {
+            "id": "world",
+            "axes": [...]
+          }
+        ],
+        "coordinateTransformations": [
+          {
+            "type": "translation",
+            "translation": [0, 0, 100],
+            "input": {
+              "path": {
+                "type": "zarr",
+                "path": "./tile_0.zarr"
+              },
+              "id": "physical"
+            },  // references coordinate system "physical" defined in tile_0
+            "output": {"id": "world"}  // references coordinate system "world" defined in same node
+          },
+          {
+            "type": "translation",
+            "translation": [100, 0, 0],
+            "input": {
+              "path": {
+                "type": "zarr",
+                "path": "./tile_1.zarr"
+              },
+              "id": "physical"
+            },  // references coordinate system "physical" defined in tile_1
+            "output": {"id": "world"}  // references coordinate system "world" defined in same node
+          }
+        ]
+      }
+    },
+    "nodes": [
+      {
+        "type": "multiscale",
+        "id": "tile_0",
+        "name": "Tile 0",
+        "path": {
+          "type": "zarr",
+          "path": "./tile_0.zarr"
+        }
+      }, 
+      {
+        "type": "multiscale",
+        "id": "tile_1",
+        "name": "Tile 1",
+        "path": {
+          "type": "zarr",
+          "path": "./tile_1.zarr"
+        }
+      }
+    ]
+  }
+}
