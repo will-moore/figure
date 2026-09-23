@@ -69,7 +69,7 @@ by a global variable `APP_SERVED_BY_OMERO` which is `false` in the standalone ap
 This is used to determine the behaviour of various features such as File Open/Save
 and the figure Export dialog.
 
-You if you create a `.env` file in the `figure` directory with the line:
+You if you create a `.local.env` file at `figure/src/.local.env` with the line:
 
 ```
     VITE_APP_SERVED_BY_OMERO=true
