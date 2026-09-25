@@ -3,7 +3,7 @@ import "../scss/styles.scss";
 
 import "../css/figure.css";
 
-if (import.meta.env.VITE_APP_SERVED_BY_OMERO) {
+if (import.meta.env.VITE_APP_SERVED_BY_OMERO == "true") {
   // e.g. figure/.env contains VITE_APP_SERVED_BY_OMERO=true
   window.APP_SERVED_BY_OMERO = true;
 }
