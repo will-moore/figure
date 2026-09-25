@@ -321,7 +321,7 @@
                 <p>You can download the figure via 'Save' and run the figure export script on your local machine.</p>
                 <p>For more details, see the
                 <a href="https://github.com/ome/omero-figure?tab=readme-ov-file#run-figure-export-locally" target="_blank">
-                figure export instructions</a>.
+                https://github.com/ome/figure/#usage</a>.
                 </p>`;
 
                 figureConfirmDialog(title, message, buttons);
