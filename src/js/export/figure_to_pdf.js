@@ -838,7 +838,15 @@ function drawEllipseShape(ctx, panel, crop, scale, shape) {
     ctx.strokeStyle = rgbaCss(getRgba(shape.strokeColor));
 
     ctx.beginPath();
-    ctx.ellipse(0, 0, Math.abs(rx), Math.abs(ry), 0, 0, 2 * Math.PI);
+    const radiusX = Math.abs(rx), radiusY = Math.abs(ry);
+    const controlFactor = 0.5522847498307936;
+    const controlX = radiusX * controlFactor, controlY = radiusY * controlFactor;
+    ctx.moveTo(radiusX, 0);
+    ctx.bezierCurveTo(radiusX, controlY, controlX, radiusY, 0, radiusY);
+    ctx.bezierCurveTo(-controlX, radiusY, -radiusX, controlY, -radiusX, 0);
+    ctx.bezierCurveTo(-radiusX, -controlY, -controlX, -radiusY, 0, -radiusY);
+    ctx.bezierCurveTo(controlX, -radiusY, radiusX, -controlY, radiusX, 0);
+    ctx.closePath();
     if (shape.fillColor !== undefined) {
         const rgba = getRgba(shape.fillColor);
         if (shape.fillOpacity !== undefined) rgba[3] = parseFloat(shape.fillOpacity);
