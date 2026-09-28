@@ -10,7 +10,7 @@
       const dev_omeroweb_url = "http://localhost:4080/";
       // These are updated by views.py when serving this page...
       // Flag for knowing if app is served from OMERO (or standalone)
-      const APP_SERVED_BY_OMERO = false;
+      window.APP_SERVED_BY_OMERO = false;
       const OMERO_FIGURE_VERSION = "";
       const BASE_OMEROWEB_URL = dev_omeroweb_url;
       const EXPORT_ENABLED = false;
@@ -1458,7 +1458,7 @@
             <div class="btn-group" style="margin-right: 20px">
               <button
                 type="button"
-                class="btn btn-sm btn-light add_panel"
+                class="btn btn-sm btn-light"
                 data-bs-toggle="modal"
                 data-bs-target="#addImagesModal"
                 title="Add images to figure"
