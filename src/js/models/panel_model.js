@@ -1166,9 +1166,9 @@
                     }
 
                     // Debug: fill, so we can see extent of canvas
-                    ctx.rect(0, 0, canvas.width, canvas.height);
-                    ctx.fillStyle = "yellow";
-                    ctx.fill();
+                    // ctx.rect(0, 0, canvas.width, canvas.height);
+                    // ctx.fillStyle = "yellow";
+                    // ctx.fill();
 
                     // BEFORE we draw on canvas, apply any rotation if specified
                     if (self.get("rotation")) {
