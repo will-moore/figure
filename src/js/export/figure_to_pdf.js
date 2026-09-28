@@ -827,9 +827,13 @@ function drawEllipseShape(ctx, panel, crop, scale, shape) {
     let rotation = shape.rotation || 0;
     const hFlip = panel.horizontal_flip;
     const vFlip = panel.vertical_flip;
-    if (vFlip) rotation = -rotation;
-    if (hFlip) rotation = 180 - rotation;
-    rotation = vFlip !== hFlip ? (rotation - panel.rotation) * -1 : (rotation + panel.rotation) * -1;
+    let panel_rotation = panel.rotation || 0;
+    if (vFlip) {
+        panel_rotation = -panel_rotation;
+    }
+    if (hFlip) {
+        panel_rotation = 180 - panel_rotation;
+    }
 
     ctx.save();
     ctx.translate(c.x, c.y);
