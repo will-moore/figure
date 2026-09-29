@@ -641,6 +641,13 @@ function rgbaCss([r, g, b, a]) {
     return `rgba(${r},${g},${b},${a === undefined ? 1 : a})`;
 }
 
+function fillWithOpacity(doc, opacity, fill) {
+    const alpha = Number.isFinite(opacity) ? Math.max(0, Math.min(1, opacity)) : 1;
+    if (alpha < 1) doc.setGState(new doc.GState({ opacity: alpha }));
+    fill();
+    if (alpha < 1) doc.setGState(new doc.GState({ opacity: 1 }));
+}
+
 function applyTransform(tf, [x, y]) {
     if (!tf) return [x, y];
     return [x * tf.A00 + y * tf.A01 + tf.A02, x * tf.A10 + y * tf.A11 + tf.A12];
@@ -763,7 +770,7 @@ function drawArrowShape(ctx, panel, crop, scale, shape) {
     drawShapeLabel(ctx, shape, boundsOf([[start.x, start.y], [end.x, end.y]]));
 }
 
-function drawPolygonShape(ctx, panel, crop, scale, shape, rawPoints, closed) {
+function drawPolygonShape(ctx, doc, panel, crop, scale, shape, rawPoints, closed) {
     let inViewport = false;
     const pagePoints = rawPoints.map(([px, py]) => {
         const c = panelToPageCoords(panel, crop, scale, px, py);
@@ -777,9 +784,11 @@ function drawPolygonShape(ctx, panel, crop, scale, shape, rawPoints, closed) {
     ctx.strokeStyle = rgbaCss(getRgba(shape.strokeColor));
 
     let hasFill = false;
+    let fillOpacity = 1;
     if (shape.fillColor !== undefined) {
         const rgba = getRgba(shape.fillColor);
         if (shape.fillOpacity !== undefined) rgba[3] = parseFloat(shape.fillOpacity);
+        fillOpacity = rgba[3];
         ctx.fillStyle = rgbaCss(rgba);
         hasFill = true;
     }
@@ -788,7 +797,7 @@ function drawPolygonShape(ctx, panel, crop, scale, shape, rawPoints, closed) {
     ctx.moveTo(pagePoints[0][0], pagePoints[0][1]);
     for (const [x, y] of pagePoints.slice(1)) ctx.lineTo(x, y);
     if (closed) ctx.closePath();
-    if (hasFill && closed) ctx.fill();
+    if (hasFill && closed) fillWithOpacity(doc, fillOpacity, () => ctx.fill());
     ctx.stroke();
     ctx.restore();
 
@@ -817,7 +826,7 @@ function parsePointsString(pointsStr) {
     });
 }
 
-function drawEllipseShape(ctx, panel, crop, scale, shape) {
+function drawEllipseShape(ctx, doc, panel, crop, scale, shape) {
     const c = panelToPageCoords(panel, crop, scale, shape.x, shape.y);
     if (!c.inPanel) return;
 
@@ -834,6 +843,7 @@ function drawEllipseShape(ctx, panel, crop, scale, shape) {
     if (hFlip) {
         panel_rotation = 180 - panel_rotation;
     }
+    rotation += panel_rotation;
 
     ctx.save();
     ctx.translate(c.x, c.y);
@@ -853,9 +863,12 @@ function drawEllipseShape(ctx, panel, crop, scale, shape) {
     ctx.closePath();
     if (shape.fillColor !== undefined) {
         const rgba = getRgba(shape.fillColor);
-        if (shape.fillOpacity !== undefined) rgba[3] = parseFloat(shape.fillOpacity);
-        ctx.fillStyle = rgbaCss(rgba);
-        ctx.fill();
+        if (shape.fillOpacity !== undefined) {
+            rgba[3] = parseFloat(shape.fillOpacity);
+        }
+        ctx.fillStyle = rgba;
+        const opacity = shape.fillOpacity !== undefined ? parseFloat(shape.fillOpacity) : 1;
+        fillWithOpacity(doc, opacity, () => ctx.fill());
     }
     ctx.stroke();
     ctx.restore();
@@ -898,12 +911,12 @@ function drawTextShape(doc, ctx, panel, crop, scale, shape) {
     if (fillOpacity > 0) {
         const pad = 1;
         ctx.fillStyle = rgbaCss([...getRgb(fillColor), fillOpacity]);
-        ctx.fillRect(
+        fillWithOpacity(doc, fillOpacity, () => ctx.fillRect(
             coords.x - x0 - pad,
             coords.y - fontSize * 0.8 - pad,
             textWidth + pad * 2,
             fontSize * 1.1 + pad * 2
-        );
+        ));
     }
     ctx.font = `${fontSize}pt helvetica`;
     ctx.textAlign = align;
@@ -930,10 +943,10 @@ function drawShapes(doc, panel) {
         const type = (shape.type || "").toLowerCase();
         if (type === "line") drawLineShape(ctx, panel, crop, scale, shape);
         else if (type === "arrow") drawArrowShape(ctx, panel, crop, scale, shape);
-        else if (type === "rectangle") drawPolygonShape(ctx, panel, crop, scale, shape, rectangleToPoints(shape), true);
-        else if (type === "polygon") drawPolygonShape(ctx, panel, crop, scale, shape, parsePointsString(shape.points), true);
-        else if (type === "polyline") drawPolygonShape(ctx, panel, crop, scale, shape, parsePointsString(shape.points), false);
-        else if (type === "ellipse") drawEllipseShape(ctx, panel, crop, scale, shape);
+        else if (type === "rectangle") drawPolygonShape(ctx, doc, panel, crop, scale, shape, rectangleToPoints(shape), true);
+        else if (type === "polygon") drawPolygonShape(ctx, doc, panel, crop, scale, shape, parsePointsString(shape.points), true);
+        else if (type === "polyline") drawPolygonShape(ctx, doc, panel, crop, scale, shape, parsePointsString(shape.points), false);
+        else if (type === "ellipse") drawEllipseShape(ctx, doc, panel, crop, scale, shape);
         else if (type === "point") drawPointShape(ctx, panel, crop, scale, shape);
         else if (type === "text") drawTextShape(doc, ctx, panel, crop, scale, shape);
     }
