@@ -182,8 +182,6 @@
         "arrays": {
           "0": {
             "dtype": ">u2",
-            "fill_value": 0,
-            "filters": null,
             "order": "C",
             "shape": [
               532,
@@ -192,13 +190,10 @@
               2048,
               2169
             ],
-            "dimension_separator": "/",
             "zarr_format": 2
           },
           "1": {
             "dtype": ">u2",
-            "fill_value": 0,
-            "filters": null,
             "order": "C",
             "shape": [
               532,
@@ -207,13 +202,10 @@
               1024,
               1084
             ],
-            "dimension_separator": "/",
             "zarr_format": 2
           },
           "2": {
             "dtype": ">u2",
-            "fill_value": 0,
-            "filters": null,
             "order": "C",
             "shape": [
               532,
@@ -222,13 +214,10 @@
               512,
               542
             ],
-            "dimension_separator": "/",
             "zarr_format": 2
           },
           "3": {
             "dtype": ">u2",
-            "fill_value": 0,
-            "filters": null,
             "order": "C",
             "shape": [
               532,
@@ -237,13 +226,10 @@
               256,
               271
             ],
-            "dimension_separator": "/",
             "zarr_format": 2
           },
           "4": {
             "dtype": ">u2",
-            "fill_value": 0,
-            "filters": null,
             "order": "C",
             "shape": [
               532,
@@ -252,7 +238,6 @@
               128,
               135
             ],
-            "dimension_separator": "/",
             "zarr_format": 2
           }
         }
@@ -495,23 +480,7 @@
         ],
         "arrays": {
           "0": {
-            "chunks": [
-              1,
-              1,
-              1024,
-              1024
-            ],
-            "compressor": {
-              "blocksize": 0,
-              "clevel": 5,
-              "cname": "lz4",
-              "id": "blosc",
-              "shuffle": 1
-            },
-            "dimension_separator": "/",
             "dtype": "<u2",
-            "fill_value": 0,
-            "filters": null,
             "order": "C",
             "shape": [
               3,
@@ -522,23 +491,7 @@
             "zarr_format": 2
           },
           "1": {
-            "chunks": [
-              1,
-              1,
-              1024,
-              1024
-            ],
-            "compressor": {
-              "blocksize": 0,
-              "clevel": 5,
-              "cname": "lz4",
-              "id": "blosc",
-              "shuffle": 1
-            },
-            "dimension_separator": "/",
             "dtype": "<u2",
-            "fill_value": 0,
-            "filters": null,
             "order": "C",
             "shape": [
               3,
@@ -549,23 +502,7 @@
             "zarr_format": 2
           },
           "2": {
-            "chunks": [
-              1,
-              1,
-              1024,
-              1024
-            ],
-            "compressor": {
-              "blocksize": 0,
-              "clevel": 5,
-              "cname": "lz4",
-              "id": "blosc",
-              "shuffle": 1
-            },
-            "dimension_separator": "/",
             "dtype": "<u2",
-            "fill_value": 0,
-            "filters": null,
             "order": "C",
             "shape": [
               3,
@@ -576,23 +513,7 @@
             "zarr_format": 2
           },
           "3": {
-            "chunks": [
-              1,
-              1,
-              1024,
-              1024
-            ],
-            "compressor": {
-              "blocksize": 0,
-              "clevel": 5,
-              "cname": "lz4",
-              "id": "blosc",
-              "shuffle": 1
-            },
-            "dimension_separator": "/",
             "dtype": "<u2",
-            "fill_value": 0,
-            "filters": null,
             "order": "C",
             "shape": [
               3,
@@ -603,23 +524,7 @@
             "zarr_format": 2
           },
           "4": {
-            "chunks": [
-              1,
-              1,
-              834,
-              1024
-            ],
-            "compressor": {
-              "blocksize": 0,
-              "clevel": 5,
-              "cname": "lz4",
-              "id": "blosc",
-              "shuffle": 1
-            },
-            "dimension_separator": "/",
             "dtype": "<u2",
-            "fill_value": 0,
-            "filters": null,
             "order": "C",
             "shape": [
               3,
@@ -630,23 +535,7 @@
             "zarr_format": 2
           },
           "5": {
-            "chunks": [
-              1,
-              1,
-              417,
-              597
-            ],
-            "compressor": {
-              "blocksize": 0,
-              "clevel": 5,
-              "cname": "lz4",
-              "id": "blosc",
-              "shuffle": 1
-            },
-            "dimension_separator": "/",
             "dtype": "<u2",
-            "fill_value": 0,
-            "filters": null,
             "order": "C",
             "shape": [
               3,
@@ -657,23 +546,7 @@
             "zarr_format": 2
           },
           "6": {
-            "chunks": [
-              1,
-              1,
-              208,
-              298
-            ],
-            "compressor": {
-              "blocksize": 0,
-              "clevel": 5,
-              "cname": "lz4",
-              "id": "blosc",
-              "shuffle": 1
-            },
-            "dimension_separator": "/",
             "dtype": "<u2",
-            "fill_value": 0,
-            "filters": null,
             "order": "C",
             "shape": [
               3,
@@ -684,23 +557,7 @@
             "zarr_format": 2
           },
           "7": {
-            "chunks": [
-              1,
-              1,
-              104,
-              149
-            ],
-            "compressor": {
-              "blocksize": 0,
-              "clevel": 5,
-              "cname": "lz4",
-              "id": "blosc",
-              "shuffle": 1
-            },
-            "dimension_separator": "/",
             "dtype": "<u2",
-            "fill_value": 0,
-            "filters": null,
             "order": "C",
             "shape": [
               3,
@@ -711,23 +568,7 @@
             "zarr_format": 2
           },
           "8": {
-            "chunks": [
-              1,
-              1,
-              52,
-              74
-            ],
-            "compressor": {
-              "blocksize": 0,
-              "clevel": 5,
-              "cname": "lz4",
-              "id": "blosc",
-              "shuffle": 1
-            },
-            "dimension_separator": "/",
             "dtype": "<u2",
-            "fill_value": 0,
-            "filters": null,
             "order": "C",
             "shape": [
               3,
@@ -1349,23 +1190,7 @@
         ],
         "arrays": {
           "0": {
-            "chunks": [
-              1,
-              1,
-              1024,
-              1024
-            ],
-            "compressor": {
-              "blocksize": 0,
-              "clevel": 5,
-              "cname": "lz4",
-              "id": "blosc",
-              "shuffle": 1
-            },
-            "dimension_separator": "/",
             "dtype": "<u2",
-            "fill_value": 0,
-            "filters": null,
             "order": "C",
             "shape": [
               3,
@@ -1376,23 +1201,7 @@
             "zarr_format": 2
           },
           "1": {
-            "chunks": [
-              1,
-              1,
-              1024,
-              1024
-            ],
-            "compressor": {
-              "blocksize": 0,
-              "clevel": 5,
-              "cname": "lz4",
-              "id": "blosc",
-              "shuffle": 1
-            },
-            "dimension_separator": "/",
             "dtype": "<u2",
-            "fill_value": 0,
-            "filters": null,
             "order": "C",
             "shape": [
               3,
@@ -1403,23 +1212,7 @@
             "zarr_format": 2
           },
           "2": {
-            "chunks": [
-              1,
-              1,
-              1024,
-              1024
-            ],
-            "compressor": {
-              "blocksize": 0,
-              "clevel": 5,
-              "cname": "lz4",
-              "id": "blosc",
-              "shuffle": 1
-            },
-            "dimension_separator": "/",
             "dtype": "<u2",
-            "fill_value": 0,
-            "filters": null,
             "order": "C",
             "shape": [
               3,
@@ -1430,23 +1223,7 @@
             "zarr_format": 2
           },
           "3": {
-            "chunks": [
-              1,
-              1,
-              1024,
-              1024
-            ],
-            "compressor": {
-              "blocksize": 0,
-              "clevel": 5,
-              "cname": "lz4",
-              "id": "blosc",
-              "shuffle": 1
-            },
-            "dimension_separator": "/",
             "dtype": "<u2",
-            "fill_value": 0,
-            "filters": null,
             "order": "C",
             "shape": [
               3,
@@ -1457,23 +1234,7 @@
             "zarr_format": 2
           },
           "4": {
-            "chunks": [
-              1,
-              1,
-              834,
-              1024
-            ],
-            "compressor": {
-              "blocksize": 0,
-              "clevel": 5,
-              "cname": "lz4",
-              "id": "blosc",
-              "shuffle": 1
-            },
-            "dimension_separator": "/",
             "dtype": "<u2",
-            "fill_value": 0,
-            "filters": null,
             "order": "C",
             "shape": [
               3,
@@ -1484,23 +1245,7 @@
             "zarr_format": 2
           },
           "5": {
-            "chunks": [
-              1,
-              1,
-              417,
-              597
-            ],
-            "compressor": {
-              "blocksize": 0,
-              "clevel": 5,
-              "cname": "lz4",
-              "id": "blosc",
-              "shuffle": 1
-            },
-            "dimension_separator": "/",
             "dtype": "<u2",
-            "fill_value": 0,
-            "filters": null,
             "order": "C",
             "shape": [
               3,
@@ -1517,17 +1262,7 @@
               208,
               298
             ],
-            "compressor": {
-              "blocksize": 0,
-              "clevel": 5,
-              "cname": "lz4",
-              "id": "blosc",
-              "shuffle": 1
-            },
-            "dimension_separator": "/",
             "dtype": "<u2",
-            "fill_value": 0,
-            "filters": null,
             "order": "C",
             "shape": [
               3,
@@ -1544,17 +1279,7 @@
               104,
               149
             ],
-            "compressor": {
-              "blocksize": 0,
-              "clevel": 5,
-              "cname": "lz4",
-              "id": "blosc",
-              "shuffle": 1
-            },
-            "dimension_separator": "/",
             "dtype": "<u2",
-            "fill_value": 0,
-            "filters": null,
             "order": "C",
             "shape": [
               3,
@@ -1565,23 +1290,7 @@
             "zarr_format": 2
           },
           "8": {
-            "chunks": [
-              1,
-              1,
-              52,
-              74
-            ],
-            "compressor": {
-              "blocksize": 0,
-              "clevel": 5,
-              "cname": "lz4",
-              "id": "blosc",
-              "shuffle": 1
-            },
-            "dimension_separator": "/",
             "dtype": "<u2",
-            "fill_value": 0,
-            "filters": null,
             "order": "C",
             "shape": [
               3,
@@ -1843,23 +1552,7 @@
         ],
         "arrays": {
           "0": {
-            "chunks": [
-              1,
-              1,
-              1024,
-              1024
-            ],
-            "compressor": {
-              "blocksize": 0,
-              "clevel": 5,
-              "cname": "lz4",
-              "id": "blosc",
-              "shuffle": 1
-            },
-            "dimension_separator": "/",
             "dtype": "<u2",
-            "fill_value": 0,
-            "filters": null,
             "order": "C",
             "shape": [
               3,
@@ -1870,23 +1563,7 @@
             "zarr_format": 2
           },
           "1": {
-            "chunks": [
-              1,
-              1,
-              1024,
-              1024
-            ],
-            "compressor": {
-              "blocksize": 0,
-              "clevel": 5,
-              "cname": "lz4",
-              "id": "blosc",
-              "shuffle": 1
-            },
-            "dimension_separator": "/",
             "dtype": "<u2",
-            "fill_value": 0,
-            "filters": null,
             "order": "C",
             "shape": [
               3,
@@ -1897,23 +1574,7 @@
             "zarr_format": 2
           },
           "2": {
-            "chunks": [
-              1,
-              1,
-              1024,
-              1024
-            ],
-            "compressor": {
-              "blocksize": 0,
-              "clevel": 5,
-              "cname": "lz4",
-              "id": "blosc",
-              "shuffle": 1
-            },
-            "dimension_separator": "/",
             "dtype": "<u2",
-            "fill_value": 0,
-            "filters": null,
             "order": "C",
             "shape": [
               3,
@@ -1924,23 +1585,7 @@
             "zarr_format": 2
           },
           "3": {
-            "chunks": [
-              1,
-              1,
-              1024,
-              1024
-            ],
-            "compressor": {
-              "blocksize": 0,
-              "clevel": 5,
-              "cname": "lz4",
-              "id": "blosc",
-              "shuffle": 1
-            },
-            "dimension_separator": "/",
             "dtype": "<u2",
-            "fill_value": 0,
-            "filters": null,
             "order": "C",
             "shape": [
               3,
@@ -1957,17 +1602,7 @@
               834,
               1024
             ],
-            "compressor": {
-              "blocksize": 0,
-              "clevel": 5,
-              "cname": "lz4",
-              "id": "blosc",
-              "shuffle": 1
-            },
-            "dimension_separator": "/",
             "dtype": "<u2",
-            "fill_value": 0,
-            "filters": null,
             "order": "C",
             "shape": [
               3,
@@ -1984,17 +1619,7 @@
               417,
               597
             ],
-            "compressor": {
-              "blocksize": 0,
-              "clevel": 5,
-              "cname": "lz4",
-              "id": "blosc",
-              "shuffle": 1
-            },
-            "dimension_separator": "/",
             "dtype": "<u2",
-            "fill_value": 0,
-            "filters": null,
             "order": "C",
             "shape": [
               3,
@@ -2011,17 +1636,7 @@
               208,
               298
             ],
-            "compressor": {
-              "blocksize": 0,
-              "clevel": 5,
-              "cname": "lz4",
-              "id": "blosc",
-              "shuffle": 1
-            },
-            "dimension_separator": "/",
             "dtype": "<u2",
-            "fill_value": 0,
-            "filters": null,
             "order": "C",
             "shape": [
               3,
@@ -2038,17 +1653,7 @@
               104,
               149
             ],
-            "compressor": {
-              "blocksize": 0,
-              "clevel": 5,
-              "cname": "lz4",
-              "id": "blosc",
-              "shuffle": 1
-            },
-            "dimension_separator": "/",
             "dtype": "<u2",
-            "fill_value": 0,
-            "filters": null,
             "order": "C",
             "shape": [
               3,
@@ -2059,23 +1664,8 @@
             "zarr_format": 2
           },
           "8": {
-            "chunks": [
-              1,
-              1,
-              52,
-              74
-            ],
-            "compressor": {
-              "blocksize": 0,
-              "clevel": 5,
-              "cname": "lz4",
-              "id": "blosc",
-              "shuffle": 1
-            },
-            "dimension_separator": "/",
+            
             "dtype": "<u2",
-            "fill_value": 0,
-            "filters": null,
             "order": "C",
             "shape": [
               3,
