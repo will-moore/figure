@@ -1,0 +1,5926 @@
+{
+  "version": 9,
+  "figure_version": "0.1.0.dev0",
+  "panels": [
+    {
+      "x": 32.124189142965065,
+      "y": 54.16421626446578,
+      "width": 139.98097879902326,
+      "height": 105.7055876246992,
+      "zoom": 100,
+      "dx": 0,
+      "dy": 0,
+      "labels": [
+        {
+          "text": "lynEGFP",
+          "size": "12",
+          "position": "top",
+          "color": "FFFFFF"
+        },
+        {
+          "text": "idr0079 - Hartmann",
+          "size": "12",
+          "position": "leftvert",
+          "color": "000000"
+        }
+      ],
+      "deltaT": [],
+      "rotation": 0,
+      "selected": false,
+      "pixel_size_x_symbol": "Âµm",
+      "pixel_size_x_unit": "MICROMETER",
+      "rotation_symbol": "Â°",
+      "max_export_dpi": 1000,
+      "vertical_flip": false,
+      "horizontal_flip": false,
+      "imageId": "https://livingobjects.ebi.ac.uk/idr/zarr/v0.4/idr0079A/idr0079_images.zarr/0",
+      "name": "9836998.ome.zarr",
+      "sizeZ": 142,
+      "theZ": 71,
+      "sizeT": 1,
+      "theT": 0,
+      "channels": [
+        {
+          "label": "lynEGFP",
+          "active": true,
+          "color": "FFFFFF",
+          "window": {
+            "min": 0,
+            "max": 255,
+            "start": 3,
+            "end": 93
+          }
+        },
+        {
+          "label": "NLStdTomato",
+          "active": false,
+          "color": "FF0000",
+          "window": {
+            "min": 0,
+            "max": 255,
+            "start": 6,
+            "end": 79
+          }
+        }
+      ],
+      "orig_width": 1584,
+      "orig_height": 788,
+      "pixelsType": "uint64",
+      "zarr": {
+        "multiscales": [
+          {
+            "axes": [
+              {
+                "name": "c",
+                "type": "channel"
+              },
+              {
+                "name": "z",
+                "type": "space",
+                "unit": "micrometer"
+              },
+              {
+                "name": "y",
+                "type": "space",
+                "unit": "micrometer"
+              },
+              {
+                "name": "x",
+                "type": "space",
+                "unit": "micrometer"
+              }
+            ],
+            "datasets": [
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      0.1024427,
+                      0.1024427
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "0"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      0.2048854,
+                      0.2048854
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "1"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      0.4097708,
+                      0.4097708
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "2"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      0.8195416,
+                      0.8195416
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "3"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      1.6390832,
+                      1.6390832
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "4"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      3.2781664,
+                      3.2781664
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "5"
+              }
+            ],
+            "name": "9836998.ome.zarr",
+            "version": "0.4"
+          }
+        ],
+        "arrays": {
+          "0": {
+            "shape": [
+              2,
+              142,
+              788,
+              1584
+            ],
+            "dtype": "uint8"
+          },
+          "1": {
+            "shape": [
+              2,
+              142,
+              394,
+              792
+            ],
+            "dtype": "uint8"
+          },
+          "2": {
+            "shape": [
+              2,
+              142,
+              197,
+              396
+            ],
+            "dtype": "uint8"
+          },
+          "3": {
+            "shape": [
+              2,
+              142,
+              98,
+              198
+            ],
+            "dtype": "uint8"
+          },
+          "4": {
+            "shape": [
+              2,
+              142,
+              49,
+              99
+            ],
+            "dtype": "uint8"
+          },
+          "5": {
+            "shape": [
+              2,
+              142,
+              24,
+              49
+            ],
+            "dtype": "uint8"
+          }
+        },
+        "zarr_version": 2,
+        "version": "0.4"
+      },
+      "pixel_size_x": 0.1024427,
+      "pixel_size_y": 0.1024427,
+      "pixel_size_y_unit": "MICROMETER",
+      "pixel_size_y_symbol": "Âµm",
+      "pixel_size_z": 0.2245383,
+      "pixel_size_z_unit": "MICROMETER",
+      "pixel_size_z_symbol": "Âµm"
+    },
+    {
+      "x": 32.124189142965065,
+      "y": 161.86980388916498,
+      "width": 139.98097879902326,
+      "height": 105.7055876246992,
+      "zoom": 100,
+      "dx": 0,
+      "dy": 0,
+      "labels": [],
+      "deltaT": [],
+      "rotation": 0,
+      "selected": false,
+      "pixel_size_x_symbol": "Âµm",
+      "pixel_size_x_unit": "MICROMETER",
+      "rotation_symbol": "Â°",
+      "max_export_dpi": 1000,
+      "vertical_flip": false,
+      "horizontal_flip": false,
+      "imageId": "https://livingobjects.ebi.ac.uk/idr/zarr/v0.4/idr0079A/idr0079_images.zarr/1",
+      "name": "9837019.ome.zarr",
+      "sizeZ": 140,
+      "theZ": 70,
+      "sizeT": 1,
+      "theT": 0,
+      "channels": [
+        {
+          "label": "lynEGFP",
+          "active": true,
+          "color": "FFFFFF",
+          "window": {
+            "min": 0,
+            "max": 255,
+            "start": 2,
+            "end": 93
+          }
+        },
+        {
+          "label": "NLStdTomato",
+          "active": false,
+          "color": "FF0000",
+          "window": {
+            "min": 0,
+            "max": 255,
+            "start": 17,
+            "end": 79
+          }
+        }
+      ],
+      "orig_width": 1584,
+      "orig_height": 788,
+      "pixelsType": "uint64",
+      "zarr": {
+        "multiscales": [
+          {
+            "axes": [
+              {
+                "name": "c",
+                "type": "channel"
+              },
+              {
+                "name": "z",
+                "type": "space",
+                "unit": "micrometer"
+              },
+              {
+                "name": "y",
+                "type": "space",
+                "unit": "micrometer"
+              },
+              {
+                "name": "x",
+                "type": "space",
+                "unit": "micrometer"
+              }
+            ],
+            "datasets": [
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      0.1024427,
+                      0.1024427
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "0"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      0.2048854,
+                      0.2048854
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "1"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      0.4097708,
+                      0.4097708
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "2"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      0.8195416,
+                      0.8195416
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "3"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      1.6390832,
+                      1.6390832
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "4"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      3.2781664,
+                      3.2781664
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "5"
+              }
+            ],
+            "name": "9837019.ome.zarr",
+            "version": "0.4"
+          }
+        ],
+        "arrays": {
+          "0": {
+            "shape": [
+              2,
+              140,
+              788,
+              1584
+            ],
+            "dtype": "uint8"
+          },
+          "1": {
+            "shape": [
+              2,
+              140,
+              394,
+              792
+            ],
+            "dtype": "uint8"
+          },
+          "2": {
+            "shape": [
+              2,
+              140,
+              197,
+              396
+            ],
+            "dtype": "uint8"
+          },
+          "3": {
+            "shape": [
+              2,
+              140,
+              98,
+              198
+            ],
+            "dtype": "uint8"
+          },
+          "4": {
+            "shape": [
+              2,
+              140,
+              49,
+              99
+            ],
+            "dtype": "uint8"
+          },
+          "5": {
+            "shape": [
+              2,
+              140,
+              24,
+              49
+            ],
+            "dtype": "uint8"
+          }
+        },
+        "zarr_version": 2,
+        "version": "0.4"
+      },
+      "pixel_size_x": 0.1024427,
+      "pixel_size_y": 0.1024427,
+      "pixel_size_y_unit": "MICROMETER",
+      "pixel_size_y_symbol": "Âµm",
+      "pixel_size_z": 0.2245383,
+      "pixel_size_z_unit": "MICROMETER",
+      "pixel_size_z_symbol": "Âµm"
+    },
+    {
+      "x": 32.124189142965065,
+      "y": 269.5753915138642,
+      "width": 139.98097879902326,
+      "height": 105.7055876246992,
+      "zoom": 100,
+      "dx": 0,
+      "dy": 0,
+      "labels": [],
+      "deltaT": [],
+      "rotation": 0,
+      "selected": false,
+      "pixel_size_x_symbol": "Âµm",
+      "pixel_size_x_unit": "MICROMETER",
+      "rotation_symbol": "Â°",
+      "max_export_dpi": 1000,
+      "vertical_flip": false,
+      "horizontal_flip": false,
+      "imageId": "https://livingobjects.ebi.ac.uk/idr/zarr/v0.4/idr0079A/idr0079_images.zarr/2",
+      "name": "9837025.ome.zarr",
+      "sizeZ": 184,
+      "theZ": 92,
+      "sizeT": 1,
+      "theT": 0,
+      "channels": [
+        {
+          "label": "lynEGFP",
+          "active": true,
+          "color": "FFFFFF",
+          "window": {
+            "min": 0,
+            "max": 255,
+            "start": 1,
+            "end": 93
+          }
+        },
+        {
+          "label": "NLStdTomato",
+          "active": false,
+          "color": "FF0000",
+          "window": {
+            "min": 0,
+            "max": 255,
+            "start": 13,
+            "end": 79
+          }
+        }
+      ],
+      "orig_width": 1584,
+      "orig_height": 788,
+      "pixelsType": "uint64",
+      "zarr": {
+        "multiscales": [
+          {
+            "axes": [
+              {
+                "name": "c",
+                "type": "channel"
+              },
+              {
+                "name": "z",
+                "type": "space",
+                "unit": "micrometer"
+              },
+              {
+                "name": "y",
+                "type": "space",
+                "unit": "micrometer"
+              },
+              {
+                "name": "x",
+                "type": "space",
+                "unit": "micrometer"
+              }
+            ],
+            "datasets": [
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      0.1024427,
+                      0.1024427
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "0"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      0.2048854,
+                      0.2048854
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "1"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      0.4097708,
+                      0.4097708
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "2"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      0.8195416,
+                      0.8195416
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "3"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      1.6390832,
+                      1.6390832
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "4"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      3.2781664,
+                      3.2781664
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "5"
+              }
+            ],
+            "name": "9837025.ome.zarr",
+            "version": "0.4"
+          }
+        ],
+        "arrays": {
+          "0": {
+            "shape": [
+              2,
+              184,
+              788,
+              1584
+            ],
+            "dtype": "uint8"
+          },
+          "1": {
+            "shape": [
+              2,
+              184,
+              394,
+              792
+            ],
+            "dtype": "uint8"
+          },
+          "2": {
+            "shape": [
+              2,
+              184,
+              197,
+              396
+            ],
+            "dtype": "uint8"
+          },
+          "3": {
+            "shape": [
+              2,
+              184,
+              98,
+              198
+            ],
+            "dtype": "uint8"
+          },
+          "4": {
+            "shape": [
+              2,
+              184,
+              49,
+              99
+            ],
+            "dtype": "uint8"
+          },
+          "5": {
+            "shape": [
+              2,
+              184,
+              24,
+              49
+            ],
+            "dtype": "uint8"
+          }
+        },
+        "zarr_version": 2,
+        "version": "0.4"
+      },
+      "pixel_size_x": 0.1024427,
+      "pixel_size_y": 0.1024427,
+      "pixel_size_y_unit": "MICROMETER",
+      "pixel_size_y_symbol": "Âµm",
+      "pixel_size_z": 0.2245383,
+      "pixel_size_z_unit": "MICROMETER",
+      "pixel_size_z_symbol": "Âµm"
+    },
+    {
+      "x": 174.10516794198833,
+      "y": 54.16421626446578,
+      "width": 139.98097879902326,
+      "height": 105.7055876246992,
+      "zoom": 100,
+      "dx": 0,
+      "dy": 0,
+      "labels": [
+        {
+          "text": "NLStdTomato",
+          "size": "12",
+          "position": "top",
+          "color": "FFFFFF"
+        }
+      ],
+      "deltaT": [],
+      "rotation": 0,
+      "selected": false,
+      "pixel_size_x_symbol": "Âµm",
+      "pixel_size_x_unit": "MICROMETER",
+      "rotation_symbol": "Â°",
+      "max_export_dpi": 1000,
+      "vertical_flip": false,
+      "horizontal_flip": false,
+      "imageId": "https://livingobjects.ebi.ac.uk/idr/zarr/v0.4/idr0079A/idr0079_images.zarr/0",
+      "name": "9836998.ome.zarr",
+      "sizeZ": 142,
+      "theZ": 71,
+      "sizeT": 1,
+      "theT": 0,
+      "channels": [
+        {
+          "label": "lynEGFP",
+          "active": false,
+          "color": "00FF00",
+          "window": {
+            "min": 0,
+            "max": 255,
+            "start": 3,
+            "end": 93
+          }
+        },
+        {
+          "label": "NLStdTomato",
+          "active": true,
+          "color": "FFFFFF",
+          "window": {
+            "min": 0,
+            "max": 255,
+            "start": 6,
+            "end": 79
+          }
+        }
+      ],
+      "orig_width": 1584,
+      "orig_height": 788,
+      "pixelsType": "uint64",
+      "zarr": {
+        "multiscales": [
+          {
+            "axes": [
+              {
+                "name": "c",
+                "type": "channel"
+              },
+              {
+                "name": "z",
+                "type": "space",
+                "unit": "micrometer"
+              },
+              {
+                "name": "y",
+                "type": "space",
+                "unit": "micrometer"
+              },
+              {
+                "name": "x",
+                "type": "space",
+                "unit": "micrometer"
+              }
+            ],
+            "datasets": [
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      0.1024427,
+                      0.1024427
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "0"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      0.2048854,
+                      0.2048854
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "1"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      0.4097708,
+                      0.4097708
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "2"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      0.8195416,
+                      0.8195416
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "3"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      1.6390832,
+                      1.6390832
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "4"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      3.2781664,
+                      3.2781664
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "5"
+              }
+            ],
+            "name": "9836998.ome.zarr",
+            "version": "0.4"
+          }
+        ],
+        "arrays": {
+          "0": {
+            "shape": [
+              2,
+              142,
+              788,
+              1584
+            ],
+            "dtype": "uint8"
+          },
+          "1": {
+            "shape": [
+              2,
+              142,
+              394,
+              792
+            ],
+            "dtype": "uint8"
+          },
+          "2": {
+            "shape": [
+              2,
+              142,
+              197,
+              396
+            ],
+            "dtype": "uint8"
+          },
+          "3": {
+            "shape": [
+              2,
+              142,
+              98,
+              198
+            ],
+            "dtype": "uint8"
+          },
+          "4": {
+            "shape": [
+              2,
+              142,
+              49,
+              99
+            ],
+            "dtype": "uint8"
+          },
+          "5": {
+            "shape": [
+              2,
+              142,
+              24,
+              49
+            ],
+            "dtype": "uint8"
+          }
+        },
+        "zarr_version": 2,
+        "version": "0.4"
+      },
+      "pixel_size_x": 0.1024427,
+      "pixel_size_y": 0.1024427,
+      "pixel_size_y_unit": "MICROMETER",
+      "pixel_size_y_symbol": "Âµm",
+      "pixel_size_z": 0.2245383,
+      "pixel_size_z_unit": "MICROMETER",
+      "pixel_size_z_symbol": "Âµm"
+    },
+    {
+      "x": 174.10516794198833,
+      "y": 161.86980388916498,
+      "width": 139.98097879902326,
+      "height": 105.7055876246992,
+      "zoom": 100,
+      "dx": 0,
+      "dy": 0,
+      "labels": [],
+      "deltaT": [],
+      "rotation": 0,
+      "selected": false,
+      "pixel_size_x_symbol": "Âµm",
+      "pixel_size_x_unit": "MICROMETER",
+      "rotation_symbol": "Â°",
+      "max_export_dpi": 1000,
+      "vertical_flip": false,
+      "horizontal_flip": false,
+      "imageId": "https://livingobjects.ebi.ac.uk/idr/zarr/v0.4/idr0079A/idr0079_images.zarr/1",
+      "name": "9837019.ome.zarr",
+      "sizeZ": 140,
+      "theZ": 70,
+      "sizeT": 1,
+      "theT": 0,
+      "channels": [
+        {
+          "label": "lynEGFP",
+          "active": false,
+          "color": "00FF00",
+          "window": {
+            "min": 0,
+            "max": 255,
+            "start": 2,
+            "end": 93
+          }
+        },
+        {
+          "label": "NLStdTomato",
+          "active": true,
+          "color": "FFFFFF",
+          "window": {
+            "min": 0,
+            "max": 255,
+            "start": 17,
+            "end": 121
+          }
+        }
+      ],
+      "orig_width": 1584,
+      "orig_height": 788,
+      "pixelsType": "uint64",
+      "zarr": {
+        "multiscales": [
+          {
+            "axes": [
+              {
+                "name": "c",
+                "type": "channel"
+              },
+              {
+                "name": "z",
+                "type": "space",
+                "unit": "micrometer"
+              },
+              {
+                "name": "y",
+                "type": "space",
+                "unit": "micrometer"
+              },
+              {
+                "name": "x",
+                "type": "space",
+                "unit": "micrometer"
+              }
+            ],
+            "datasets": [
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      0.1024427,
+                      0.1024427
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "0"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      0.2048854,
+                      0.2048854
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "1"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      0.4097708,
+                      0.4097708
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "2"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      0.8195416,
+                      0.8195416
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "3"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      1.6390832,
+                      1.6390832
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "4"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      3.2781664,
+                      3.2781664
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "5"
+              }
+            ],
+            "name": "9837019.ome.zarr",
+            "version": "0.4"
+          }
+        ],
+        "arrays": {
+          "0": {
+            "shape": [
+              2,
+              140,
+              788,
+              1584
+            ],
+            "dtype": "uint8"
+          },
+          "1": {
+            "shape": [
+              2,
+              140,
+              394,
+              792
+            ],
+            "dtype": "uint8"
+          },
+          "2": {
+            "shape": [
+              2,
+              140,
+              197,
+              396
+            ],
+            "dtype": "uint8"
+          },
+          "3": {
+            "shape": [
+              2,
+              140,
+              98,
+              198
+            ],
+            "dtype": "uint8"
+          },
+          "4": {
+            "shape": [
+              2,
+              140,
+              49,
+              99
+            ],
+            "dtype": "uint8"
+          },
+          "5": {
+            "shape": [
+              2,
+              140,
+              24,
+              49
+            ],
+            "dtype": "uint8"
+          }
+        },
+        "zarr_version": 2,
+        "version": "0.4"
+      },
+      "pixel_size_x": 0.1024427,
+      "pixel_size_y": 0.1024427,
+      "pixel_size_y_unit": "MICROMETER",
+      "pixel_size_y_symbol": "Âµm",
+      "pixel_size_z": 0.2245383,
+      "pixel_size_z_unit": "MICROMETER",
+      "pixel_size_z_symbol": "Âµm"
+    },
+    {
+      "x": 174.10516794198833,
+      "y": 269.5753915138642,
+      "width": 139.98097879902326,
+      "height": 105.7055876246992,
+      "zoom": 100,
+      "dx": 0,
+      "dy": 0,
+      "labels": [],
+      "deltaT": [],
+      "rotation": 0,
+      "selected": false,
+      "pixel_size_x_symbol": "Âµm",
+      "pixel_size_x_unit": "MICROMETER",
+      "rotation_symbol": "Â°",
+      "max_export_dpi": 1000,
+      "vertical_flip": false,
+      "horizontal_flip": false,
+      "imageId": "https://livingobjects.ebi.ac.uk/idr/zarr/v0.4/idr0079A/idr0079_images.zarr/2",
+      "name": "9837025.ome.zarr",
+      "sizeZ": 184,
+      "theZ": 92,
+      "sizeT": 1,
+      "theT": 0,
+      "channels": [
+        {
+          "label": "lynEGFP",
+          "active": false,
+          "color": "00FF00",
+          "window": {
+            "min": 0,
+            "max": 255,
+            "start": 1,
+            "end": 93
+          }
+        },
+        {
+          "label": "NLStdTomato",
+          "active": true,
+          "color": "FFFFFF",
+          "window": {
+            "min": 0,
+            "max": 255,
+            "start": 13,
+            "end": 79
+          }
+        }
+      ],
+      "orig_width": 1584,
+      "orig_height": 788,
+      "pixelsType": "uint64",
+      "zarr": {
+        "multiscales": [
+          {
+            "axes": [
+              {
+                "name": "c",
+                "type": "channel"
+              },
+              {
+                "name": "z",
+                "type": "space",
+                "unit": "micrometer"
+              },
+              {
+                "name": "y",
+                "type": "space",
+                "unit": "micrometer"
+              },
+              {
+                "name": "x",
+                "type": "space",
+                "unit": "micrometer"
+              }
+            ],
+            "datasets": [
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      0.1024427,
+                      0.1024427
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "0"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      0.2048854,
+                      0.2048854
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "1"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      0.4097708,
+                      0.4097708
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "2"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      0.8195416,
+                      0.8195416
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "3"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      1.6390832,
+                      1.6390832
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "4"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      3.2781664,
+                      3.2781664
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "5"
+              }
+            ],
+            "name": "9837025.ome.zarr",
+            "version": "0.4"
+          }
+        ],
+        "arrays": {
+          "0": {
+            "shape": [
+              2,
+              184,
+              788,
+              1584
+            ],
+            "dtype": "uint8"
+          },
+          "1": {
+            "shape": [
+              2,
+              184,
+              394,
+              792
+            ],
+            "dtype": "uint8"
+          },
+          "2": {
+            "shape": [
+              2,
+              184,
+              197,
+              396
+            ],
+            "dtype": "uint8"
+          },
+          "3": {
+            "shape": [
+              2,
+              184,
+              98,
+              198
+            ],
+            "dtype": "uint8"
+          },
+          "4": {
+            "shape": [
+              2,
+              184,
+              49,
+              99
+            ],
+            "dtype": "uint8"
+          },
+          "5": {
+            "shape": [
+              2,
+              184,
+              24,
+              49
+            ],
+            "dtype": "uint8"
+          }
+        },
+        "zarr_version": 2,
+        "version": "0.4"
+      },
+      "pixel_size_x": 0.1024427,
+      "pixel_size_y": 0.1024427,
+      "pixel_size_y_unit": "MICROMETER",
+      "pixel_size_y_symbol": "Âµm",
+      "pixel_size_z": 0.2245383,
+      "pixel_size_z_unit": "MICROMETER",
+      "pixel_size_z_symbol": "Âµm"
+    },
+    {
+      "x": 316.0861467410116,
+      "y": 54.16421626446578,
+      "width": 139.98097879902326,
+      "height": 105.7055876246992,
+      "zoom": 100,
+      "dx": 0,
+      "dy": 0,
+      "labels": [
+        {
+          "text": "lynEGFP",
+          "size": "12",
+          "position": "top",
+          "color": "00FF00"
+        },
+        {
+          "text": "NLStdTomato",
+          "size": "12",
+          "position": "top",
+          "color": "FF00FF"
+        }
+      ],
+      "deltaT": [],
+      "rotation": 0,
+      "selected": false,
+      "pixel_size_x_symbol": "Âµm",
+      "pixel_size_x_unit": "MICROMETER",
+      "rotation_symbol": "Â°",
+      "max_export_dpi": 1000,
+      "vertical_flip": false,
+      "horizontal_flip": false,
+      "imageId": "https://livingobjects.ebi.ac.uk/idr/zarr/v0.4/idr0079A/idr0079_images.zarr/0",
+      "name": "9836998.ome.zarr",
+      "sizeZ": 142,
+      "theZ": 71,
+      "sizeT": 1,
+      "theT": 0,
+      "channels": [
+        {
+          "label": "lynEGFP",
+          "active": true,
+          "color": "00FF00",
+          "window": {
+            "min": 0,
+            "max": 255,
+            "start": 3,
+            "end": 93
+          }
+        },
+        {
+          "label": "NLStdTomato",
+          "active": true,
+          "color": "FF00FF",
+          "window": {
+            "min": 0,
+            "max": 255,
+            "start": 6,
+            "end": 79
+          }
+        }
+      ],
+      "orig_width": 1584,
+      "orig_height": 788,
+      "pixelsType": "uint64",
+      "zarr": {
+        "multiscales": [
+          {
+            "axes": [
+              {
+                "name": "c",
+                "type": "channel"
+              },
+              {
+                "name": "z",
+                "type": "space",
+                "unit": "micrometer"
+              },
+              {
+                "name": "y",
+                "type": "space",
+                "unit": "micrometer"
+              },
+              {
+                "name": "x",
+                "type": "space",
+                "unit": "micrometer"
+              }
+            ],
+            "datasets": [
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      0.1024427,
+                      0.1024427
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "0"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      0.2048854,
+                      0.2048854
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "1"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      0.4097708,
+                      0.4097708
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "2"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      0.8195416,
+                      0.8195416
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "3"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      1.6390832,
+                      1.6390832
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "4"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      3.2781664,
+                      3.2781664
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "5"
+              }
+            ],
+            "name": "9836998.ome.zarr",
+            "version": "0.4"
+          }
+        ],
+        "arrays": {
+          "0": {
+            "shape": [
+              2,
+              142,
+              788,
+              1584
+            ],
+            "dtype": "uint8"
+          },
+          "1": {
+            "shape": [
+              2,
+              142,
+              394,
+              792
+            ],
+            "dtype": "uint8"
+          },
+          "2": {
+            "shape": [
+              2,
+              142,
+              197,
+              396
+            ],
+            "dtype": "uint8"
+          },
+          "3": {
+            "shape": [
+              2,
+              142,
+              98,
+              198
+            ],
+            "dtype": "uint8"
+          },
+          "4": {
+            "shape": [
+              2,
+              142,
+              49,
+              99
+            ],
+            "dtype": "uint8"
+          },
+          "5": {
+            "shape": [
+              2,
+              142,
+              24,
+              49
+            ],
+            "dtype": "uint8"
+          }
+        },
+        "zarr_version": 2,
+        "version": "0.4"
+      },
+      "pixel_size_x": 0.1024427,
+      "pixel_size_y": 0.1024427,
+      "pixel_size_y_unit": "MICROMETER",
+      "pixel_size_y_symbol": "Âµm",
+      "pixel_size_z": 0.2245383,
+      "pixel_size_z_unit": "MICROMETER",
+      "pixel_size_z_symbol": "Âµm",
+      "scalebar": {
+        "show": true,
+        "length": 20,
+        "units": "MICROMETER",
+        "position": "bottomleft",
+        "color": "FFFFFF",
+        "show_label": true,
+        "font_size": "10",
+        "height": 3,
+        "margin": 5
+      },
+      "shapes": [
+        {
+          "type": "Rectangle",
+          "strokeWidth": 2,
+          "strokeColor": "#FFFFFF",
+          "fillColor": "#FFFFFF",
+          "fillOpacity": 0,
+          "x": 567.8684242240613,
+          "y": 351.19031570070143,
+          "width": 166.7369763618844,
+          "height": 166.94915254237284,
+          "id": 46245739,
+          "textId": 6741368,
+          "rotation": 360
+        }
+      ],
+      "lastInsetTextIndex": 65
+    },
+    {
+      "x": 316.0861467410116,
+      "y": 161.86980388916498,
+      "width": 139.98097879902326,
+      "height": 105.7055876246992,
+      "zoom": 100,
+      "dx": 0,
+      "dy": 0,
+      "labels": [],
+      "deltaT": [],
+      "rotation": 0,
+      "selected": false,
+      "pixel_size_x_symbol": "Âµm",
+      "pixel_size_x_unit": "MICROMETER",
+      "rotation_symbol": "Â°",
+      "max_export_dpi": 1000,
+      "vertical_flip": false,
+      "horizontal_flip": false,
+      "imageId": "https://livingobjects.ebi.ac.uk/idr/zarr/v0.4/idr0079A/idr0079_images.zarr/1",
+      "name": "9837019.ome.zarr",
+      "sizeZ": 140,
+      "theZ": 70,
+      "sizeT": 1,
+      "theT": 0,
+      "channels": [
+        {
+          "label": "lynEGFP",
+          "active": true,
+          "color": "00FF00",
+          "window": {
+            "min": 0,
+            "max": 255,
+            "start": 2,
+            "end": 93
+          }
+        },
+        {
+          "label": "NLStdTomato",
+          "active": true,
+          "color": "FF00FF",
+          "window": {
+            "min": 0,
+            "max": 255,
+            "start": 17,
+            "end": 121
+          }
+        }
+      ],
+      "orig_width": 1584,
+      "orig_height": 788,
+      "pixelsType": "uint64",
+      "zarr": {
+        "multiscales": [
+          {
+            "axes": [
+              {
+                "name": "c",
+                "type": "channel"
+              },
+              {
+                "name": "z",
+                "type": "space",
+                "unit": "micrometer"
+              },
+              {
+                "name": "y",
+                "type": "space",
+                "unit": "micrometer"
+              },
+              {
+                "name": "x",
+                "type": "space",
+                "unit": "micrometer"
+              }
+            ],
+            "datasets": [
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      0.1024427,
+                      0.1024427
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "0"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      0.2048854,
+                      0.2048854
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "1"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      0.4097708,
+                      0.4097708
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "2"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      0.8195416,
+                      0.8195416
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "3"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      1.6390832,
+                      1.6390832
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "4"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      3.2781664,
+                      3.2781664
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "5"
+              }
+            ],
+            "name": "9837019.ome.zarr",
+            "version": "0.4"
+          }
+        ],
+        "arrays": {
+          "0": {
+            "shape": [
+              2,
+              140,
+              788,
+              1584
+            ],
+            "dtype": "uint8"
+          },
+          "1": {
+            "shape": [
+              2,
+              140,
+              394,
+              792
+            ],
+            "dtype": "uint8"
+          },
+          "2": {
+            "shape": [
+              2,
+              140,
+              197,
+              396
+            ],
+            "dtype": "uint8"
+          },
+          "3": {
+            "shape": [
+              2,
+              140,
+              98,
+              198
+            ],
+            "dtype": "uint8"
+          },
+          "4": {
+            "shape": [
+              2,
+              140,
+              49,
+              99
+            ],
+            "dtype": "uint8"
+          },
+          "5": {
+            "shape": [
+              2,
+              140,
+              24,
+              49
+            ],
+            "dtype": "uint8"
+          }
+        },
+        "zarr_version": 2,
+        "version": "0.4"
+      },
+      "pixel_size_x": 0.1024427,
+      "pixel_size_y": 0.1024427,
+      "pixel_size_y_unit": "MICROMETER",
+      "pixel_size_y_symbol": "Âµm",
+      "pixel_size_z": 0.2245383,
+      "pixel_size_z_unit": "MICROMETER",
+      "pixel_size_z_symbol": "Âµm",
+      "scalebar": {
+        "show": true,
+        "length": 20,
+        "units": "MICROMETER",
+        "position": "bottomleft",
+        "color": "FFFFFF",
+        "show_label": true,
+        "font_size": "10",
+        "height": 3,
+        "margin": 5
+      },
+      "shapes": [
+        {
+          "type": "Rectangle",
+          "strokeWidth": 2,
+          "strokeColor": "#FFFFFF",
+          "fillColor": "#FFFFFF",
+          "fillOpacity": 0,
+          "x": 708.6315118190578,
+          "y": 310.52542372881356,
+          "width": 166.73697636188442,
+          "height": 166.94915254237287,
+          "id": 68376970,
+          "textId": 18874064,
+          "rotation": 360
+        }
+      ],
+      "lastInsetTextIndex": 65
+    },
+    {
+      "x": 316.0861467410116,
+      "y": 269.5753915138642,
+      "width": 139.98097879902326,
+      "height": 105.7055876246992,
+      "zoom": 100,
+      "dx": 0,
+      "dy": 0,
+      "labels": [],
+      "deltaT": [],
+      "rotation": 0,
+      "selected": false,
+      "pixel_size_x_symbol": "Âµm",
+      "pixel_size_x_unit": "MICROMETER",
+      "rotation_symbol": "Â°",
+      "max_export_dpi": 1000,
+      "vertical_flip": false,
+      "horizontal_flip": false,
+      "imageId": "https://livingobjects.ebi.ac.uk/idr/zarr/v0.4/idr0079A/idr0079_images.zarr/2",
+      "name": "9837025.ome.zarr",
+      "sizeZ": 184,
+      "theZ": 92,
+      "sizeT": 1,
+      "theT": 0,
+      "channels": [
+        {
+          "label": "lynEGFP",
+          "active": true,
+          "color": "00FF00",
+          "window": {
+            "min": 0,
+            "max": 255,
+            "start": 1,
+            "end": 93
+          }
+        },
+        {
+          "label": "NLStdTomato",
+          "active": true,
+          "color": "FF00FF",
+          "window": {
+            "min": 0,
+            "max": 255,
+            "start": 13,
+            "end": 79
+          }
+        }
+      ],
+      "orig_width": 1584,
+      "orig_height": 788,
+      "pixelsType": "uint64",
+      "zarr": {
+        "multiscales": [
+          {
+            "axes": [
+              {
+                "name": "c",
+                "type": "channel"
+              },
+              {
+                "name": "z",
+                "type": "space",
+                "unit": "micrometer"
+              },
+              {
+                "name": "y",
+                "type": "space",
+                "unit": "micrometer"
+              },
+              {
+                "name": "x",
+                "type": "space",
+                "unit": "micrometer"
+              }
+            ],
+            "datasets": [
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      0.1024427,
+                      0.1024427
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "0"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      0.2048854,
+                      0.2048854
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "1"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      0.4097708,
+                      0.4097708
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "2"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      0.8195416,
+                      0.8195416
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "3"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      1.6390832,
+                      1.6390832
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "4"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      3.2781664,
+                      3.2781664
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "5"
+              }
+            ],
+            "name": "9837025.ome.zarr",
+            "version": "0.4"
+          }
+        ],
+        "arrays": {
+          "0": {
+            "shape": [
+              2,
+              184,
+              788,
+              1584
+            ],
+            "dtype": "uint8"
+          },
+          "1": {
+            "shape": [
+              2,
+              184,
+              394,
+              792
+            ],
+            "dtype": "uint8"
+          },
+          "2": {
+            "shape": [
+              2,
+              184,
+              197,
+              396
+            ],
+            "dtype": "uint8"
+          },
+          "3": {
+            "shape": [
+              2,
+              184,
+              98,
+              198
+            ],
+            "dtype": "uint8"
+          },
+          "4": {
+            "shape": [
+              2,
+              184,
+              49,
+              99
+            ],
+            "dtype": "uint8"
+          },
+          "5": {
+            "shape": [
+              2,
+              184,
+              24,
+              49
+            ],
+            "dtype": "uint8"
+          }
+        },
+        "zarr_version": 2,
+        "version": "0.4"
+      },
+      "pixel_size_x": 0.1024427,
+      "pixel_size_y": 0.1024427,
+      "pixel_size_y_unit": "MICROMETER",
+      "pixel_size_y_symbol": "Âµm",
+      "pixel_size_z": 0.2245383,
+      "pixel_size_z_unit": "MICROMETER",
+      "pixel_size_z_symbol": "Âµm",
+      "scalebar": {
+        "show": true,
+        "length": 20,
+        "units": "MICROMETER",
+        "position": "bottomleft",
+        "color": "FFFFFF",
+        "show_label": true,
+        "font_size": "10",
+        "height": 3,
+        "margin": 5
+      },
+      "shapes": [
+        {
+          "type": "Rectangle",
+          "strokeWidth": 2,
+          "strokeColor": "#FFFFFF",
+          "fillColor": "#FFFFFF",
+          "fillOpacity": 0,
+          "x": 708.6315118190578,
+          "y": 310.52542372881356,
+          "width": 166.7369763618844,
+          "height": 166.94915254237284,
+          "id": 42547153,
+          "textId": 32383122,
+          "rotation": 360
+        }
+      ],
+      "lastInsetTextIndex": 65
+    },
+    {
+      "x": 458.06712554003485,
+      "y": 54.16421626446578,
+      "width": 105.57124607520973,
+      "height": 105.7055876246992,
+      "zoom": 472.00000000000006,
+      "dx": 140.76308759499648,
+      "dy": -40.66489197188787,
+      "labels": [],
+      "deltaT": [],
+      "rotation": 0,
+      "selected": false,
+      "pixel_size_x_symbol": "Âµm",
+      "pixel_size_x_unit": "MICROMETER",
+      "rotation_symbol": "Â°",
+      "max_export_dpi": 1000,
+      "vertical_flip": false,
+      "horizontal_flip": false,
+      "imageId": "https://livingobjects.ebi.ac.uk/idr/zarr/v0.4/idr0079A/idr0079_images.zarr/0",
+      "name": "9836998.ome.zarr",
+      "sizeZ": 142,
+      "theZ": 71,
+      "sizeT": 1,
+      "theT": 0,
+      "channels": [
+        {
+          "label": "lynEGFP",
+          "active": true,
+          "color": "00FF00",
+          "window": {
+            "min": 0,
+            "max": 255,
+            "start": 3,
+            "end": 93
+          }
+        },
+        {
+          "label": "NLStdTomato",
+          "active": true,
+          "color": "FF00FF",
+          "window": {
+            "min": 0,
+            "max": 255,
+            "start": 6,
+            "end": 79
+          }
+        }
+      ],
+      "orig_width": 1584,
+      "orig_height": 788,
+      "pixelsType": "uint64",
+      "zarr": {
+        "multiscales": [
+          {
+            "axes": [
+              {
+                "name": "c",
+                "type": "channel"
+              },
+              {
+                "name": "z",
+                "type": "space",
+                "unit": "micrometer"
+              },
+              {
+                "name": "y",
+                "type": "space",
+                "unit": "micrometer"
+              },
+              {
+                "name": "x",
+                "type": "space",
+                "unit": "micrometer"
+              }
+            ],
+            "datasets": [
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      0.1024427,
+                      0.1024427
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "0"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      0.2048854,
+                      0.2048854
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "1"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      0.4097708,
+                      0.4097708
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "2"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      0.8195416,
+                      0.8195416
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "3"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      1.6390832,
+                      1.6390832
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "4"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      3.2781664,
+                      3.2781664
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "5"
+              }
+            ],
+            "name": "9836998.ome.zarr",
+            "version": "0.4"
+          }
+        ],
+        "arrays": {
+          "0": {
+            "shape": [
+              2,
+              142,
+              788,
+              1584
+            ],
+            "dtype": "uint8"
+          },
+          "1": {
+            "shape": [
+              2,
+              142,
+              394,
+              792
+            ],
+            "dtype": "uint8"
+          },
+          "2": {
+            "shape": [
+              2,
+              142,
+              197,
+              396
+            ],
+            "dtype": "uint8"
+          },
+          "3": {
+            "shape": [
+              2,
+              142,
+              98,
+              198
+            ],
+            "dtype": "uint8"
+          },
+          "4": {
+            "shape": [
+              2,
+              142,
+              49,
+              99
+            ],
+            "dtype": "uint8"
+          },
+          "5": {
+            "shape": [
+              2,
+              142,
+              24,
+              49
+            ],
+            "dtype": "uint8"
+          }
+        },
+        "zarr_version": 2,
+        "version": "0.4"
+      },
+      "pixel_size_x": 0.1024427,
+      "pixel_size_y": 0.1024427,
+      "pixel_size_y_unit": "MICROMETER",
+      "pixel_size_y_symbol": "Âµm",
+      "pixel_size_z": 0.2245383,
+      "pixel_size_z_unit": "MICROMETER",
+      "pixel_size_z_symbol": "Âµm",
+      "scalebar": {
+        "show": true,
+        "length": 10,
+        "units": "MICROMETER",
+        "position": "bottomleft",
+        "color": "FFFFFF",
+        "show_label": true,
+        "font_size": "10",
+        "height": 3,
+        "margin": 5
+      },
+      "shapes": [],
+      "lastInsetTextIndex": 64,
+      "insetRoiId": 46245739
+    },
+    {
+      "x": 458.06712554003485,
+      "y": 161.86980388916498,
+      "width": 105.57124607520973,
+      "height": 105.7055876246992,
+      "zoom": 472,
+      "dx": 0,
+      "dy": 0,
+      "labels": [],
+      "deltaT": [],
+      "rotation": 0,
+      "selected": false,
+      "pixel_size_x_symbol": "Âµm",
+      "pixel_size_x_unit": "MICROMETER",
+      "rotation_symbol": "Â°",
+      "max_export_dpi": 1000,
+      "vertical_flip": false,
+      "horizontal_flip": false,
+      "imageId": "https://livingobjects.ebi.ac.uk/idr/zarr/v0.4/idr0079A/idr0079_images.zarr/1",
+      "name": "9837019.ome.zarr",
+      "sizeZ": 140,
+      "theZ": 70,
+      "sizeT": 1,
+      "theT": 0,
+      "channels": [
+        {
+          "label": "lynEGFP",
+          "active": true,
+          "color": "00FF00",
+          "window": {
+            "min": 0,
+            "max": 255,
+            "start": 2,
+            "end": 93
+          }
+        },
+        {
+          "label": "NLStdTomato",
+          "active": true,
+          "color": "FF00FF",
+          "window": {
+            "min": 0,
+            "max": 255,
+            "start": 17,
+            "end": 121
+          }
+        }
+      ],
+      "orig_width": 1584,
+      "orig_height": 788,
+      "pixelsType": "uint64",
+      "zarr": {
+        "multiscales": [
+          {
+            "axes": [
+              {
+                "name": "c",
+                "type": "channel"
+              },
+              {
+                "name": "z",
+                "type": "space",
+                "unit": "micrometer"
+              },
+              {
+                "name": "y",
+                "type": "space",
+                "unit": "micrometer"
+              },
+              {
+                "name": "x",
+                "type": "space",
+                "unit": "micrometer"
+              }
+            ],
+            "datasets": [
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      0.1024427,
+                      0.1024427
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "0"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      0.2048854,
+                      0.2048854
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "1"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      0.4097708,
+                      0.4097708
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "2"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      0.8195416,
+                      0.8195416
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "3"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      1.6390832,
+                      1.6390832
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "4"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      3.2781664,
+                      3.2781664
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "5"
+              }
+            ],
+            "name": "9837019.ome.zarr",
+            "version": "0.4"
+          }
+        ],
+        "arrays": {
+          "0": {
+            "shape": [
+              2,
+              140,
+              788,
+              1584
+            ],
+            "dtype": "uint8"
+          },
+          "1": {
+            "shape": [
+              2,
+              140,
+              394,
+              792
+            ],
+            "dtype": "uint8"
+          },
+          "2": {
+            "shape": [
+              2,
+              140,
+              197,
+              396
+            ],
+            "dtype": "uint8"
+          },
+          "3": {
+            "shape": [
+              2,
+              140,
+              98,
+              198
+            ],
+            "dtype": "uint8"
+          },
+          "4": {
+            "shape": [
+              2,
+              140,
+              49,
+              99
+            ],
+            "dtype": "uint8"
+          },
+          "5": {
+            "shape": [
+              2,
+              140,
+              24,
+              49
+            ],
+            "dtype": "uint8"
+          }
+        },
+        "zarr_version": 2,
+        "version": "0.4"
+      },
+      "pixel_size_x": 0.1024427,
+      "pixel_size_y": 0.1024427,
+      "pixel_size_y_unit": "MICROMETER",
+      "pixel_size_y_symbol": "Âµm",
+      "pixel_size_z": 0.2245383,
+      "pixel_size_z_unit": "MICROMETER",
+      "pixel_size_z_symbol": "Âµm",
+      "scalebar": {
+        "show": true,
+        "length": 10,
+        "units": "MICROMETER",
+        "position": "bottomleft",
+        "color": "FFFFFF",
+        "show_label": true,
+        "font_size": "10",
+        "height": 3,
+        "margin": 5
+      },
+      "shapes": [],
+      "lastInsetTextIndex": 64,
+      "insetRoiId": 68376970
+    },
+    {
+      "x": 458.06712554003485,
+      "y": 269.5753915138642,
+      "width": 105.57124607520973,
+      "height": 105.7055876246992,
+      "zoom": 472.00000000000006,
+      "dx": 0,
+      "dy": 0,
+      "labels": [],
+      "deltaT": [],
+      "rotation": 0,
+      "selected": false,
+      "pixel_size_x_symbol": "Âµm",
+      "pixel_size_x_unit": "MICROMETER",
+      "rotation_symbol": "Â°",
+      "max_export_dpi": 1000,
+      "vertical_flip": false,
+      "horizontal_flip": false,
+      "imageId": "https://livingobjects.ebi.ac.uk/idr/zarr/v0.4/idr0079A/idr0079_images.zarr/2",
+      "name": "9837025.ome.zarr",
+      "sizeZ": 184,
+      "theZ": 92,
+      "sizeT": 1,
+      "theT": 0,
+      "channels": [
+        {
+          "label": "lynEGFP",
+          "active": true,
+          "color": "00FF00",
+          "window": {
+            "min": 0,
+            "max": 255,
+            "start": 1,
+            "end": 93
+          }
+        },
+        {
+          "label": "NLStdTomato",
+          "active": true,
+          "color": "FF00FF",
+          "window": {
+            "min": 0,
+            "max": 255,
+            "start": 13,
+            "end": 79
+          }
+        }
+      ],
+      "orig_width": 1584,
+      "orig_height": 788,
+      "pixelsType": "uint64",
+      "zarr": {
+        "multiscales": [
+          {
+            "axes": [
+              {
+                "name": "c",
+                "type": "channel"
+              },
+              {
+                "name": "z",
+                "type": "space",
+                "unit": "micrometer"
+              },
+              {
+                "name": "y",
+                "type": "space",
+                "unit": "micrometer"
+              },
+              {
+                "name": "x",
+                "type": "space",
+                "unit": "micrometer"
+              }
+            ],
+            "datasets": [
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      0.1024427,
+                      0.1024427
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "0"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      0.2048854,
+                      0.2048854
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "1"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      0.4097708,
+                      0.4097708
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "2"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      0.8195416,
+                      0.8195416
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "3"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      1.6390832,
+                      1.6390832
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "4"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      3.2781664,
+                      3.2781664
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "5"
+              }
+            ],
+            "name": "9837025.ome.zarr",
+            "version": "0.4"
+          }
+        ],
+        "arrays": {
+          "0": {
+            "shape": [
+              2,
+              184,
+              788,
+              1584
+            ],
+            "dtype": "uint8"
+          },
+          "1": {
+            "shape": [
+              2,
+              184,
+              394,
+              792
+            ],
+            "dtype": "uint8"
+          },
+          "2": {
+            "shape": [
+              2,
+              184,
+              197,
+              396
+            ],
+            "dtype": "uint8"
+          },
+          "3": {
+            "shape": [
+              2,
+              184,
+              98,
+              198
+            ],
+            "dtype": "uint8"
+          },
+          "4": {
+            "shape": [
+              2,
+              184,
+              49,
+              99
+            ],
+            "dtype": "uint8"
+          },
+          "5": {
+            "shape": [
+              2,
+              184,
+              24,
+              49
+            ],
+            "dtype": "uint8"
+          }
+        },
+        "zarr_version": 2,
+        "version": "0.4"
+      },
+      "pixel_size_x": 0.1024427,
+      "pixel_size_y": 0.1024427,
+      "pixel_size_y_unit": "MICROMETER",
+      "pixel_size_y_symbol": "Âµm",
+      "pixel_size_z": 0.2245383,
+      "pixel_size_z_unit": "MICROMETER",
+      "pixel_size_z_symbol": "Âµm",
+      "scalebar": {
+        "show": true,
+        "length": 10,
+        "units": "MICROMETER",
+        "position": "bottomleft",
+        "color": "FFFFFF",
+        "show_label": true,
+        "font_size": "10",
+        "height": 3,
+        "margin": 5
+      },
+      "shapes": [],
+      "lastInsetTextIndex": 64,
+      "insetRoiId": 42547153
+    },
+    {
+      "x": 32.124189142965065,
+      "y": 390.1576400040083,
+      "width": 139.98097879902326,
+      "height": 105.7055876246992,
+      "zoom": 100,
+      "dx": 0,
+      "dy": 0,
+      "labels": [],
+      "deltaT": [],
+      "rotation": 0,
+      "selected": false,
+      "pixel_size_x_symbol": "Âµm",
+      "pixel_size_x_unit": "MICROMETER",
+      "rotation_symbol": "Â°",
+      "max_export_dpi": 1000,
+      "vertical_flip": false,
+      "horizontal_flip": false,
+      "imageId": "https://livingobjects.ebi.ac.uk/idr/zarr/v0.4/idr0079A/idr0079_images.zarr/0/labels/0",
+      "name": "0",
+      "sizeZ": 142,
+      "theZ": 71,
+      "sizeT": 1,
+      "theT": 0,
+      "channels": [
+        {
+          "label": "Ch0",
+          "active": true,
+          "color": "glasbey_inverted.lut",
+          "window": {
+            "min": 0,
+            "max": 155,
+            "start": 0,
+            "end": 155
+          }
+        }
+      ],
+      "orig_width": 1584,
+      "orig_height": 788,
+      "pixelsType": "int8",
+      "zarr": {
+        "multiscales": [
+          {
+            "axes": [
+              {
+                "name": "c",
+                "type": "channel"
+              },
+              {
+                "name": "z",
+                "type": "space",
+                "unit": "micrometer"
+              },
+              {
+                "name": "y",
+                "type": "space",
+                "unit": "micrometer"
+              },
+              {
+                "name": "x",
+                "type": "space",
+                "unit": "micrometer"
+              }
+            ],
+            "datasets": [
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      0.1024427,
+                      0.1024427
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "0"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      0.2048854,
+                      0.2048854
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "1"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      0.4097708,
+                      0.4097708
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "2"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      0.8195416,
+                      0.8195416
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "3"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      1.6390832,
+                      1.6390832
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "4"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      3.2781664,
+                      3.2781664
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "5"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      0.2245383,
+                      6.5563328,
+                      6.5563328
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "6"
+              }
+            ],
+            "name": "0",
+            "version": "0.4"
+          }
+        ],
+        "arrays": {
+          "0": {
+            "shape": [
+              1,
+              142,
+              788,
+              1584
+            ],
+            "dtype": "int16"
+          },
+          "1": {
+            "shape": [
+              1,
+              142,
+              394,
+              792
+            ],
+            "dtype": "int16"
+          },
+          "2": {
+            "shape": [
+              1,
+              142,
+              197,
+              396
+            ],
+            "dtype": "int16"
+          },
+          "3": {
+            "shape": [
+              1,
+              142,
+              98,
+              198
+            ],
+            "dtype": "int16"
+          },
+          "4": {
+            "shape": [
+              1,
+              142,
+              49,
+              99
+            ],
+            "dtype": "int16"
+          },
+          "5": {
+            "shape": [
+              1,
+              142,
+              24,
+              49
+            ],
+            "dtype": "int16"
+          },
+          "6": {
+            "shape": [
+              1,
+              142,
+              12,
+              24
+            ],
+            "dtype": "int16"
+          }
+        },
+        "zarr_version": 2,
+        "version": "0.4"
+      },
+      "pixel_size_x": 0.1024427,
+      "pixel_size_y": 0.1024427,
+      "pixel_size_y_unit": "MICROMETER",
+      "pixel_size_y_symbol": "Âµm",
+      "pixel_size_z": 0.2245383,
+      "pixel_size_z_unit": "MICROMETER",
+      "pixel_size_z_symbol": "Âµm"
+    },
+    {
+      "x": 248.8217539479105,
+      "y": 431.2598180647224,
+      "width": 314.5286195286195,
+      "height": 220.39660446499477,
+      "zoom": 100,
+      "dx": 0,
+      "dy": 0,
+      "labels": [
+        {
+          "text": "idr0048 - Abdeladim",
+          "size": "14",
+          "position": "topleft",
+          "color": "FFFFFF"
+        }
+      ],
+      "deltaT": [],
+      "rotation": 0,
+      "selected": false,
+      "pixel_size_x_symbol": "µm",
+      "pixel_size_x_unit": "MICROMETER",
+      "rotation_symbol": "°",
+      "max_export_dpi": 1000,
+      "vertical_flip": false,
+      "horizontal_flip": false,
+      "imageId": "https://livingobjects.ebi.ac.uk/idr/zarr/v0.4/idr0048A/9846152.zarr",
+      "name": "/",
+      "sizeZ": 91,
+      "theZ": 45,
+      "sizeT": 1,
+      "theT": 0,
+      "channels": [
+        {
+          "label": "0",
+          "active": true,
+          "color": "FF0000",
+          "window": {
+            "min": 0,
+            "max": 65535,
+            "start": 0,
+            "end": 25000
+          }
+        },
+        {
+          "label": "1",
+          "active": true,
+          "color": "00FF00",
+          "window": {
+            "min": 0,
+            "max": 65535,
+            "start": 0,
+            "end": 25000
+          }
+        },
+        {
+          "label": "2",
+          "active": true,
+          "color": "0000FF",
+          "window": {
+            "min": 0,
+            "max": 65535,
+            "start": 0,
+            "end": 25000
+          }
+        }
+      ],
+      "orig_width": 19120,
+      "orig_height": 13350,
+      "pixelsType": "uint8",
+      "zarr": {
+        "multiscales": [
+          {
+            "axes": [
+              {
+                "name": "c",
+                "type": "channel"
+              },
+              {
+                "name": "z",
+                "type": "space"
+              },
+              {
+                "name": "y",
+                "type": "space"
+              },
+              {
+                "name": "x",
+                "type": "space"
+              }
+            ],
+            "datasets": [
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      1,
+                      1
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "0"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      2,
+                      2
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "1"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      4,
+                      4
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "2"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      8,
+                      8
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "3"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      16,
+                      16
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "4"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      32,
+                      32
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "5"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      64,
+                      64
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "6"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      128,
+                      128
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "7"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      256,
+                      256
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "8"
+              }
+            ],
+            "name": "/",
+            "version": "0.4"
+          }
+        ],
+        "arrays": {
+          "0": {
+            "shape": [
+              3,
+              91,
+              13350,
+              19120
+            ],
+            "dtype": "uint16"
+          },
+          "1": {
+            "shape": [
+              3,
+              91,
+              6675,
+              9560
+            ],
+            "dtype": "uint16"
+          },
+          "2": {
+            "shape": [
+              3,
+              91,
+              3337,
+              4780
+            ],
+            "dtype": "uint16"
+          },
+          "3": {
+            "shape": [
+              3,
+              91,
+              1668,
+              2390
+            ],
+            "dtype": "uint16"
+          },
+          "4": {
+            "shape": [
+              3,
+              91,
+              834,
+              1195
+            ],
+            "dtype": "uint16"
+          },
+          "5": {
+            "shape": [
+              3,
+              91,
+              417,
+              597
+            ],
+            "dtype": "uint16"
+          },
+          "6": {
+            "shape": [
+              3,
+              91,
+              208,
+              298
+            ],
+            "dtype": "uint16"
+          },
+          "7": {
+            "shape": [
+              3,
+              91,
+              104,
+              149
+            ],
+            "dtype": "uint16"
+          },
+          "8": {
+            "shape": [
+              3,
+              91,
+              52,
+              74
+            ],
+            "dtype": "uint16"
+          }
+        },
+        "zarr_version": 2,
+        "version": "0.4"
+      },
+      "shapes": [
+        {
+          "type": "Rectangle",
+          "x": 10747.055458415522,
+          "y": 3645.7946152110653,
+          "width": 4666.246341330019,
+          "height": 4450,
+          "area": 19856538.900646027,
+          "strokeWidth": 2,
+          "strokeColor": "#FFFFFF",
+          "rotation": 313,
+          "fillColor": "#FFFFFF",
+          "fillOpacity": "0.0",
+          "textId": 58338004,
+          "id": 96089354
+        },
+        {
+          "type": "Rectangle",
+          "x": 7234.802767797277,
+          "y": 7655.324636972559,
+          "width": 591.9055477738697,
+          "height": 572.7155727155728,
+          "area": 1028762.7717181634,
+          "strokeWidth": 2,
+          "strokeColor": "#FFFFFF",
+          "rotation": 360,
+          "fillColor": "#FFFFFF",
+          "fillOpacity": "0.0",
+          "textId": 73984307,
+          "id": 18962897
+        },
+        {
+          "type": "Text",
+          "x": 6574.053514822432,
+          "y": 8030.012712635022,
+          "area": 393.5987472214365,
+          "fontSize": 12,
+          "strokeColor": "#FFFFFF",
+          "fillColor": "#000000",
+          "fillOpacity": "0.0",
+          "text": "A",
+          "textAnchor": "middle",
+          "rotation": 0,
+          "id": 73984307
+        },
+        {
+          "type": "Text",
+          "x": 11090.061894912957,
+          "y": 6016.792252609334,
+          "area": 392.23038264419665,
+          "fontSize": 12,
+          "strokeColor": "#FFFFFF",
+          "fillColor": "#000000",
+          "fillOpacity": "0.0",
+          "text": "B",
+          "textAnchor": "middle",
+          "rotation": 0,
+          "id": 58338004
+        }
+      ],
+      "lastInsetTextIndex": 66,
+      "scalebar": {
+        "show": true,
+        "length": 1,
+        "units": "MILLIMETER",
+        "position": "bottomright",
+        "color": "FFFFFF",
+        "show_label": true,
+        "font_size": "10",
+        "height": 3,
+        "margin": 10
+      },
+      "pixel_size_x": 0.3
+    },
+    {
+      "x": 249.728612355096,
+      "y": 655.5563721620234,
+      "width": 153.745795463729,
+      "height": 148.76125360335413,
+      "zoom": 2331,
+      "dx": 2029.2444583157885,
+      "dy": -1266.682423330346,
+      "labels": [
+        {
+          "text": "A",
+          "size": 18,
+          "position": "topleft",
+          "color": "FFFFFF",
+          "inset": true
+        }
+      ],
+      "deltaT": [],
+      "rotation": 0,
+      "selected": false,
+      "pixel_size_x_symbol": "µm",
+      "pixel_size_x_unit": "MICROMETER",
+      "rotation_symbol": "°",
+      "max_export_dpi": 1000,
+      "vertical_flip": false,
+      "horizontal_flip": false,
+      "imageId": "https://livingobjects.ebi.ac.uk/idr/zarr/v0.4/idr0048A/9846152.zarr",
+      "name": "/",
+      "sizeZ": 91,
+      "theZ": 45,
+      "sizeT": 1,
+      "theT": 0,
+      "channels": [
+        {
+          "label": "0",
+          "active": true,
+          "color": "FF0000",
+          "window": {
+            "min": 0,
+            "max": 65535,
+            "start": 0,
+            "end": 25000
+          }
+        },
+        {
+          "label": "1",
+          "active": true,
+          "color": "00FF00",
+          "window": {
+            "min": 0,
+            "max": 65535,
+            "start": 0,
+            "end": 25000
+          }
+        },
+        {
+          "label": "2",
+          "active": true,
+          "color": "0000FF",
+          "window": {
+            "min": 0,
+            "max": 65535,
+            "start": 0,
+            "end": 25000
+          }
+        }
+      ],
+      "orig_width": 19120,
+      "orig_height": 13350,
+      "pixelsType": "uint8",
+      "zarr": {
+        "multiscales": [
+          {
+            "axes": [
+              {
+                "name": "c",
+                "type": "channel"
+              },
+              {
+                "name": "z",
+                "type": "space"
+              },
+              {
+                "name": "y",
+                "type": "space"
+              },
+              {
+                "name": "x",
+                "type": "space"
+              }
+            ],
+            "datasets": [
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      1,
+                      1
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "0"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      2,
+                      2
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "1"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      4,
+                      4
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "2"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      8,
+                      8
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "3"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      16,
+                      16
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "4"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      32,
+                      32
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "5"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      64,
+                      64
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "6"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      128,
+                      128
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "7"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      256,
+                      256
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "8"
+              }
+            ],
+            "name": "/",
+            "version": "0.4"
+          }
+        ],
+        "arrays": {
+          "0": {
+            "shape": [
+              3,
+              91,
+              13350,
+              19120
+            ],
+            "dtype": "uint16"
+          },
+          "1": {
+            "shape": [
+              3,
+              91,
+              6675,
+              9560
+            ],
+            "dtype": "uint16"
+          },
+          "2": {
+            "shape": [
+              3,
+              91,
+              3337,
+              4780
+            ],
+            "dtype": "uint16"
+          },
+          "3": {
+            "shape": [
+              3,
+              91,
+              1668,
+              2390
+            ],
+            "dtype": "uint16"
+          },
+          "4": {
+            "shape": [
+              3,
+              91,
+              834,
+              1195
+            ],
+            "dtype": "uint16"
+          },
+          "5": {
+            "shape": [
+              3,
+              91,
+              417,
+              597
+            ],
+            "dtype": "uint16"
+          },
+          "6": {
+            "shape": [
+              3,
+              91,
+              208,
+              298
+            ],
+            "dtype": "uint16"
+          },
+          "7": {
+            "shape": [
+              3,
+              91,
+              104,
+              149
+            ],
+            "dtype": "uint16"
+          },
+          "8": {
+            "shape": [
+              3,
+              91,
+              52,
+              74
+            ],
+            "dtype": "uint16"
+          }
+        },
+        "zarr_version": 2,
+        "version": "0.4"
+      },
+      "shapes": [],
+      "lastInsetTextIndex": 64,
+      "insetRoiId": 18962897
+    },
+    {
+      "x": 407.4881806313295,
+      "y": 655.6950623062852,
+      "width": 155.99025963108278,
+      "height": 148.76125360335413,
+      "zoom": 300,
+      "dx": -3520.178629080532,
+      "dy": 804.2053847889347,
+      "labels": [
+        {
+          "text": "B",
+          "size": 18,
+          "position": "topleft",
+          "color": "FFFFFF",
+          "inset": true
+        }
+      ],
+      "deltaT": [],
+      "rotation": 47,
+      "selected": false,
+      "pixel_size_x_symbol": "µm",
+      "pixel_size_x_unit": "MICROMETER",
+      "rotation_symbol": "°",
+      "max_export_dpi": 1000,
+      "vertical_flip": false,
+      "horizontal_flip": false,
+      "imageId": "https://livingobjects.ebi.ac.uk/idr/zarr/v0.4/idr0048A/9846152.zarr",
+      "name": "/",
+      "sizeZ": 91,
+      "theZ": 45,
+      "sizeT": 1,
+      "theT": 0,
+      "channels": [
+        {
+          "label": "0",
+          "active": true,
+          "color": "FF0000",
+          "window": {
+            "min": 0,
+            "max": 65535,
+            "start": 0,
+            "end": 25000
+          }
+        },
+        {
+          "label": "1",
+          "active": true,
+          "color": "00FF00",
+          "window": {
+            "min": 0,
+            "max": 65535,
+            "start": 0,
+            "end": 25000
+          }
+        },
+        {
+          "label": "2",
+          "active": true,
+          "color": "0000FF",
+          "window": {
+            "min": 0,
+            "max": 65535,
+            "start": 0,
+            "end": 25000
+          }
+        }
+      ],
+      "orig_width": 19120,
+      "orig_height": 13350,
+      "pixelsType": "uint8",
+      "zarr": {
+        "multiscales": [
+          {
+            "axes": [
+              {
+                "name": "c",
+                "type": "channel"
+              },
+              {
+                "name": "z",
+                "type": "space"
+              },
+              {
+                "name": "y",
+                "type": "space"
+              },
+              {
+                "name": "x",
+                "type": "space"
+              }
+            ],
+            "datasets": [
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      1,
+                      1
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "0"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      2,
+                      2
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "1"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      4,
+                      4
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "2"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      8,
+                      8
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "3"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      16,
+                      16
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "4"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      32,
+                      32
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "5"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      64,
+                      64
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "6"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      128,
+                      128
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "7"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      256,
+                      256
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "8"
+              }
+            ],
+            "name": "/",
+            "version": "0.4"
+          }
+        ],
+        "arrays": {
+          "0": {
+            "shape": [
+              3,
+              91,
+              13350,
+              19120
+            ],
+            "dtype": "uint16"
+          },
+          "1": {
+            "shape": [
+              3,
+              91,
+              6675,
+              9560
+            ],
+            "dtype": "uint16"
+          },
+          "2": {
+            "shape": [
+              3,
+              91,
+              3337,
+              4780
+            ],
+            "dtype": "uint16"
+          },
+          "3": {
+            "shape": [
+              3,
+              91,
+              1668,
+              2390
+            ],
+            "dtype": "uint16"
+          },
+          "4": {
+            "shape": [
+              3,
+              91,
+              834,
+              1195
+            ],
+            "dtype": "uint16"
+          },
+          "5": {
+            "shape": [
+              3,
+              91,
+              417,
+              597
+            ],
+            "dtype": "uint16"
+          },
+          "6": {
+            "shape": [
+              3,
+              91,
+              208,
+              298
+            ],
+            "dtype": "uint16"
+          },
+          "7": {
+            "shape": [
+              3,
+              91,
+              104,
+              149
+            ],
+            "dtype": "uint16"
+          },
+          "8": {
+            "shape": [
+              3,
+              91,
+              52,
+              74
+            ],
+            "dtype": "uint16"
+          }
+        },
+        "zarr_version": 2,
+        "version": "0.4"
+      },
+      "shapes": [],
+      "lastInsetTextIndex": 64,
+      "insetRoiId": 96089354
+    },
+    {
+      "x": 812.6564759110713,
+      "y": 29.098634050208375,
+      "width": 134.2329545454544,
+      "height": 126.18131522695838,
+      "zoom": 178,
+      "dx": -121.96234247124549,
+      "dy": 9.75698739769964,
+      "labels": [
+        {
+          "text": "T: [time.index]",
+          "size": "12",
+          "position": "topleft",
+          "color": "FFFFFF"
+        }
+      ],
+      "deltaT": [],
+      "rotation": 0,
+      "selected": false,
+      "pixel_size_x_symbol": "µm",
+      "pixel_size_x_unit": "MICROMETER",
+      "rotation_symbol": "°",
+      "max_export_dpi": 1000,
+      "vertical_flip": false,
+      "horizontal_flip": false,
+      "imageId": "https://livingobjects.ebi.ac.uk/idr/zarr/v0.4/idr0044A/4007801.zarr",
+      "name": "4007801.zarr",
+      "sizeZ": 988,
+      "theZ": 403,
+      "sizeT": 532,
+      "theT": 180,
+      "channels": [
+        {
+          "label": "H2B-eGFP",
+          "active": true,
+          "color": "00FF00",
+          "window": {
+            "min": 0,
+            "max": 65535,
+            "start": 0,
+            "end": 1093
+          }
+        },
+        {
+          "label": "myr-tdTomato",
+          "active": true,
+          "color": "FF0000",
+          "window": {
+            "min": 0,
+            "max": 65535,
+            "start": 0,
+            "end": 439
+          }
+        }
+      ],
+      "orig_width": 2169,
+      "orig_height": 2048,
+      "pixelsType": "uint8",
+      "zarr": {
+        "multiscales": [
+          {
+            "axes": [
+              {
+                "name": "t",
+                "type": "time"
+              },
+              {
+                "name": "c",
+                "type": "channel"
+              },
+              {
+                "name": "z",
+                "type": "space",
+                "unit": "micrometer"
+              },
+              {
+                "name": "y",
+                "type": "space",
+                "unit": "micrometer"
+              },
+              {
+                "name": "x",
+                "type": "space",
+                "unit": "micrometer"
+              }
+            ],
+            "datasets": [
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      1,
+                      1,
+                      1
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "0"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      1,
+                      2,
+                      2
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "1"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      1,
+                      4,
+                      4
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "2"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      1,
+                      8,
+                      8
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "3"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      1,
+                      16,
+                      16
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "4"
+              }
+            ],
+            "metadata": {
+              "method": "loci.common.image.SimpleImageScaler",
+              "version": "Bio-Formats 6.9.1"
+            },
+            "version": "0.4"
+          }
+        ],
+        "arrays": {
+          "0": {
+            "shape": [
+              532,
+              2,
+              988,
+              2048,
+              2169
+            ],
+            "dtype": "uint16"
+          },
+          "1": {
+            "shape": [
+              532,
+              2,
+              988,
+              1024,
+              1084
+            ],
+            "dtype": "uint16"
+          },
+          "2": {
+            "shape": [
+              532,
+              2,
+              988,
+              512,
+              542
+            ],
+            "dtype": "uint16"
+          },
+          "3": {
+            "shape": [
+              532,
+              2,
+              988,
+              256,
+              271
+            ],
+            "dtype": "uint16"
+          },
+          "4": {
+            "shape": [
+              532,
+              2,
+              988,
+              128,
+              135
+            ],
+            "dtype": "uint16"
+          }
+        },
+        "zarr_version": 2,
+        "version": "0.4"
+      },
+      "pixel_size_x": 1,
+      "pixel_size_y": 1,
+      "pixel_size_y_unit": "MICROMETER",
+      "pixel_size_y_symbol": "µm",
+      "pixel_size_z": 1,
+      "pixel_size_z_unit": "MICROMETER",
+      "pixel_size_z_symbol": "µm"
+    },
+    {
+      "x": 948.8894304565257,
+      "y": 29.098634050208375,
+      "width": 134.2329545454545,
+      "height": 126.18131522695838,
+      "zoom": 178,
+      "dx": -121.96234247124549,
+      "dy": 9.75698739769964,
+      "labels": [
+        {
+          "text": "T: [time.index]",
+          "size": 12,
+          "position": "topleft",
+          "color": "FFFFFF"
+        }
+      ],
+      "deltaT": [],
+      "rotation": 0,
+      "selected": false,
+      "pixel_size_x_symbol": "µm",
+      "pixel_size_x_unit": "MICROMETER",
+      "rotation_symbol": "°",
+      "max_export_dpi": 1000,
+      "vertical_flip": false,
+      "horizontal_flip": false,
+      "imageId": "https://livingobjects.ebi.ac.uk/idr/zarr/v0.4/idr0044A/4007801.zarr",
+      "name": "4007801.zarr",
+      "sizeZ": 988,
+      "theZ": 403,
+      "sizeT": 532,
+      "theT": 294,
+      "channels": [
+        {
+          "label": "H2B-eGFP",
+          "active": true,
+          "color": "00FF00",
+          "window": {
+            "min": 0,
+            "max": 65535,
+            "start": 0,
+            "end": 1093
+          }
+        },
+        {
+          "label": "myr-tdTomato",
+          "active": true,
+          "color": "FF0000",
+          "window": {
+            "min": 0,
+            "max": 65535,
+            "start": 0,
+            "end": 439
+          }
+        }
+      ],
+      "orig_width": 2169,
+      "orig_height": 2048,
+      "pixelsType": "uint8",
+      "zarr": {
+        "multiscales": [
+          {
+            "axes": [
+              {
+                "name": "t",
+                "type": "time"
+              },
+              {
+                "name": "c",
+                "type": "channel"
+              },
+              {
+                "name": "z",
+                "type": "space",
+                "unit": "micrometer"
+              },
+              {
+                "name": "y",
+                "type": "space",
+                "unit": "micrometer"
+              },
+              {
+                "name": "x",
+                "type": "space",
+                "unit": "micrometer"
+              }
+            ],
+            "datasets": [
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      1,
+                      1,
+                      1
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "0"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      1,
+                      2,
+                      2
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "1"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      1,
+                      4,
+                      4
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "2"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      1,
+                      8,
+                      8
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "3"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      1,
+                      16,
+                      16
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "4"
+              }
+            ],
+            "metadata": {
+              "method": "loci.common.image.SimpleImageScaler",
+              "version": "Bio-Formats 6.9.1"
+            },
+            "version": "0.4"
+          }
+        ],
+        "arrays": {
+          "0": {
+            "shape": [
+              532,
+              2,
+              988,
+              2048,
+              2169
+            ],
+            "dtype": "uint16"
+          },
+          "1": {
+            "shape": [
+              532,
+              2,
+              988,
+              1024,
+              1084
+            ],
+            "dtype": "uint16"
+          },
+          "2": {
+            "shape": [
+              532,
+              2,
+              988,
+              512,
+              542
+            ],
+            "dtype": "uint16"
+          },
+          "3": {
+            "shape": [
+              532,
+              2,
+              988,
+              256,
+              271
+            ],
+            "dtype": "uint16"
+          },
+          "4": {
+            "shape": [
+              532,
+              2,
+              988,
+              128,
+              135
+            ],
+            "dtype": "uint16"
+          }
+        },
+        "zarr_version": 2,
+        "version": "0.4"
+      },
+      "pixel_size_x": 1,
+      "pixel_size_y": 1,
+      "pixel_size_y_unit": "MICROMETER",
+      "pixel_size_y_symbol": "µm",
+      "pixel_size_z": 1,
+      "pixel_size_z_unit": "MICROMETER",
+      "pixel_size_z_symbol": "µm"
+    },
+    {
+      "x": 1085.12238500198,
+      "y": 29.098634050208375,
+      "width": 134.2329545454545,
+      "height": 126.18131522695838,
+      "zoom": 178,
+      "dx": -121.96234247124549,
+      "dy": 9.75698739769964,
+      "labels": [
+        {
+          "text": "T: [time.index]",
+          "size": 12,
+          "position": "topleft",
+          "color": "FFFFFF"
+        }
+      ],
+      "deltaT": [],
+      "rotation": 0,
+      "selected": false,
+      "pixel_size_x_symbol": "µm",
+      "pixel_size_x_unit": "MICROMETER",
+      "rotation_symbol": "°",
+      "max_export_dpi": 1000,
+      "vertical_flip": false,
+      "horizontal_flip": false,
+      "imageId": "https://livingobjects.ebi.ac.uk/idr/zarr/v0.4/idr0044A/4007801.zarr",
+      "name": "4007801.zarr",
+      "sizeZ": 988,
+      "theZ": 403,
+      "sizeT": 532,
+      "theT": 444,
+      "channels": [
+        {
+          "label": "H2B-eGFP",
+          "active": true,
+          "color": "00FF00",
+          "window": {
+            "min": 0,
+            "max": 65535,
+            "start": 0,
+            "end": 1093
+          }
+        },
+        {
+          "label": "myr-tdTomato",
+          "active": true,
+          "color": "FF0000",
+          "window": {
+            "min": 0,
+            "max": 65535,
+            "start": 0,
+            "end": 439
+          }
+        }
+      ],
+      "orig_width": 2169,
+      "orig_height": 2048,
+      "pixelsType": "uint8",
+      "zarr": {
+        "multiscales": [
+          {
+            "axes": [
+              {
+                "name": "t",
+                "type": "time"
+              },
+              {
+                "name": "c",
+                "type": "channel"
+              },
+              {
+                "name": "z",
+                "type": "space",
+                "unit": "micrometer"
+              },
+              {
+                "name": "y",
+                "type": "space",
+                "unit": "micrometer"
+              },
+              {
+                "name": "x",
+                "type": "space",
+                "unit": "micrometer"
+              }
+            ],
+            "datasets": [
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      1,
+                      1,
+                      1
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "0"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      1,
+                      2,
+                      2
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "1"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      1,
+                      4,
+                      4
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "2"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      1,
+                      8,
+                      8
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "3"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      1,
+                      16,
+                      16
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "4"
+              }
+            ],
+            "metadata": {
+              "method": "loci.common.image.SimpleImageScaler",
+              "version": "Bio-Formats 6.9.1"
+            },
+            "version": "0.4"
+          }
+        ],
+        "arrays": {
+          "0": {
+            "shape": [
+              532,
+              2,
+              988,
+              2048,
+              2169
+            ],
+            "dtype": "uint16"
+          },
+          "1": {
+            "shape": [
+              532,
+              2,
+              988,
+              1024,
+              1084
+            ],
+            "dtype": "uint16"
+          },
+          "2": {
+            "shape": [
+              532,
+              2,
+              988,
+              512,
+              542
+            ],
+            "dtype": "uint16"
+          },
+          "3": {
+            "shape": [
+              532,
+              2,
+              988,
+              256,
+              271
+            ],
+            "dtype": "uint16"
+          },
+          "4": {
+            "shape": [
+              532,
+              2,
+              988,
+              128,
+              135
+            ],
+            "dtype": "uint16"
+          }
+        },
+        "zarr_version": 2,
+        "version": "0.4"
+      },
+      "pixel_size_x": 1,
+      "pixel_size_y": 1,
+      "pixel_size_y_unit": "MICROMETER",
+      "pixel_size_y_symbol": "µm",
+      "pixel_size_z": 1,
+      "pixel_size_z_unit": "MICROMETER",
+      "pixel_size_z_symbol": "µm"
+    },
+    {
+      "x": 676.4235213656169,
+      "y": 29.098634050208375,
+      "width": 134.2329545454544,
+      "height": 126.18131522695836,
+      "zoom": 178,
+      "dx": -121.96234247124549,
+      "dy": 9.75698739769964,
+      "labels": [
+        {
+          "text": "T: [time.index]",
+          "size": "12",
+          "position": "topleft",
+          "color": "FFFFFF"
+        },
+        {
+          "text": "idr0044 McDole",
+          "size": 14,
+          "position": "leftvert",
+          "color": "000000"
+        }
+      ],
+      "deltaT": [],
+      "rotation": 0,
+      "selected": false,
+      "pixel_size_x_symbol": "µm",
+      "pixel_size_x_unit": "MICROMETER",
+      "rotation_symbol": "°",
+      "max_export_dpi": 1000,
+      "vertical_flip": false,
+      "horizontal_flip": false,
+      "imageId": "https://livingobjects.ebi.ac.uk/idr/zarr/v0.4/idr0044A/4007801.zarr",
+      "name": "4007801.zarr",
+      "sizeZ": 988,
+      "theZ": 540,
+      "sizeT": 532,
+      "theT": 76,
+      "channels": [
+        {
+          "label": "H2B-eGFP",
+          "active": true,
+          "color": "00FF00",
+          "window": {
+            "min": 0,
+            "max": 65535,
+            "start": 0,
+            "end": 1093
+          }
+        },
+        {
+          "label": "myr-tdTomato",
+          "active": true,
+          "color": "FF0000",
+          "window": {
+            "min": 0,
+            "max": 65535,
+            "start": 0,
+            "end": 439
+          }
+        }
+      ],
+      "orig_width": 2169,
+      "orig_height": 2048,
+      "pixelsType": "uint8",
+      "zarr": {
+        "multiscales": [
+          {
+            "axes": [
+              {
+                "name": "t",
+                "type": "time"
+              },
+              {
+                "name": "c",
+                "type": "channel"
+              },
+              {
+                "name": "z",
+                "type": "space",
+                "unit": "micrometer"
+              },
+              {
+                "name": "y",
+                "type": "space",
+                "unit": "micrometer"
+              },
+              {
+                "name": "x",
+                "type": "space",
+                "unit": "micrometer"
+              }
+            ],
+            "datasets": [
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      1,
+                      1,
+                      1
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "0"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      1,
+                      2,
+                      2
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "1"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      1,
+                      4,
+                      4
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "2"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      1,
+                      8,
+                      8
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "3"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      1,
+                      16,
+                      16
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "4"
+              }
+            ],
+            "metadata": {
+              "method": "loci.common.image.SimpleImageScaler",
+              "version": "Bio-Formats 6.9.1"
+            },
+            "version": "0.4"
+          }
+        ],
+        "arrays": {
+          "0": {
+            "shape": [
+              532,
+              2,
+              988,
+              2048,
+              2169
+            ],
+            "dtype": "uint16"
+          },
+          "1": {
+            "shape": [
+              532,
+              2,
+              988,
+              1024,
+              1084
+            ],
+            "dtype": "uint16"
+          },
+          "2": {
+            "shape": [
+              532,
+              2,
+              988,
+              512,
+              542
+            ],
+            "dtype": "uint16"
+          },
+          "3": {
+            "shape": [
+              532,
+              2,
+              988,
+              256,
+              271
+            ],
+            "dtype": "uint16"
+          },
+          "4": {
+            "shape": [
+              532,
+              2,
+              988,
+              128,
+              135
+            ],
+            "dtype": "uint16"
+          }
+        },
+        "zarr_version": 2,
+        "version": "0.4"
+      },
+      "pixel_size_x": 1,
+      "pixel_size_y": 1,
+      "pixel_size_y_unit": "MICROMETER",
+      "pixel_size_y_symbol": "µm",
+      "pixel_size_z": 1,
+      "pixel_size_z_unit": "MICROMETER",
+      "pixel_size_z_symbol": "µm"
+    },
+    {
+      "x": 676.4235213656169,
+      "y": 204.17285756897837,
+      "width": 246.41414141414134,
+      "height": 341.44519015659955,
+      "zoom": 100,
+      "dx": 0,
+      "dy": 0,
+      "labels": [
+        {
+          "text": "***Chick* Embryo**",
+          "size": "21",
+          "position": "top",
+          "color": "FF0000"
+        },
+        {
+          "text": "idr0066 Voigt Mesospim",
+          "size": 14,
+          "position": "leftvert",
+          "color": "000000"
+        }
+      ],
+      "deltaT": [],
+      "rotation": 0,
+      "selected": false,
+      "pixel_size_x_symbol": "µm",
+      "pixel_size_x_unit": "MICROMETER",
+      "rotation_symbol": "°",
+      "max_export_dpi": 1000,
+      "vertical_flip": false,
+      "horizontal_flip": false,
+      "imageId": "https://livingobjects.ebi.ac.uk/idr/zarr/v0.5/idr0066/ExpD_chicken_embryo_MIP.ome.zarr",
+      "name": "/",
+      "sizeZ": 1,
+      "theZ": 0,
+      "sizeT": 1,
+      "theT": 0,
+      "channels": [
+        {
+          "label": "Cy3",
+          "active": true,
+          "color": "FFFFFF",
+          "window": {
+            "min": 0,
+            "max": 255,
+            "start": 0,
+            "end": 55
+          }
+        }
+      ],
+      "orig_width": 6510,
+      "orig_height": 8978,
+      "pixelsType": "uint64",
+      "zarr": {
+        "multiscales": [
+          {
+            "axes": [
+              {
+                "name": "y",
+                "type": "space",
+                "unit": "micrometer"
+              },
+              {
+                "name": "x",
+                "type": "space",
+                "unit": "micrometer"
+              }
+            ],
+            "datasets": [
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1.6,
+                      1.6
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "0"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      3.2,
+                      3.2
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "1"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      6.4,
+                      6.4
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "2"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      12.8,
+                      12.8
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "3"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      25.6,
+                      25.6
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "4"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      51.2,
+                      51.2
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "5"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      102.4,
+                      102.4
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "6"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      204.8,
+                      204.8
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "7"
+              }
+            ],
+            "name": "/"
+          }
+        ],
+        "arrays": {
+          "0": {
+            "shape": [
+              8978,
+              6510
+            ],
+            "dtype": "uint8"
+          },
+          "1": {
+            "shape": [
+              4489,
+              3255
+            ],
+            "dtype": "uint8"
+          },
+          "2": {
+            "shape": [
+              2244,
+              1627
+            ],
+            "dtype": "uint8"
+          },
+          "3": {
+            "shape": [
+              1122,
+              813
+            ],
+            "dtype": "uint8"
+          },
+          "4": {
+            "shape": [
+              561,
+              406
+            ],
+            "dtype": "uint8"
+          },
+          "5": {
+            "shape": [
+              280,
+              203
+            ],
+            "dtype": "uint8"
+          },
+          "6": {
+            "shape": [
+              140,
+              101
+            ],
+            "dtype": "uint8"
+          },
+          "7": {
+            "shape": [
+              70,
+              50
+            ],
+            "dtype": "uint8"
+          }
+        },
+        "zarr_version": 3,
+        "version": "0.5"
+      },
+      "pixel_size_x": 1.6,
+      "pixel_size_y": 1.6,
+      "pixel_size_y_unit": "MICROMETER",
+      "pixel_size_y_symbol": "µm",
+      "shapes": [
+        {
+          "type": "Rectangle",
+          "strokeWidth": 2,
+          "strokeColor": "#FF0000",
+          "fillColor": "#FFFFFF",
+          "fillOpacity": 0,
+          "x": 1053.8534902118872,
+          "y": 3709.4807826432198,
+          "width": 1443.458980044346,
+          "height": 1443.4589800443462,
+          "id": 68569259,
+          "textId": 74064397,
+          "rotation": 360
+        }
+      ],
+      "lastInsetTextIndex": 65,
+      "border": {
+        "color": "#FFFFFF",
+        "strokeWidth": 2,
+        "showBorder": true
+      },
+      "scalebar": {
+        "show": true,
+        "length": 2,
+        "units": "MILLIMETER",
+        "position": "bottomleft",
+        "color": "00FFFF",
+        "show_label": true,
+        "font_size": "14",
+        "height": 3,
+        "margin": 10
+      }
+    },
+    {
+      "x": 810.6491105912061,
+      "y": 204.17285756897837,
+      "width": 112.1885521885522,
+      "height": 112.18855218855221,
+      "zoom": 451,
+      "dx": 1479.4170197659398,
+      "dy": 57.78972733460705,
+      "labels": [],
+      "deltaT": [],
+      "rotation": 0,
+      "selected": false,
+      "pixel_size_x_symbol": "µm",
+      "pixel_size_x_unit": "MICROMETER",
+      "rotation_symbol": "°",
+      "max_export_dpi": 1000,
+      "vertical_flip": false,
+      "horizontal_flip": false,
+      "imageId": "https://livingobjects.ebi.ac.uk/idr/zarr/v0.5/idr0066/ExpD_chicken_embryo_MIP.ome.zarr",
+      "name": "/",
+      "sizeZ": 1,
+      "theZ": 0,
+      "sizeT": 1,
+      "theT": 0,
+      "channels": [
+        {
+          "label": "Cy3",
+          "active": true,
+          "color": "FFFF00",
+          "window": {
+            "min": 0,
+            "max": 255,
+            "start": 0,
+            "end": 55
+          }
+        }
+      ],
+      "orig_width": 6510,
+      "orig_height": 8978,
+      "pixelsType": "uint64",
+      "zarr": {
+        "multiscales": [
+          {
+            "axes": [
+              {
+                "name": "y",
+                "type": "space",
+                "unit": "micrometer"
+              },
+              {
+                "name": "x",
+                "type": "space",
+                "unit": "micrometer"
+              }
+            ],
+            "datasets": [
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1.6,
+                      1.6
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "0"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      3.2,
+                      3.2
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "1"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      6.4,
+                      6.4
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "2"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      12.8,
+                      12.8
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "3"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      25.6,
+                      25.6
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "4"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      51.2,
+                      51.2
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "5"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      102.4,
+                      102.4
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "6"
+              },
+              {
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      204.8,
+                      204.8
+                    ],
+                    "type": "scale"
+                  }
+                ],
+                "path": "7"
+              }
+            ],
+            "name": "/"
+          }
+        ],
+        "arrays": {
+          "0": {
+            "shape": [
+              8978,
+              6510
+            ],
+            "dtype": "uint8"
+          },
+          "1": {
+            "shape": [
+              4489,
+              3255
+            ],
+            "dtype": "uint8"
+          },
+          "2": {
+            "shape": [
+              2244,
+              1627
+            ],
+            "dtype": "uint8"
+          },
+          "3": {
+            "shape": [
+              1122,
+              813
+            ],
+            "dtype": "uint8"
+          },
+          "4": {
+            "shape": [
+              561,
+              406
+            ],
+            "dtype": "uint8"
+          },
+          "5": {
+            "shape": [
+              280,
+              203
+            ],
+            "dtype": "uint8"
+          },
+          "6": {
+            "shape": [
+              140,
+              101
+            ],
+            "dtype": "uint8"
+          },
+          "7": {
+            "shape": [
+              70,
+              50
+            ],
+            "dtype": "uint8"
+          }
+        },
+        "zarr_version": 3,
+        "version": "0.5"
+      },
+      "pixel_size_x": 1.6,
+      "pixel_size_y": 1.6,
+      "pixel_size_y_unit": "MICROMETER",
+      "pixel_size_y_symbol": "µm",
+      "shapes": [],
+      "lastInsetTextIndex": 64,
+      "insetRoiId": 68569259,
+      "border": {
+        "color": "#FFFFFF",
+        "strokeWidth": 2,
+        "showBorder": true
+      },
+      "colorbar": {
+        "show": true,
+        "position": "right",
+        "thickness": 15,
+        "font_size": "10",
+        "axis_color": "000000",
+        "num_ticks": 7,
+        "mark_len": 3,
+        "gap": 5,
+        "tick_margin": 2
+      }
+    },
+    {
+      "x": 676.4235213656169,
+      "y": 583.2096258089166,
+      "width": 428.7205387205387,
+      "height": 223.09585213840535,
+      "zoom": 100,
+      "dx": 0,
+      "dy": 0,
+      "labels": [
+        {
+          "text": "3245 D - 2022-06-15 16.05.26.ndpi (JAX)",
+          "size": 14,
+          "position": "bottom",
+          "color": "000000"
+        }
+      ],
+      "deltaT": [],
+      "rotation": 0,
+      "selected": false,
+      "pixel_size_x_symbol": "µm",
+      "pixel_size_x_unit": "MICROMETER",
+      "rotation_symbol": "°",
+      "max_export_dpi": 1000,
+      "vertical_flip": false,
+      "horizontal_flip": false,
+      "imageId": "https://storage.googleapis.com/jax-public-ngff/public/47308.zarr/0",
+      "name": "0",
+      "sizeZ": 1,
+      "theZ": 0,
+      "sizeT": 1,
+      "theT": 0,
+      "channels": [
+        {
+          "label": "Channel 0",
+          "active": true,
+          "color": "FF0000",
+          "window": {
+            "min": 0,
+            "max": 255,
+            "start": 0,
+            "end": 255
+          }
+        },
+        {
+          "label": "Channel 1",
+          "active": true,
+          "color": "00FF00",
+          "window": {
+            "min": 0,
+            "max": 255,
+            "start": 0,
+            "end": 255
+          }
+        },
+        {
+          "label": "Channel 2",
+          "active": true,
+          "color": "0000FF",
+          "window": {
+            "min": 0,
+            "max": 255,
+            "start": 0,
+            "end": 255
+          }
+        }
+      ],
+      "orig_width": 65280,
+      "orig_height": 34048,
+      "pixelsType": "uint64",
+      "zarr": {
+        "multiscales": [
+          {
+            "metadata": {
+              "method": "loci.common.image.SimpleImageScaler",
+              "version": "Bio-Formats 8.0.1"
+            },
+            "axes": [
+              {
+                "name": "t",
+                "type": "time"
+              },
+              {
+                "name": "c",
+                "type": "channel"
+              },
+              {
+                "name": "z",
+                "type": "space"
+              },
+              {
+                "unit": "micrometer",
+                "name": "y",
+                "type": "space"
+              },
+              {
+                "unit": "micrometer",
+                "name": "x",
+                "type": "space"
+              }
+            ],
+            "name": "",
+            "datasets": [
+              {
+                "path": "0",
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      1,
+                      0.4607021100156639,
+                      0.4607021100156639
+                    ],
+                    "type": "scale"
+                  }
+                ]
+              },
+              {
+                "path": "1",
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      1,
+                      0.9214042200313278,
+                      0.9214042200313278
+                    ],
+                    "type": "scale"
+                  }
+                ]
+              },
+              {
+                "path": "2",
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      1,
+                      1.8428084400626557,
+                      1.8428084400626557
+                    ],
+                    "type": "scale"
+                  }
+                ]
+              },
+              {
+                "path": "3",
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      1,
+                      3.6856168801253113,
+                      3.6856168801253113
+                    ],
+                    "type": "scale"
+                  }
+                ]
+              },
+              {
+                "path": "4",
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      1,
+                      7.371233760250623,
+                      7.371233760250623
+                    ],
+                    "type": "scale"
+                  }
+                ]
+              },
+              {
+                "path": "5",
+                "coordinateTransformations": [
+                  {
+                    "scale": [
+                      1,
+                      1,
+                      1,
+                      14.742467520501245,
+                      14.742467520501245
+                    ],
+                    "type": "scale"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "arrays": {
+          "0": {
+            "shape": [
+              1,
+              3,
+              1,
+              34048,
+              65280
+            ],
+            "dtype": "uint8"
+          },
+          "1": {
+            "shape": [
+              1,
+              3,
+              1,
+              17024,
+              32640
+            ],
+            "dtype": "uint8"
+          },
+          "2": {
+            "shape": [
+              1,
+              3,
+              1,
+              8512,
+              16320
+            ],
+            "dtype": "uint8"
+          },
+          "3": {
+            "shape": [
+              1,
+              3,
+              1,
+              4256,
+              8160
+            ],
+            "dtype": "uint8"
+          },
+          "4": {
+            "shape": [
+              1,
+              3,
+              1,
+              2128,
+              4080
+            ],
+            "dtype": "uint8"
+          },
+          "5": {
+            "shape": [
+              1,
+              3,
+              1,
+              1064,
+              2040
+            ],
+            "dtype": "uint8"
+          }
+        },
+        "zarr_version": 3,
+        "version": "0.5"
+      },
+      "pixel_size_x": 0.4607021100156639,
+      "pixel_size_y": 0.4607021100156639,
+      "pixel_size_y_unit": "MICROMETER",
+      "pixel_size_y_symbol": "µm"
+    }
+  ],
+  "paper_width": 595,
+  "paper_height": 842,
+  "page_size": "A4",
+  "page_count": "2",
+  "paper_spacing": 50,
+  "page_col_count": "2",
+  "height_mm": 297,
+  "width_mm": 210,
+  "orientation": "vertical",
+  "legend": "",
+  "legend_collapsed": true,
+  "page_color": "ffffff",
+  "figureName": "IDR & JAX sample OME-Zarr images"
+}
