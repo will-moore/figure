@@ -101,78 +101,18 @@
             ],
             "datasets": [
               {
-                "coordinateTransformations": [
-                  {
-                    "scale": [
-                      1,
-                      1,
-                      1,
-                      1,
-                      1
-                    ],
-                    "type": "scale"
-                  }
-                ],
                 "path": "0"
               },
               {
-                "coordinateTransformations": [
-                  {
-                    "scale": [
-                      1,
-                      1,
-                      1,
-                      2,
-                      2
-                    ],
-                    "type": "scale"
-                  }
-                ],
                 "path": "1"
               },
               {
-                "coordinateTransformations": [
-                  {
-                    "scale": [
-                      1,
-                      1,
-                      1,
-                      4,
-                      4
-                    ],
-                    "type": "scale"
-                  }
-                ],
                 "path": "2"
               },
               {
-                "coordinateTransformations": [
-                  {
-                    "scale": [
-                      1,
-                      1,
-                      1,
-                      8,
-                      8
-                    ],
-                    "type": "scale"
-                  }
-                ],
                 "path": "3"
               },
               {
-                "coordinateTransformations": [
-                  {
-                    "scale": [
-                      1,
-                      1,
-                      1,
-                      16,
-                      16
-                    ],
-                    "type": "scale"
-                  }
-                ],
                 "path": "4"
               }
             ],
@@ -348,129 +288,30 @@
             ],
             "datasets": [
               {
-                "coordinateTransformations": [
-                  {
-                    "scale": [
-                      1,
-                      1,
-                      1,
-                      1
-                    ],
-                    "type": "scale"
-                  }
-                ],
                 "path": "0"
               },
               {
-                "coordinateTransformations": [
-                  {
-                    "scale": [
-                      1,
-                      1,
-                      2,
-                      2
-                    ],
-                    "type": "scale"
-                  }
-                ],
                 "path": "1"
               },
               {
-                "coordinateTransformations": [
-                  {
-                    "scale": [
-                      1,
-                      1,
-                      4,
-                      4
-                    ],
-                    "type": "scale"
-                  }
-                ],
                 "path": "2"
               },
               {
-                "coordinateTransformations": [
-                  {
-                    "scale": [
-                      1,
-                      1,
-                      8,
-                      8
-                    ],
-                    "type": "scale"
-                  }
-                ],
                 "path": "3"
               },
               {
-                "coordinateTransformations": [
-                  {
-                    "scale": [
-                      1,
-                      1,
-                      16,
-                      16
-                    ],
-                    "type": "scale"
-                  }
-                ],
                 "path": "4"
               },
               {
-                "coordinateTransformations": [
-                  {
-                    "scale": [
-                      1,
-                      1,
-                      32,
-                      32
-                    ],
-                    "type": "scale"
-                  }
-                ],
                 "path": "5"
               },
               {
-                "coordinateTransformations": [
-                  {
-                    "scale": [
-                      1,
-                      1,
-                      64,
-                      64
-                    ],
-                    "type": "scale"
-                  }
-                ],
                 "path": "6"
               },
               {
-                "coordinateTransformations": [
-                  {
-                    "scale": [
-                      1,
-                      1,
-                      128,
-                      128
-                    ],
-                    "type": "scale"
-                  }
-                ],
                 "path": "7"
               },
               {
-                "coordinateTransformations": [
-                  {
-                    "scale": [
-                      1,
-                      1,
-                      256,
-                      256
-                    ],
-                    "type": "scale"
-                  }
-                ],
                 "path": "8"
               }
             ],
@@ -757,99 +598,27 @@
             ],
             "datasets": [
               {
-                "coordinateTransformations": [
-                  {
-                    "scale": [
-                      1.6,
-                      1.6
-                    ],
-                    "type": "scale"
-                  }
-                ],
                 "path": "0"
               },
               {
-                "coordinateTransformations": [
-                  {
-                    "scale": [
-                      3.2,
-                      3.2
-                    ],
-                    "type": "scale"
-                  }
-                ],
                 "path": "1"
               },
               {
-                "coordinateTransformations": [
-                  {
-                    "scale": [
-                      6.4,
-                      6.4
-                    ],
-                    "type": "scale"
-                  }
-                ],
                 "path": "2"
               },
               {
-                "coordinateTransformations": [
-                  {
-                    "scale": [
-                      12.8,
-                      12.8
-                    ],
-                    "type": "scale"
-                  }
-                ],
                 "path": "3"
               },
               {
-                "coordinateTransformations": [
-                  {
-                    "scale": [
-                      25.6,
-                      25.6
-                    ],
-                    "type": "scale"
-                  }
-                ],
                 "path": "4"
               },
               {
-                "coordinateTransformations": [
-                  {
-                    "scale": [
-                      51.2,
-                      51.2
-                    ],
-                    "type": "scale"
-                  }
-                ],
                 "path": "5"
               },
               {
-                "coordinateTransformations": [
-                  {
-                    "scale": [
-                      102.4,
-                      102.4
-                    ],
-                    "type": "scale"
-                  }
-                ],
                 "path": "6"
               },
               {
-                "coordinateTransformations": [
-                  {
-                    "scale": [
-                      204.8,
-                      204.8
-                    ],
-                    "type": "scale"
-                  }
-                ],
                 "path": "7"
               }
             ],
@@ -1058,129 +827,30 @@
             ],
             "datasets": [
               {
-                "coordinateTransformations": [
-                  {
-                    "scale": [
-                      1,
-                      1,
-                      1,
-                      1
-                    ],
-                    "type": "scale"
-                  }
-                ],
                 "path": "0"
               },
               {
-                "coordinateTransformations": [
-                  {
-                    "scale": [
-                      1,
-                      1,
-                      2,
-                      2
-                    ],
-                    "type": "scale"
-                  }
-                ],
                 "path": "1"
               },
               {
-                "coordinateTransformations": [
-                  {
-                    "scale": [
-                      1,
-                      1,
-                      4,
-                      4
-                    ],
-                    "type": "scale"
-                  }
-                ],
                 "path": "2"
               },
               {
-                "coordinateTransformations": [
-                  {
-                    "scale": [
-                      1,
-                      1,
-                      8,
-                      8
-                    ],
-                    "type": "scale"
-                  }
-                ],
                 "path": "3"
               },
               {
-                "coordinateTransformations": [
-                  {
-                    "scale": [
-                      1,
-                      1,
-                      16,
-                      16
-                    ],
-                    "type": "scale"
-                  }
-                ],
                 "path": "4"
               },
               {
-                "coordinateTransformations": [
-                  {
-                    "scale": [
-                      1,
-                      1,
-                      32,
-                      32
-                    ],
-                    "type": "scale"
-                  }
-                ],
                 "path": "5"
               },
               {
-                "coordinateTransformations": [
-                  {
-                    "scale": [
-                      1,
-                      1,
-                      64,
-                      64
-                    ],
-                    "type": "scale"
-                  }
-                ],
                 "path": "6"
               },
               {
-                "coordinateTransformations": [
-                  {
-                    "scale": [
-                      1,
-                      1,
-                      128,
-                      128
-                    ],
-                    "type": "scale"
-                  }
-                ],
                 "path": "7"
               },
               {
-                "coordinateTransformations": [
-                  {
-                    "scale": [
-                      1,
-                      1,
-                      256,
-                      256
-                    ],
-                    "type": "scale"
-                  }
-                ],
                 "path": "8"
               }
             ],
@@ -1420,129 +1090,30 @@
             ],
             "datasets": [
               {
-                "coordinateTransformations": [
-                  {
-                    "scale": [
-                      1,
-                      1,
-                      1,
-                      1
-                    ],
-                    "type": "scale"
-                  }
-                ],
                 "path": "0"
               },
               {
-                "coordinateTransformations": [
-                  {
-                    "scale": [
-                      1,
-                      1,
-                      2,
-                      2
-                    ],
-                    "type": "scale"
-                  }
-                ],
                 "path": "1"
               },
               {
-                "coordinateTransformations": [
-                  {
-                    "scale": [
-                      1,
-                      1,
-                      4,
-                      4
-                    ],
-                    "type": "scale"
-                  }
-                ],
                 "path": "2"
               },
               {
-                "coordinateTransformations": [
-                  {
-                    "scale": [
-                      1,
-                      1,
-                      8,
-                      8
-                    ],
-                    "type": "scale"
-                  }
-                ],
                 "path": "3"
               },
               {
-                "coordinateTransformations": [
-                  {
-                    "scale": [
-                      1,
-                      1,
-                      16,
-                      16
-                    ],
-                    "type": "scale"
-                  }
-                ],
                 "path": "4"
               },
               {
-                "coordinateTransformations": [
-                  {
-                    "scale": [
-                      1,
-                      1,
-                      32,
-                      32
-                    ],
-                    "type": "scale"
-                  }
-                ],
                 "path": "5"
               },
               {
-                "coordinateTransformations": [
-                  {
-                    "scale": [
-                      1,
-                      1,
-                      64,
-                      64
-                    ],
-                    "type": "scale"
-                  }
-                ],
                 "path": "6"
               },
               {
-                "coordinateTransformations": [
-                  {
-                    "scale": [
-                      1,
-                      1,
-                      128,
-                      128
-                    ],
-                    "type": "scale"
-                  }
-                ],
                 "path": "7"
               },
               {
-                "coordinateTransformations": [
-                  {
-                    "scale": [
-                      1,
-                      1,
-                      256,
-                      256
-                    ],
-                    "type": "scale"
-                  }
-                ],
                 "path": "8"
               }
             ],
@@ -1664,7 +1235,6 @@
             "zarr_format": 2
           },
           "8": {
-            
             "dtype": "<u2",
             "order": "C",
             "shape": [
@@ -1796,94 +1366,22 @@
             "name": "",
             "datasets": [
               {
-                "path": "0",
-                "coordinateTransformations": [
-                  {
-                    "scale": [
-                      1,
-                      1,
-                      1,
-                      0.4607021100156639,
-                      0.4607021100156639
-                    ],
-                    "type": "scale"
-                  }
-                ]
+                "path": "0"
               },
               {
-                "path": "1",
-                "coordinateTransformations": [
-                  {
-                    "scale": [
-                      1,
-                      1,
-                      1,
-                      0.9214042200313278,
-                      0.9214042200313278
-                    ],
-                    "type": "scale"
-                  }
-                ]
+                "path": "1"
               },
               {
-                "path": "2",
-                "coordinateTransformations": [
-                  {
-                    "scale": [
-                      1,
-                      1,
-                      1,
-                      1.8428084400626557,
-                      1.8428084400626557
-                    ],
-                    "type": "scale"
-                  }
-                ]
+                "path": "2"
               },
               {
-                "path": "3",
-                "coordinateTransformations": [
-                  {
-                    "scale": [
-                      1,
-                      1,
-                      1,
-                      3.6856168801253113,
-                      3.6856168801253113
-                    ],
-                    "type": "scale"
-                  }
-                ]
+                "path": "3"
               },
               {
-                "path": "4",
-                "coordinateTransformations": [
-                  {
-                    "scale": [
-                      1,
-                      1,
-                      1,
-                      7.371233760250623,
-                      7.371233760250623
-                    ],
-                    "type": "scale"
-                  }
-                ]
+                "path": "4"
               },
               {
-                "path": "5",
-                "coordinateTransformations": [
-                  {
-                    "scale": [
-                      1,
-                      1,
-                      1,
-                      14.742467520501245,
-                      14.742467520501245
-                    ],
-                    "type": "scale"
-                  }
-                ]
+                "path": "5"
               }
             ]
           }
@@ -2042,45 +1540,12 @@
             ],
             "datasets": [
               {
-                "coordinateTransformations": [
-                  {
-                    "scale": [
-                      1,
-                      0.5002025531914894,
-                      0.3603981534640209,
-                      0.3603981534640209
-                    ],
-                    "type": "scale"
-                  }
-                ],
                 "path": "0"
               },
               {
-                "coordinateTransformations": [
-                  {
-                    "scale": [
-                      1,
-                      0.5002025531914894,
-                      0.7207963069280418,
-                      0.7207963069280418
-                    ],
-                    "type": "scale"
-                  }
-                ],
                 "path": "1"
               },
               {
-                "coordinateTransformations": [
-                  {
-                    "scale": [
-                      1,
-                      0.5002025531914894,
-                      1.4415926138560835,
-                      1.4415926138560835
-                    ],
-                    "type": "scale"
-                  }
-                ],
                 "path": "2"
               }
             ]
@@ -2232,45 +1697,12 @@
             ],
             "datasets": [
               {
-                "coordinateTransformations": [
-                  {
-                    "scale": [
-                      1,
-                      0.5002025531914894,
-                      0.3603981534640209,
-                      0.3603981534640209
-                    ],
-                    "type": "scale"
-                  }
-                ],
                 "path": "0"
               },
               {
-                "coordinateTransformations": [
-                  {
-                    "scale": [
-                      1,
-                      0.5002025531914894,
-                      0.7207963069280418,
-                      0.7207963069280418
-                    ],
-                    "type": "scale"
-                  }
-                ],
                 "path": "1"
               },
               {
-                "coordinateTransformations": [
-                  {
-                    "scale": [
-                      1,
-                      0.5002025531914894,
-                      1.4415926138560835,
-                      1.4415926138560835
-                    ],
-                    "type": "scale"
-                  }
-                ],
                 "path": "2"
               }
             ]
@@ -2373,46 +1805,13 @@
           {
             "datasets": [
               {
-                "path": "0",
-                "coordinateTransformations": [
-                  {
-                    "type": "scale",
-                    "scale": [
-                      1,
-                      0.5002025531914894,
-                      0.3603981534640209,
-                      0.3603981534640209
-                    ]
-                  }
-                ]
+                "path": "0"
               },
               {
-                "path": "1",
-                "coordinateTransformations": [
-                  {
-                    "type": "scale",
-                    "scale": [
-                      1,
-                      0.5002025531914894,
-                      0.7207963069280418,
-                      0.7207963069280418
-                    ]
-                  }
-                ]
+                "path": "1"
               },
               {
-                "path": "2",
-                "coordinateTransformations": [
-                  {
-                    "type": "scale",
-                    "scale": [
-                      1,
-                      0.5002025531914894,
-                      1.4415926138560835,
-                      1.4415926138560835
-                    ]
-                  }
-                ]
+                "path": "2"
               }
             ],
             "name": "0",
@@ -2547,99 +1946,27 @@
             ],
             "datasets": [
               {
-                "coordinateTransformations": [
-                  {
-                    "scale": [
-                      1.6,
-                      1.6
-                    ],
-                    "type": "scale"
-                  }
-                ],
                 "path": "0"
               },
               {
-                "coordinateTransformations": [
-                  {
-                    "scale": [
-                      3.2,
-                      3.2
-                    ],
-                    "type": "scale"
-                  }
-                ],
                 "path": "1"
               },
               {
-                "coordinateTransformations": [
-                  {
-                    "scale": [
-                      6.4,
-                      6.4
-                    ],
-                    "type": "scale"
-                  }
-                ],
                 "path": "2"
               },
               {
-                "coordinateTransformations": [
-                  {
-                    "scale": [
-                      12.8,
-                      12.8
-                    ],
-                    "type": "scale"
-                  }
-                ],
                 "path": "3"
               },
               {
-                "coordinateTransformations": [
-                  {
-                    "scale": [
-                      25.6,
-                      25.6
-                    ],
-                    "type": "scale"
-                  }
-                ],
                 "path": "4"
               },
               {
-                "coordinateTransformations": [
-                  {
-                    "scale": [
-                      51.2,
-                      51.2
-                    ],
-                    "type": "scale"
-                  }
-                ],
                 "path": "5"
               },
               {
-                "coordinateTransformations": [
-                  {
-                    "scale": [
-                      102.4,
-                      102.4
-                    ],
-                    "type": "scale"
-                  }
-                ],
                 "path": "6"
               },
               {
-                "coordinateTransformations": [
-                  {
-                    "scale": [
-                      204.8,
-                      204.8
-                    ],
-                    "type": "scale"
-                  }
-                ],
                 "path": "7"
               }
             ],
