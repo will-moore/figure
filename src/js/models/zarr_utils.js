@@ -68,9 +68,14 @@ export async function loadZarrForPanel(zarrUrl) {
     zarrays[path] = {shape: ds_array.shape, dtype: ds_array.dtype};
   }
   // store under 'arrays' key
-  let zarr_attrs = {
-    multiscales: [multiscale],
-  }
+  let zarr_attrs = {};
+
+  // Only store what we need: axes and dataset paths (not coordinateTransformations etc)
+  // This keeps the "data model" simpler.
+  zarr_attrs["multiscales"] = [{
+    "axes": axes,
+    "datasets": datasets.map(ds => ({ "path": ds.path })),
+  }];
   zarr_attrs["arrays"] = zarrays;
   zarr_attrs["zarr_version"] = zarr_version;
 
