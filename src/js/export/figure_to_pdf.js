@@ -473,6 +473,11 @@ function drawScalebar(doc, panel) {
 
 function buildColorRampDataUrl(channelColor, reverseIntensity, isVertical) {
     let hex = channelColor || "";
+    const canvas = document.createElement("canvas");
+    canvas.width = isVertical ? 1 : 256;
+    canvas.height = isVertical ? 256 : 1;
+    const ctx = canvas.getContext("2d");
+
     if (channelColor.endsWith(".lut")) {
         let lutRgb = omezarr.getLutRgb(channelColor);
         let height = isVertical ? 256 : 1;
@@ -482,47 +487,29 @@ function buildColorRampDataUrl(channelColor, reverseIntensity, isVertical) {
         for (let y = 0; y < height; y++) {
             for (let x = 0; x < width; x++) {
                 let rgb = lutRgb[isVertical ? 255 - offset : offset];
-                // for red, green, blue,
                 for (let i = 0; i < 3; i++) {
-                    // rgb[i] is 0-255...
                     rgba[offset * 4 + i] = rgb[i];
                 }
                 offset += 1;
             }
         }
-
-        const canvas = document.createElement("canvas");
-        canvas.width = width;
-        canvas.height = height;
-        const context = canvas.getContext("2d");
-        if (!context) {
-            return "";
-        }
-        console.log("LUT rgba", rgba);
-        context.putImageData(new ImageData(rgba, width, height), 0, 0);
-        let dataUrl = canvas.toDataURL("image/png");
-        return dataUrl;
+        ctx.putImageData(new ImageData(rgba, width, height), 0, 0);
+    } else {
+        const rgb = hex.length === 6 ? getRgb("#" + hex) : [0, 0, 0];
+        const full = `rgb(${rgb[0]},${rgb[1]},${rgb[2]})`;
+        const black = "rgb(0,0,0)";
+        const grad = isVertical
+            ? ctx.createLinearGradient(0, 0, 0, canvas.height)
+            : ctx.createLinearGradient(0, 0, canvas.width, 0);
+        // top->bottom (vertical) or left->right (horizontal), flipped by reverseIntensity
+        const [start, end] = isVertical
+            ? reverseIntensity ? [black, full] : [full, black]
+            : reverseIntensity ? [full, black] : [black, full];
+        grad.addColorStop(0, start);
+        grad.addColorStop(1, end);
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
-    const rgb = hex.length === 6 ? getRgb("#" + hex) : [0, 0, 0];
-    const full = `rgb(${rgb[0]},${rgb[1]},${rgb[2]})`;
-    const black = "rgb(0,0,0)";
-
-    const canvas = document.createElement("canvas");
-    canvas.width = isVertical ? 2 : 256;
-    canvas.height = isVertical ? 256 : 2;
-    const ctx = canvas.getContext("2d");
-
-    const grad = isVertical
-        ? ctx.createLinearGradient(0, 0, 0, canvas.height)
-        : ctx.createLinearGradient(0, 0, canvas.width, 0);
-    // top->bottom (vertical) or left->right (horizontal), flipped by reverseIntensity
-    const [start, end] = isVertical
-        ? reverseIntensity ? [black, full] : [full, black]
-        : reverseIntensity ? [full, black] : [black, full];
-    grad.addColorStop(0, start);
-    grad.addColorStop(1, end);
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
     return canvas.toDataURL("image/png");
 }
 
