@@ -3,6 +3,11 @@ import "../scss/styles.scss";
 
 import "../css/figure.css";
 
+if (import.meta.env.VITE_APP_SERVED_BY_OMERO == "true") {
+  // e.g. figure/.env contains VITE_APP_SERVED_BY_OMERO=true
+  window.APP_SERVED_BY_OMERO = true;
+}
+
 // Import all of Bootstrap's JS
 import * as bootstrap from "bootstrap";
 
@@ -182,7 +187,7 @@ $(document).on("click", "a", function (ev) {
   // check that links are 'internal' to this app
   if (href.substring(0, BASE_WEBFIGURE_URL.length) === BASE_WEBFIGURE_URL) {
     ev.preventDefault();
-    let baseUrl = APP_SERVED_BY_OMERO ? "/" : "/omero-figure/";
+    let baseUrl = window.APP_SERVED_BY_OMERO ? "/" : "/omero-figure/";
     href = href.replace(BASE_WEBFIGURE_URL, baseUrl);
     app.navigate(href, { trigger: true });
   }

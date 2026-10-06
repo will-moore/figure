@@ -482,6 +482,9 @@ import { hideModal } from "./util";
             // when the modal dialog is shown, focus the input
             $("#addImagesModal").on("focus",
                 function() {
+                    if (window.APP_SERVED_BY_OMERO) {
+                        $('#addImagesModal input.imgIds').attr("placeholder", "OMERO Image IDs or OME-Zarr URL");
+                    }
                     setTimeout(function(){
                         $('#addImagesModal input.imgIds').trigger("focus");
                     },20);

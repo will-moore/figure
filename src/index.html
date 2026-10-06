@@ -10,7 +10,8 @@
       const dev_omeroweb_url = "http://localhost:4080/";
       // These are updated by views.py when serving this page...
       // Flag for knowing if app is served from OMERO (or standalone)
-      const APP_SERVED_BY_OMERO = false;
+      window.APP_SERVED_BY_OMERO = false;
+      const OMERO_FIGURE_VERSION = "";
       const BASE_OMEROWEB_URL = dev_omeroweb_url;
       const EXPORT_ENABLED = false;
       const SCRIPT_VERSION = "";
@@ -75,7 +76,7 @@
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">Welcome to figure</h5>
+            <h5 class="modal-title">Welcome to Figure</h5>
             <button
               type="button"
               class="btn-close"
@@ -119,7 +120,7 @@
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header" style="padding: 15px; text-align: center">
-            <h5 class="modal-title">About figure</h5>
+            <h5 class="modal-title">About Figure</h5>
             <button
               type="button"
               class="btn-close"
@@ -132,21 +133,33 @@
             style="padding: 25px 25px 35px 25px; text-align: center"
           >
             <p>
-              <strong>Version</strong>:
+              <strong>Figure Version</strong>:
               <span id="release_version"></span>
+            </p>
+            <p class="omero_only_element">
+                <strong>OMERO Figure Version</strong>:
+                <script>
+                  document.write(OMERO_FIGURE_VERSION);
+                </script>
             </p>
             <p>
               For more information, visit the
               <a
                 target="new"
-                href="https://www.openmicroscopy.org/omero/figure/"
-                >figure Home Page</a
+                href="https://github.com/ome/figure"
+                >OME Figure github Page</a
               >
+            </p>
+            <p class="omero_only_element">or the <a
+                target="new"
+                href="https://openmicroscopy.org/omero/figure/"
+                >OMERO.figure Home Page</a
+              >.
             </p>
             <p>
               &copy; 2026 University of Dundee &amp; Open
-              Microscopy Environment<br />
-              figure is distributed under AGPL.<br />
+              Microscopy Environment.<br />
+              Figure is distributed under AGPL.<br />
               See:
               <a target="new" href="http://www.openmicroscopy.org"
                 >openmicroscopy.org</a
@@ -730,10 +743,11 @@
                 class="form-group"
                 style="margin-top: 15px; margin-bottom: 0px"
               >
+                <!-- placeholder text updated when addImagesModal is shown -->
                 <input
                   type="text"
                   class="form-control imgIds"
-                  placeholder="Image IDs or URL"
+                  placeholder="OME-Zarr image URL"
                 />
               </div>
             </div>
@@ -1281,7 +1295,8 @@
 
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
       <div class="container-fluid">
-        <a class="navbar-brand text-white" href="#">OMERO</a>
+        <img src="images/ome-logomark.svg" alt="OME logo" class="navbar-brand-logo" />
+        <a class="navbar-brand text-white" href="#">Figure</a>
         <button
           class="navbar-toggler"
           type="button"
@@ -1406,12 +1421,12 @@
               </a>
               <ul class="dropdown-menu">
                 <li class="about_figure">
-                  <a class="dropdown-item" href="#">About figure</a>
+                  <a class="dropdown-item" href="#">About Figure</a>
                 </li>
                 <li>
                   <a
                     class="dropdown-item"
-                    href="https://www.openmicroscopy.org/omero/figure/"
+                    href="https://github.com/ome/figure"
                     target="new"
                   >
                     Home Page
@@ -1443,7 +1458,7 @@
             <div class="btn-group" style="margin-right: 20px">
               <button
                 type="button"
-                class="btn btn-sm btn-light add_panel"
+                class="btn btn-sm btn-light"
                 data-bs-toggle="modal"
                 data-bs-target="#addImagesModal"
                 title="Add images to figure"
@@ -1666,20 +1681,20 @@
               <!-- script warning shown in FigureView.initialise() if needed -->
               <button
                 type="button" style="display: none"
-                class="btn btn-danger btn-sm script_version_warning"
+                class="btn btn-danger btn-sm script_version_warning omero_only_element"
               >
                 <i class="bi-exclamation-circle"></i>
               </button>
               <button
                 type="button"
-                class="btn btn-success btn-sm dropdown-toggle dropdown-toggle-split"
+                class="btn btn-success btn-sm dropdown-toggle dropdown-toggle-split omero_only_element"
                 data-bs-toggle="dropdown"
                 aria-expanded="false"
               >
                 <span class="visually-hidden">Toggle Dropdown</span>
               </button>
               <ul
-                class="dropdown-menu dropdown-menu-end export_options"
+                class="dropdown-menu dropdown-menu-end export_options omero_only_element"
                 role="menu"
               >
                 <!-- NB: data-export-option attr used to label export button & handled by js on click -->
