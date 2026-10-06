@@ -363,7 +363,7 @@ export async function renderZarrToSrc(source, attrs, theZ, theT, channels, rect,
       activeChIndicies.push(index);
       colors.push(hexToRGB(ch.color));
       minMaxValues.push([ch.window.start, ch.window.end]);
-      luts.push(ch.color.endsWith(".lut") ? ch.color : undefined);
+      luts.push(ch.color.endsWith(".lut") ? omezarr.getLutRgb(ch.color) : undefined);
       inverteds.push(ch.reverseIntensity);
     }
   });
@@ -450,14 +450,14 @@ export async function renderZarrToSrc(source, attrs, theZ, theT, channels, rect,
 
   let ndChunks = await Promise.all(promises);
   let start = new Date().getTime();
-  let rbgData = omezarr.renderTo8bitArray(
+  let rbgData = omezarr.renderChunks(
     ndChunks,
     minMaxValues,
     colors,
     luts,
     inverteds
   );
-  console.log("renderTo8bitArray took", new Date().getTime() - start, "ms");
+  console.log("renderChunks took", new Date().getTime() - start, "ms");
 
   let chunk_width = ndChunks[0].shape.at(-1);
   let chunk_height = ndChunks[0].shape.at(-2);

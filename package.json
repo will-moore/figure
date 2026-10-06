@@ -42,7 +42,7 @@
     "jspdf": "^3.0.4",
     "marked": "^4.2.12",
     "mousetrap": "^1.6.5",
-    "ome-zarr.js": "^0.0.17",
+    "ome-zarr.js": "^0.0.22",
     "raphael": "^2.3.0",
     "sortablejs": "^1.15.2",
     "underscore": "^1.13.8",

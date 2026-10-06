@@ -4,6 +4,7 @@
 
 import { jsPDF } from "jspdf";
 import { marked } from "marked";
+import * as omezarr from "ome-zarr.js";
 
 const DEFAULT_OFFSET = 0;
 const POINT_RADIUS = 5;
@@ -472,7 +473,36 @@ function drawScalebar(doc, panel) {
 
 function buildColorRampDataUrl(channelColor, reverseIntensity, isVertical) {
     let hex = channelColor || "";
-    if (hex.endsWith(".lut")) hex = "FFFFFF"; // TODO: app should provide the real LUT ramp
+    if (channelColor.endsWith(".lut")) {
+        let lutRgb = omezarr.getLutRgb(channelColor);
+        let height = isVertical ? 256 : 1;
+        let width = isVertical ? 1 : 256;
+        let rgba = new Uint8ClampedArray(4 * height * width).fill(255);
+        let offset = 0;
+        for (let y = 0; y < height; y++) {
+            for (let x = 0; x < width; x++) {
+                let rgb = lutRgb[isVertical ? 255 - offset : offset];
+                // for red, green, blue,
+                for (let i = 0; i < 3; i++) {
+                    // rgb[i] is 0-255...
+                    rgba[offset * 4 + i] = rgb[i];
+                }
+                offset += 1;
+            }
+        }
+
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const context = canvas.getContext("2d");
+        if (!context) {
+            return "";
+        }
+        console.log("LUT rgba", rgba);
+        context.putImageData(new ImageData(rgba, width, height), 0, 0);
+        let dataUrl = canvas.toDataURL("image/png");
+        return dataUrl;
+    }
     const rgb = hex.length === 6 ? getRgb("#" + hex) : [0, 0, 0];
     const full = `rgb(${rgb[0]},${rgb[1]},${rgb[2]})`;
     const black = "rgb(0,0,0)";
