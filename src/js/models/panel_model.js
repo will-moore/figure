@@ -1106,6 +1106,12 @@
             let imgUrl = baseUrl + imageId + "/" + theZ + "/" + theT
                     + '/?c=' + renderString + proj + maps + region + "&m=c";
 
+            // If window.APP_SERVED_BY_OMERO is true BUT we are cross-origin (dev setup), the browser will
+            // block the canvas tainting. So we return the URL directly - jsPDF cannot be used in this case.
+            if (window.APP_SERVED_BY_OMERO && new URL(imgUrl).origin !== window.location.origin) {
+                return imgUrl;
+            }
+
             // We want to return data: src. Load the URL to canvas and render to data: URL
             return new Promise((resolve, reject) => {
                 let img = new Image();
