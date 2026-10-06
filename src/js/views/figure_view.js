@@ -315,7 +315,8 @@
                 "to OMERO": "OMERO"};
             exportOption = opts[export_opt];
 
-            if (!window.APP_SERVED_BY_OMERO) {
+            // Standalone app OR if jsPDF export is selected...
+            if (!window.APP_SERVED_BY_OMERO || export_opt === "jsPDF") {
                 this.export_pdf_in_browser();
                 return;
             }
