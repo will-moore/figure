@@ -327,11 +327,18 @@
 
         // Client-side PDF export (single page, panels + labels only for now)
         export_pdf_in_browser: function() {
+            for (let panel of this.model.panels) {
+                if (!panel.get('src')) {
+                    alert("Please wait for all panel images to load before exporting the PDF.");
+                    return;
+                }
+            }
             let $pdf_inprogress = $("#pdf_inprogress").show();
             let $create_figure_pdf = $(".export_pdf").hide();
             let $script_error = $("#script_error").hide();
 
-            this.model.figure_toJSON(true).then(figureJSON => {
+            let includeSrc = true;
+            this.model.figure_toJSON(includeSrc).then(figureJSON => {
                 return buildFigurePdf(figureJSON).then(blob => {
                     let fileName = (figureJSON.figureName || "figure") + ".pdf";
                     downloadAsFile(blob, "application/pdf", fileName);
