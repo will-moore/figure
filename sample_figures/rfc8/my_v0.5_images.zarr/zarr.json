@@ -1,0 +1,1509 @@
+{
+  "ome": {
+    "version": "0.x",
+    "type": "collection",
+    "name": "IDR_ome.zarr_v0.5_images",
+    "nodes": [
+      {
+        "type": "multiscale",
+        "name": "0_1",
+        "nodes": [
+          {
+            "name": "s0",
+            "type": "singlescale",
+            "path": {
+              "type": "zarr",
+              "path": "https://livingobjects.ebi.ac.uk/idr/zarr/v0.5/idr0033A/BR00109990_C2.zarr/0/0"
+            },
+            "attributes": {
+              "coordinateTransformations": [
+                {
+                  "type": "scale",
+                  "scale": [
+                    1,
+                    0.3,
+                    0.3
+                  ],
+                  "input": {
+                    "id": "s0"
+                  },
+                  "output": {
+                    "id": "0_1_physical"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "s1",
+            "type": "singlescale",
+            "path": {
+              "type": "zarr",
+              "path": "https://livingobjects.ebi.ac.uk/idr/zarr/v0.5/idr0033A/BR00109990_C2.zarr/0/1"
+            },
+            "attributes": {
+              "coordinateTransformations": [
+                {
+                  "type": "scale",
+                  "scale": [
+                    1,
+                    0.6,
+                    0.6
+                  ],
+                  "input": {
+                    "id": "s1"
+                  },
+                  "output": {
+                    "id": "0_1_physical"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "s2",
+            "type": "singlescale",
+            "path": {
+              "type": "zarr",
+              "path": "https://livingobjects.ebi.ac.uk/idr/zarr/v0.5/idr0033A/BR00109990_C2.zarr/0/2"
+            },
+            "attributes": {
+              "coordinateTransformations": [
+                {
+                  "type": "scale",
+                  "scale": [
+                    1,
+                    1.2,
+                    1.2
+                  ],
+                  "input": {
+                    "id": "s2"
+                  },
+                  "output": {
+                    "id": "0_1_physical"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "s3",
+            "type": "singlescale",
+            "path": {
+              "type": "zarr",
+              "path": "https://livingobjects.ebi.ac.uk/idr/zarr/v0.5/idr0033A/BR00109990_C2.zarr/0/3"
+            },
+            "attributes": {
+              "coordinateTransformations": [
+                {
+                  "type": "scale",
+                  "scale": [
+                    1,
+                    2.4,
+                    2.4
+                  ],
+                  "input": {
+                    "id": "s3"
+                  },
+                  "output": {
+                    "id": "0_1_physical"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "s4",
+            "type": "singlescale",
+            "path": {
+              "type": "zarr",
+              "path": "https://livingobjects.ebi.ac.uk/idr/zarr/v0.5/idr0033A/BR00109990_C2.zarr/0/4"
+            },
+            "attributes": {
+              "coordinateTransformations": [
+                {
+                  "type": "scale",
+                  "scale": [
+                    1,
+                    4.8,
+                    4.8
+                  ],
+                  "input": {
+                    "id": "s4"
+                  },
+                  "output": {
+                    "id": "0_1_physical"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "s5",
+            "type": "singlescale",
+            "path": {
+              "type": "zarr",
+              "path": "https://livingobjects.ebi.ac.uk/idr/zarr/v0.5/idr0033A/BR00109990_C2.zarr/0/5"
+            },
+            "attributes": {
+              "coordinateTransformations": [
+                {
+                  "type": "scale",
+                  "scale": [
+                    1,
+                    9.6,
+                    9.6
+                  ],
+                  "input": {
+                    "id": "s5"
+                  },
+                  "output": {
+                    "id": "0_1_physical"
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        "attributes": {
+          "coordinateSystems": [
+            {
+              "id": "0_1_physical",
+              "axes": [
+                {
+                  "name": "c"
+                },
+                {
+                  "name": "y",
+                  "unit": "micrometer"
+                },
+                {
+                  "name": "x",
+                  "unit": "micrometer"
+                }
+              ]
+            }
+          ],
+          "figure:panel": {
+            "x": 33.99026709884924,
+            "y": 348.31190919372835,
+            "width": 239.40235690235693,
+            "height": 178.26563015148622,
+            "zoom": 197,
+            "dx": 0,
+            "dy": 0,
+            "labels": [
+              {
+                "text": "Nuclei",
+                "size": "12",
+                "position": "topright",
+                "color": "0000FF"
+              },
+              {
+                "text": "ER",
+                "size": "12",
+                "position": "topright",
+                "color": "00FF00"
+              },
+              {
+                "text": "Nucleoli/Cytoplasmic RNA",
+                "size": "12",
+                "position": "topright",
+                "color": "FF0000"
+              }
+            ],
+            "deltaT": [],
+            "rotation": 0,
+            "selected": false,
+            "pixel_size_x_symbol": "µm",
+            "pixel_size_x_unit": "MICROMETER",
+            "rotation_symbol": "°",
+            "max_export_dpi": 1000,
+            "vertical_flip": false,
+            "horizontal_flip": false,
+            "imageId": "https://livingobjects.ebi.ac.uk/idr/zarr/v0.5/idr0033A/BR00109990_C2.zarr/0",
+            "name": "14002892",
+            "sizeZ": 1,
+            "theZ": 0,
+            "sizeT": 1,
+            "theT": 0,
+            "channels": [
+              {
+                "label": "Nuclei",
+                "active": true,
+                "color": "0000FF",
+                "window": {
+                  "min": 0,
+                  "max": 65535,
+                  "start": 457,
+                  "end": 25000
+                }
+              },
+              {
+                "label": "ER",
+                "active": true,
+                "color": "00FF00",
+                "window": {
+                  "min": 0,
+                  "max": 65535,
+                  "start": 1306,
+                  "end": 30000
+                }
+              },
+              {
+                "label": "Nucleoli/Cytoplasmic RNA",
+                "active": true,
+                "color": "FF0000",
+                "window": {
+                  "min": 0,
+                  "max": 65535,
+                  "start": 889,
+                  "end": 30000
+                }
+              },
+              {
+                "label": "Actin/Golgi/Membrane",
+                "active": false,
+                "color": "FFA500",
+                "window": {
+                  "min": 0,
+                  "max": 65535,
+                  "start": 979,
+                  "end": 65535
+                }
+              },
+              {
+                "label": "Mitochondria",
+                "active": false,
+                "color": "00FFFF",
+                "window": {
+                  "min": 0,
+                  "max": 65535,
+                  "start": 1804,
+                  "end": 65535
+                }
+              }
+            ],
+            "orig_width": 2080,
+            "orig_height": 1552,
+            "pixelsType": "uint8",
+            "pixel_size_x": 0.3,
+            "pixel_size_y": 0.3,
+            "pixel_size_y_unit": "MICROMETER",
+            "pixel_size_y_symbol": "µm"
+          }
+        }
+      },
+      {
+        "type": "multiscale",
+        "name": "ExpD_chicken_embryo_MIP.ome_2",
+        "nodes": [
+          {
+            "name": "s0",
+            "type": "singlescale",
+            "path": {
+              "type": "zarr",
+              "path": "https://livingobjects.ebi.ac.uk/idr/zarr/v0.5/idr0066/ExpD_chicken_embryo_MIP.ome.zarr/0"
+            },
+            "attributes": {
+              "coordinateTransformations": [
+                {
+                  "scale": [
+                    1.6,
+                    1.6
+                  ],
+                  "type": "scale",
+                  "input": {
+                    "id": "s0"
+                  },
+                  "output": {
+                    "id": "ExpD_chicken_embryo_MIP.ome_2_physical"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "s1",
+            "type": "singlescale",
+            "path": {
+              "type": "zarr",
+              "path": "https://livingobjects.ebi.ac.uk/idr/zarr/v0.5/idr0066/ExpD_chicken_embryo_MIP.ome.zarr/1"
+            },
+            "attributes": {
+              "coordinateTransformations": [
+                {
+                  "scale": [
+                    3.2,
+                    3.2
+                  ],
+                  "type": "scale",
+                  "input": {
+                    "id": "s1"
+                  },
+                  "output": {
+                    "id": "ExpD_chicken_embryo_MIP.ome_2_physical"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "s2",
+            "type": "singlescale",
+            "path": {
+              "type": "zarr",
+              "path": "https://livingobjects.ebi.ac.uk/idr/zarr/v0.5/idr0066/ExpD_chicken_embryo_MIP.ome.zarr/2"
+            },
+            "attributes": {
+              "coordinateTransformations": [
+                {
+                  "scale": [
+                    6.4,
+                    6.4
+                  ],
+                  "type": "scale",
+                  "input": {
+                    "id": "s2"
+                  },
+                  "output": {
+                    "id": "ExpD_chicken_embryo_MIP.ome_2_physical"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "s3",
+            "type": "singlescale",
+            "path": {
+              "type": "zarr",
+              "path": "https://livingobjects.ebi.ac.uk/idr/zarr/v0.5/idr0066/ExpD_chicken_embryo_MIP.ome.zarr/3"
+            },
+            "attributes": {
+              "coordinateTransformations": [
+                {
+                  "scale": [
+                    12.8,
+                    12.8
+                  ],
+                  "type": "scale",
+                  "input": {
+                    "id": "s3"
+                  },
+                  "output": {
+                    "id": "ExpD_chicken_embryo_MIP.ome_2_physical"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "s4",
+            "type": "singlescale",
+            "path": {
+              "type": "zarr",
+              "path": "https://livingobjects.ebi.ac.uk/idr/zarr/v0.5/idr0066/ExpD_chicken_embryo_MIP.ome.zarr/4"
+            },
+            "attributes": {
+              "coordinateTransformations": [
+                {
+                  "scale": [
+                    25.6,
+                    25.6
+                  ],
+                  "type": "scale",
+                  "input": {
+                    "id": "s4"
+                  },
+                  "output": {
+                    "id": "ExpD_chicken_embryo_MIP.ome_2_physical"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "s5",
+            "type": "singlescale",
+            "path": {
+              "type": "zarr",
+              "path": "https://livingobjects.ebi.ac.uk/idr/zarr/v0.5/idr0066/ExpD_chicken_embryo_MIP.ome.zarr/5"
+            },
+            "attributes": {
+              "coordinateTransformations": [
+                {
+                  "scale": [
+                    51.2,
+                    51.2
+                  ],
+                  "type": "scale",
+                  "input": {
+                    "id": "s5"
+                  },
+                  "output": {
+                    "id": "ExpD_chicken_embryo_MIP.ome_2_physical"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "s6",
+            "type": "singlescale",
+            "path": {
+              "type": "zarr",
+              "path": "https://livingobjects.ebi.ac.uk/idr/zarr/v0.5/idr0066/ExpD_chicken_embryo_MIP.ome.zarr/6"
+            },
+            "attributes": {
+              "coordinateTransformations": [
+                {
+                  "scale": [
+                    102.4,
+                    102.4
+                  ],
+                  "type": "scale",
+                  "input": {
+                    "id": "s6"
+                  },
+                  "output": {
+                    "id": "ExpD_chicken_embryo_MIP.ome_2_physical"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "s7",
+            "type": "singlescale",
+            "path": {
+              "type": "zarr",
+              "path": "https://livingobjects.ebi.ac.uk/idr/zarr/v0.5/idr0066/ExpD_chicken_embryo_MIP.ome.zarr/7"
+            },
+            "attributes": {
+              "coordinateTransformations": [
+                {
+                  "scale": [
+                    204.8,
+                    204.8
+                  ],
+                  "type": "scale",
+                  "input": {
+                    "id": "s7"
+                  },
+                  "output": {
+                    "id": "ExpD_chicken_embryo_MIP.ome_2_physical"
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        "attributes": {
+          "coordinateSystems": [
+            {
+              "id": "ExpD_chicken_embryo_MIP.ome_2_physical",
+              "axes": [
+                {
+                  "name": "y",
+                  "unit": "micrometer"
+                },
+                {
+                  "name": "x",
+                  "unit": "micrometer"
+                }
+              ]
+            }
+          ],
+          "figure:panel": {
+            "x": 357.77673268008976,
+            "y": 51.14084556030912,
+            "width": 162.7460749931462,
+            "height": 224.48666351010087,
+            "zoom": 100,
+            "dx": 0,
+            "dy": 0,
+            "labels": [
+              {
+                "text": "ExpD_chicken_embryo_MIP.ome.zarr",
+                "size": "14",
+                "position": "bottom",
+                "color": "000000"
+              }
+            ],
+            "deltaT": [],
+            "rotation": 0,
+            "selected": false,
+            "pixel_size_x_symbol": "µm",
+            "pixel_size_x_unit": "MICROMETER",
+            "rotation_symbol": "°",
+            "max_export_dpi": 1000,
+            "vertical_flip": false,
+            "horizontal_flip": false,
+            "imageId": "https://livingobjects.ebi.ac.uk/idr/zarr/v0.5/idr0066/ExpD_chicken_embryo_MIP.ome.zarr",
+            "name": "/",
+            "sizeZ": 1,
+            "theZ": 0,
+            "sizeT": 1,
+            "theT": 0,
+            "channels": [
+              {
+                "label": "Cy3",
+                "active": true,
+                "color": "FFFFFF",
+                "window": {
+                  "min": 0,
+                  "max": 255,
+                  "start": 0,
+                  "end": 55
+                }
+              }
+            ],
+            "orig_width": 6510,
+            "orig_height": 8978,
+            "pixelsType": "uint64",
+            "pixel_size_x": 1.6,
+            "pixel_size_y": 1.6,
+            "pixel_size_y_unit": "MICROMETER",
+            "pixel_size_y_symbol": "µm",
+            "scalebar": {
+              "show": true,
+              "length": 1,
+              "units": "MILLIMETER",
+              "position": "topright",
+              "color": "FFFF00",
+              "show_label": true,
+              "font_size": "10",
+              "height": 3,
+              "margin": 10
+            }
+          }
+        }
+      },
+      {
+        "type": "multiscale",
+        "name": "6001240_labels_3",
+        "nodes": [
+          {
+            "name": "s0",
+            "type": "singlescale",
+            "path": {
+              "type": "zarr",
+              "path": "https://livingobjects.ebi.ac.uk/idr/zarr/v0.5/idr0062A/6001240_labels.zarr/0"
+            },
+            "attributes": {
+              "coordinateTransformations": [
+                {
+                  "scale": [
+                    1,
+                    0.5002025531914894,
+                    0.3603981534640209,
+                    0.3603981534640209
+                  ],
+                  "type": "scale",
+                  "input": {
+                    "id": "s0"
+                  },
+                  "output": {
+                    "id": "6001240_labels_3_physical"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "s1",
+            "type": "singlescale",
+            "path": {
+              "type": "zarr",
+              "path": "https://livingobjects.ebi.ac.uk/idr/zarr/v0.5/idr0062A/6001240_labels.zarr/1"
+            },
+            "attributes": {
+              "coordinateTransformations": [
+                {
+                  "scale": [
+                    1,
+                    0.5002025531914894,
+                    0.7207963069280418,
+                    0.7207963069280418
+                  ],
+                  "type": "scale",
+                  "input": {
+                    "id": "s1"
+                  },
+                  "output": {
+                    "id": "6001240_labels_3_physical"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "s2",
+            "type": "singlescale",
+            "path": {
+              "type": "zarr",
+              "path": "https://livingobjects.ebi.ac.uk/idr/zarr/v0.5/idr0062A/6001240_labels.zarr/2"
+            },
+            "attributes": {
+              "coordinateTransformations": [
+                {
+                  "scale": [
+                    1,
+                    0.5002025531914894,
+                    1.4415926138560835,
+                    1.4415926138560835
+                  ],
+                  "type": "scale",
+                  "input": {
+                    "id": "s2"
+                  },
+                  "output": {
+                    "id": "6001240_labels_3_physical"
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        "attributes": {
+          "coordinateSystems": [
+            {
+              "id": "6001240_labels_3_physical",
+              "axes": [
+                {
+                  "name": "c"
+                },
+                {
+                  "name": "z",
+                  "unit": "micrometer"
+                },
+                {
+                  "name": "y",
+                  "unit": "micrometer"
+                },
+                {
+                  "name": "x",
+                  "unit": "micrometer"
+                }
+              ]
+            }
+          ],
+          "figure:panel": {
+            "x": 30.36674914199058,
+            "y": 572.1687860337302,
+            "width": 187.4295900178253,
+            "height": 189.6209386281588,
+            "zoom": 100,
+            "dx": 0,
+            "dy": 0,
+            "labels": [
+              {
+                "text": "LaminB1",
+                "size": "14",
+                "position": "topleft",
+                "color": "0000FF"
+              },
+              {
+                "text": "Dapi",
+                "size": "14",
+                "position": "topleft",
+                "color": "FFFF00"
+              }
+            ],
+            "deltaT": [],
+            "rotation": 0,
+            "selected": false,
+            "pixel_size_x_symbol": "µm",
+            "pixel_size_x_unit": "MICROMETER",
+            "rotation_symbol": "°",
+            "max_export_dpi": 1000,
+            "vertical_flip": false,
+            "horizontal_flip": false,
+            "imageId": "https://livingobjects.ebi.ac.uk/idr/zarr/v0.5/idr0062A/6001240_labels.zarr",
+            "name": "6001240_labels.zarr",
+            "sizeZ": 236,
+            "theZ": 118,
+            "sizeT": 1,
+            "theT": 0,
+            "channels": [
+              {
+                "label": "LaminB1",
+                "active": true,
+                "color": "0000FF",
+                "window": {
+                  "min": 0,
+                  "max": 65535,
+                  "start": 0,
+                  "end": 1500
+                }
+              },
+              {
+                "label": "Dapi",
+                "active": true,
+                "color": "FFFF00",
+                "window": {
+                  "min": 0,
+                  "max": 65535,
+                  "start": 0,
+                  "end": 1500
+                }
+              }
+            ],
+            "orig_width": 271,
+            "orig_height": 275,
+            "pixelsType": "uint8",
+            "pixel_size_x": 0.3603981534640209,
+            "pixel_size_y": 0.3603981534640209,
+            "pixel_size_y_unit": "MICROMETER",
+            "pixel_size_y_symbol": "µm",
+            "pixel_size_z": 0.5002025531914894,
+            "pixel_size_z_unit": "MICROMETER",
+            "pixel_size_z_symbol": "µm"
+          }
+        }
+      },
+      {
+        "type": "multiscale",
+        "name": "0_4",
+        "nodes": [
+          {
+            "name": "s0",
+            "type": "singlescale",
+            "path": {
+              "type": "zarr",
+              "path": "https://livingobjects.ebi.ac.uk/idr/zarr/v0.5/idr0062A/6001240_labels.zarr/labels/0/0"
+            },
+            "attributes": {
+              "coordinateTransformations": [
+                {
+                  "type": "scale",
+                  "scale": [
+                    1,
+                    0.5002025531914894,
+                    0.3603981534640209,
+                    0.3603981534640209
+                  ],
+                  "input": {
+                    "id": "s0"
+                  },
+                  "output": {
+                    "id": "0_4_physical"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "s1",
+            "type": "singlescale",
+            "path": {
+              "type": "zarr",
+              "path": "https://livingobjects.ebi.ac.uk/idr/zarr/v0.5/idr0062A/6001240_labels.zarr/labels/0/1"
+            },
+            "attributes": {
+              "coordinateTransformations": [
+                {
+                  "type": "scale",
+                  "scale": [
+                    1,
+                    0.5002025531914894,
+                    0.7207963069280418,
+                    0.7207963069280418
+                  ],
+                  "input": {
+                    "id": "s1"
+                  },
+                  "output": {
+                    "id": "0_4_physical"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "s2",
+            "type": "singlescale",
+            "path": {
+              "type": "zarr",
+              "path": "https://livingobjects.ebi.ac.uk/idr/zarr/v0.5/idr0062A/6001240_labels.zarr/labels/0/2"
+            },
+            "attributes": {
+              "coordinateTransformations": [
+                {
+                  "type": "scale",
+                  "scale": [
+                    1,
+                    0.5002025531914894,
+                    1.4415926138560835,
+                    1.4415926138560835
+                  ],
+                  "input": {
+                    "id": "s2"
+                  },
+                  "output": {
+                    "id": "0_4_physical"
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        "attributes": {
+          "coordinateSystems": [
+            {
+              "id": "0_4_physical",
+              "axes": [
+                {
+                  "name": "c"
+                },
+                {
+                  "name": "z",
+                  "unit": "micrometer"
+                },
+                {
+                  "name": "y",
+                  "unit": "micrometer"
+                },
+                {
+                  "name": "x",
+                  "unit": "micrometer"
+                }
+              ]
+            }
+          ],
+          "figure:panel": {
+            "x": 227.16781866070713,
+            "y": 572.1687860337302,
+            "width": 187.42959001782532,
+            "height": 189.6209386281589,
+            "zoom": 100,
+            "dx": 0,
+            "dy": 0,
+            "labels": [],
+            "deltaT": [],
+            "rotation": 0,
+            "selected": false,
+            "pixel_size_x_symbol": "µm",
+            "pixel_size_x_unit": "MICROMETER",
+            "rotation_symbol": "°",
+            "max_export_dpi": 1000,
+            "vertical_flip": false,
+            "horizontal_flip": false,
+            "imageId": "https://livingobjects.ebi.ac.uk/idr/zarr/v0.5/idr0062A/6001240_labels.zarr/labels/0",
+            "name": "0",
+            "sizeZ": 236,
+            "theZ": 118,
+            "sizeT": 1,
+            "theT": 0,
+            "channels": [
+              {
+                "label": "Ch0",
+                "active": true,
+                "color": "FF0000",
+                "window": {
+                  "min": 0,
+                  "max": 60,
+                  "start": 0,
+                  "end": 60
+                }
+              }
+            ],
+            "orig_width": 271,
+            "orig_height": 275,
+            "pixelsType": "int64",
+            "pixel_size_x": 0.3603981534640209,
+            "pixel_size_y": 0.3603981534640209,
+            "pixel_size_y_unit": "MICROMETER",
+            "pixel_size_y_symbol": "µm",
+            "pixel_size_z": 0.5002025531914894,
+            "pixel_size_z_unit": "MICROMETER",
+            "pixel_size_z_symbol": "µm"
+          }
+        }
+      },
+      {
+        "type": "multiscale",
+        "name": "IMG_1033-1112 Asterella gracilis (Mannia gracilis) stature.ome_5",
+        "nodes": [
+          {
+            "name": "s0",
+            "type": "singlescale",
+            "path": {
+              "type": "zarr",
+              "path": "https://livingobjects.ebi.ac.uk/idr/zarr/v0.5/idr0157/Asterella gracilis SWE/IMG_1033-1112 Asterella gracilis (Mannia gracilis) stature.ome.zarr/0"
+            },
+            "attributes": {
+              "coordinateTransformations": [
+                {
+                  "scale": [
+                    1,
+                    1,
+                    1,
+                    70.55555555555556,
+                    70.55555555555556
+                  ],
+                  "type": "scale",
+                  "input": {
+                    "id": "s0"
+                  },
+                  "output": {
+                    "id": "IMG_1033-1112 Asterella gracilis (Mannia gracilis) stature.ome_5_physical"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "s1",
+            "type": "singlescale",
+            "path": {
+              "type": "zarr",
+              "path": "https://livingobjects.ebi.ac.uk/idr/zarr/v0.5/idr0157/Asterella gracilis SWE/IMG_1033-1112 Asterella gracilis (Mannia gracilis) stature.ome.zarr/1"
+            },
+            "attributes": {
+              "coordinateTransformations": [
+                {
+                  "scale": [
+                    1,
+                    1,
+                    1,
+                    141.11111111111111,
+                    141.11111111111111
+                  ],
+                  "type": "scale",
+                  "input": {
+                    "id": "s1"
+                  },
+                  "output": {
+                    "id": "IMG_1033-1112 Asterella gracilis (Mannia gracilis) stature.ome_5_physical"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "s2",
+            "type": "singlescale",
+            "path": {
+              "type": "zarr",
+              "path": "https://livingobjects.ebi.ac.uk/idr/zarr/v0.5/idr0157/Asterella gracilis SWE/IMG_1033-1112 Asterella gracilis (Mannia gracilis) stature.ome.zarr/2"
+            },
+            "attributes": {
+              "coordinateTransformations": [
+                {
+                  "scale": [
+                    1,
+                    1,
+                    1,
+                    282.22222222222223,
+                    282.22222222222223
+                  ],
+                  "type": "scale",
+                  "input": {
+                    "id": "s2"
+                  },
+                  "output": {
+                    "id": "IMG_1033-1112 Asterella gracilis (Mannia gracilis) stature.ome_5_physical"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "s3",
+            "type": "singlescale",
+            "path": {
+              "type": "zarr",
+              "path": "https://livingobjects.ebi.ac.uk/idr/zarr/v0.5/idr0157/Asterella gracilis SWE/IMG_1033-1112 Asterella gracilis (Mannia gracilis) stature.ome.zarr/3"
+            },
+            "attributes": {
+              "coordinateTransformations": [
+                {
+                  "scale": [
+                    1,
+                    1,
+                    1,
+                    564.4444444444445,
+                    564.4444444444445
+                  ],
+                  "type": "scale",
+                  "input": {
+                    "id": "s3"
+                  },
+                  "output": {
+                    "id": "IMG_1033-1112 Asterella gracilis (Mannia gracilis) stature.ome_5_physical"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "s4",
+            "type": "singlescale",
+            "path": {
+              "type": "zarr",
+              "path": "https://livingobjects.ebi.ac.uk/idr/zarr/v0.5/idr0157/Asterella gracilis SWE/IMG_1033-1112 Asterella gracilis (Mannia gracilis) stature.ome.zarr/4"
+            },
+            "attributes": {
+              "coordinateTransformations": [
+                {
+                  "scale": [
+                    1,
+                    1,
+                    1,
+                    1128.888888888889,
+                    1128.888888888889
+                  ],
+                  "type": "scale",
+                  "input": {
+                    "id": "s4"
+                  },
+                  "output": {
+                    "id": "IMG_1033-1112 Asterella gracilis (Mannia gracilis) stature.ome_5_physical"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "s5",
+            "type": "singlescale",
+            "path": {
+              "type": "zarr",
+              "path": "https://livingobjects.ebi.ac.uk/idr/zarr/v0.5/idr0157/Asterella gracilis SWE/IMG_1033-1112 Asterella gracilis (Mannia gracilis) stature.ome.zarr/5"
+            },
+            "attributes": {
+              "coordinateTransformations": [
+                {
+                  "scale": [
+                    1,
+                    1,
+                    1,
+                    2257.777777777778,
+                    2257.777777777778
+                  ],
+                  "type": "scale",
+                  "input": {
+                    "id": "s5"
+                  },
+                  "output": {
+                    "id": "IMG_1033-1112 Asterella gracilis (Mannia gracilis) stature.ome_5_physical"
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        "attributes": {
+          "coordinateSystems": [
+            {
+              "id": "IMG_1033-1112 Asterella gracilis (Mannia gracilis) stature.ome_5_physical",
+              "axes": [
+                {
+                  "name": "t"
+                },
+                {
+                  "name": "c"
+                },
+                {
+                  "name": "z"
+                },
+                {
+                  "name": "y",
+                  "unit": "micrometer"
+                },
+                {
+                  "name": "x",
+                  "unit": "micrometer"
+                }
+              ]
+            }
+          ],
+          "figure:panel": {
+            "x": 15.434560962918155,
+            "y": 51.14084556030912,
+            "width": 335.563973063973,
+            "height": 224.48666351010087,
+            "zoom": 100,
+            "dx": 0,
+            "dy": 0,
+            "labels": [
+              {
+                "text": "[image]",
+                "size": 14,
+                "position": "top",
+                "color": "000000"
+              }
+            ],
+            "deltaT": [],
+            "rotation": 0,
+            "selected": false,
+            "pixel_size_x_symbol": "µm",
+            "pixel_size_x_unit": "MICROMETER",
+            "rotation_symbol": "°",
+            "max_export_dpi": 1000,
+            "vertical_flip": false,
+            "horizontal_flip": false,
+            "imageId": "https://livingobjects.ebi.ac.uk/idr/zarr/v0.5/idr0157/Asterella gracilis SWE/IMG_1033-1112 Asterella gracilis (Mannia gracilis) stature.ome.zarr",
+            "name": "IMG_1033 Asterella gracilis (Mannia gracilis) stature.TIF",
+            "sizeZ": 80,
+            "theZ": 40,
+            "sizeT": 1,
+            "theT": 0,
+            "channels": [
+              {
+                "label": "Channel 0",
+                "active": true,
+                "color": "FF0000",
+                "window": {
+                  "min": 0,
+                  "max": 65535,
+                  "start": 0,
+                  "end": 65535
+                }
+              },
+              {
+                "label": "Channel 1",
+                "active": true,
+                "color": "00FF00",
+                "window": {
+                  "min": 0,
+                  "max": 65535,
+                  "start": 0,
+                  "end": 65535
+                }
+              },
+              {
+                "label": "Channel 2",
+                "active": true,
+                "color": "0000FF",
+                "window": {
+                  "min": 0,
+                  "max": 65535,
+                  "start": 0,
+                  "end": 65535
+                }
+              }
+            ],
+            "orig_width": 8192,
+            "orig_height": 5464,
+            "pixelsType": "uint8",
+            "pixel_size_x": 70.55555555555556,
+            "pixel_size_y": 70.55555555555556,
+            "pixel_size_y_unit": "MICROMETER",
+            "pixel_size_y_symbol": "µm"
+          }
+        }
+      },
+      {
+        "type": "multiscale",
+        "name": "0_6",
+        "nodes": [
+          {
+            "name": "s0",
+            "type": "singlescale",
+            "path": {
+              "type": "zarr",
+              "path": "https://livingobjects.ebi.ac.uk/idr/zarr/v0.5/idr0033A/BR00109990_C2.zarr/0/0"
+            },
+            "attributes": {
+              "coordinateTransformations": [
+                {
+                  "type": "scale",
+                  "scale": [
+                    1,
+                    0.3,
+                    0.3
+                  ],
+                  "input": {
+                    "id": "s0"
+                  },
+                  "output": {
+                    "id": "0_6_physical"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "s1",
+            "type": "singlescale",
+            "path": {
+              "type": "zarr",
+              "path": "https://livingobjects.ebi.ac.uk/idr/zarr/v0.5/idr0033A/BR00109990_C2.zarr/0/1"
+            },
+            "attributes": {
+              "coordinateTransformations": [
+                {
+                  "type": "scale",
+                  "scale": [
+                    1,
+                    0.6,
+                    0.6
+                  ],
+                  "input": {
+                    "id": "s1"
+                  },
+                  "output": {
+                    "id": "0_6_physical"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "s2",
+            "type": "singlescale",
+            "path": {
+              "type": "zarr",
+              "path": "https://livingobjects.ebi.ac.uk/idr/zarr/v0.5/idr0033A/BR00109990_C2.zarr/0/2"
+            },
+            "attributes": {
+              "coordinateTransformations": [
+                {
+                  "type": "scale",
+                  "scale": [
+                    1,
+                    1.2,
+                    1.2
+                  ],
+                  "input": {
+                    "id": "s2"
+                  },
+                  "output": {
+                    "id": "0_6_physical"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "s3",
+            "type": "singlescale",
+            "path": {
+              "type": "zarr",
+              "path": "https://livingobjects.ebi.ac.uk/idr/zarr/v0.5/idr0033A/BR00109990_C2.zarr/0/3"
+            },
+            "attributes": {
+              "coordinateTransformations": [
+                {
+                  "type": "scale",
+                  "scale": [
+                    1,
+                    2.4,
+                    2.4
+                  ],
+                  "input": {
+                    "id": "s3"
+                  },
+                  "output": {
+                    "id": "0_6_physical"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "s4",
+            "type": "singlescale",
+            "path": {
+              "type": "zarr",
+              "path": "https://livingobjects.ebi.ac.uk/idr/zarr/v0.5/idr0033A/BR00109990_C2.zarr/0/4"
+            },
+            "attributes": {
+              "coordinateTransformations": [
+                {
+                  "type": "scale",
+                  "scale": [
+                    1,
+                    4.8,
+                    4.8
+                  ],
+                  "input": {
+                    "id": "s4"
+                  },
+                  "output": {
+                    "id": "0_6_physical"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "s5",
+            "type": "singlescale",
+            "path": {
+              "type": "zarr",
+              "path": "https://livingobjects.ebi.ac.uk/idr/zarr/v0.5/idr0033A/BR00109990_C2.zarr/0/5"
+            },
+            "attributes": {
+              "coordinateTransformations": [
+                {
+                  "type": "scale",
+                  "scale": [
+                    1,
+                    9.6,
+                    9.6
+                  ],
+                  "input": {
+                    "id": "s5"
+                  },
+                  "output": {
+                    "id": "0_6_physical"
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        "attributes": {
+          "coordinateSystems": [
+            {
+              "id": "0_6_physical",
+              "axes": [
+                {
+                  "name": "c"
+                },
+                {
+                  "name": "y",
+                  "unit": "micrometer"
+                },
+                {
+                  "name": "x",
+                  "unit": "micrometer"
+                }
+              ]
+            }
+          ],
+          "figure:panel": {
+            "x": 285.362741846324,
+            "y": 348.31190919372835,
+            "width": 239.40235690235693,
+            "height": 178.26563015148622,
+            "zoom": 197,
+            "dx": 0,
+            "dy": 0,
+            "labels": [
+              {
+                "text": "ER",
+                "size": "12",
+                "position": "topright",
+                "color": "00FF00"
+              },
+              {
+                "text": "Actin/Golgi/Membrane",
+                "size": "12",
+                "position": "topright",
+                "color": "FFA500"
+              },
+              {
+                "text": "Mitochondria",
+                "size": "12",
+                "position": "topright",
+                "color": "00FFFF"
+              }
+            ],
+            "deltaT": [],
+            "rotation": 0,
+            "selected": false,
+            "pixel_size_x_symbol": "µm",
+            "pixel_size_x_unit": "MICROMETER",
+            "rotation_symbol": "°",
+            "max_export_dpi": 1000,
+            "vertical_flip": false,
+            "horizontal_flip": false,
+            "imageId": "https://livingobjects.ebi.ac.uk/idr/zarr/v0.5/idr0033A/BR00109990_C2.zarr/0",
+            "name": "14002892",
+            "sizeZ": 1,
+            "theZ": 0,
+            "sizeT": 1,
+            "theT": 0,
+            "channels": [
+              {
+                "label": "Nuclei",
+                "active": false,
+                "color": "0000FF",
+                "window": {
+                  "min": 0,
+                  "max": 65535,
+                  "start": 457,
+                  "end": 25000
+                }
+              },
+              {
+                "label": "ER",
+                "active": true,
+                "color": "00FF00",
+                "window": {
+                  "min": 0,
+                  "max": 65535,
+                  "start": 1306,
+                  "end": 30000
+                }
+              },
+              {
+                "label": "Nucleoli/Cytoplasmic RNA",
+                "active": false,
+                "color": "FF0000",
+                "window": {
+                  "min": 0,
+                  "max": 65535,
+                  "start": 889,
+                  "end": 30000
+                }
+              },
+              {
+                "label": "Actin/Golgi/Membrane",
+                "active": true,
+                "color": "FFA500",
+                "window": {
+                  "min": 0,
+                  "max": 65535,
+                  "start": 979,
+                  "end": 65535
+                }
+              },
+              {
+                "label": "Mitochondria",
+                "active": true,
+                "color": "00FFFF",
+                "window": {
+                  "min": 0,
+                  "max": 65535,
+                  "start": 1804,
+                  "end": 65535
+                }
+              }
+            ],
+            "orig_width": 2080,
+            "orig_height": 1552,
+            "pixelsType": "uint8",
+            "pixel_size_x": 0.3,
+            "pixel_size_y": 0.3,
+            "pixel_size_y_unit": "MICROMETER",
+            "pixel_size_y_symbol": "µm"
+          }
+        }
+      }
+    ],
+    "attributes": {
+      "figure:figure": {
+        "version": 9,
+        "paper_width": 595,
+        "paper_height": 842,
+        "page_size": "A4",
+        "page_count": 1,
+        "paper_spacing": 50,
+        "page_col_count": 1,
+        "height_mm": 297,
+        "width_mm": 210,
+        "orientation": "vertical",
+        "legend": "",
+        "legend_collapsed": true,
+        "page_color": "FFFFFF",
+        "figureName": "IDR_ome.zarr_v0.5_images"
+      }
+    }
+  }
+}
