@@ -237,7 +237,6 @@ export class LabelSuggestions {
         this.$menu = $container.find('.label-suggestions');
         this.$input = $container.find('.label-text');
         this.$suggestions_toggle = $container.find('.suggestions-toggle');
-        this.prevent_blur_hide = false;
         this.suggestions_enabled = true;
         // Cached state about the current input cursor/segment to avoid
         // re-parsing when handling suggestion clicks.
@@ -677,19 +676,12 @@ export class LabelSuggestions {
      */
     handle_suggestion_click(value, extra_option, default_value) {
         if (preformatted_label_options.has(value)) {
-            this.$input.val(value);
+            this.$input.val(value).trigger('input').focus();
             return;
         }
 
         var current = this.$input.val();
         var cursor_pos = this.$input[0].selectionStart || 0;
-
-        // Prevent blur from hiding the menu
-        this.prevent_blur_hide = true;
-        var self = this;
-        setTimeout(function() {
-            self.prevent_blur_hide = false;
-        }, 200);
 
         // Reuse cached cursor state if it matches the current input/caret,
         // otherwise fall back to recomputing the segment/bracket info from get_current_segment.
@@ -734,18 +726,10 @@ export class LabelSuggestions {
     /**
      * Hide the suggestions dropdown menu
      *
-     * Called when the input loses focus (blur event). Respects the prevent_blur_hide
-     * flag to avoid hiding the menu during suggestion clicks, which would prevent
-     * the click from being registered.
-     *
-     * Side effects:
-     *   - Removes 'show' class from menu if not prevented
-     *   - Does nothing if prevent_blur_hide is true
+     * Called when the input loses focus (blur event). Clicking a suggestion does
+     * not blur the input, because mousedown on the menu is default-prevented.
      */
     hide() {
-        if (this.prevent_blur_hide) {
-            return;
-        }
         this.$menu.removeClass('show');
     }
 }
