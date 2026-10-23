@@ -44,6 +44,11 @@ In the OME figure app, `File > Open` dialog, paste in this URL and click `Open`.
 The app will load the figure and the URL will show `?file=[YOUR URL]`.
 You can share the complete figure URL, for example https://ome.github.io/figure/?file=https://gist.githubusercontent.com/will-moore/75a7f0de5be0f7b4202d5f0229cadcc9/raw/ngff_images_figure.json 
 
+## figure JSON format
+
+The format of the JSON data that is used to store OME figure files is described in the [OMERO.figure docs](https://github.com/ome/omero-figure/blob/master/docs/figure_file_format.rst#json-format). To date, this has been designed to serve as an internal
+figure storage format, rather than a formal specification for external tools to write. The figure app is designed to support
+all past versions of the format and current versions will continue to be supported in the future.
 
 # Development
 
