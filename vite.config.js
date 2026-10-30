@@ -5,6 +5,7 @@ const path = require('path')
 
 let config = {
   root: path.resolve(__dirname, 'src'),
+  envDir: path.resolve(__dirname, 'src'),
   plugins: [injectHTML()],
   resolve: {
     alias: {

@@ -25,7 +25,11 @@ The workflow for creating figures can be summarised as follows:
  - Export your figure to PDF or TIFF. The python script will read the OME-Zarr images from the specified URLs and generate a figure as a PDF or TIFF, depending on the chosen file extension:
 
 ```
-    $ pip install ome-figure
+    # first create a python environment, e.g. with conda:
+    $ conda create --name ome_figure python=3.12
+    $ conda activate ome_figure
+
+    $ pip install git+https://github.com/ome/figure.git
 
     # export to PDF
     $ figure_export downloaded_figure.json my_figure.pdf
@@ -64,6 +68,15 @@ by a global variable `APP_SERVED_BY_OMERO` which is `false` in the standalone ap
 
 This is used to determine the behaviour of various features such as File Open/Save
 and the figure Export dialog.
+
+You if you create a `.env.local` file at `figure/src/.env.local` with the line:
+
+```
+    VITE_APP_SERVED_BY_OMERO=true
+```
+
+then the app will set `window.APP_SERVED_BY_OMERO` to `true`, allowing you to
+load images and figures from the `BASE_OMEROWEB_URL` which is `localhost:4080`.
 
 If you are editing the Shape-Editor code, you can view the test page at
 http://localhost:8080/shapeEditorTest.html

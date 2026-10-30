@@ -626,7 +626,7 @@ export const CropModalView = Backbone.View.extend({
                 'width': boundingBox.width
             });
 
-            this.$cropImg.css(css).attr('src', src);
+            this.$cropImg.css(css);
 
             // Center the scroll position
             var $viewer = $("#cropViewer");

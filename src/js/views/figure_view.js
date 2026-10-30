@@ -114,12 +114,12 @@
                 $("button.export_pdf").removeAttr("disabled");
             }
 
-            // if we're NOT served by OMERO, hide elements such as Delete and Chgrp menu-items
-            if (!APP_SERVED_BY_OMERO) {
-                $(".omero_only_element").hide();
+            // if we're NOT served by OMERO, remove elements such as Delete and Chgrp menu-items
+            if (!window.APP_SERVED_BY_OMERO) {
+                $(".omero_only_element").remove();
             } else {
-                // otherwise hide elements with stand-alone specific content
-                $(".standalone_only_element").hide();
+                // otherwise remove elements with stand-alone specific content
+                $(".standalone_only_element").remove();
             }
 
             // respond to zoom changes
@@ -148,7 +148,6 @@
             "click .script_version_warning": "script_version_warning",
             "click .upload_omero_script": "upload_omero_script",
             "click .export_options li": "export_options",
-            "click .add_panel": "addPanel",
             "click .reload_metadata": "reloadMetadata",
             "click .delete_panel": "deleteSelectedPanels",
             "click .copy": "copy_selected_panels",
@@ -315,14 +314,14 @@
                 "to OMERO": "OMERO"};
             exportOption = opts[export_opt];
 
-            if (!APP_SERVED_BY_OMERO) {
+            if (!window.APP_SERVED_BY_OMERO) {
                 let title = "Figure Export Options";
                 let buttons = ["OK"];
                 let message = `The standalone app doesn't support export to PDF or TIFF.
                 <p>You can download the figure via 'Save' and run the figure export script on your local machine.</p>
                 <p>For more details, see the
                 <a href="https://github.com/ome/omero-figure?tab=readme-ov-file#run-figure-export-locally" target="_blank">
-                figure export instructions</a>.
+                https://github.com/ome/figure/#usage</a>.
                 </p>`;
 
                 figureConfirmDialog(title, message, buttons);
@@ -547,7 +546,7 @@
             var self = this;
             var callback = function() {
                 // Opening modal will trigger fetch of files
-                if (APP_SERVED_BY_OMERO) {
+                if (window.APP_SERVED_BY_OMERO) {
                     self.fileListViewModal.modal.show();
                 } else {
                     // Open local file or URL
@@ -590,7 +589,7 @@
 
             var fileId = this.model.get('fileId'),
                 canEdit = this.model.get('canEdit');
-            if (fileId && canEdit && APP_SERVED_BY_OMERO) {
+            if (fileId && canEdit && window.APP_SERVED_BY_OMERO) {
                 // Prevent double-click
                 this.$saveBtn.attr('disabled', 'disabled');
                 // Save
@@ -636,7 +635,7 @@
             if (figureName) {
                 options.figureName = figureName;
 
-                if (!APP_SERVED_BY_OMERO) {
+                if (!window.APP_SERVED_BY_OMERO) {
                     this.model.set('figureName', figureName);
                     this.model.save_to_download(options);
                     return;

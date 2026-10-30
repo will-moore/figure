@@ -75,7 +75,7 @@ var LutPickerView = Backbone.View.extend({
     },
 
     loadLuts: async function(force_reload = false) {
-        if (!APP_SERVED_BY_OMERO) {
+        if (!window.APP_SERVED_BY_OMERO) {
             $(":root").css({
                 "--pngHeight": "100%"
             });
@@ -125,7 +125,7 @@ var LutPickerView = Backbone.View.extend({
     },
 
     getLutBackgroundPosition: function(lutName) {
-        if (!APP_SERVED_BY_OMERO) {
+        if (!window.APP_SERVED_BY_OMERO) {
             return '0px 0px';
         }
         var lutIndex = this.lut_names.indexOf(lutName);
