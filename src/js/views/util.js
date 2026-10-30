@@ -425,3 +425,20 @@ export function normalizeZProjectionBounds(z_start, z_end, z_projection, sizeZ) 
     }
     return result;
 }
+
+// Simple CSV column reader that tries multiple column names in order
+export async function readCsvColumn(url, ...columnNames) {
+    const response = await fetch(url);
+    const text = await response.text();
+    const rows = text.split('\n').map(row => row.split(','));
+    const header = rows[0];
+    let colIndex = -1;
+    for (const columnName of columnNames) {
+        colIndex = header.indexOf(columnName);
+        if (colIndex !== -1) break;
+    }
+    if (colIndex === -1) {
+        return [];
+    }
+    return rows.slice(1).map(row => row[colIndex]);
+}

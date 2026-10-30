@@ -11,6 +11,7 @@ import paper_setup_modal_template from '../../templates/modal_dialogs/paper_setu
 import FigureModel from "../models/figure_model";
 import FigureColorPicker from "../views/colorpicker";
 import { hideModal } from "./util";
+import { readCsvColumn } from "./util";
 
     export const DpiModalView = Backbone.View.extend({
 
@@ -526,8 +527,34 @@ import { hideModal } from "./util";
             // test for E.g: http://localhost:8000/webclient/?show=image-25|image-26|image-27
             if (idInput.indexOf('?show') > 10) {
                 iIds = idInput.split('image-').slice(1);
+            } else if (idInput.startsWith('http')) {
+                // Handle Google Sheets CSV export URL conversion...
+                // https://docs.google.com/spreadsheets/d/kf...XSk/export?format=csv
+                if (idInput.startsWith('https://docs.google.com/spreadsheets/')) {
+                    let sheetUrl = idInput.split("edit")[0];
+                    idInput = sheetUrl + 'export?format=csv';
+                }
+                // Handle google sheets OR any CSV URL
+                if (idInput.endsWith("csv")) {
+                    // Try to read "uri" column OR "File Path" column from CSV
+                    readCsvColumn(idInput, "uri", "File Path").then(csvValues => {
+                        if (!csvValues || csvValues.length === 0) {
+                            alert("No values found in CSV for columns 'uri' or 'File Path'");
+                            return;
+                        } else if (csvValues.length > 20) {
+                            alert("Only the first 20 IDs will be used from CSV");
+                        }
+                        iIds = csvValues.slice(0, 20);
+                        this.model.addImages(iIds);
+                    });
+                    return; // Wait for CSV to be read before adding images
+                }
+                // Handle URL...
+                if (idInput.includes(".zarr")) {
+                    iIds = [idInput];
+                }
             } else {
-                // iIds could be Zarr URLs - NB: this will fail if a Zarr URL contains ','
+                // Just split by commas for non-URL input
                 iIds = idInput.split(',');
             }
 
