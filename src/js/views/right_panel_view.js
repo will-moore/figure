@@ -510,6 +510,8 @@
             "click .new-label-form .label-text": "handle_label_input",
             "keyup .new-label-form .label-text": "handle_label_input",
             "blur .new-label-form .label-text": "handle_label_blur",
+            // Keep focus (and caret) in the text input when pressing a suggestion
+            "mousedown .label-suggestions": function(event) { event.preventDefault(); },
             "click .label-suggestions .dropdown-item": "handle_label_suggestion_click",
             "click .markdown-info": "markdownInfo",
         },
@@ -527,10 +529,7 @@
 
         handle_label_blur: function() {
             if (this.labelSuggestions) {
-                var self = this;
-                setTimeout(function(){
-                    self.labelSuggestions.hide();
-                }, 150);
+                this.labelSuggestions.hide();
             }
         },
 
