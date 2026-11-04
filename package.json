@@ -42,6 +42,7 @@
     "marked": "^4.2.12",
     "mousetrap": "^1.6.5",
     "ome-zarr.js": "^0.0.17",
+    "papaparse": "^5.7.0",
     "raphael": "^2.3.0",
     "sortablejs": "^1.15.2",
     "underscore": "^1.13.8",
