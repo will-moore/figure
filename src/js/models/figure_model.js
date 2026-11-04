@@ -9,6 +9,7 @@
         downloadAsFile,
         figureConfirmDialog,
         getJsonWithCredentials,
+        readCsvColumn,
         saveFigureToStorage,
         normalizeZProjectionBounds} from "../views/util";
     import { loadZarrForPanel, figure_to_ome_zarr_collection } from "./zarr_utils";
@@ -384,6 +385,26 @@
 
         load_from_url: function(url) {
             // load content from a URL
+            if (url.startsWith('https://docs.google.com/spreadsheets/')) {
+                let sheetUrl = url.split("edit")[0];
+                url = sheetUrl + 'export?format=csv';
+            }
+            // Handle google sheets OR any CSV URL
+            if (url.endsWith("csv")) {
+                // Try to read "uri" column OR "File Path" column from CSV
+                readCsvColumn(url, "uri", "File Path").then(csvValues => {
+                    if (!csvValues || csvValues.length === 0) {
+                        alert("No values found in CSV for columns 'uri' or 'File Path'");
+                        return;
+                    } else if (csvValues.length > 100) {
+                        alert("Only the first 100 IDs will be used from CSV");
+                    }
+                    const iIds = csvValues.slice(0, 100);
+                    this.addImages(iIds);
+                });
+                return; // Wait for CSV to be read before adding images
+            }
+
             console.log("load_from_url...", url);
             $.getJSON(url, function(data){
                 this.load_from_JSON(data);
