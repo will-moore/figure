@@ -9,7 +9,7 @@
         downloadAsFile,
         figureConfirmDialog,
         getJsonWithCredentials,
-        readCsvColumn,
+        readCsvColumnWithGrid,
         saveFigureToStorage,
         normalizeZProjectionBounds} from "../views/util";
     import { loadZarrForPanel, figure_to_ome_zarr_collection } from "./zarr_utils";
@@ -392,7 +392,7 @@
             // Handle google sheets OR any CSV URL
             if (url.endsWith("csv")) {
                 // Try to read "uri" column OR "File Path" column from CSV
-                readCsvColumn(url, "uri", "File Path").then(csvValues => {
+                readCsvColumnWithGrid(url, "uri", "File Path").then(({values: csvValues, gridPositions}) => {
                     if (!csvValues || csvValues.length === 0) {
                         alert("No values found in CSV for columns 'uri' or 'File Path'");
                         return;
@@ -400,7 +400,7 @@
                         alert("Only the first 100 IDs will be used from CSV");
                     }
                     const iIds = csvValues.slice(0, 100);
-                    this.addImages(iIds);
+                    this.addImages(iIds, gridPositions && gridPositions.slice(0, 100));
                 });
                 return; // Wait for CSV to be read before adding images
             }
@@ -570,8 +570,15 @@
             }
         },
 
-        addImages: function(iIds) {
+        // gridPositions (optional): array of {col, row}, one per image, to place
+        // images at specific grid locations instead of in the order added.
+        addImages: function(iIds, gridPositions) {
             this.clearSelected();
+
+            if (gridPositions && (gridPositions.length !== iIds.length || gridPositions.some(p => !p))) {
+                alert("Invalid 'grid_position' values (expected e.g. \"(0,1)\" as column,row). Images will be added in order.");
+                gridPositions = null;
+            }
 
             // approx work out number of columns to layout new panels
             var paper_width = this.get('paper_width'),
@@ -587,6 +594,15 @@
                           'colCount': colCount,
                           'rowCount': rowCount,
                           'paper_width': paper_width};
+
+            if (gridPositions) {
+                // grid size is needed up front to work out the layout and scale
+                colCount = Math.max(...gridPositions.map(p => p.col)) + 1;
+                rowCount = Math.max(...gridPositions.map(p => p.row)) + 1;
+                coords.colCount = colCount;
+                coords.rowCount = rowCount;
+                coords.gridPositions = gridPositions;
+            }
 
             // This loop sets up a load of async imports.
             // The first one to return will set all the coords
@@ -629,6 +645,10 @@
             // calculate panel coordinates from index...
             var row = parseInt(index / coords.colCount, 10);
             var col = index % coords.colCount;
+            if (coords.gridPositions) {
+                row = coords.gridPositions[index].row;
+                col = coords.gridPositions[index].col;
+            }
             var panelX = coords.px + ((panel_json.orig_width + coords.spacer) * coords.scale * col);
             var panelY = coords.py + ((panel_json.orig_height + coords.spacer) * coords.scale * row);
             
