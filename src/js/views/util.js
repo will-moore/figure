@@ -398,9 +398,16 @@ export function normalizeZProjectionBounds(z_start, z_end, z_projection, sizeZ) 
 
 import Papa from 'papaparse';
 
-// Fetch a CSV and return the values of the first matching column
-// (column names are tried in order). Returns [] if none match.
-export async function readCsvColumn(url, ...columnNames) {
+// Parse a grid_position value like "(1,2)" into {col, row}. Returns null if invalid.
+export function parseGridPosition(value) {
+    const match = /^\s*\(?\s*(\d+)\s*,\s*(\d+)\s*\)?\s*$/.exec(value || "");
+    return match ? {col: parseInt(match[1], 10), row: parseInt(match[2], 10)} : null;
+}
+
+// Fetch a CSV and return {values, gridPositions}. values come from the first matching
+// column (column names are tried in order). gridPositions is an array of {col, row}
+// (same length as values) if the CSV has a "grid_position" column, otherwise null.
+export async function readCsvColumnWithGrid(url, ...columnNames) {
     const response = await fetch(url);
     if (!response.ok) {
         throw new Error(`Failed to fetch CSV: ${response.status}`);
@@ -409,7 +416,18 @@ export async function readCsvColumn(url, ...columnNames) {
     const { data, meta } = Papa.parse(text, { header: true, skipEmptyLines: true });
     const columnName = columnNames.find(name => meta.fields.includes(name));
     if (!columnName) {
-        return [];
+        return {values: [], gridPositions: null};
     }
-    return data.map(row => row[columnName]).filter(value => value);
+    const rows = data.filter(row => row[columnName]);
+    const values = rows.map(row => row[columnName]);
+    let gridPositions = null;
+    if (meta.fields.includes("grid_position")) {
+        gridPositions = rows.map(row => parseGridPosition(row.grid_position));
+    }
+    return {values, gridPositions};
+}
+
+// Fetch a CSV and return the values of the first matching column. Returns [] if none match.
+export async function readCsvColumn(url, ...columnNames) {
+    return (await readCsvColumnWithGrid(url, ...columnNames)).values;
 }

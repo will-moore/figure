@@ -11,7 +11,7 @@ import paper_setup_modal_template from '../../templates/modal_dialogs/paper_setu
 import FigureModel from "../models/figure_model";
 import FigureColorPicker from "../views/colorpicker";
 import { hideModal } from "./util";
-import { readCsvColumn } from "./util";
+import { readCsvColumnWithGrid } from "./util";
 
     export const DpiModalView = Backbone.View.extend({
 
@@ -540,7 +540,7 @@ import { readCsvColumn } from "./util";
                 // Handle google sheets OR any CSV URL
                 if (idInput.endsWith("csv")) {
                     // Try to read "uri" column OR "File Path" column from CSV
-                    readCsvColumn(idInput, "uri", "File Path").then(csvValues => {
+                    readCsvColumnWithGrid(idInput, "uri", "File Path").then(({values: csvValues, gridPositions}) => {
                         if (!csvValues || csvValues.length === 0) {
                             alert("No values found in CSV for columns 'uri' or 'File Path'");
                             return;
@@ -548,7 +548,7 @@ import { readCsvColumn } from "./util";
                             alert("Only the first 20 IDs will be used from CSV");
                         }
                         iIds = csvValues.slice(0, 20);
-                        this.model.addImages(iIds);
+                        this.model.addImages(iIds, gridPositions && gridPositions.slice(0, 20));
                     });
                     return; // Wait for CSV to be read before adding images
                 }
