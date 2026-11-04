@@ -426,19 +426,20 @@ export function normalizeZProjectionBounds(z_start, z_end, z_projection, sizeZ) 
     return result;
 }
 
-// Simple CSV column reader that tries multiple column names in order
+import Papa from 'papaparse';
+
+// Fetch a CSV and return the values of the first matching column
+// (column names are tried in order). Returns [] if none match.
 export async function readCsvColumn(url, ...columnNames) {
     const response = await fetch(url);
-    const text = await response.text();
-    const rows = text.split('\n').map(row => row.split(','));
-    const header = rows[0];
-    let colIndex = -1;
-    for (const columnName of columnNames) {
-        colIndex = header.indexOf(columnName);
-        if (colIndex !== -1) break;
+    if (!response.ok) {
+        throw new Error(`Failed to fetch CSV: ${response.status}`);
     }
-    if (colIndex === -1) {
+    const text = await response.text();
+    const { data, meta } = Papa.parse(text, { header: true, skipEmptyLines: true });
+    const columnName = columnNames.find(name => meta.fields.includes(name));
+    if (!columnName) {
         return [];
     }
-    return rows.slice(1).map(row => row[colIndex]);
+    return data.map(row => row[columnName]).filter(value => value);
 }
