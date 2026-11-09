@@ -80,7 +80,8 @@ set up GitHub pages to deploy from the root of your `gh-pages` branch.
 
 # License
 
-figure is currently licensed under the AGPL.
+Distributed under the terms of the [BSD license](https://opensource.org/licenses/BSD-2-Clause),
+"figure" is free and open source software.
 
 # Copyright
 
