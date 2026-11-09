@@ -22,21 +22,8 @@ The workflow for creating figures can be summarised as follows:
 
  - You can open this figure to make further edits with the figure app `File > Open` dialog, and choosing your locally saved file.
 
- - Export your figure to PDF or TIFF. The python script will read the OME-Zarr images from the specified URLs and generate a figure as a PDF or TIFF, depending on the chosen file extension:
+ - Export your figure to PDF or TIFF. See the OMERO.figure instructions [Run Figure export locally](https://github.com/ome/omero-figure/#run-figure-export-locally) if you wish to export your local `downloaded_figure.json` to PDF or TIFF.
 
-```
-    # first create a python environment, e.g. with conda:
-    $ conda create --name ome_figure python=3.12
-    $ conda activate ome_figure
-
-    $ pip install git+https://github.com/ome/figure.git
-
-    # export to PDF
-    $ figure_export downloaded_figure.json my_figure.pdf
-    
-    # or export to TIFF
-    $ figure_export downloaded_figure.json my_figure.tiff
-```
 
 ## Sharing your figures publicly
 
