@@ -1107,8 +1107,11 @@
                     + '/?c=' + renderString + proj + maps + region + "&m=c";
 
             // If window.APP_SERVED_BY_OMERO is true BUT we are cross-origin (dev setup), the browser will
-            // block the canvas tainting. So we return the URL directly - jsPDF cannot be used in this case.
-            if (window.APP_SERVED_BY_OMERO && new URL(imgUrl).origin !== window.location.origin) {
+            // block the canvas tainting with canvas.toDataURL() below.
+            // So instead we return the image URL directly (not data:src - jsPDF cannot be used in this case).
+            // NB: in production, imgUrl is relative - can't do new URL(imgUrl), so this check only applies in dev.
+            if (window.APP_SERVED_BY_OMERO && imgUrl.startsWith("http") &&
+                new URL(imgUrl).origin !== window.location.origin) {
                 return imgUrl;
             }
 
