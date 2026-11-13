@@ -12,7 +12,7 @@ The app is also packaged as an OMERO.web plugin: [omero-figure](https://github.c
 
 The workflow for creating figures can be summarised as follows:
 
- - Your OME-Zarr images need to be hosted at a URL that OME figure can access. If your images are on your local machine, we suggest that you use [FileGlancer](https://github.com/JaneliaSciComp/fileglancer) to serve them. You can use the `Copy link` button to get a URL that can be used in OME figure.
+ - Your OME-Zarr images need to be hosted at a URL that OME figure can access. If your images are on your local machine, we suggest that you use [FileGlancer](https://github.com/JaneliaSciComp/fileglancer) to serve them. You can use the `Copy` button to get a URL that can be used in OME figure.
 
  - Create a new figure at [ome.github.io/figure/](https://ome.github.io/figure/), then `Add Images` and paste in the URL to your OME-Zarr image(s).
 
@@ -29,7 +29,7 @@ The workflow for creating figures can be summarised as follows:
 
 If you wish to share your figures publicly (and your OME-Zarr images are already public) then you need to host your `downloaded_figure.json` somewhere.
 For GitHub users, you can use [gist.github.com](https://gist.github.com/) to create
-a public gist, with a chosen filename. Once created, e.g. [ngff_images_figure.json](https://gist.github.com/will-moore/75a7f0de5be0f7b4202d5f0229cadcc9) you can click the `Raw` link to see the original file, then `Copy` this URL.
+a public gist, with a chosen filename. Once created, e.g. [ngff_images_figure.json](https://gist.github.com/will-moore/75a7f0de5be0f7b4202d5f0229cadcc9) you can click the `Raw` link to see the original file, then copy this URL from the browser.
 
 In the OME figure app, `File > Open` dialog, paste in this URL and click `Open`.
 The app will load the figure and the URL will show `?file=[YOUR URL]`.
