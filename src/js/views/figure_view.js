@@ -97,7 +97,7 @@
                 if (EXPORT_ENABLED) {
                     $("button.export_pdf").removeAttr("disabled");
                     // check script version
-                    if (SCRIPT_VERSION != RELEASE_VERSION) {
+                    if (SCRIPT_VERSION != OMERO_FIGURE_VERSION) {
                         $(".script_version_warning").show()
                         .attr("title", "Script Version Warning");
                     }
@@ -253,7 +253,7 @@
 
         script_version_warning: function(event) {
             // Show the script manager (warning/upload) dialog
-            document.getElementById("figure_app_version").innerHTML = RELEASE_VERSION;
+            document.getElementById("figure_app_version").innerHTML = OMERO_FIGURE_VERSION;
             let script_version = SCRIPT_VERSION.length > 0 ? SCRIPT_VERSION : "unknown";
             document.getElementById("export_script_version").innerHTML = script_version;
 
