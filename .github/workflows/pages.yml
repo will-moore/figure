@@ -16,10 +16,12 @@ jobs:
           persist-credentials: false
 
       - name: Install and Build 🔧
+        if: startsWith(github.ref, 'refs/tags')
         run: |
           npm install
           npm run ghpages
       - name: Deploy 🚀
+        if: startsWith(github.ref, 'refs/tags')
         uses: JamesIves/github-pages-deploy-action@v4.7.2
         with:
           TOKEN: ${{ secrets.GITHUB_TOKEN }}
