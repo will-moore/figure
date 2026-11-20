@@ -1,7 +1,7 @@
 {
   "name": "ome-figure",
   "//": "version required to build but not used. See src/.env for version",
-  "version": "0.1.1.dev0",
+  "version": "0.1.1.rc0",
   "description": "OME figure creation app",
   "main": "index.js",
   "scripts": {
